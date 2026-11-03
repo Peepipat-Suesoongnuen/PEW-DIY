@@ -227,10 +227,12 @@ Commit · Push · Rebase · Reset · Cherry-pick · Force Push (ห้ามโ�
 - หากต้องทำนอกขอบเขตที่อนุมัติ → ขออนุมัติใหม่
 
 ### 11.3 Branch and Commit Conventions (ตาม workflow รายวิชา)
-- Branch: `feature/<scope>` หรือ `fix/<scope>` จาก **sprint staging branch** ของ sprint ปัจจุบัน
+- **Branch Strategy (ทีมยืนยัน):** ห้าม Push ขึ้น `main` โดยตรง — ทุก Branch ต้องสร้างจาก `sprint/1-staging` และรวมเข้า `main` ผ่าน `sprint/1-staging` เท่านั้น (ลำดับ: `feature/*`/`fix/*`/`docs/*` → `sprint/1-staging` → `main`)
+- Branch: `feature/<scope>`, `fix/<scope>` หรือ `docs/<issue#>-<scope>` จาก **`sprint/1-staging`** ของ sprint ปัจจุบัน
 - Commit message: ระบุงาน/Issue ที่เกี่ยวข้อง กระชับ อธิบาย "ทำไม" ไม่ใช่แค่ "อะไร"
-- ลำดับ: Issue → feature/fix branch → PR เข้า sprint staging → review → integrate → release PR เข้า `main` → tag release
+- ลำดับ: Issue → branch จาก sprint staging → PR เข้า sprint staging → review → integrate → release PR เข้า `main` (ผ่าน staging เท่านั้น) → tag release
 - เก็บหลักฐาน local test results ผูกกับ commit ที่ส่ง (CI บังคับใน Lab 5)
+- **Baseline Exception:** commits แรก 2 รายการบน `main` (`.gitignore` + `README.md`) สร้างโดยทีมก่อนกฎนี้มีผล (bootstrap) — ตั้งแต่นี้ไปห้าม direct push ตามข้อบน
 
 ## 12. Pull Request and Peer Review Rules
 
