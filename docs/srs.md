@@ -142,9 +142,9 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | BR-06 | Only a **Custodian** may modify the catalog. | A Borrower calling catalog-write endpoints is rejected server-side. | Sprint 1 (enforcement) |
 | BR-07 | The **due date** of a loan is assigned automatically at checkout as **checkout date + 7 calendar days** (team decision). | A created loan's due date equals checkout date + 7 days. | Sprint 1 |
 | BR-08 | A loan is **Overdue** when the current date is later than its due date and no return has been recorded. | A loan past due date appears in the overdue list; a returned loan does not. | Sprint 2 |
-| BR-09 | Return closes exactly one Active Loan and increases Available Quantity by the returned quantity; quantity returned must be positive and not exceed the quantity held. | After return, availability is restored; returning more than held is rejected. | Sprint 2 |
+| BR-09 | Return closes exactly one Active Loan and increases Available Quantity by the returned quantity; quantity returned must be positive and not exceed the quantity held. When a loan closes, all quantity it held must be accounted for (returned) — otherwise held units would escape the Available Quantity formula of BR-03. Partial-return semantics, if multi-unit loans are allowed, will be fixed together with OQ-02. | After return, availability is restored; returning more than held is rejected; a loan cannot close while quantity is still held. | Sprint 2 |
 | BR-10 | Passwords shall be stored only as salted hashes; plaintext password storage is prohibited. | No plaintext password exists in database or seed data. | Sprint 1 |
-| BR-11 | All availability and loan state transitions (request, checkout, return) shall be persisted and survive application restart. | After restart, loans/availability read back identically. | Sprint 1 |
+| BR-11 | All availability and loan state transitions shall be persisted and survive application restart **or redeployment**. Allocation by function: request/checkout persistence from Sprint 1; return persistence from Sprint 2 (FR-17). | After restart or redeployment, loans/availability read back identically. | Sprint 1 (request, checkout) / Sprint 2 (return) |
 
 ---
 
@@ -155,9 +155,9 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | NFR-01 | Authentication enforcement | 100% of protected API endpoints reject unauthenticated requests with **no private data in the response body** | Automated API tests (unauthenticated request to each protected endpoint) | Sprint 1 |
 | NFR-02 | Authorization enforcement | 100% of protected operations reject wrong-role and cross-owner calls server-side (HTTP 403/denied), with **0** bypasses via direct API calls | Automated API tests (forbidden role, cross-borrower access) | Sprint 1 |
 | NFR-03 | Credential protection | 0 plaintext passwords in database/seed; passwords verified by hash comparison only | Automated test + database inspection | Sprint 1 |
-| NFR-04 | Data persistence | All loans/requests/availability read back correctly after application restart; 0 data loss on clean restart | Automated integration test (restart, then read) | Sprint 1 |
+| NFR-04 | Data persistence and durability | All loans/requests/availability read back correctly after application restart **or redeployment** (e.g., a recreated container backed by the same persistent store); 0 data loss | Automated integration test (restart, then read); redeployment check after deployment exists: redeploy, then read — target for Lab 5 (deployment established) | Sprint 1 (restart) / Lab 5 (redeployment) |
 | NFR-05 | Concurrency safety | Under competing checkout attempts for one item, oversold state (Available Quantity < 0 or duplicate active loans for a single-unit item) occurs in **0** of N test runs | Automated concurrency/integration test | Sprint 1 |
-| NFR-06 | Transaction atomicity | Checkout/return update loan record and availability together — partial updates occur in 0 cases when failures are injected | Automated integration test | Sprint 2 |
+| NFR-06 | Transaction atomicity | Each of checkout and return updates loan record and availability together — partial updates occur in 0 cases when failures are injected; allocation by function: checkout atomicity from Sprint 1 (FR-14), return atomicity from Sprint 2 (FR-17) | Automated integration test | Sprint 1 (checkout) / Sprint 2 (return) |
 | NFR-07 | Performance (baseline) | Catalog list (≤ 100 items) responds within **2 s** at the 95th percentile on the local environment | Manual timing / simple load check recorded in verification evidence | Sprint 3 |
 | NFR-08 | Reproducible setup | A fresh environment reaches a running seeded app by following README steps only, in **≤ 15 minutes** | Manual setup run-through documented in release evidence | Sprint 1 |
 | NFR-09 | Test automation | Automated tests cover 100% of Sprint 1 AC; test command exits non-zero on failure | Test report tied to release commit | Sprint 1 |
@@ -191,7 +191,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | ID | Question | Impact | Target |
 |---|---|---|---|
 | OQ-01 | What is the actual initial equipment catalog? (Arduino Uno, ESP32, Breadboard, Jumper Wires, Sensors, Multimeter, Soldering Equipment are examples only, not confirmed) | Seed data content | Decide before Sprint 1 seed implementation |
-| OQ-02 | May one loan/request cover a quantity greater than 1 (e.g., 5 jumper wires), and is there a per-borrower quantity limit? | Request/loan data model | Decide before Sprint 1 contract ([D1-05]) |
+| OQ-02 | May one loan/request cover a quantity greater than 1 (e.g., 5 jumper wires), and is there a per-borrower quantity limit? **Coupled decision (raised in PR #15 review):** if multi-unit loans are allowed, BR-09 must define full-quantity vs partial return — a partial return must not close the loan while quantity is still held, or held units escape the Available Quantity formula (BR-03). | Request/loan data model + BR-09 return semantics | Decide before Sprint 1 contract ([D1-05]) |
 | OQ-03 | Are there loan-period differences by item category (e.g., tools 7 days, consumables same-day)? | BR-07 generalization | Decide before Sprint 2 |
 | OQ-04 | What happens to overdue loans beyond listing (reminders, suspension of borrowing rights)? | Out of scope currently; may extend BR-08 | Decide before Sprint 2 |
 | OQ-05 | Should returned items record condition (ok/damaged)? | Excluded for now (§3.2) | Revisit after Sprint 2 |
@@ -199,4 +199,4 @@ Each rule is stated as testable behavior with its rejection/edge case.
 
 ---
 
-*Document history: created in [D1-01] (Part A). FR/BR/NFR IDs are stable and will be referenced by Part B traceability, Part C SDS, and Sprint 1 contracts.*
+*Document history: created in [D1-01] (Part A), rev 1 (commit `8252496`). Rev 2 (PR #15 review): added redeployment durability to NFR-04/BR-11 per `group_work_specs_v1.pdf` §5.1; split persistence/atomicity sprint allocation by function (request/checkout → Sprint 1, return → Sprint 2); added close-accounting guard to BR-09 and coupled-decision note to OQ-02. FR/BR/NFR IDs are stable and will be referenced by Part B traceability, Part C SDS, and Sprint 1 contracts.*
