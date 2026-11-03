@@ -2,7 +2,7 @@
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Status:** Draft — pending peer review (created by AI agent, Issue [D1-07]; not yet approved by the team)
-> **Last updated:** 2026-11-03
+> **Last updated:** 2026-11-03 (เพิ่ม Branch Strategy: sprint/1-staging ตามคำสั่งทีม 2026-11-03)
 > **Purpose:** คู่มือกลางสำหรับ AI Agent ทุกตัวที่เข้ามาทำงานใน Repository นี้ เพื่อให้การพัฒนาเป็นมาตรฐาน ตรวจสอบได้ ปลอดภัย และไม่ลดอำนาจการตัดสินใจของมนุษย์
 > **Maintenance:** เมื่อ stack/โครงสร้าง/กระบวนการทำงานเปลี่ยนแปลงอย่างมีนัยสำคัญ ต้องอัปเดตไฟล์นี้ผ่าน PR ที่ผ่าน Peer Review (ดู §21)
 
