@@ -2,7 +2,7 @@
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Status:** Draft — pending peer review (created by AI agent, Issue [D1-07]; not yet approved by the team)
-> **Last updated:** 2026-11-03 (เพิ่ม Branch Strategy: sprint/1-staging ตามคำสั่งทีม 2026-11-03)
+> **Last updated:** 2026-11-03 (แก้ไข 3 จุดตาม Review Feedback บน PR #14: (1) ข้อยกเว้นคัดลอกเนื้อหาลง PDF ส่งงาน (2) โครงสร้างที่ตรวจพบจริงใน Git tree (3) ข้อยกเว้น Done สำหรับงานเอกสารที่ไม่มี PR)
 > **Purpose:** คู่มือกลางสำหรับ AI Agent ทุกตัวที่เข้ามาทำงานใน Repository นี้ เพื่อให้การพัฒนาเป็นมาตรฐาน ตรวจสอบได้ ปลอดภัย และไม่ลดอำนาจการตัดสินใจของมนุษย์
 > **Maintenance:** เมื่อ stack/โครงสร้าง/กระบวนการทำงานเปลี่ยนแปลงอย่างมีนัยสำคัญ ต้องอัปเดตไฟล์นี้ผ่าน PR ที่ผ่าน Peer Review (ดู §21)
 
@@ -42,9 +42,12 @@ PEW-DIY/
 ├── AGENT.md          ← ไฟล์นี้
 ├── README.md         ← ภาพรวม + setup instructions
 ├── .gitignore        ← กัน .env/secrets, logs, editor files
-└── docs/
-    └── srs.md        ← SRS (โครงร่าง)
+└── docs/             ← (ยังไม่มีใน commit tree ของ branch นี้ — ดูด้านล่าง)
 ```
+
+**โครงสร้างที่ตรวจพบจริงใน Git commit tree ของ branch นี้ (verified):** `AGENT.md`, `README.md`, `.gitignore`
+
+**โครงสร้างที่อยู่ใน working tree แต่ยังไม่ได้ commit (untracked local — ยังไม่ใช่ส่วนหนึ่งของ repository commit):** `docs/srs.md` (โครงร่าง SRS ที่ทีมกำลังร่าง)
 
 **โครงสร้างที่วางแผน (ยังไม่สร้าง — suggested by course spec):** `docs/features.md`, `docs/traceability.md`, `docs/system-sds.md`, `docs/sprints/`, `docs/labs/`
 
@@ -59,7 +62,9 @@ PEW-DIY/
 5. **Issue Requirements และ Acceptance Criteria** ของงานที่กำลังทำ
 6. `README.md` และไฟล์นี้ (`AGENT.md`)
 
-ห้ามคัดลอกเนื้อหา SRS/สัญญาทั้งหมดมาใส่ไฟล์อื่น — ให้อ้างอิงลิงก์ต้นทาง
+**หลักการ:** เอกสารใน Repository เป็น Source of Truth ฉบับหลัก (master) ห้ามใช้สำเนา/สิ่งที่คัดลอกมาแทนที่เอกสารต้นฉบับ อย่างไรก็ตาม **การรวมเนื้อหา SRS/Contract ลงใน PDF ส่งงาน (ตามที่ `project_deliverable_1_v1.pdf` §4.1 กำหนด) เป็นข้อยกเว้นโดยชอบธรรม** — อนุญาตให้คัดลอกเนื้อหาจากเอกสารต้นฉบับใน Repository ไปใส่ PDF ส่งงานได้ โดยระบุ commit/version ที่อ้างอิงเพื่อตรวจสอบย้อนกลับ
+
+ในทางกลับกัน สำหรับงานเอกสารอื่น ๆ ใน Repository (ไม่รวม PDF ส่งงาน) ให้อ้างอิงลิงก์ต้นทาง ไม่คัดลอกเนื้อหาซ้ำเพื่อเลี่ยงความไม่สอดคล้องกันระหว่างสำเนา
 
 ## 4. Agent Roles, Responsibilities, and Scope Restrictions
 
@@ -195,9 +200,9 @@ Kanban ของทีมมี 6 สถานะ (เรียงตามล�
 | **Backlog** | มีงานแล้ว แต่ยังไม่ได้กำหนดรายละเอียดให้พร้อมเริ่ม |
 | **Specified** | กำหนด Objective/Scope/Tasks/AC ชัดเจน — วางแผนและวิเคราะห์จนพร้อมเริ่มงาน แล้วเข้าสู่ Started |
 | **Started** | เริ่มสร้าง/แก้ไขงานตาม Engineering Loop — เสร็จและตรวจสอบแล้ว พร้อมส่งตรวจ (ต้องได้รับอนุมัติจากมนุษย์ก่อนเปิด PR) จึงเข้าสู่ PR Review |
-| **PR Review** | รอเพื่อนร่วมทีมตรวจสอบ (งานโค้ดผ่าน Pull Request; งานเอกสารส่งตรวจได้โดยไม่มี PR ตามข้อตกลงทีม) — Reviewer ขอ Changes → Fixing |
+| **PR Review** | รอเพื่อนร่วมทีมตรวจสอบ (งานโค้ดผ่าน Pull Request; **งานเอกสาร**ใน repository ให้ใช้ PR เสมอเพื่อเข้าสู่ Done — ส่วนงานเอกสารนอก repository ที่ทีมอนุญาตเป็นกรณีพิเศษ ให้แนบหลักฐาน peer review ที่เทียบเท่ากัน) — Reviewer ขอ Changes → Fixing |
 | **Fixing** | แก้ไขตาม Reviewer Feedback โดยใช้ Engineering Loop — เสร็จและตรวจสอบแล้ว กลับ PR Review เพื่อ Re-review |
-| **Done** | ต้องผ่านการตรวจ AC/DoD **และ** Reviewer Approve **และ** Reviewer เป็นผู้ Merge PR เรียบร้อยแล้ว |
+| **Done** | ต้องผ่านการตรวจ AC/DoD **และ** ได้รับการ Approve จาก Reviewer **และ** (กรณีมี PR) Reviewer เป็นผู้ Merge PR เรียบร้อยแล้ว — **กรณีงานเอกสารนอก repository ที่ไม่มี PR** ต้องมีหลักฐาน peer review ที่ชัดเจนจากเพื่อนร่วมทีม (บันทึกไว้ใน Issue/ช่องทางที่ตกลงกัน) และได้รับอนุมัติจากมนุษย์ จึงถือเป็น Done ได้ |
 
 ### Relationship Between Kanban and Engineering Loop
 - Engineering Loop = กระบวนการภายในของ Agent (ทำงานใน `Started` และ `Fixing` เท่านั้น)
@@ -255,6 +260,8 @@ Commit · Push · Rebase · Reset · Cherry-pick · Force Push (ห้ามโ�
 ### 12.4 Definition of Done for Pull Requests
 Issue จะเป็น **Done** เมื่อ Reviewer Approve **และ** Reviewer Merge PR เรียบร้อยแล้ว (ควบคู่กับการตรวจ AC/DoD — §10)
 การเปิด PR, CI ผ่าน, Agent แจ้งว่างานเสร็จ, หรือ Reviewer Approve แต่ยังไม่ Merge **ไม่ถือว่า Done**
+
+**ข้อยกเว้นสำหรับงานเอกสารนอก repository ที่ไม่มี PR:** หากทีมอนุญาตให้ตรวจงานเอกสารที่ไม่ได้อยู่ใน repository โดยไม่ผ่าน PR ต้องมีหลักฐาน peer review ที่เทียบเท่า (เช่น บันทึกการตรวจสอบจากเพื่อนร่วมทีมใน Issue หรือช่องทางที่ตกลงกัน) และได้รับอนุมัติจากมนุษย์ จึงจะเข้าสู่ Done ได้ — งานเอกสารที่อยู่ใน repository ให้ใช้ PR เสมอ
 
 ## 13. Quality, Testing, and Verification Standards
 
