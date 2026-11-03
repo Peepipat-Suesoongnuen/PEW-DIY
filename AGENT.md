@@ -2,7 +2,7 @@
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Status:** Draft — pending peer review (created by AI agent, Issue [D1-07]; not yet approved by the team)
-> **Last updated:** 2026-11-03 (แก้ไข 3 จุดตาม Review Feedback บน PR #14: (1) ข้อยกเว้นคัดลอกเนื้อหาลง PDF ส่งงาน (2) โครงสร้างที่ตรวจพบจริงใน Git tree (3) ข้อยกเว้น Done สำหรับงานเอกสารที่ไม่มี PR)
+> **Last updated:** 2026-11-03 (ปรับ §2 ตามแนวทาง B ที่ reviewer อนุมัติ: แยกกฎถาวรออกจากข้อมูลที่เปลี่ยนบ่อย — รายละเอียด stack/โครงสร้างดูแลใน README/System SDS; แยกสถานะ commit/local draft/planned)
 > **Purpose:** คู่มือกลางสำหรับ AI Agent ทุกตัวที่เข้ามาทำงานใน Repository นี้ เพื่อให้การพัฒนาเป็นมาตรฐาน ตรวจสอบได้ ปลอดภัย และไม่ลดอำนาจการตัดสินใจของมนุษย์
 > **Maintenance:** เมื่อ stack/โครงสร้าง/กระบวนการทำงานเปลี่ยนแปลงอย่างมีนัยสำคัญ ต้องอัปเดตไฟล์นี้ผ่าน PR ที่ผ่าน Peer Review (ดู §21)
 
@@ -29,27 +29,30 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 
 ## 2. Technology Stack and Repository Structure
 
-**สถานะจริง ณ วันที่เขียนเอกสารนี้:** Repository ยังไม่มี application source code (มีเพียงเอกสาร) — **จึงยังยืนยัน Technology Stack ไม่ได้**
+**หลักการ (แนวทาง B ที่ reviewer อนุมัติ):** ไฟล์นี้เก็บ **กฎ วิธีตรวจสอบ และแหล่งอ้างอิง** เป็นหลัก ส่วนรายละเอียดที่เปลี่ยนตามการพัฒนา (รายการไฟล์, Technology Stack, คำสั่ง setup) ให้ดูแลใน `README.md` (โครงสร้าง/คำสั่งใช้งาน) และ `docs/system-sds.md` (Stack/Architecture ตาม Part C) เพื่อไม่ให้ข้อมูลในไฟล์นี้ล้าหลัง
 
-- **ห้ามเดา stack, framework, หรือโครงสร้างระบบ** — ให้ตรวจสอบจากโค้ด/เอกสาร/คำสั่งมนุษย์จริงก่อนเสมอ
-- เมื่อทีมเลือก stack แล้ว (กำหนดใน `docs/system-sds.md`) ต้องอัปเดต §2 นี้ทันทีผ่าน PR
-- เครื่องมือใน development environment ต้องตรวจสอบว่ามีจริงก่อนใช้ (`which`/`--version`) ห้ามสมมติว่ามีเครื่องมือใดพร้อมใช้งาน
+### 2.1 กฎการตรวจสอบ (ถาวร)
+- **ห้ามเดา stack, framework หรือโครงสร้างระบบ** — ต้องตรวจสอบจากข้อมูลจริงก่อนเสมอ โดยถือลำดับ: โค้ดใน Repository → `docs/system-sds.md` (เมื่อมี) → `README.md` → คำสั่งมนุษย์
+- เครื่องมือใน development environment ต้องตรวจสอบว่ามีจริงก่อนใช้ (`which`/`--version`) — ห้ามสมมติว่ามีเครื่องมือใดพร้อมใช้งาน
+- สถานะใน §2.3 เป็น snapshot ณ วันที่ระบุ — **ต้อง verify ซ้ำก่อนใช้เสมอ** ห้ามเชื่อโดยไม่ตรวจสอบ
+- เมื่อ stack/โครงสร้างเปลี่ยนแปลงอย่างมีนัยสำคัญ ให้อัปเดตเอกสารต้นทาง (`README.md`/`docs/system-sds.md`) — แก้ไฟล์นี้เฉพาะเมื่อ "กฎ" เปลี่ยนเท่านั้น
 
-**โครงสร้าง Repository ปัจจุบัน (verified):**
+### 2.2 Layout Conventions (ถาวร)
+- Root: `AGENT.md` (กติกา Agent — ไฟล์นี้), `README.md` (ภาพรวม/โครงสร้าง/คำสั่ง setup), `.gitignore` (กัน `.env`/secrets, logs, editor files)
+- `docs/` — เอกสารวิศวกรรม: `docs/srs.md`, `docs/features.md`, `docs/traceability.md`, `docs/system-sds.md`, `docs/sprints/`, `docs/labs/`
+- โครงสร้าง source code ตามที่กำหนดใน `docs/system-sds.md` เมื่อทีมเลือก stack แล้ว
 
-```
-PEW-DIY/
-├── AGENT.md          ← ไฟล์นี้
-├── README.md         ← ภาพรวม + setup instructions
-├── .gitignore        ← กัน .env/secrets, logs, editor files
-└── docs/             ← (ยังไม่มีใน commit tree ของ branch นี้ — ดูด้านล่าง)
-```
+### 2.3 แหล่งอ้างอิงและสถานะจริง (snapshot ณ 2026-11-03 — verify ซ้ำก่อนใช้)
 
-**โครงสร้างที่ตรวจพบจริงใน Git commit tree ของ branch นี้ (verified):** `AGENT.md`, `README.md`, `.gitignore`
+**ยืนยันได้จาก git commit ของ branch นี้:** `AGENT.md`, `README.md`, `.gitignore` — ยังไม่มี application source code และ**ยังยืนยัน Technology Stack ไม่ได้** (ห้ามเดา)
 
-**โครงสร้างที่อยู่ใน working tree แต่ยังไม่ได้ commit (untracked local — ยังไม่ใช่ส่วนหนึ่งของ repository commit):** `docs/srs.md` (โครงร่าง SRS ที่ทีมกำลังร่าง)
+**Local draft (untracked — ยังไม่ได้ commit จึงไม่ใช่ส่วนหนึ่งของ repository):** `docs/srs.md` (โครงร่างที่ทีมเริ่มร่างบนเครื่องพัฒนา — จึงไม่ปรากฏใน repository หรือ working tree ของผู้ตรวจ; จะจัดทำเป็นทางการใน [D1-01])
 
-**โครงสร้างที่วางแผน (ยังไม่สร้าง — suggested by course spec):** `docs/features.md`, `docs/traceability.md`, `docs/system-sds.md`, `docs/sprints/`, `docs/labs/`
+**Planned/pending (ยังไม่มีใน repository — ไม่ต้องจัดทำใน PR นี้):**
+- `docs/srs.md` ฉบับทางการ (FR/BR/NFR) — [D1-01] Part A
+- `docs/features.md`, `docs/traceability.md` — [D1-02] Part B
+- `docs/system-sds.md` (Technology Stack/Data Model) — [D1-03] Part C
+- `docs/sprints/` (Three-sprint plan + engineering contracts) — [D1-04]/[D1-05] Part D/E
 
 ## 3. Source of Truth Documents
 
@@ -208,7 +211,7 @@ Kanban ของทีมมี 6 สถานะ (เรียงตามล�
 - Engineering Loop = กระบวนการภายในของ Agent (ทำงานใน `Started` และ `Fixing` เท่านั้น)
 - Kanban = ระบบติดตามสถานะงานของทีม — **Engineering Loop ไม่ได้เป็นตัวเปลี่ยน Kanban Status**
 - **Agent ห้ามเปลี่ยน Kanban Status โดยไม่ได้รับอนุมัติจากมนุษย์**
-- Agent ห้ามถือว่างานเสร็จเป็น Done เพียงเพราะ Implementation/Tests ผ่าน — ต้องผ่าน Peer Review และ Reviewer Merge ก่อน
+- Agent ห้ามถือว่างานเสร็จเป็น Done เพียงเพราะ Implementation/Tests ผ่าน — ต้องผ่าน Peer Review และ (กรณีมี PR) Reviewer Merge ก่อน
 
 ## 11. Git and GitHub Governance
 
