@@ -21,3 +21,12 @@ Desktop.ini
 # Temporary files
 *.tmp
 *.temp
+
+# Local AI Agent Skills
+skills/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
