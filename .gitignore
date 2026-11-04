@@ -21,3 +21,7 @@ Desktop.ini
 # Temporary files
 *.tmp
 *.temp
+
+# Local AI Agent Skills
+skills/node_modules/
+dist/
