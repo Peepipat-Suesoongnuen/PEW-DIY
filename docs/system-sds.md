@@ -4,7 +4,7 @@
 >
 > **Deliverable:** D1-03 Part C — System-Level SDS | **Issue:** [#3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/3)
 >
-> **Revision:** 1, 2026-11-04 | **Status:** Draft for team decision and peer review
+> **Revision:** 2, 2026-11-04 | **Status:** Draft for team decision and peer review
 >
 > **Baseline:** [SRS](srs.md) rev 2 and [Feature Inventory](features.md) rev 1, present at commit `9d3c57b`
 >
@@ -340,8 +340,10 @@ The following are **planned checks for [D1-05]/[D1-06]**, not executed tests or 
 | Catalog/request — FR-06–FR-08, FR-11–FR-13, BR-01 | Repeatable seed; list/detail availability; valid persisted request; unavailable/malformed/forged-owner request rejected without writes |
 | Checkout — FR-14–FR-16, BR-02/03/07 | Authorized checkout; unavailable/repeated checkout denial; +7 calendar-day boundary; competing attempts for a single-unit item yield at most one loan |
 | Persistence/atomicity — BR-11, NFR-04/05/06 | Real DB concurrency with defined repetitions; injected failure rolls back every checkout write; restart read-back; no hidden negative availability |
-| Reproducibility/automation — NFR-08/09 | Fresh setup from README within target; migrations/seed repeat; all Sprint 1 AC mapped to real tests with failure exit status |
+| Reproducibility/automation — NFR-08/09 (F-10) | Fresh setup from README within target; migrations/seed repeat; all Sprint 1 AC mapped to real tests with failure exit status |
 | Later allocation | Return/close accounting and atomicity, overdue date boundaries, catalog writes/history in S2; report/performance target NFR-07 in S3; recreated-container/redeployment read-back in Lab 5 |
+
+F-10 (Sprint 1 Integration and Verification, named system responsibility per [Part B](features.md)) coordinates the Sprint 1 checks above; the [traceability matrix](traceability.md) remains authoritative for requirement-to-feature-to-sprint allocation.
 
 ## 10. Open Decisions and Part C Acceptance Review
 
@@ -373,3 +375,4 @@ This local document is not a claim that Issue #3 is Done. Resolve the decisions 
 | Revision | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-04 | Initial System-Level SDS; architecture/data/UI/API/access/configuration proposals, explicit decision gaps and AC review | Local baseline `9d3c57b`, SRS rev 2, Part B rev 1, Issues #1–#3 and original course PDFs |
+| 2 — 2026-11-04 | Tagged the NFR-08/NFR-09 verification row with `F-10` and added its coordination sentence for cross-document consistency with Part B; no design change | Peer review feedback on PR #17 (confirmed by reviewer); `docs/traceability.md` rows NFR-08 → F-10, NFR-09 → F-10 |
