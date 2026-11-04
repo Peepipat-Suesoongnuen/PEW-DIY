@@ -52,7 +52,8 @@ export class SessionStore {
    * throws for those cases (deny-by-default).
    */
   async resolve(rawId: string | undefined): Promise<SessionRecord | null> {
-    if (!rawId) return null;
+    // Defense-in-depth: only a string may reach the digest (PR #22, P2-2).
+    if (typeof rawId !== "string" || rawId.length === 0) return null;
     const key = this.digest(rawId);
     const now = this.clock();
     const res = await this.pool.query(
@@ -88,7 +89,8 @@ export class SessionStore {
 
   /** Server-side revocation; returns false if the session never existed. */
   async revoke(rawId: string | undefined): Promise<boolean> {
-    if (!rawId) return false;
+    // Defense-in-depth: only a string may reach the digest (PR #22, P2-2).
+    if (typeof rawId !== "string" || rawId.length === 0) return false;
     const res = await this.pool.query(
       `UPDATE sessions SET revoked_at = $2 WHERE session_key = $1 AND revoked_at IS NULL`,
       [this.digest(rawId), this.clock()],

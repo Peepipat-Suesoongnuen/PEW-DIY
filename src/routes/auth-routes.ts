@@ -7,7 +7,7 @@
  * - Login sets the cookie only after successful session creation.
  * - Logout revokes server-side then clears the cookie; 204 on success.
  */
-import express, { Request, Response, Router } from "express";
+import express, { Request, Response, Router, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import { randomUUID } from "crypto";
 import { AuthService } from "../services/auth";
@@ -21,17 +21,61 @@ export interface AppDeps {
 
 export function createApp({ auth, config }: AppDeps): express.Application {
   const app = express();
-  app.use(express.json({ limit: "10kb" }));
-  app.use(cookieParser());
 
-  // Request ID middleware for safe error correlation (shared-conventions).
+  // Request ID first so parser/guard failures also carry a correlation id
+  // in their safe error envelope (PR #22 review, P2-2).
   app.use((req: Request, res: Response, next) => {
     req.requestId = randomUUID();
     next();
   });
+  app.use(express.json({ limit: "10kb" }));
+  app.use(cookieParser());
 
   const { requireAuth } = createAuthMiddleware(auth, config.session.cookieName);
   const router = Router();
+
+  // Anti-CSRF: cookie mode enforces trusted-origin validation on
+  // state-changing requests (AC-F01-12, TEST-F01-15; SDS §7.2). A hostile
+  // cross-origin POST (e.g. forced logout) must be denied before handlers.
+  // Browser same-origin requests carry a matching Origin; non-browser
+  // clients that omit Origin fall back to Referer when present.
+  function requireTrustedOrigin(req: Request, res: Response, next: NextFunction): void {
+    if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+      next();
+      return;
+    }
+    const origin = req.headers.origin;
+    if (typeof origin === "string") {
+      if (origin !== config.appOrigin) {
+        res.status(403).json({
+          error: { code: "FORBIDDEN", message: "Request origin not allowed.", requestId: req.requestId },
+        });
+        return;
+      }
+      next();
+      return;
+    }
+    const referer = req.headers.referer;
+    if (typeof referer === "string") {
+      let refererOrigin: string;
+      try {
+        refererOrigin = new URL(referer).origin;
+      } catch {
+        res.status(403).json({
+          error: { code: "FORBIDDEN", message: "Request origin not allowed.", requestId: req.requestId },
+        });
+        return;
+      }
+      if (refererOrigin !== config.appOrigin) {
+        res.status(403).json({
+          error: { code: "FORBIDDEN", message: "Request origin not allowed.", requestId: req.requestId },
+        });
+        return;
+      }
+    }
+    next();
+  }
+  app.use("/api", requireTrustedOrigin);
 
   // POST /api/auth/login — available without existing credential.
   router.post("/auth/login", async (req: Request, res: Response) => {
@@ -108,6 +152,30 @@ export function createApp({ auth, config }: AppDeps): express.Application {
   app.use("/api", (_req: Request, res: Response) => {
     res.status(404).json({
       error: { code: "NOT_FOUND", message: "Resource not found.", requestId: "n/a" },
+    });
+  });
+
+  // Safe error handler — LAST. Converts body-parser and unexpected auth/storage
+  // failures to the shared JSON envelope and never leaks stack traces or
+  // internal diagnostics (contract §3, AC-F01-05/14; PR #22 review, P2-2).
+  // Without this, Express's default handler returns text/html with details.
+  app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+    if (res.headersSent) {
+      next(err);
+      return;
+    }
+    const requestId = req.requestId ?? "n/a";
+    const type = typeof err === "object" && err !== null
+      ? (err as { type?: string }).type
+      : undefined;
+    if (type === "entity.parse.failed" || type === "entity.too.large") {
+      res.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Invalid request body.", requestId },
+      });
+      return;
+    }
+    res.status(500).json({
+      error: { code: "INTERNAL_ERROR", message: "Internal error.", requestId },
     });
   });
 

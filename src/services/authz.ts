@@ -33,7 +33,11 @@ export const PROTECTED_ROUTES: ReadonlyArray<{
 export function createAuthMiddleware(auth: AuthService, cookieName: string) {
   /** Deny-by-default authentication guard (AC-F01-05). */
   async function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-    const rawSessionId = req.cookies?.[cookieName] as string | undefined;
+    // Type-check the cookie before hashing: cookie-parser may decode JSON
+    // cookies (`j%3A%7B%7D`) into objects; a non-string must deny (401), not
+    // throw inside the digest (PR #22 review, P2-2 / TEST-F01-06).
+    const raw = req.cookies?.[cookieName];
+    const rawSessionId = typeof raw === "string" ? raw : undefined;
     const user = await auth.currentUser(rawSessionId);
     if (!user) {
       res.status(401).json({

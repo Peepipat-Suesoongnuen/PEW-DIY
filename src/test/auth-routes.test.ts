@@ -138,3 +138,77 @@ describe("POST /api/auth/logout (TEST-F01-06/07)", () => {
     expect(res.body.error.code).toBe("UNAUTHENTICATED");
   });
 });
+
+describe("Regression — safe error envelopes (TEST-F01-03/06/14)", () => {
+  it("malformed JSON body returns 400 JSON envelope, never HTML (TEST-F01-03)", async () => {
+    const res = await request(app)
+      .post("/api/auth/login")
+      .set("Content-Type", "application/json")
+      .send("{bad json");
+    expect(res.status).toBe(400);
+    expect(res.headers["content-type"]).toContain("application/json");
+    expect(res.body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("object-typed session cookie is denied with 401 JSON, not 500 HTML (TEST-F01-06)", async () => {
+    // cookie-parser decodes `j%3A%7B%7D` into an object via its JSON-cookie
+    // convention; the guard must type-check before hashing.
+    const res = await request(app).get("/api/auth/me").set("Cookie", "pew_session=j%3A%7B%7D");
+    expect(res.status).toBe(401);
+    expect(res.headers["content-type"]).toContain("application/json");
+    expect(res.body.error.code).toBe("UNAUTHENTICATED");
+  });
+
+  it("auth storage failure returns safe 500 JSON without internal details (TEST-F01-14)", async () => {
+    const brokenPool = {
+      query: async () => {
+        throw new Error("connection refused: secret-dsn-detail-should-not-leak");
+      },
+    } as never;
+    const brokenStore = new SessionStore(brokenPool, 60, 480);
+    const brokenAuth = new AuthService(brokenPool, brokenStore);
+    const brokenApp = createApp({ auth: brokenAuth, config });
+
+    const res = await request(brokenApp).get("/api/auth/me").set("Cookie", "pew_session=any-value");
+    expect(res.status).toBe(500);
+    expect(res.headers["content-type"]).toContain("application/json");
+    expect(res.body.error.code).toBe("INTERNAL_ERROR");
+    const serialized = JSON.stringify(res.body);
+    expect(serialized).not.toContain("secret-dsn-detail-should-not-leak");
+    expect(serialized).not.toContain("TypeError");
+    expect(serialized).not.toContain("at ");
+  });
+});
+
+describe("Regression — anti-CSRF origin enforcement (TEST-F01-15)", () => {
+  it("cross-origin logout is denied 403 and does NOT revoke the session (forced-logout defense)", async () => {
+    await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
+    const login = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "pw-http" });
+    const cookie = parseCookies(login.headers["set-cookie"]);
+
+    const attack = await request(app)
+      .post("/api/auth/logout")
+      .set("Cookie", `pew_session=${cookie}`)
+      .set("Origin", "http://evil.example")
+      .send({});
+    expect(attack.status).toBe(403);
+    expect(attack.body.error.code).toBe("FORBIDDEN");
+
+    // The attack must have no side effect: session is still valid.
+    const me = await request(app).get("/api/auth/me").set("Cookie", `pew_session=${cookie}`);
+    expect(me.status).toBe(200);
+  });
+
+  it("same-origin state-changing request is allowed", async () => {
+    await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
+    const login = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "pw-http" });
+    const cookie = parseCookies(login.headers["set-cookie"]);
+
+    const res = await request(app)
+      .post("/api/auth/logout")
+      .set("Cookie", `pew_session=${cookie}`)
+      .set("Origin", config.appOrigin)
+      .send({});
+    expect(res.status).toBe(204);
+  });
+});

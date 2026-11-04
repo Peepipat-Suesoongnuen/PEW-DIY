@@ -4,9 +4,31 @@
  * value must stop startup rather than substituting a default.
  */
 
+import { existsSync } from "fs";
+
+/**
+ * Loads `.env` into `process.env` if present (PR #22 review, P2-4).
+ * Existing environment variables always take precedence over file values,
+ * so explicitly exported variables still win. Absence of `.env` is fine:
+ * callers may export variables directly.
+ */
+function loadDotEnv(): void {
+  if (!existsSync(".env")) return;
+  try {
+    process.loadEnvFile(".env");
+  } catch {
+    // Fail-closed behavior lives in required()/loadConfig(); a malformed .env
+    // must not be silently ignored for required keys — required() will throw
+    // on any missing value below.
+  }
+}
+loadDotEnv();
+
 export interface AppConfig {
   databaseUrl: string;
   port: number;
+  /** Trusted browser origin for anti-CSRF origin enforcement (cookie mode). */
+  appOrigin: string;
   session: {
     idleMinutes: number;
     absoluteMinutes: number;
@@ -36,6 +58,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   return {
     databaseUrl: required("DATABASE_URL", env),
     port: requiredPositiveInt("PORT", env),
+    appOrigin: required("APP_ORIGIN", env),
     session: {
       idleMinutes: requiredPositiveInt("SESSION_IDLE_MINUTES", env),
       absoluteMinutes: requiredPositiveInt("SESSION_ABSOLUTE_MINUTES", env),

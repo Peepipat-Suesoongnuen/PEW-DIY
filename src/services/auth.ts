@@ -50,7 +50,9 @@ export class AuthService {
 
   async login(body: unknown): Promise<LoginResult> {
     const validated = validateLoginPayload(body);
-    if (!validated.valid) return { ok: false, errorCode: "VALIDATION_ERROR" };
+    if (!validated.valid || validated.username === undefined || validated.password === undefined) {
+      return { ok: false, errorCode: "VALIDATION_ERROR" };
+    }
 
     const { username, password } = validated;
     const res = await this.pool.query<AuthUserRow>(
