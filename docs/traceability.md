@@ -13,7 +13,7 @@
 - **Requirement** — stable ID from `docs/srs.md`.
 - **Feature/responsibility** — `F-xx` from `docs/features.md` (a cross-cutting requirement may map to several features or to the named responsibility F-10).
 - **Sprint** — planned allocation from the SRS (Sprint 1 / 2 / 3; Lab 5 where the spec says so).
-- **Verification** — Sprint 1 rows carry **AC/TEST placeholders** to be fixed in [D1-05] contracts (`AC/TEST — [D1-05]`); Sprint 2/3 rows need sprint allocation only per §3.2. Actual test IDs and results are recorded in Deliverable 2/Final traceability (implemented column).
+- **Verification** — Sprint 1 references `AC/TEST — [D1-05]` resolve to the [Part E planned AC↔TEST matrix](sprints/sprint-1/verification-matrix.md), which maps each Sprint 1 requirement and existing Issue AC to its detailed contract/STS. These are draft test designs, not executed results. Actual files/commands/tested-SHA/results are required by Part F/F-10; Sprint 2/3 rows retain sprint allocation per §3.2 and later result traceability.
 
 ## 2. Functional Requirements (FR-01 – FR-21)
 
@@ -103,4 +103,4 @@
 
 ---
 
-*Document history: rev 1 created in [D1-02] (Part B) against `docs/srs.md` rev 2. Feature IDs `F-01`–`F-10` are stable; future changes require a recorded revision with rationale (AGENT.md §15.1).*
+*Document history: rev 1 created in [D1-02] (Part B) against `docs/srs.md` rev 2. Rev 2 (2026-11-05, [D1-05]) links the new planned Part E AC↔TEST matrix and clarifies that execution evidence belongs to Part F; no requirement-to-feature or sprint allocation changed. Feature IDs `F-01`–`F-10` are stable; future changes require a recorded revision with rationale (AGENT.md §15.1).*
