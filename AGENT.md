@@ -2,7 +2,7 @@
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Status:** Draft — pending peer review (created by AI agent, Issue [D1-07]; not yet approved by the team)
-> **Last updated:** 2026-11-03 (ปรับ §2 ตามแนวทาง B ที่ reviewer อนุมัติ: แยกกฎถาวรออกจากข้อมูลที่เปลี่ยนบ่อย — รายละเอียด stack/โครงสร้างดูแลใน README/System SDS; แยกสถานะ commit/local draft/planned)
+> **Last updated:** 2026-11-04 (§1: reconcile กับ SRS rev 2 — ย้ายระยะเวลาการยืม/นิยาม exclusive item จาก Open Questions ไป Confirmed decisions ตาม SRS A-03/BR-07/08, A-04/BR-03; เพิ่ม SRS OQ-01/OQ-02 อ้างอิง — ตาม AGENT.md §21)
 > **Purpose:** คู่มือกลางสำหรับ AI Agent ทุกตัวที่เข้ามาทำงานใน Repository นี้ เพื่อให้การพัฒนาเป็นมาตรฐาน ตรวจสอบได้ ปลอดภัย และไม่ลดอำนาจการตัดสินใจของมนุษย์
 > **Maintenance:** เมื่อ stack/โครงสร้าง/กระบวนการทำงานเปลี่ยนแปลงอย่างมีนัยสำคัญ ต้องอัปเดตไฟล์นี้ผ่าน PR ที่ผ่าน Peer Review (ดู §21)
 
@@ -16,15 +16,16 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 - **Borrower (Student)** — ดู/ค้นหาอุปกรณ์ ดูความพร้อมให้ยืม ส่งคำขอยืม ดูคำขอ/รายการยืม/ประวัติของตนเอง
 - **Custodian (Staff)** — จัดการรายการอุปกรณ์ บันทึก Checkout/Return ดูรายการเกินกำหนด ดูรายงาน Inventory
 
-**ข้อตกลงทีมที่ยืนยันแล้ว (Confirmed decisions):**
+**ข้อตกลงทีมที่ยืนยันแล้ว (Confirmed decisions — อ้างอิง `docs/srs.md`):**
 - Theme 2: Inventory and Borrowing System — capabilities บังคับ: Inventory Availability, Borrowing Requests, Checkout, Active Loans, Return, Overdue Status, Inventory Reporting
-- **Inventory Tracking = Quantity Tracking** (ติดตามอุปกรณ์เป็นจำนวนรวม ไม่ใช่รายชิ้น)
-- **Borrowing Approval = Direct Checkout** (ไม่มีขั้นตอนอนุมัติแยกก่อน Checkout)
+- **Inventory Tracking = Quantity Tracking** (ติดตามอุปกรณ์เป็นจำนวนรวม ไม่ใช่รายชิ้น) — SRS A-01
+- **Borrowing Approval = Direct Checkout** (ไม่มีขั้นตอนอนุมัติแยกก่อน Checkout) — SRS A-02
+- **ระยะเวลาการยืม = 7 วัน** กำหนดอัตโนมัติที่ checkout และ **Overdue = เลย due date โดยยังไม่คืน** (SRS A-03/BR-07/BR-08 — เดิมอยู่ใน Open Questions ด้านล่าง ตัดสินแล้วใน SRS rev 2)
+- **นิยาม "exclusive item / duplicate active loan" ภายใต้ Quantity Tracking = กฎจำนวน** (available quantity ห้ามต่ำกว่า 0; ของ quantity = 1 มี active loan ซ้ำไม่ได้) (SRS A-04/BR-03 — เดิมอยู่ใน Open Questions ด้านล่าง ตัดสินแล้วใน SRS rev 2)
 
 **ประเด็นที่ยังไม่ตัดสินใจ (Open Questions — ห้ามเดา/ห้ามตัดสินใจแทนทีม):**
-- รายการอุปกรณ์จริงใน catalog (ตัวอย่าง Arduino Uno, ESP32, Breadboard, Jumper Wires, Sensors ฯลฯ เป็นเพียงตัวอย่างบริบท)
-- ระยะเวลาการยืม/กำหนดคืน/นิยาม Overdue
-- นิยาม "exclusive item / duplicate active loan" ภายใต้ Quantity Tracking
+- รายการอุปกรณ์จริงใน catalog (ตัวอย่าง Arduino Uno, ESP32, Breadboard, Jumper Wires, Sensors ฯลฯ เป็นเพียงตัวอย่างบริบท) — SRS OQ-01
+- จำนวนที่ยืมต่อ request/loan (multi-unit) และ full/partial return ที่ต้องตัดสินคู่กัน — SRS OQ-02 (ผูกกับ BR-09)
 - Technology stack ที่แน่นอน (ดู §2) และรูปแบบ session/token
 
 ## 2. Technology Stack and Repository Structure
