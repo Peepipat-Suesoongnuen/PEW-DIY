@@ -16,9 +16,12 @@
 | Sprint 1 → **Deliverable 1** | **8 Nov 2026, 23:59** | Engineering baseline (Parts A–E) + working Sprint 1 on `main` with release tag | `project_deliverable_1_v1.pdf` header/§4 |
 | Sprint 2 → **Deliverable 2** | **29 Nov 2026** | Sprint 2 complete + Sprint 3 contracts and working progress; integrated release candidate | `group_work_specs_v1.pdf` §9 |
 | Sprint 3 → **Final Delivery** | **13 Dec 2026** | Complete verified release, final report, demo video | `group_work_specs_v1.pdf` §9 |
-| Group labs (cross-cutting) | Lab 5 due 22 Nov; Lab 6 due 22 Nov; Lab 7 due 29 Nov | Docker/CI/GCP on the Sprint 1 release; cross-team UAT; maintenance change + metrics | `group_work_specs_v1.pdf` §10 |
+| Group labs (cross-cutting) | Lab 5: labs 10 & 12 Nov, **due 22 Nov** (per §4 table); Lab 6: labs 17 & 19 Nov, due 22 Nov; Lab 7: due 29 Nov | Docker/CI/GCP on the Sprint 1 release; cross-team UAT; maintenance change + metrics | `group_work_specs_v1.pdf` §4/§10 |
 
-> **Open — schedule note:** the master spec's §4 schedule table renders ambiguously (it also shows an 8 Nov workshop "SRS, system SDS, Sprint 1 contract, tests, integration"). This plan targets the **earlier deadline (8 Nov)** per the Deliverable 1 handout and AC-D-03; if the instructor confirms a later date, the buffer only improves. To be confirmed with the instructor.
+> **Open — schedule conflicts in source documents (recorded per PR #20 review):**
+> 1. **Lab 5 due date:** §4 schedule table says **22 Nov** ("Lab 5 due: deployed Sprint 1 and repeatable delivery"), but §10's Lab 5 header says "Due 15 November". This plan uses **22 Nov** (the schedule table row) but **any Docker/CI/GCP and redeployment verification work must plan for the earlier 15 Nov date** until the instructor clarifies — do not wait until 22 Nov.
+> 2. **Deliverable 1 date:** §4 table clearly shows **8 Nov** ("Project Deliverable 1 due") — this plan targets 8 Nov per AC-D-03. The "15 Nov" entry in §4 is the Lab 5 row, not a second D1 deadline. If the instructor issues a formal change announcement, reference that announcement directly.
+> 3. **Demo video length conflict:** master spec §9 and `project_final_delivery_v1.pdf` §2 say "Maximum 10 minutes", but `project_final_delivery_v1.pdf` §3.5 says "Maximum 4 minutes" — see §10 Open Questions.
 
 ## 2. Sprint Overview
 
@@ -88,7 +91,7 @@ Collectively the three sprints cover the entire product baseline (`docs/traceabi
 
 **Dependencies:** F-09 depends on F-06/F-07/F-08 data. Sprint 3 **contracts are drafted during Sprint 2** (Deliverable 2 requires them plus working progress).
 
-**Expected outcomes:** complete verified release (`main` + tag, deployed URL retained for grading); final requirements/test traceability with actual results; final QA/Product DoD evidence; demo video (≤ 10 min, both students) showing one business rule, one failure/access case, one requirement→test chain; one-page release summary.
+**Expected outcomes:** complete verified release (`main` + tag, deployed URL retained for grading); final requirements/test traceability with actual results; final QA/Product DoD evidence; demo video (**length conflict — see §10 OQ; plan ≤ 4 min until clarified**, both students) showing one business rule, one failure/access case, one requirement→test chain; one-page release summary.
 
 **Verification activities:** full regression suite; NFR-07 timing check; UAT re-tests of corrected defects; traceability completeness (baseline coverage, requirement → AC/verification → final result); release readiness checklist.
 
@@ -100,7 +103,7 @@ Sprint 1:   F-01 → F-02 → F-03 → F-04 → F-05 → F-10 (integration) → 
 Sprint 2:   F-05 ─┬→ F-06 (Return) → F-07 (Overdue) ─┐
             F-02 ─┴→ F-08 (Catalog mgmt/search/views) ┴→ integration → RC
 Sprint 3:   F-06/F-07/F-08 data → F-09 (Reporting) + hardening → final release
-Decision gates before implementation: SDS-OQ-01 (stack), SDS-OQ-02 (auth), OQ-01 (seed catalog), OQ-02 (quantity/return semantics)
+Decision gates before implementation: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (calendar/timezone policy — tied to F-05 checkout contract/tests per SDS §10), OQ-01 (seed catalog), OQ-02 (quantity/return semantics)
 ```
 
 Rule: every feature is implemented on a branch from `sprint/1-staging` under its engineering contract, peer-reviewed, and integrated before release (AGENTS/AGENT.md §11.3).
@@ -110,7 +113,7 @@ Rule: every feature is implemented on a branch from `sprint/1-staging` under its
 | Sprint | Features | Requirement set covered |
 |---|---|---|
 | 1 | F-01–F-05, F-10 | FR-01–FR-08, FR-11–FR-16(active), BR-01–BR-07, BR-10, BR-11(S1), NFR-01–NFR-06(S1), NFR-08, NFR-09 |
-| 2 | F-06–F-08 | FR-09, FR-10, FR-17, FR-18, FR-21, BR-06(writes), BR-08, BR-09, BR-11(S2), NFR-04(S2), NFR-06(S2) |
+| 2 | F-06–F-08 | FR-09, FR-10, FR-17, FR-18, **FR-19**, FR-21, BR-06(writes), BR-08, BR-09, BR-11(S2), NFR-04(S2), NFR-06(S2) |
 | 3 | F-09 + hardening | FR-20, NFR-07 + regression/defect scope |
 
 Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 NFR all mapped). Return/Overdue/Reporting are allocated across Sprint 2–3 per AC-D-02.
@@ -143,6 +146,8 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | Item | Impact | Target |
 |---|---|---|
 | SDS-OQ-01 (stack), SDS-OQ-02 (session/token) | Block Sprint 1 implementation and AC-C-01/04 closure | Immediately — before [D1-05] baseline |
+| SDS-OQ-03 (calendar/timezone policy) | F-05 checkout contract and BR-07/08 date-boundary tests | Before [D1-05] checkout contract |
+| **Demo video length conflict** — master spec §9 + `project_final_delivery_v1.pdf` §2 say ≤ 10 min; `project_final_delivery_v1.pdf` §3.5 says ≤ 4 min | Final Delivery rubric compliance | Confirm with instructor/TA; **plan ≤ 4 min meanwhile** (stricter limit satisfies both readings) — recorded per PR #20 review |
 | SRS OQ-01 (actual catalog) | Seed fixtures | Before Sprint 1 seed |
 | SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | Before [D1-05] baseline |
 | Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | Confirm with instructor |
@@ -153,3 +158,4 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-04 | Initial three-sprint plan | SRS rev 2, Part B rev 1, Part C rev 2, `project_deliverable_1_v1.pdf` §3.4, `group_work_specs_v1.pdf` §4/§7/§9 |
+| 2 — 2026-11-04 | PR #20 peer review: recorded Lab 5 due-date conflict (§4 table 22 Nov vs §10 header 15 Nov) with plan-for-earlier guidance; recorded demo video length conflict (10 min vs 4 min) as OQ with ≤ 4 min interim plan; removed ambiguous D1 date note (8 Nov confirmed by §4 table); added FR-19 to §7 coverage summary; added SDS-OQ-03 to decision gates | PR #20 review by L0u1sss; `group_work_specs_v1.pdf` §4/§9/§10; `project_final_delivery_v1.pdf` §2/§3.5; SDS §10 |
