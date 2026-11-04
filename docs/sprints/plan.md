@@ -16,12 +16,11 @@
 | Sprint 1 → **Deliverable 1** | **8 Nov 2026, 23:59** | Engineering baseline (Parts A–E) + working Sprint 1 on `main` with release tag | `project_deliverable_1_v1.pdf` header/§4 |
 | Sprint 2 → **Deliverable 2** | **29 Nov 2026** | Sprint 2 complete + Sprint 3 contracts and working progress; integrated release candidate | `group_work_specs_v1.pdf` §9 |
 | Sprint 3 → **Final Delivery** | **13 Dec 2026** | Complete verified release, final report, demo video | `group_work_specs_v1.pdf` §9 |
-| Group labs (cross-cutting) | Lab 5: labs 10 & 12 Nov, **due 22 Nov** (per §4 table); Lab 6: labs 17 & 19 Nov, due 22 Nov; Lab 7: due 29 Nov | Docker/CI/GCP on the Sprint 1 release; cross-team UAT; maintenance change + metrics | `group_work_specs_v1.pdf` §4/§10 |
+| Group labs (cross-cutting) | Lab 5: sessions 3 & 5 Nov, **due 15 Nov**; Lab 6: sessions 10 & 12 Nov, due 22 Nov; Lab 7: sessions 17 & 19 Nov, due 29 Nov | Docker/CI/GCP on the Sprint 1 release; cross-team UAT; maintenance change + metrics | `group_work_specs_v1.pdf` §4/§10 |
 
-> **Open — schedule conflicts in source documents (recorded per PR #20 review):**
-> 1. **Lab 5 due date:** §4 schedule table says **22 Nov** ("Lab 5 due: deployed Sprint 1 and repeatable delivery"), but §10's Lab 5 header says "Due 15 November". This plan uses **22 Nov** (the schedule table row) but **any Docker/CI/GCP and redeployment verification work must plan for the earlier 15 Nov date** until the instructor clarifies — do not wait until 22 Nov.
-> 2. **Deliverable 1 date:** §4 table clearly shows **8 Nov** ("Project Deliverable 1 due") — this plan targets 8 Nov per AC-D-03. The "15 Nov" entry in §4 is the Lab 5 row, not a second D1 deadline. If the instructor issues a formal change announcement, reference that announcement directly.
-> 3. **Demo video length conflict:** master spec §9 and `project_final_delivery_v1.pdf` §2 say "Maximum 10 minutes", but `project_final_delivery_v1.pdf` §3.5 says "Maximum 4 minutes" — see §10 Open Questions.
+> **Verified schedule (§4 table rows match §9/§10 headers exactly):** Deliverable 1 = **8 Nov** · Lab 5 = **15 Nov** · Lab 6 = **22 Nov** · Lab 7 = **29 Nov** · Deliverable 2 = 29 Nov · Final = 13 Dec.
+> **Note (rev 3):** rev 2 claimed a Lab 5/D1 date conflict — that claim was **withdrawn as incorrect** (caused by a text-extraction row misalignment, not a real document conflict). If the instructor issues a formal schedule change, reference that announcement directly.
+> **Open — demo video length conflict (real, verified in both PDFs):** master spec §9 and `project_final_delivery_v1.pdf` §2 say "Maximum 10 minutes", but `project_final_delivery_v1.pdf` §3.5 says "Maximum 4 minutes" — see §10 Open Questions.
 
 ## 2. Sprint Overview
 
@@ -76,7 +75,7 @@ Collectively the three sprints cover the entire product baseline (`docs/traceabi
 
 **Verification activities:** return/close-accounting tests (BR-09); return atomicity (NFR-06-S2); overdue boundary tests (due date equality is not overdue); catalog-write authorization (BR-06); search; borrower-history isolation (BR-05); full regression of Sprint 1 behavior.
 
-**Cross-cutting labs in this window (Confirmed):** Lab 5 containerizes the Sprint 1 release (redeployment read-back for NFR-04 completes here); Lab 6 cross-team UAT; Lab 7 one approved maintenance change + metrics — evidence feeds Deliverable 2 and Final Delivery.
+**Cross-cutting labs in this window (Confirmed):** Lab 5 containerizes the Sprint 1 release (**due 15 Nov**; redeployment read-back for NFR-04 completes here); Lab 6 cross-team UAT (**due 22 Nov**); Lab 7 one approved maintenance change + metrics (**due 29 Nov**) — evidence feeds Deliverable 2 and Final Delivery.
 
 ## 5. Sprint 3 — Completion and Hardening (Final Delivery, 13 Dec)
 
@@ -150,7 +149,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | **Demo video length conflict** — master spec §9 + `project_final_delivery_v1.pdf` §2 say ≤ 10 min; `project_final_delivery_v1.pdf` §3.5 says ≤ 4 min | Final Delivery rubric compliance | Confirm with instructor/TA; **plan ≤ 4 min meanwhile** (stricter limit satisfies both readings) — recorded per PR #20 review |
 | SRS OQ-01 (actual catalog) | Seed fixtures | Before Sprint 1 seed |
 | SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | Before [D1-05] baseline |
-| Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | Confirm with instructor |
+| Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | **Resolved — 8 Nov confirmed** by §4 table row and §9 (removed as OQ per PR #20 review rev 3) |
 | Team capacity split (§8) | Task assignment | Team confirmation |
 
 ## 11. Revision History
@@ -158,4 +157,5 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-04 | Initial three-sprint plan | SRS rev 2, Part B rev 1, Part C rev 2, `project_deliverable_1_v1.pdf` §3.4, `group_work_specs_v1.pdf` §4/§7/§9 |
-| 2 — 2026-11-04 | PR #20 peer review: recorded Lab 5 due-date conflict (§4 table 22 Nov vs §10 header 15 Nov) with plan-for-earlier guidance; recorded demo video length conflict (10 min vs 4 min) as OQ with ≤ 4 min interim plan; removed ambiguous D1 date note (8 Nov confirmed by §4 table); added FR-19 to §7 coverage summary; added SDS-OQ-03 to decision gates | PR #20 review by L0u1sss; `group_work_specs_v1.pdf` §4/§9/§10; `project_final_delivery_v1.pdf` §2/§3.5; SDS §10 |
+| 2 — 2026-11-04 | PR #20 peer review round 1: recorded demo video length conflict (10 min vs 4 min) as OQ with ≤ 4 min interim plan; added FR-19 to §7 coverage summary; added SDS-OQ-03 to decision gates | PR #20 review by L0u1sss; `project_final_delivery_v1.pdf` §2/§3.5; SDS §10 |
+| 3 — 2026-11-04 | PR #20 peer review round 2: **corrected lab/deliverable schedule** to Lab 5 = 15 Nov, Lab 6 = 22 Nov, Lab 7 = 29 Nov, D1 = 8 Nov (verified by extracting the §4 table with row structure — table rows match §9/§10 headers); **withdrew the rev-2 "schedule conflict" claim as incorrect** (text-extraction row misalignment, not a document conflict); removed the D1-date OQ (resolved); added due dates to Sprint 2 lab references | PR #20 review round 2 by L0u1sss; `group_work_specs_v1.pdf` §4 table (extracted with cell coordinates), §9, §10 |
