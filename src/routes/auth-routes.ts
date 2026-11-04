@@ -37,19 +37,24 @@ export function createApp({ auth, config }: AppDeps): express.Application {
   // Anti-CSRF: cookie mode enforces trusted-origin validation on
   // state-changing requests (AC-F01-12, TEST-F01-15; SDS §7.2). A hostile
   // cross-origin POST (e.g. forced logout) must be denied before handlers.
-  // Browser same-origin requests carry a matching Origin; non-browser
-  // clients that omit Origin fall back to Referer when present.
+  // Evidence policy (review round 2): a state-changing request must carry
+  // either a trusted Origin or a trusted Referer. Requests with neither are
+  // DENIED (403) — absent evidence is not treated as safe. Non-browser
+  // clients must send an explicit Origin header.
   function requireTrustedOrigin(req: Request, res: Response, next: NextFunction): void {
     if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
       next();
       return;
     }
+    const deny = (): void => {
+      res.status(403).json({
+        error: { code: "FORBIDDEN", message: "Request origin not allowed.", requestId: req.requestId },
+      });
+    };
     const origin = req.headers.origin;
     if (typeof origin === "string") {
       if (origin !== config.appOrigin) {
-        res.status(403).json({
-          error: { code: "FORBIDDEN", message: "Request origin not allowed.", requestId: req.requestId },
-        });
+        deny();
         return;
       }
       next();
@@ -61,19 +66,18 @@ export function createApp({ auth, config }: AppDeps): express.Application {
       try {
         refererOrigin = new URL(referer).origin;
       } catch {
-        res.status(403).json({
-          error: { code: "FORBIDDEN", message: "Request origin not allowed.", requestId: req.requestId },
-        });
+        deny();
         return;
       }
       if (refererOrigin !== config.appOrigin) {
-        res.status(403).json({
-          error: { code: "FORBIDDEN", message: "Request origin not allowed.", requestId: req.requestId },
-        });
+        deny();
         return;
       }
+      next();
+      return;
     }
-    next();
+    // Neither Origin nor Referer: no anti-CSRF evidence — deny by default.
+    deny();
   }
   app.use("/api", requireTrustedOrigin);
 

@@ -64,7 +64,7 @@ beforeEach(async () => {
 describe("POST /api/auth/login (TEST-F01-01/02/03)", () => {
   it("returns 200 with data.user and sets a session cookie (TEST-F01-01)", async () => {
     await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
-    const res = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "pw-http" });
+    const res = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send({ username: "B-A-http", password: "pw-http" });
     expect(res.status).toBe(200);
     expect(res.body.data.user).toEqual({ id: "u-b-a-http", username: "B-A-http", role: "BORROWER" });
     expect(res.body.data.user).not.toHaveProperty("password");
@@ -75,8 +75,8 @@ describe("POST /api/auth/login (TEST-F01-01/02/03)", () => {
 
   it("returns 401 INVALID_CREDENTIALS for unknown user and wrong password identically (TEST-F01-02)", async () => {
     await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
-    const wrongPw = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "wrong" });
-    const unknown = await request(app).post("/api/auth/login").send({ username: "nonexistent-http", password: "wrong" });
+    const wrongPw = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send({ username: "B-A-http", password: "wrong" });
+    const unknown = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send({ username: "nonexistent-http", password: "wrong" });
     expect(wrongPw.status).toBe(401);
     expect(unknown.status).toBe(401);
     expect(wrongPw.body.error.code).toBe("INVALID_CREDENTIALS");
@@ -92,7 +92,7 @@ describe("POST /api/auth/login (TEST-F01-01/02/03)", () => {
       { username: "B-A-http", password: "pw-http", user_id: "admin" },
     ];
     for (const payload of cases) {
-      const res = await request(app).post("/api/auth/login").send(payload);
+      const res = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send(payload);
       expect(res.status).toBe(400);
       expect(res.body.error.code).toBe("VALIDATION_ERROR");
     }
@@ -102,7 +102,7 @@ describe("POST /api/auth/login (TEST-F01-01/02/03)", () => {
 describe("GET /api/auth/me (TEST-F01-04/05)", () => {
   it("returns 200 with user identity when authenticated (TEST-F01-04)", async () => {
     await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
-    const login = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "pw-http" });
+    const login = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send({ username: "B-A-http", password: "pw-http" });
     const cookie = parseCookies(login.headers["set-cookie"]);
     const me = await request(app).get("/api/auth/me").set("Cookie", `pew_session=${cookie}`);
     expect(me.status).toBe(200);
@@ -120,10 +120,10 @@ describe("GET /api/auth/me (TEST-F01-04/05)", () => {
 describe("POST /api/auth/logout (TEST-F01-06/07)", () => {
   it("returns 204, clears cookie, and denies replay (TEST-F01-07)", async () => {
     await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
-    const login = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "pw-http" });
+    const login = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send({ username: "B-A-http", password: "pw-http" });
     const cookie = parseCookies(login.headers["set-cookie"]);
 
-    const logout = await request(app).post("/api/auth/logout").set("Cookie", `pew_session=${cookie}`).send({});
+    const logout = await request(app).post("/api/auth/logout").set("Origin", config.appOrigin).set("Cookie", `pew_session=${cookie}`).send({});
     expect(logout.status).toBe(204);
     const cleared = parseCookies(logout.headers["set-cookie"]);
     expect(cleared).toBe("");
@@ -133,7 +133,7 @@ describe("POST /api/auth/logout (TEST-F01-06/07)", () => {
   });
 
   it("returns 401 for logout without authentication (TEST-F01-05)", async () => {
-    const res = await request(app).post("/api/auth/logout").send({});
+    const res = await request(app).post("/api/auth/logout").set("Origin", config.appOrigin).send({});
     expect(res.status).toBe(401);
     expect(res.body.error.code).toBe("UNAUTHENTICATED");
   });
@@ -183,7 +183,7 @@ describe("Regression — safe error envelopes (TEST-F01-03/06/14)", () => {
 describe("Regression — anti-CSRF origin enforcement (TEST-F01-15)", () => {
   it("cross-origin logout is denied 403 and does NOT revoke the session (forced-logout defense)", async () => {
     await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
-    const login = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "pw-http" });
+    const login = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send({ username: "B-A-http", password: "pw-http" });
     const cookie = parseCookies(login.headers["set-cookie"]);
 
     const attack = await request(app)
@@ -201,7 +201,7 @@ describe("Regression — anti-CSRF origin enforcement (TEST-F01-15)", () => {
 
   it("same-origin state-changing request is allowed", async () => {
     await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
-    const login = await request(app).post("/api/auth/login").send({ username: "B-A-http", password: "pw-http" });
+    const login = await request(app).post("/api/auth/login").set("Origin", config.appOrigin).send({ username: "B-A-http", password: "pw-http" });
     const cookie = parseCookies(login.headers["set-cookie"]);
 
     const res = await request(app)
@@ -210,5 +210,29 @@ describe("Regression — anti-CSRF origin enforcement (TEST-F01-15)", () => {
       .set("Origin", config.appOrigin)
       .send({});
     expect(res.status).toBe(204);
+  });
+});
+
+describe("Regression — missing anti-CSRF evidence (TEST-F01-15, review round 2)", () => {
+  it("logout with neither Origin nor Referer is denied 403 and does NOT revoke the session", async () => {
+    await seedUser("u-b-a-http", "B-A-http", "BORROWER", "pw-http");
+    const login = await request(app)
+      .post("/api/auth/login")
+      .set("Origin", config.appOrigin)
+      .send({ username: "B-A-http", password: "pw-http" });
+    const cookie = parseCookies(login.headers["set-cookie"]);
+
+    // No Origin, no Referer: absent anti-CSRF evidence must be denied
+    // before the handler runs (contract TEST-F01-15).
+    const res = await request(app)
+      .post("/api/auth/logout")
+      .set("Cookie", `pew_session=${cookie}`)
+      .send({});
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe("FORBIDDEN");
+
+    // No side effect: the session must remain valid after the rejection.
+    const me = await request(app).get("/api/auth/me").set("Cookie", `pew_session=${cookie}`);
+    expect(me.status).toBe(200);
   });
 });

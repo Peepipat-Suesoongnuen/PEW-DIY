@@ -100,11 +100,49 @@ AssertionError: expected 204 to be 403 // Object.is equality
 npm run build  →  tsc exits 0
 ```
 
+
 ---
+
+## Cycle 3 — Missing anti-CSRF evidence (PR #22 review round 2)
+
+**RED** (regression test written first; actual output):
+
+```
+ × logout with neither Origin nor Referer is denied 403 and does NOT
+   revoke the session
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 38 passed (39)
+```
+
+**Behavior gap proven:** with neither `Origin` nor `Referer` the guard called
+`next()`, so an authenticated logout succeeded (204 + revocation) with zero
+anti-CSRF evidence.
+
+**Correction:** `requireTrustedOrigin` now denies by default — state-changing
+requests must carry a trusted `Origin` or `Referer`; absent evidence returns
+403 before the handler. Positive tests updated to send an explicit trusted
+`Origin` (non-browser clients must do the same).
+
+**GREEN** (same command, after correction):
+
+```
+ Test Files  5 passed (5)
+      Tests  39 passed (39)
+npm run build -> exit 0
+```
+
+**Live HTTP probe against real session + database (reviewer's table):**
+
+| logout request | HTTP | session after |
+|---|---|---|
+| Disallowed Origin | 403 | still valid |
+| No Origin + no Referer | **403** (was 204) | **still valid** (was revoked) |
+| Allowed Origin | 204 | revoked |
+
 
 ## Final state
 
-- `npm test` → **38/38 passing** (5 files), source tests only (vitest config
+- `npm test` → **39/39 passing** (5 files), source tests only (vitest config
   excludes `dist`), reproducible without shell exports (`.env` auto-loaded).
 - `npm run build` → exits 0 (TypeScript 7, `moduleResolution: nodenext`).
 - Deferred/blocked STS rows (TEST-F01-11/12 execution evidence, TEST-F01-13
