@@ -7,6 +7,7 @@ A university equipment-borrowing system for the D.I.Y. Room, which supports stud
 ## Project Documentation
 
 - [Software Requirements Specification (SRS)](docs/srs.md)
+- [System-Level Design Specification (SDS)](docs/system-sds.md) — draft; stack and authentication choices pending team decision
 
 ## Project Status
 
