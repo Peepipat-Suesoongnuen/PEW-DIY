@@ -238,31 +238,60 @@ describe("Availability derivation and UI serving (TEST-F02-07/08 backend portion
   });
 });
 
-describe("Safe failure and restart persistence (TEST-F02-09/10 catalog portion)", () => {
-  it("DB unavailability yields safe 503 without SQL/stack details (TEST-F02-09)", async () => {
-    const brokenPool = {
-      query: async () => {
-        throw new Error("connection refused: secret-connection-string-should-not-leak");
+describe("Safe failure and restart persistence (TEST-F02-09/10)", () => {
+  it("catalog DB failure yields safe 503 for list/detail and recovery returns real data (TEST-F02-09)", async () => {
+    // Reviewer fix: a VALID authenticated session must reach the catalog
+    // query — only equipment reads fail; auth/session queries pass through.
+    // The old version failed at authentication first and accepted 401|503,
+    // which proved nothing about the catalog failure path.
+    await seedFixtures();
+    let failEquipment = true;
+    const flakyPool = {
+      query: (text: string, params?: unknown[]) => {
+        if (failEquipment && /FROM equipment/.test(text)) {
+          return Promise.reject(new Error("connection refused: secret-connection-string-should-not-leak"));
+        }
+        return pool.query(text, params as never[]);
       },
-    } as never;
-    const brokenSessions = new SessionStore(brokenPool, 60, 480);
-    const brokenAuth = new AuthService(brokenPool, brokenSessions);
-    const brokenApp = createApp({ auth: brokenAuth, config });
+    } as unknown as Pool;
+    const flakySessions = new SessionStore(flakyPool, 60, 480);
+    const flakyAuth = new AuthService(flakyPool, flakySessions);
+    const flakyApp = createApp({ auth: flakyAuth, config });
 
-    // a valid session id is required to reach the DB-failure path deterministically
-    const res = await request(brokenApp).get("/api/equipment").set("Cookie", "pew_session=any");
-    expect([401, 503]).toContain(res.status); // deny-by-default if auth store fails first
-    if (res.status === 503) {
-      const s = JSON.stringify(res.body);
-      expect(s).not.toContain("secret-connection-string-should-not-leak");
-      expect(s).not.toContain("TypeError");
-    }
+    const cookie = await login("B-A-cat", "pw-cat"); // valid session (real store)
+    // list
+    const list = await request(flakyApp).get("/api/equipment").set("Cookie", `pew_session=${cookie}`);
+    expect(list.status).toBe(503);
+    expect(list.body.error.code).toBe("SERVICE_UNAVAILABLE");
+    expect(list.body.data).toBeUndefined();
+    // detail
+    const detail = await request(flakyApp).get("/api/equipment/fixture-e-one").set("Cookie", `pew_session=${cookie}`);
+    expect(detail.status).toBe(503);
+    expect(detail.body.error.code).toBe("SERVICE_UNAVAILABLE");
+    // safe envelope: no SQL/stack/connection details, no false empty success
+    const serialized = JSON.stringify([list.body, detail.body]);
+    expect(serialized).not.toContain("secret-connection-string-should-not-leak");
+    expect(serialized).not.toContain("SELECT");
+    expect(serialized).not.toContain("at ");
+    expect(list.body.data).not.toEqual([]);
+
+    // restore DB and retry → real persisted data
+    failEquipment = false;
+    const retry = await request(flakyApp).get("/api/equipment").set("Cookie", `pew_session=${cookie}`);
+    expect(retry.status).toBe(200);
+    expect(retry.body.data).toHaveLength(3);
+    const retryDetail = await request(flakyApp).get("/api/equipment/fixture-e-one").set("Cookie", `pew_session=${cookie}`);
+    expect(retryDetail.status).toBe(200);
+    expect(retryDetail.body.data.id).toBe("fixture-e-one");
   });
 
-  it("catalog survives application restart against the same DB (TEST-F02-10 catalog portion)", async () => {
+  it("catalog survives a new application instance on the same DB (TEST-F02-10 instance-level portion)", async () => {
     await seedFixtures();
     const before = await pool.query(`SELECT id, name, quantity_total FROM equipment ORDER BY id`);
-    // "restart": a brand-new app instance against the same durable database
+    // Instance-level check (fast complement to the real process-restart
+    // evidence in restart-e2e.test.ts — see that file for AC-06.2-03 proof):
+    // a brand-new app instance on the same durable database reads identical
+    // records. Loan-dependent domain records remain dependency-gated (F-04/F-05).
     const sessions2 = new SessionStore(pool, config.session.idleMinutes, config.session.absoluteMinutes);
     const auth2 = new AuthService(pool, sessions2);
     const app2 = createApp({ auth: auth2, config });

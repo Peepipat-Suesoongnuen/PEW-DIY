@@ -9,10 +9,10 @@ Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.[39m
  RUN  v5.1.0 C:/kmutt2026/01-2026/Software_Engineer/Group Project/PEW-DIY
 
 
- Test Files  6 passed (6)
-      Tests  50 passed (50)
-   Start at  19:58:02
-   Duration  2.24s (tests 67%, import 28%, transform 4%, worker 1%)
+ Test Files  8 passed (8)
+      Tests  55 passed (55)
+   Start at  20:46:20
+   Duration  4.40s (tests 69%, import 28%, transform 2%, worker 1%)
 
-    Isolate  6 workers spawned · ~95ms startup each (spawn + environment, per file)
-             at least ~477ms faster with isolate: false — reuses workers across files instead of one per file
+    Isolate  8 workers spawned · ~102ms startup each (spawn + environment, per file)
+             at least ~712ms faster with isolate: false — reuses workers across files instead of one per file

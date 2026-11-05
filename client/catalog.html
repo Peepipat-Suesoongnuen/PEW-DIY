@@ -63,11 +63,19 @@
         const rows = document.getElementById("rows");
         rows.innerHTML = "";
         for (const item of items) {
+          // P1 fix (PR #27 review): build every cell with textContent — item
+          // fields come from the DB and must render as text, never as HTML.
           const tr = document.createElement("tr");
-          const availClass = item.availability === "UNAVAILABLE" ? "unavailable" : "";
-          tr.innerHTML = "<td>" + item.id + "</td><td>" + item.name + "</td><td>" + item.description +
-            "</td><td>" + item.category + "</td><td>" + item.quantity_total +
-            "</td><td>" + item.quantity_available + "</td><td class='" + availClass + "'>" + item.availability + "</td>";
+          const values = [item.id, item.name, item.description, item.category,
+                          String(item.quantity_total), String(item.quantity_available), item.availability];
+          for (const value of values) {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+          }
+          if (item.availability === "UNAVAILABLE") {
+            tr.lastChild.classList.add("unavailable");
+          }
           tr.style.cursor = "pointer";
           tr.addEventListener("click", () => { window.location.href = "/item.html?id=" + encodeURIComponent(item.id); });
           rows.appendChild(tr);
@@ -82,15 +90,25 @@
     }
 
     document.getElementById("logout").addEventListener("click", async () => {
+      // P2 fix (PR #27 review): only redirect on confirmed 204. On failure or
+      // network error the server credential may still be valid — show a safe
+      // failure and allow a controlled retry (F-01 contract §2.3).
+      hide("error");
       try {
-        await fetch("/api/auth/logout", {
+        const res = await fetch("/api/auth/logout", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Origin": window.location.origin },
           body: "{}",
           credentials: "same-origin",
         });
-      } catch (e) { /* logout failure: fall through to login page */ }
-      redirectToLogin();
+        if (res.status === 204) {
+          redirectToLogin();
+          return;
+        }
+      } catch (e) { /* network failure: fall through to the failure state */ }
+      const box = document.getElementById("error");
+      box.textContent = "Logout could not be confirmed. Please try again.";
+      show("error");
     });
 
     load();
