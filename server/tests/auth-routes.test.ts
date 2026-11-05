@@ -7,11 +7,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Pool } from "pg";
 import request from "supertest";
 import type express from "express";
-import { createApp } from "../routes/auth-routes";
-import { AuthService } from "../services/auth";
-import { SessionStore } from "../services/session";
-import { hashPassword } from "../services/password";
-import { loadConfig, AppConfig } from "../config/config";
+import { createApp } from "../src/routes/auth-routes";
+import { AuthService } from "../src/services/auth";
+import { SessionStore } from "../src/services/session";
+import { hashPassword } from "../src/services/password";
+import { loadConfig, AppConfig } from "../src/config/config";
 import { createTestContext, TestContext } from "./harness";
 
 let ctx: TestContext;

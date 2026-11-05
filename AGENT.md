@@ -2,7 +2,7 @@
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Status:** Draft — pending peer review (created by AI agent, Issue [D1-07]; not yet approved by the team)
-> **Last updated:** 2026-11-04 (§1: reconcile กับ SRS rev 2 — ย้ายระยะเวลาการยืม/นิยาม exclusive item จาก Open Questions ไป Confirmed decisions ตาม SRS A-03/BR-07/08, A-04/BR-03; เพิ่ม SRS OQ-01/OQ-02 อ้างอิง — ตาม AGENT.md §21)
+> **Last updated:** 2026-11-05 (FIX-A #23: §2.3 snapshot ล้าหลัง — อัปเดตโครงสร้าง client/server + stack ที่เลือกแล้ว (ปิด SDS-OQ-01/02) ตาม AGENT.md §21)
 > **Purpose:** คู่มือกลางสำหรับ AI Agent ทุกตัวที่เข้ามาทำงานใน Repository นี้ เพื่อให้การพัฒนาเป็นมาตรฐาน ตรวจสอบได้ ปลอดภัย และไม่ลดอำนาจการตัดสินใจของมนุษย์
 > **Maintenance:** เมื่อ stack/โครงสร้าง/กระบวนการทำงานเปลี่ยนแปลงอย่างมีนัยสำคัญ ต้องอัปเดตไฟล์นี้ผ่าน PR ที่ผ่าน Peer Review (ดู §21)
 
@@ -43,17 +43,13 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 - `docs/` — เอกสารวิศวกรรม: `docs/srs.md`, `docs/features.md`, `docs/traceability.md`, `docs/system-sds.md`, `docs/sprints/`, `docs/labs/`
 - โครงสร้าง source code ตามที่กำหนดใน `docs/system-sds.md` เมื่อทีมเลือก stack แล้ว
 
-### 2.3 แหล่งอ้างอิงและสถานะจริง (snapshot ณ 2026-11-03 — verify ซ้ำก่อนใช้)
+### 2.3 แหล่งอ้างอิงและสถานะจริง (snapshot ณ 2026-11-05 — verify ซ้ำก่อนใช้)
 
-**ยืนยันได้จาก git commit ของ branch นี้:** `AGENT.md`, `README.md`, `.gitignore` — ยังไม่มี application source code และ**ยังยืนยัน Technology Stack ไม่ได้** (ห้ามเดา)
+**โครงสร้างที่ยืนยันได้จาก repository (FIX-A):** `client/` (โครงสร้างเตรียมพร้อมสำหรับ frontend — ยังไม่มี framework), `server/src` (application code: config/db/routes/services), `server/tests` (tests — อยู่นอก build output), `docs/` (เอกสารวิศวกรรมทั้งหมด), root config (`package.json`, `tsconfig.json`, `vitest.config.ts`, `.env.example`)
 
-**Local draft (untracked — ยังไม่ได้ commit จึงไม่ใช่ส่วนหนึ่งของ repository):** `docs/srs.md` (โครงร่างที่ทีมเริ่มร่างบนเครื่องพัฒนา — จึงไม่ปรากฏใน repository หรือ working tree ของผู้ตรวจ; จะจัดทำเป็นทางการใน [D1-01])
+**Technology Stack (เลือกแล้ว — ปิด SDS-OQ-01/02):** Node.js + TypeScript + Express + PostgreSQL + Vitest/Supertest; authentication = server session + HttpOnly cookie + trusted-origin anti-CSRF (ทีมตัดสินใจ D1/D2; implement แล้วใน PR #22; บันทึกใน `docs/system-sds.md` §2.1)
 
-**Planned/pending (ยังไม่มีใน repository — ไม่ต้องจัดทำใน PR นี้):**
-- `docs/srs.md` ฉบับทางการ (FR/BR/NFR) — [D1-01] Part A
-- `docs/features.md`, `docs/traceability.md` — [D1-02] Part B
-- `docs/system-sds.md` (Technology Stack/Data Model) — [D1-03] Part C
-- `docs/sprints/` (Three-sprint plan + engineering contracts) — [D1-04]/[D1-05] Part D/E
+**เอกสารที่มีใน repository แล้ว:** `docs/srs.md` (Part A), `docs/features.md` + `docs/traceability.md` (Part B), `docs/system-sds.md` (Part C), `docs/sprints/plan.md` (Part D), `docs/sprints/sprint-1/` (Part E contracts) — ดู §3 Source of Truth Documents
 
 ## 3. Source of Truth Documents
 

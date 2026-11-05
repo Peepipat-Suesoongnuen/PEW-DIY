@@ -7,8 +7,23 @@ A university equipment-borrowing system for the D.I.Y. Room, which supports stud
 ## Project Documentation
 
 - [Software Requirements Specification (SRS)](docs/srs.md)
-- [System-Level Design Specification (SDS)](docs/system-sds.md) — draft; stack and authentication choices pending team decision
-- [Sprint 1 Engineering Contracts (Part E)](docs/sprints/sprint-1/README.md) — draft feature specifications, AC/STS mapping and Product DoD
+- [System-Level Design Specification (SDS)](docs/system-sds.md)
+- [Sprint 1 Engineering Contracts (Part E)](docs/sprints/sprint-1/README.md) — feature specifications, AC/STS mapping and Product DoD
+
+## Project Structure
+
+```text
+PEW-DIY/
+├── client/            # Frontend application (structure prepared; framework/UI comes with F-02+)
+├── server/
+│   ├── src/           # Backend application: config, db, routes, services
+│   └── tests/         # Unit + API/integration tests (outside build output)
+├── docs/              # SRS, SDS, feature inventory, traceability, sprint plans and contracts
+├── package.json       # Shared root configuration (single package)
+└── AGENT.md           # Repository agent instructions
+```
+
+Deployment remains a modular monolith: one application container serves UI and API (SDS §2.2/§8.2).
 
 ## Development Setup (Sprint 1)
 
@@ -33,7 +48,7 @@ npm run migrate
 # 5. Seed the demo accounts (B-A, B-B, C-A) — upsert-safe, rerun-friendly
 npm run seed
 
-# 6. Run the test suite against the test database (38 tests)
+# 6. Run the test suite against the test database (39 tests)
 npm test
 
 # 7. Start the development server

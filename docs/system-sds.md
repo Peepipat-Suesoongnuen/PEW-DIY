@@ -45,9 +45,21 @@ The local baseline contains documentation only: no application source, runtime m
 
 Before [D1-05] is baselined, record the team's exact selections and rationale in this table, pin supported dependency versions in implementation manifests, and replace the setup outline in §4 with verified README commands. Criteria are team familiarity, testability of protected APIs, atomic checkout, reproducible migrations/seed, and later Docker/GCP suitability. Stack approval is recorded as SDS-OQ-01 in §10.
 
+**Update (revision 3 — SDS-OQ-01/02 resolved):** the team selected and implemented the stack below (decision D1/D2, 2026-11-03/04; implemented in PR #22, merged). The status text above is retained as the historical record at revision 1.
+
+| Layer | Selection (revision 3) | Evidence |
+|---|---|---|
+| Runtime/framework | Node.js 24 + TypeScript 7 + Express 5 | PR #22 implementation; `package.json`/`package-lock.json` (pinned) |
+| Database | PostgreSQL 17 (`pg` driver; versioned SQL migrations) | PR #22 `server/src/db` |
+| Password hashing | argon2id via `@node-rs/argon2` | PR #22 `server/src/services/password.ts` |
+| Identity transport | Server session + HttpOnly cookie (SameSite=Lax) + trusted-origin anti-CSRF; idle/absolute expiry; durable revocation in DB | PR #22 `server/src/services/session.ts`, `auth-routes.ts`; tests TEST-F01-07/08/15/16 |
+| Test tooling | Vitest + Supertest | PR #22 `server/tests` (39 tests) |
+
 ### 2.2 Logical Architecture — Proposed Modular Monolith
 
 The course permits a modular monolith: UI, API/application, and database are logical responsibilities, not a requirement for three servers or containers. One application can serve the UI and API; the database remains a durable store.
+
+**Physical layout (revision 3, FIX-A):** the repository separates frontend and backend directories — `client/` (frontend application; structure prepared, framework not yet chosen — the framework decision belongs to UI work) and `server/` (`server/src` application code: config/db/routes/services; `server/tests` tests, kept outside the build output). This is a directory-level separation of the same logical layers below; **the deployment topology is unchanged** — one application container serves UI and API (§8.2, Lab 5 R-01).
 
 ```mermaid
 flowchart LR
@@ -329,7 +341,7 @@ On any topology, replacing the application image/container must preserve the sam
 | AD-C-04 — Proposed | Modular monolith with logical UI/API/DB boundaries | Fits course §5.1 and small team; business rules remain server-side without extra services |
 | AD-C-05 — Proposed | Derived availability and serialized Equipment writes | Avoid competing stock counters; enforce BR-03/NFR-05/06 with DB transactions, not browser state |
 | AD-C-06 — Proposed | One request → at most one loan; ownership through request | Prevent duplicate fulfillment and inconsistent borrower/item links; quantity/split fulfillment contract awaits OQ-02/[D1-05] |
-| AD-C-07 — Open | Exact stack and authentication strategy | Evidence does not choose them; alternatives in §2/§7, required before implementation |
+| AD-C-07 — Resolved (rev 3) | Exact stack and authentication strategy | Resolved: Node.js/TypeScript/Express/PostgreSQL + server session/cookie/trusted-origin (team decision D1/D2; PR #22) — see §2.1 |
 | AD-C-08 — Proposed | Durable store separate from application lifecycle | BR-11/NFR-04 and later GCP design; no data stored only in app memory/container filesystem |
 
 The following are **planned checks for [D1-05]/[D1-06]**, not executed tests or invented TEST IDs. [Part B traceability](traceability.md) remains the authoritative requirement/sprint allocation.
@@ -353,8 +365,8 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 |---|---|---|
 | SRS OQ-01 | Team supplies actual initial catalog; until then fixtures remain labelled synthetic/proposed | Before Sprint 1 seed implementation |
 | SRS OQ-02 | Team fixes >1 quantities, borrower limits and full/partial return together; confirm request-to-loan fulfillment contract | Before [D1-05] baseline |
-| SDS-OQ-01 — stack | Team supplies Lab stack evidence or chooses UI/API/DB/version/migration tools with rationale | Before AC-C-01 can be fully satisfied |
-| SDS-OQ-02 — authentication | Team chooses session/token, expiry, transport, revocation and CSRF policy | Before AC-C-04 can be fully satisfied and F-01 implemented |
+| SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + Vitest/Supertest (team decision D1; PR #22) | Closed — AC-C-01 now verifiable |
+| SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 now verifiable |
 | SDS-OQ-03 — calendar policy | Approve business timezone/date boundary representation consistent with BR-07/08 | Before checkout contract/tests |
 | SDS-OQ-04 — hosting | Select GCP services/storage/secret delivery after actual Lab 5 guidance and access | Design candidate now; implementation in Lab 5 |
 | SRS OQ-03–OQ-06, A-08–A-10 | Keep later-sprint policy/assumptions visible; do not add category periods, penalties, damage workflow or new search requirements now | Per SRS targets |
@@ -376,3 +388,4 @@ This local document is not a claim that Issue #3 is Done. Resolve the decisions 
 |---|---|---|
 | 1 — 2026-11-04 | Initial System-Level SDS; architecture/data/UI/API/access/configuration proposals, explicit decision gaps and AC review | Local baseline `9d3c57b`, SRS rev 2, Part B rev 1, Issues #1–#3 and original course PDFs |
 | 2 — 2026-11-04 | Tagged the NFR-08/NFR-09 verification row with `F-10` and added its coordination sentence for cross-document consistency with Part B; no design change | Peer review feedback on PR #17 (confirmed by reviewer); `docs/traceability.md` rows NFR-08 → F-10, NFR-09 → F-10 |
+| 3 — 2026-11-05 | Closed SDS-OQ-01/02 with the team-selected stack and authentication strategy (§2.1 update block, AD-C-07, §10) and recorded the client/server physical layout with unchanged monolith deployment (§2.2) | FIX-A #23; team decisions D1/D2 (2026-11-03/04); PR #22 implementation evidence |

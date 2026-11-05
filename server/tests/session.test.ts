@@ -5,7 +5,7 @@
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Pool } from "pg";
-import { SessionStore } from "../services/session";
+import { SessionStore } from "../src/services/session";
 import { createTestContext, resetTestDb, TestContext } from "./harness";
 
 let ctx: TestContext;
