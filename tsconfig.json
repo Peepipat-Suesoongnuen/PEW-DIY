@@ -8,9 +8,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": "server/src",
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": ["server/src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "server/tests", "client"]
 }

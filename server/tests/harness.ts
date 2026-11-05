@@ -5,9 +5,9 @@
  * routes (contract §2.2). No in-process fallbacks; fail-closed by design.
  */
 import { Pool } from "pg";
-import { migrate } from "../db/migrations";
-import { createPool } from "../db/pool";
-import { loadConfig } from "../config/config";
+import { migrate } from "../src/db/migrations";
+import { createPool } from "../src/db/pool";
+import { loadConfig } from "../src/config/config";
 
 export interface TestContext {
   pool: Pool;

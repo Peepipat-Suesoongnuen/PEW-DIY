@@ -10,9 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "tsc",
-    "dev": "tsx src/index.ts",
-    "migrate": "tsx src/db/migrate.ts",
-    "seed": "tsx src/db/seed.ts"
+    "dev": "tsx server/src/index.ts",
+    "migrate": "tsx server/src/db/migrate.ts",
+    "seed": "tsx server/src/db/seed.ts"
   },
   "repository": {
     "type": "git",

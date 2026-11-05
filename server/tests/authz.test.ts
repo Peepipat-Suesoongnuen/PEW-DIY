@@ -5,9 +5,9 @@
  * level; full HTTP integration follows once the Express app is wired.
  */
 import { describe, expect, it } from "vitest";
-import { createAuthMiddleware, PROTECTED_ROUTES, Role } from "../services/authz";
-import { AuthService } from "../services/auth";
-import { SessionStore } from "../services/session";
+import { createAuthMiddleware, PROTECTED_ROUTES, Role } from "../src/services/authz";
+import { AuthService } from "../src/services/auth";
+import { SessionStore } from "../src/services/session";
 
 function makeAuthMiddleware() {
   // Pools are not exercised for guard logic; pass a dummy.

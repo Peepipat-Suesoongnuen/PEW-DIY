@@ -4,7 +4,7 @@
  * exercised; failures here are behavior failures, not setup errors.
  */
 import { describe, expect, it } from "vitest";
-import { getDummyHash, hashPassword, verifyPassword } from "../../src/services/password";
+import { getDummyHash, hashPassword, verifyPassword } from "../src/services/password";
 
 describe("password hashing service (BR-10, NFR-03)", () => {
   it("produces a salted argon2 hash that is not the plaintext and differs for equal inputs", async () => {
