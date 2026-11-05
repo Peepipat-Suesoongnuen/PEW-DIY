@@ -33,6 +33,7 @@
 | N-2 | **Role-aware links:** Borrower = Catalog/My Requests/My Loans · Custodian = Catalog/Submitted Requests | Matches f-01 §2.3 ("navigation uses current-user's server-returned role") and SDS §5 | **Confirmed** (contract behavior) |
 | N-3 | **No dead links** — links appear only when the feature exists | Later-sprint screens (My Loans history, return…) must not render before their features land | Proposed (consistency rule) |
 | N-4 | **Back to catalog link on Item Detail** | Direct URL navigation must work (SPA fallback, ARCH §12.1); explicit back link keeps the flow obvious | Proposed |
+| N-5 | **After successful request submit → navigate to My Requests** (confirmation displayed there) | Follows the approved f-04 contract §2 ("UI opens My Requests") and AC-F04-08 (submit → own-request display → reload). The alternative (stay on page + manual link) would be a contract change — recorded as OQ-UI-6 | **Confirmed by contract** |
 
 ## 4. Color and Typography
 
@@ -65,6 +66,7 @@
 | OQ-UI-3 | Item images | **Gap** — FR-06 has no image field; inventing one would create a requirement | Keep out until SRS change approved |
 | OQ-UI-4 | Catalog sorting | **Gap** — no FR supports sorting | Out of scope |
 | OQ-UI-5 | "Checkout Action" wording on Item Detail | Task brief says "Checkout Action"; approved SRS/contracts define the Borrower action as "Request to borrow" (FR-11) with custodian checkout (FR-14) on a different screen | Spec follows approved contracts; team to confirm label wording |
+| OQ-UI-6 | Post-submit success flow variant: stay on Item Detail + manual "My Requests" link (instead of the contract's redirect) | Would require a f-04 contract revision (AC-F04-08 assumes redirect to own-request display) | **Not adopted** — spec follows the approved contract (N-5); if the team prefers the variant, raise a f-04 contract revision first |
 
 ## 8. Scope Note
 

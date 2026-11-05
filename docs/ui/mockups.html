@@ -91,6 +91,7 @@
   <strong>UI-01 design artifact (documentation only)</strong> — static mockup rendering the Confirmed design direction:
   Classic Navy <code>#313B7B</code> · Pure White <code>#FFFFFF</code> · Academic/University + Minimal &amp; Clean.
   Not application code; implementation will be React + Vite + Tailwind v4 per the Architecture Change Proposal.
+  <br><strong>Desktop-only rendering</strong> (composed at ≥1024px desktop widths — narrow widths show the desktop layout clipped, which is expected for this artifact). For tablet and mobile layouts see <code>wireframes.md</code> §2.2–2.3 (Catalog) and §3.2–3.3 (Item Detail).
 </div>
 
 <!-- ============ MOCKUP 1: LOGIN ============ -->
@@ -177,7 +178,7 @@
 <!-- ============ MOCKUP 3: ITEM DETAIL ============ -->
 <div class="section">
   <h2>3. Item Detail</h2>
-  <p class="caption">Two-zone card: item information left (Quantity Tracking display), Borrower request panel right. Action = "Request to borrow" (FR-11, Direct Checkout flow — no approval step). Quantity bounds pending OQ-02. (ui-spec.md §3 · wireframes.md §3)</p>
+  <p class="caption">Two-zone card: item information left (Quantity Tracking display), Borrower request panel right. Action = "Request to borrow" (FR-11, Direct Checkout flow — no approval step). <strong>On 201 the UI navigates to My Requests and shows the confirmation there</strong> (f-04 §2/AC-F04-08). Quantity bounds pending OQ-02. (ui-spec.md §3 · wireframes.md §3)</p>
   <div class="frame">
     <nav class="nav">
       <span class="brand"><span aria-hidden="true">▣</span> PEW-DIY</span>
@@ -218,7 +219,7 @@
   <div class="state-row">
     <div class="state-card">
       <strong>Success state</strong>
-      <div class="alert alert-success">✓ Request submitted. <a href="#" style="color:inherit">→ My Requests</a></div>
+      <div class="alert alert-success">✓ Request submitted — redirecting to <strong>My Requests</strong> (confirmation shown there per f-04 §2/AC-F04-08)</div>
     </div>
     <div class="state-card">
       <strong>Error state (409 insufficient availability)</strong>

@@ -208,11 +208,11 @@ Component hierarchy: `AppShell` → `Nav` → `BackLink` → `Card`(`DetailList`
 | **Unavailable state** | Badge UNAVAILABLE + no request form (action hidden/disabled with explanation "This item is currently unavailable."); server remains authoritative (hidden ≠ authorization) | f-02 §2 |
 | **Checkout error (request failure)** | `Alert` per error code: 409 INSUFFICIENT_AVAILABILITY → "This item is no longer available." + re-fetch stock; 401 → login; 500/503 → generic retry + requestId; preserve safe input | f-04 §API, shared-conventions |
 | **Loading** | Page-level loading while detail loads; submit button loading+disabled while request in flight | f-02 §3 |
-| **Success / Confirmation** | After 201: `Alert` (success): "Request submitted." + link to My Requests; form resets; **no approval step shown anywhere** (Direct Checkout) | f-04, SRS A-02 |
+| **Success / Confirmation** | After 201: **navigate to My Requests** (f-04 §2: "UI opens My Requests"; AC-F04-08: submit → own-request display → reload) and display the confirmation there (e.g., success `Alert`: "Request submitted." at top of My Requests list). Per the approved contract this is a redirect, not stay-on-page + manual link. The My Requests screen itself belongs to F-04 UI (outside UI-01's 3 pages) — this spec defines the redirect behavior and where the confirmation appears. **No approval step shown anywhere** (Direct Checkout). If the team prefers stay-on-page + link instead, that would be a contract change and must be reviewed as a f-04 revision (recorded in design-decisions.md OQ-UI-6) | f-04 §2, AC-F04-08, SRS A-02 |
 
 ### 3.3 Interaction and UI States (summary)
 
-Default → validate on submit → loading/pending → success (confirmation + nav link) **or** error (safe message per code + preserved input) · 404 missing item → `EmptyState`-style "Item not found" + "Back to catalog" · 401 → Login. Custodian view: same data, **no request form**.
+Default → validate on submit → loading/pending → **success (redirect to My Requests; confirmation displayed there — f-04 §2/AC-F04-08)** or error (safe message per code + preserved input) · 404 missing item → `EmptyState`-style "Item not found" + "Back to catalog" · 401 → Login. Custodian view: same data, **no request form**.
 
 ### 3.4 Responsive
 

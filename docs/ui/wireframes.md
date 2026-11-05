@@ -186,7 +186,7 @@
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-**Caption:** Two-zone card — info left (DetailList), request panel right (sticky). Badge top-right of heading. Success state replaces panel with "Request submitted. → My Requests".
+**Caption:** Two-zone card — info left (DetailList), request panel right (sticky). Badge top-right of heading. After 201 the UI **navigates to My Requests** and shows the confirmation there (f-04 §2: "UI opens My Requests"; AC-F04-08: submit → own-request display → reload) — not a stay-on-page link.
 
 ### 3.2 Tablet (≥768px)
 
@@ -244,12 +244,16 @@ UNAVAILABLE ITEM                 ITEM NOT FOUND (404)
 │ (no request form —    │        │ [ Back to catalog ]   │
 │  explanation shown)   │        └───────────────────────┘
 └───────────────────────┘
-SUCCESS (after request)           ERROR (409 insufficient)
-┌───────────────────────┐        ┌───────────────────────┐
-│ ✓ Request submitted.  │        │ ⚠ This item is no      │
-│ → Go to My Requests   │        │ longer available.     │
-└───────────────────────┘        │ (re-fetch stock)      │
-                                 └───────────────────────┘
+SUCCESS (after request → My Requests)     ERROR (409 insufficient)
+┌───────────────────────────────┐        ┌───────────────────────┐
+│ [cpu] PEW-DIY  ...  [B-A ▾]  │        │ ⚠ This item is no      │
+│ My Requests                  │        │ longer available.     │
+│ ✓ Request submitted.         │        │ (re-fetch stock)      │
+│ ┌─────────────────────────┐  │        └───────────────────────┘
+│ │ Your requests (1)       │  │
+│ │ Arduino Uno × 1 [SUBMIT]│  │
+│ └─────────────────────────┘  │
+└───────────────────────────────┘
 ```
 
-**Caption:** Unavailable hides the form with explanation (server remains authoritative); success uses `role="status"`; errors use `role="alert"` with safe wording from shared-conventions — never raw server text.
+**Caption:** On 201 the UI redirects to **My Requests** and the confirmation `Alert` (role="status") displays at the top of that screen (f-04 §2/AC-F04-08: submit → own-request display → reload). The My Requests screen belongs to F-04 UI (outside UI-01's 3 pages) — the state wireframe shows where the confirmation lands, not a full My Requests spec. Unavailable hides the form with explanation (server remains authoritative); errors use `role="alert"` with safe wording from shared-conventions — never raw server text.
