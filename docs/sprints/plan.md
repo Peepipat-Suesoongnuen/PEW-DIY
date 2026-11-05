@@ -152,10 +152,67 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | **Resolved — 8 Nov confirmed** by §4 table row and §9 (removed as OQ per PR #20 review rev 3) |
 | Team capacity split (§8) | Task assignment | Team confirmation |
 
-## 11. Revision History
+## 11. Lab 5 Readiness and Deliverable Separation
+
+> Source: `01_SE_Lab_5_updated.pdf` (Lab 5 handout) §4.1, §4.3, §8, §11, §12. Status levels: **Completed** · **In Progress / Planned** · **External Dependency**. Owners/targets are **Pending Team Assignment** (no team agreement recorded yet — do not assume). This section tracks lab requirements only; it does **not** change Sprint allocation (see §11.4).
+
+### 11.1 Lab 5 Requirements (R-01 – R-12) status map
+
+| ID | Requirement (summary) | Status | Owner / target | How verified |
+|---|---|---|---|---|
+| R-01 | Docker packaging; fresh build from clean clone produces a working container | In Progress / Planned | Pending Team Assignment | C-03 |
+| R-02 | Read every setting from environment; document each variable (`.env.example` or `deployment.md`); no real secret committed | In Progress / Planned (`.env.example` + fail-closed config exist since PR #22; must stay current as the app grows) | Pending Team Assignment | C-03 + repository inspection |
+| R-03 | Deploy on GCP at a public URL; domain workflow works through UI, API, database | External Dependency (GCP Free Trial access per handout §4.4) / Planned (deploy work) | Pending Team Assignment | C-04 |
+| R-04 | Persistent database; data survives restart **and** redeploy; nothing needed is kept only in the container | In Progress / Planned (**verified แล้ว:** revocation persistence — TEST-F01-16 สร้าง SessionStore/AuthService instance ใหม่บนฐานข้อมูลเดิม และ revoked session ยังถูกปฏิเสธ; **ยังไม่ได้ทดสอบ:** application process restart, domain-data read-back หลัง restart และ redeploy verification ตาม C-05) | Pending Team Assignment | TEST-F01-16 (revocation persistence เท่านั้น) + C-05 (before/after — ยังรอดำเนินการ) |
+| R-05 | Build + automated tests run on every relevant PR with meaningful results | Planned | Pending Team Assignment | C-01 |
+| R-06 | Passing check is required; failed check blocks the release path (failing PR demo from a temporary branch) | Planned | Pending Team Assignment | C-02 |
+| R-07 | Accepted releases deploy from main through a repeatable pipeline (reviewed change → CI → merge → deployment) | Planned (staging→main release-PR convention already in use) | Pending Team Assignment | C-06 |
+| R-08 | Identify the commit of each release (tag or SHA); document the release procedure | Planned (tag convention in use) | Pending Team Assignment | C-06 |
+| R-09 | Issues/project board/feature branches/PRs into staging reviewed by teammate; release PR staging→main; authors do not approve own PRs; reviews state a specific check | In Progress / Planned (**ใช้งานแล้ว:** Issue/feature-PR workflow และ peer review — PR #14–#26 ทั้งหมดเข้า `sprint/1-staging` พร้อม review จากเพื่อน; **รอดำเนินการ:** release PR จาก `sprint/1-staging` → `main` — ยังไม่มี PR ที่ base เป็น `main` และ `main` ยังอยู่ที่ bootstrap commit `7bf6c8d`) | Both members (ongoing) | PR history evidence (Issues/PRs/reviews ที่มีแล้ว) + release PR staging→main (ยังไม่เกิด) |
+| R-10 | Label Lab 5 Issues and PRs (e.g. `lab5`) so evidence is separate from unrelated feature work | In Progress / Planned (label `lab5` created with this change) | Pending Team Assignment | Label existence + usage on Lab 5 Issues/PRs |
+| R-11 | Both members take part in requirements, testing, AI-agent supervision, implementation, review, deployment; record contributions | In Progress / Planned (team practice per §8) | Both members | Contribution records (Issues/PRs) |
+| R-12 | Repository public until grading ends | **Completed** (repository is public) | Both members | Repository visibility |
+
+### 11.2 Lab 5 Required Files checklist
+
+| File | Status | Note |
+|---|---|---|
+| `Dockerfile`, `.dockerignore` | Planned | Lab 5 execution work (not Sprint 1 doc work) |
+| `.env.example` | In Progress | Exists since PR #22 — must document **every** env var the app reads |
+| CI + deploy workflows (e.g. `.github/workflows/ci-docker.yml`, `deploy.yml`) | Planned | Lab 5 execution work |
+| `docs/labs/lab-05/deployment.md` | Planned | Stack + env var table + build/test/run/migrate/seed commands + GCP names + release procedure incl. how to find the running commit |
+
+### 11.3 Required Checks (C-01 – C-06) — verification method
+
+| Check | What it shows | Evidence / how verified |
+|---|---|---|
+| C-01 | Normal PR runs build + all automated tests, passing | CI run link + test summary |
+| C-02 | A PR from a temporary branch with one failing test cannot be merged | PR link; failed check + blocked-merge evidence |
+| C-03 | Fresh clone builds and runs with only `.env.example` values filled in | Commands + output |
+| C-04 | Domain workflow works on the public URL: sign in, main business action, one rule rejection or access restriction | Screenshots with the URL visible |
+| C-05 | A record created before restart and redeploy still exists afterwards | Before/after screenshots |
+| C-06 | A reviewed change goes staging→main and deploys; running revision matches its commit | PR links, pipeline run, GCP revision |
+
+### 11.4 Lab 5 vs Deliverable 2 — scope separation
+
+| Dimension | Lab 5 (lab track) | Deliverable 2 (project track) |
+|---|---|---|
+| Due | 15 Nov 2026, 23:59 | 29 Nov 2026, 23:59 |
+| Points | 100 lab points (5%) | 70 project points (7%) |
+| Purpose | Containerize the accepted Sprint 1 release + CI/CD + GCP deployment | Sprint 2 completion + Sprint 3 contracts/progress + deployed integrated release candidate |
+| Submission | `lab5_sec<section>_<group name>.pdf` | Deliverable 2 PDF via LEB2 |
+| Requirements | R-01..R-12 + C-01..C-06 (this section) | Deliverable 2 Parts A–E |
+
+**Rule:** Lab 5 requirements are **not** Sprint 2/3 features — they add no `F-xx` and do not change Sprint allocation (the allocation in §2–§5 stands unchanged). The dependency direction is one-way: Deliverable 2 §3.5 requires the candidate to deploy **through the delivery process established in Lab 5** — i.e. Deliverable 2 *uses* Lab 5 infrastructure; it does not absorb Lab 5 requirements.
+
+**UI readiness note (C-04 dependency):** C-04 requires a working UI domain journey (sign in → main business action → one rejection/restriction) on the deployed URL by **15 Nov**. The F-01 implementation is currently backend-only; the remaining F-01 scope (AC-F01-11 UI, TEST-F01-13 browser/E2E — tracked in Issue #8) and the F-02..F-05 UI work must therefore land **within Sprint 1**. This is a readiness note for Lab 5 — it does not change Sprint allocation.
+
+## 12. Revision History
 
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-04 | Initial three-sprint plan | SRS rev 2, Part B rev 1, Part C rev 2, `project_deliverable_1_v1.pdf` §3.4, `group_work_specs_v1.pdf` §4/§7/§9 |
 | 2 — 2026-11-04 | PR #20 peer review round 1: recorded demo video length conflict (10 min vs 4 min) as OQ with ≤ 4 min interim plan; added FR-19 to §7 coverage summary; added SDS-OQ-03 to decision gates | PR #20 review by L0u1sss; `project_final_delivery_v1.pdf` §2/§3.5; SDS §10 |
 | 3 — 2026-11-04 | PR #20 peer review round 2: **corrected lab/deliverable schedule** to Lab 5 = 15 Nov, Lab 6 = 22 Nov, Lab 7 = 29 Nov, D1 = 8 Nov (verified by extracting the §4 table with row structure — table rows match §9/§10 headers); **withdrew the rev-2 "schedule conflict" claim as incorrect** (text-extraction row misalignment, not a document conflict); removed the D1-date OQ (resolved); added due dates to Sprint 2 lab references | PR #20 review round 2 by L0u1sss; `group_work_specs_v1.pdf` §4 table (extracted with cell coordinates), §9, §10 |
+| 4 — 2026-11-05 | Added §11 Lab 5 Readiness: R-01..R-12 status map (Completed / In Progress-Planned / External Dependency, owners Pending Team Assignment), Required Files checklist, C-01..C-06 verification methods, Lab 5 ↔ Deliverable 2 scope separation, and the C-04 UI readiness note; **no Sprint allocation change** | FIX-B #24; `01_SE_Lab_5_updated.pdf` §4.1/§4.3/§8/§11/§12 |
+| 5 — 2026-11-05 | PR #26 review: corrected R-09 from Completed to In Progress / Planned (no release PR staging→main exists; `main` at `7bf6c8d`) and corrected R-04 to claim only revocation persistence (TEST-F01-16 = new store instance on same DB) with application restart / domain-data read-back / redeploy marked untested per C-05; no other rows changed | PR #26 review by L0u1sss; GitHub PR/base state verified; `src/test/auth.test.ts` TEST-F01-16 source |
