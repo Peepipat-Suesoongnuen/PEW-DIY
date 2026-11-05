@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { User } from "../lib/api";
+import { ApiError, type User } from "../lib/api";
 import { useSession } from "../lib/session";
 
 const roleLabels: Record<User["role"], string> = {
@@ -18,7 +18,7 @@ function initials(username: string): string {
  * redirect (shared logout behavior §4; PR #27 P2 review).
  */
 export function AccountMenu({ user }: { user: User }) {
-  const { signOut } = useSession();
+  const { signOut, expire } = useSession();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -41,9 +41,19 @@ export function AccountMenu({ user }: { user: User }) {
     try {
       await signOut();
       navigate("/login", { replace: true });
-    } catch {
-      // Uncertain outcome (network) or confirmed failure: keep the session
-      // page and offer retry — never pretend the logout happened.
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        // 401 CONFIRMS the server-side credential is already invalid
+        // (expired/revoked) — this is the shared 401 behavior (f-01 §2.3):
+        // clear stale identity/state and return to Login. A retry would offer
+        // to revoke a session that no longer exists.
+        expire();
+        navigate("/login", { replace: true });
+        return;
+      }
+      // Network failure or 500/503: outcome uncertain or the credential may
+      // still be valid — do not assert the server credential is invalid; show
+      // a safe failure and permit a controlled retry (f-01 §2.3).
       setError("Could not sign out. Please try again.");
       setBusy(false);
     }

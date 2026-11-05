@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Equipment } from "../lib/api";
+import { itemPath } from "../lib/paths";
 import { AvailabilityBadge } from "./AvailabilityBadge";
 
 /**
@@ -10,7 +11,7 @@ import { AvailabilityBadge } from "./AvailabilityBadge";
 export function ItemCard({ item }: { item: Equipment }) {
   return (
     <Link
-      to={`/items/${item.id}`}
+      to={itemPath(item.id)}
       aria-label={`View ${item.name}`}
       className="block rounded-card border border-border bg-white p-4 hover:border-primary/40"
     >

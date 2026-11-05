@@ -49,6 +49,9 @@ export function LoginPage() {
       setPasswordError(null);
     }
     if (!valid) {
+      // f-01 §2.3: when showing an error, preserve ONLY safe input — the
+      // username stays, the password is cleared on every failed submit.
+      setPassword("");
       return;
     }
 
@@ -59,10 +62,12 @@ export function LoginPage() {
       // Success → Catalog (both roles). React Router state handles navigation
       // after re-render via <Navigate> below (user is now set).
     } catch (err) {
+      // Preserve only safe input on ANY failure (401, 500/503, network):
+      // username kept, password cleared (f-01 §2.3 — PR #34 review P2-3).
+      setPassword("");
       if (err instanceof ApiError && err.status === 401) {
         // One generic message for unknown user AND wrong password (§1.3).
         setFormError({ message: "Invalid credentials." });
-        setPassword(""); // preserve username; never keep the password value
       } else if (err instanceof ApiError) {
         setFormError({ message: "Something went wrong. Please try again.", requestId: err.requestId });
       } else {
@@ -120,7 +125,6 @@ export function LoginPage() {
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 onClick={() => setShowPassword((value) => !value)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 rounded-control p-2 text-text-muted hover:text-text"
-                tabIndex={-1}
               >
                 {showPassword ? (
                   <EyeOff aria-hidden="true" className="h-4 w-4" />

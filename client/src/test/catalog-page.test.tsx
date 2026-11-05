@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
 import { CatalogPage } from "../pages/CatalogPage";
 import { SessionProvider } from "../lib/session";
 import type { Equipment } from "../lib/api";
@@ -49,6 +50,11 @@ function renderCatalog() {
 afterEach(() => {
   vi.unstubAllGlobals();
 });
+
+function DetailStub() {
+  const { id } = useParams<{ id: string }>();
+  return <div>DETAIL_ID:{id}</div>;
+}
 
 describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
   it("loads and renders item fields with availability badges", async () => {
@@ -107,6 +113,51 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     expect(await screen.findByText("Something went wrong. Please try again.")).toBeInTheDocument();
     expect(screen.getByText("Request ID: req-42")).toBeInTheDocument();
     expect(screen.queryByText("The catalog has no items yet.")).not.toBeInTheDocument();
+  });
+
+  it("encodes opaque ids with URL-significant characters and round-trips them to the detail route (PR #34 P2-2)", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/auth/me")) {
+        return jsonResponse(200, { data: { user: { id: "u1", username: "B-A", role: "BORROWER" } } });
+      }
+      return jsonResponse(200, {
+        data: [
+          {
+            id: "fixture#opaque",
+            name: "Hash fixture",
+            description: "Test fixture",
+            category: "Synthetic",
+            quantity_total: 1,
+            quantity_available: 1,
+            availability: "AVAILABLE",
+          },
+        ],
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/catalog"]}>
+        <SessionProvider>
+          <Routes>
+            <Route path="/login" element={<div>LOGIN_PAGE</div>} />
+            <Route path="/catalog" element={<CatalogPage />} />
+            <Route path="/items/:id" element={<DetailStub />} />
+          </Routes>
+        </SessionProvider>
+      </MemoryRouter>,
+    );
+
+    // Both responsive surfaces link to the ENCODED path.
+    const links = await screen.findAllByRole("link", { name: "View Hash fixture" });
+    for (const link of links) {
+      expect(link).toHaveAttribute("href", "/items/fixture%23opaque");
+    }
+
+    // Clicking round-trips: the router decodes the param back to the opaque id.
+    await user.click(links[0]);
+    expect(await screen.findByText("DETAIL_ID:fixture#opaque")).toBeInTheDocument();
   });
 
   it("clears stale state and returns to Login on 401", async () => {

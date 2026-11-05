@@ -7,6 +7,7 @@ import { ItemCard } from "../components/ItemCard";
 import { Loading } from "../components/Loading";
 import { Table, Th } from "../components/Table";
 import { api, type Equipment } from "../lib/api";
+import { itemPath } from "../lib/paths";
 import { useUnauthorizedRedirect } from "../lib/session";
 
 type CatalogState =
@@ -87,16 +88,16 @@ export function CatalogPage() {
                 <tr
                   key={item.id}
                   className="cursor-pointer hover:bg-white/50"
-                  onClick={() => navigate(`/items/${item.id}`)}
+                  onClick={() => navigate(itemPath(item.id))}
                 >
                   <td className="px-4 py-3">
                     <a
-                      href={`/items/${item.id}`}
+                      href={itemPath(item.id)}
                       aria-label={`View ${item.name}`}
                       className="font-medium text-primary hover:underline"
                       onClick={(event) => {
                         event.preventDefault();
-                        navigate(`/items/${item.id}`);
+                        navigate(itemPath(item.id));
                       }}
                     >
                       {item.name}

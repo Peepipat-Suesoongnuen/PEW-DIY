@@ -27,11 +27,15 @@ Deployment remains a modular monolith: one application container serves UI and A
 
 ## Development Setup (Sprint 1)
 
-Prerequisites: **Node.js 24+**, **PostgreSQL 17+**, npm.
+Prerequisites: **Node.js 24.15+** (or 22.22.2+ / 26+ — matches the `jsdom`
+engine range used by the client test suite; earlier 24.x versions trigger an
+npm engine warning), **PostgreSQL 17+**, npm.
 
 ```bash
 # 1. Install dependencies
 npm install
+npm --prefix client install        # frontend app (React + Vite + Tailwind v4)
+npx playwright install chromium    # browser for the E2E suite (one-time)
 
 # 2. Create the two databases (dev and test — kept separate per SDS §4)
 psql -U <admin> -c "CREATE DATABASE pewdiy_dev;"
@@ -49,11 +53,20 @@ npm run migrate
 #    fixtures (E-ONE/E-MANY/E-ZERO) — upsert-safe, rerun-friendly
 npm run seed
 
-# 6. Run the test suite against the test database (50 tests)
+# 6. Run the test suite against the test database (55 tests)
 npm test
+npm --prefix client test           # frontend component/page tests
 
-# 7. Start the development server
-npm run dev   # http://localhost:3000 → /login.html → /catalog.html
+# 7. Build the frontend (client/dist — served by Express together with the
+#    legacy .html pages; see ARCH-01 section 12.1)
+npm run build:client
+
+# 8. Start the development server
+npm run dev   # http://localhost:3000 → React UI: /login, /catalog
+              #                        → legacy UI: /login.html, /catalog.html
+
+# Optional: run the Core UI E2E suite (Playwright, 3 viewports)
+npm run test:e2e
 ```
 
 **Environment loading:** scripts and tests load `.env` automatically via

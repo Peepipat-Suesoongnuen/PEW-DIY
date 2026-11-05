@@ -59,4 +59,16 @@ describe("api client (safe error mapping — shared-conventions)", () => {
     expect(res.data.user.username).toBe("C-A");
     expect(res.data.user.role).toBe("CUSTODIAN");
   });
+
+  it("encodes opaque ids with URL-significant characters in the detail URL (PR #34 P2-2)", async () => {
+    const fetchMock = vi.fn(async (_url: RequestInfo | URL) =>
+      new Response(JSON.stringify({ data: { id: "fixture#opaque" } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    await api.getEquipment("fixture#opaque");
+    expect(String(fetchMock.mock.calls[0][0])).toBe("/api/equipment/fixture%23opaque");
+  });
 });

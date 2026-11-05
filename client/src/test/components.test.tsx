@@ -149,4 +149,14 @@ describe("ItemCard (mobile list)", () => {
     expect(screen.getByText("Electronics")).toBeInTheDocument();
     expect(screen.getByText("AVAILABLE")).toBeInTheDocument();
   });
+
+  it("encodes opaque ids with URL-significant characters in the detail link (PR #34 P2-2)", () => {
+    render(
+      <MemoryRouter>
+        <ItemCard item={{ ...item, id: "fixture#opaque" }} />
+      </MemoryRouter>,
+    );
+    const link = screen.getByRole("link", { name: "View Arduino Uno" });
+    expect(link).toHaveAttribute("href", "/items/fixture%23opaque");
+  });
 });

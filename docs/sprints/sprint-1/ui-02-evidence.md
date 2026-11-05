@@ -9,7 +9,7 @@
 | Suite | Command | Result |
 |---|---|---|
 | Server suite (existing baseline — unchanged) | `npm test` (root) | **55/55 passed** (8 files) — same baseline as 2026-11-06 audit; no existing test was modified or deleted by this work |
-| Client component/page tests (new, UI-02) | `npm test` (in `client/`) | **34/34 passed** (6 files) |
+| Client component/page tests (new, UI-02) | `npm test` (in `client/`) | **41/41 passed** (6 files) — includes 7 regression cases added for the PR #34 review fixes (logout-401, opaque-id URL encoding ×3, password clearing ×2, keyboard toggle) |
 | Core UI E2E (new, UI-02) | `npm run test:e2e` (root) | **36/36 passed** (12 scenarios × 3 viewport projects) |
 | Server build | `npm run build` | exit 0 |
 | Client build | `npm run build` (in `client/`) | exit 0 — `client/dist` (index.html + hashed assets) |
@@ -99,8 +99,26 @@ computation and post-checkout updates.
 - `@playwright/test` pinned to **1.64.1**: the registry mirror currently lacks
   `playwright-core@1.65.0` (the `^1.65` resolution fails); 1.64.1 is the newest
   resolvable stable pair. Revisit when the mirror syncs.
+- Node minimum recorded as **24.15+** (README): `jsdom@31` engines are
+  `^22.22.2 || ^24.15.0 || >=26.0.0` — earlier 24.x (e.g. 24.14.0) triggers an
+  npm engine warning (PR #34 review, suggestion).
 - Playwright run needs seeded accounts: `.env` `SEED_PASSWORD_BA/BB/CA` are read
   at runtime (`e2e/pages/fixtures.ts`) — never hardcoded, never logged.
 - E2E serving contract note: unauthenticated `GET /api/unknown` returns 401 from
   the auth guard before the 404 handler (pre-existing contract behavior,
   unchanged by UI-02); the AC-1 invariant tested is "never the SPA shell".
+
+## 6. PR #34 review fixes (2026-11-06)
+
+| # | Finding (reviewer) | Root cause | Fix |
+|---|---|---|---|
+| 1 | Logout 401 kept stale identity + retry | `handleSignOut` treated 401 like uncertain failures | 401 → shared 401 behavior (expire + Login); retry only for network/500/503 (f-01 §2.3) |
+| 2 | Detail links didn't encode opaque ids (`fixture#opaque`) | URL built with raw `item.id` at 3 call sites | `lib/paths.ts` `itemPath()` uses `encodeURIComponent` at every call site |
+| 3 | Login kept the password on 503/network errors | Password cleared only in the 401 branch | Password cleared on every failed submit (validation + API + network); username preserved (f-01 §2.3 "preserve only safe input") |
+| 4 | Password toggle not keyboard reachable | `tabIndex={-1}` removed tab stop | Removed; ui-spec §1.5 tab order (username → password → toggle → submit) verified by test |
+
+Regression tests added: `account-menu.test.tsx` (401 logout),
+`components.test.tsx` (ItemCard encoded href), `catalog-page.test.tsx` (encoded
+hrefs + router round-trip of the opaque id), `api.test.ts` (encoded API URL),
+`login-page.test.tsx` (password cleared on 503 + network + validation; keyboard
+toggle order/activation/name).

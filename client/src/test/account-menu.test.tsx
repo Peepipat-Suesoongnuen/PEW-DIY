@@ -86,4 +86,28 @@ describe("AccountMenu (ui-spec §2.2 + shared logout behavior §4)", () => {
     expect(screen.queryByText("LOGIN_PAGE")).not.toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole("menuitem", { name: "Sign out" })).toBeEnabled());
   });
+
+  it("clears stale identity and returns to Login on a 401 logout (session already invalid)", async () => {
+    // PR #34 review P2-1 (f-01 §2.3): 401 CONFIRMS the server credential is
+    // gone — apply the shared 401 behavior instead of offering a retry.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user } });
+        }
+        return jsonResponse(401, { error: { code: "UNAUTHENTICATED", message: "Sign in required.", requestId: "n/a" } });
+      }),
+    );
+    const userInteractions = userEvent.setup();
+    renderMenu();
+
+    await userInteractions.click(screen.getByRole("button", { name: /B-A/ }));
+    await userInteractions.click(await screen.findByRole("menuitem", { name: "Sign out" }));
+
+    expect(await screen.findByText("LOGIN_PAGE")).toBeInTheDocument();
+    // No retry offered for a confirmed-dead session.
+    expect(screen.queryByText("Could not sign out. Please try again.")).not.toBeInTheDocument();
+  });
 });
