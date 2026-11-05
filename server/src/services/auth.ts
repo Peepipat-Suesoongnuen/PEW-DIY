@@ -44,7 +44,7 @@ export function validateLoginPayload(body: unknown): { valid: boolean; username?
 
 export class AuthService {
   constructor(
-    private readonly pool: Pool,
+    readonly pool: Pool,
     private readonly sessions: SessionStore,
   ) {}
 

@@ -1,5 +1,6 @@
 /**
- * Seed script — reproducible demo accounts (contract §4, fixtures.md).
+ * Seed script — reproducible demo accounts + synthetic equipment fixtures
+ * (contract §4, fixtures.md; F-02 AC-F02-04).
  *
  * Security obligations (TEST-F01-11/12):
  * - Passwords come from local env (SEED_PASSWORD_*); only salted hashes reach
@@ -7,12 +8,18 @@
  * - Reruns preserve existing credentials/roles (upsert-safe, no reset).
  * - Seeded accounts: B-A, B-B (BORROWER), C-A (CUSTODIAN).
  *
+ * F-02 equipment fixtures (synthetic — SRS OQ-01 (real catalog) remains
+ * OPEN; these are NOT the approved real catalog): E-ONE (total 1),
+ * E-MANY (3), E-ZERO (0) per fixtures.md. Non-destructive: never overwrites
+ * existing totals, never touches users/requests/loans.
+ *
  * Usage: SEED_PASSWORD_BA=... SEED_PASSWORD_BB=... SEED_PASSWORD_CA=... \
- *        npx tsx src/db/seed.ts
+ *        npm run seed
  */
 import { loadConfig } from "../config/config";
 import { createPool, withTransaction } from "./pool";
 import { hashPassword } from "../services/password";
+import { seedEquipmentFixture, EquipmentInput } from "../services/catalog";
 
 interface SeedAccount {
   id: string;
@@ -25,6 +32,12 @@ const ACCOUNTS: SeedAccount[] = [
   { id: "seed-b-a", username: "B-A", role: "BORROWER", envVar: "SEED_PASSWORD_BA" },
   { id: "seed-b-b", username: "B-B", role: "BORROWER", envVar: "SEED_PASSWORD_BB" },
   { id: "seed-c-a", username: "C-A", role: "CUSTODIAN", envVar: "SEED_PASSWORD_CA" },
+];
+
+const EQUIPMENT: EquipmentInput[] = [
+  { id: "fixture-e-one", name: "Synthetic single-unit fixture", description: "Test fixture", category: "Synthetic", quantityTotal: 1 },
+  { id: "fixture-e-many", name: "Synthetic pooled fixture", description: "Test fixture", category: "Synthetic", quantityTotal: 3 },
+  { id: "fixture-e-zero", name: "Synthetic zero-stock fixture", description: "Test fixture", category: "Synthetic", quantityTotal: 0 },
 ];
 
 async function main() {
@@ -53,6 +66,12 @@ async function main() {
       } else {
         console.log(`Skipped ${account.username} — already exists (preserved)`);
       }
+    }
+
+    // F-02: synthetic equipment fixtures (non-destructive; SRS OQ-01 open).
+    for (const item of EQUIPMENT) {
+      const result = await seedEquipmentFixture(client, item);
+      console.log(`${result === "inserted" ? "Seeded" : "Skipped"} equipment ${item.id} (${item.name})`);
     }
   });
 

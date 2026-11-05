@@ -1,0 +1,18 @@
+
+> pew-diy@1.0.0 test
+> vitest run
+
+[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.[39m
+
+ RUN  v5.1.0 C:/kmutt2026/01-2026/Software_Engineer/Group Project/PEW-DIY
+
+
+ Test Files  6 passed (6)
+      Tests  50 passed (50)
+   Start at  19:58:02
+   Duration  2.24s (tests 67%, import 28%, transform 4%, worker 1%)
+
+    Isolate  6 workers spawned · ~95ms startup each (spawn + environment, per file)
+             at least ~477ms faster with isolate: false — reuses workers across files instead of one per file

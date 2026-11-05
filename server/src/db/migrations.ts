@@ -38,6 +38,21 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 CREATE INDEX IF NOT EXISTS sessions_user_id_idx ON sessions(user_id);
+
+-- F-02 Equipment Catalog (contract f-02-equipment-catalog.md §5; SDS §3.1).
+-- Quantity Tracking (SRS A-01): aggregate totals, no serial-level entity.
+-- name/category nonempty; description may be empty; quantity_total >= 0
+-- (fractional quantities are rejected at the typed boundary — catalog.ts).
+CREATE TABLE IF NOT EXISTS equipment (
+  id             TEXT PRIMARY KEY,
+  name           TEXT NOT NULL,
+  description    TEXT NOT NULL,
+  category       TEXT NOT NULL,
+  quantity_total INTEGER NOT NULL,
+  CONSTRAINT equipment_name_nonempty CHECK (length(name) > 0),
+  CONSTRAINT equipment_category_nonempty CHECK (length(category) > 0),
+  CONSTRAINT equipment_quantity_nonnegative CHECK (quantity_total >= 0)
+);
 `;
 
 export async function migrate(client: Pick<PoolClient, "query">): Promise<void> {
