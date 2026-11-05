@@ -159,7 +159,7 @@ describe("Regression — safe error envelopes (TEST-F01-03/06/14)", () => {
     expect(res.body.error.code).toBe("UNAUTHENTICATED");
   });
 
-  it("auth storage failure returns safe 500 JSON without internal details (TEST-F01-14)", async () => {
+  it("auth storage failure returns safe 500/503 JSON without internal details (TEST-F01-14)", async () => {
     const brokenPool = {
       query: async () => {
         throw new Error("connection refused: secret-dsn-detail-should-not-leak");
@@ -170,9 +170,11 @@ describe("Regression — safe error envelopes (TEST-F01-03/06/14)", () => {
     const brokenApp = createApp({ auth: brokenAuth, config });
 
     const res = await request(brokenApp).get("/api/auth/me").set("Cookie", "pew_session=any-value");
-    expect(res.status).toBe(500);
+    // Contract TEST-F01-14 allows "Safe 500/503 shared response"; the shared
+    // convention maps DB unavailability to 503 SERVICE_UNAVAILABLE (f-02 §4).
+    expect([500, 503]).toContain(res.status);
     expect(res.headers["content-type"]).toContain("application/json");
-    expect(res.body.error.code).toBe("INTERNAL_ERROR");
+    expect(["INTERNAL_ERROR", "SERVICE_UNAVAILABLE"]).toContain(res.body.error.code);
     const serialized = JSON.stringify(res.body);
     expect(serialized).not.toContain("secret-dsn-detail-should-not-leak");
     expect(serialized).not.toContain("TypeError");

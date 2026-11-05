@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PEW-DIY — Catalog</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    .state { margin: 1rem 0; padding: 1rem; border: 1px solid #ddd; }
+    .hidden { display: none; }
+    .unavailable { color: #b00; }
+  </style>
+</head>
+<body>
+  <h1>PEW-DIY — Equipment Catalog</h1>
+  <p id="whoami" class="state hidden"></p>
+  <p><a href="/item.html">Item detail</a> · <button id="logout">Log out</button></p>
+
+  <div id="loading" class="state hidden">Loading catalog…</div>
+  <div id="empty" class="state hidden">The catalog has no items yet.</div>
+  <div id="error" class="state hidden"></div>
+
+  <table id="catalog" class="hidden">
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Description</th><th>Category</th><th>Total</th><th>Available</th><th>Availability</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <script>
+    const show = (id) => document.getElementById(id).classList.remove("hidden");
+    const hide = (id) => document.getElementById(id).classList.add("hidden");
+
+    function redirectToLogin() {
+      // Shared F-01 behavior: clear stale identity state and return to login.
+      window.location.href = "/login.html";
+    }
+
+    async function load() {
+      show("loading");
+      hide("empty");
+      hide("error");
+      hide("catalog");
+      try {
+        const res = await fetch("/api/equipment", { credentials: "same-origin" });
+        if (res.status === 401) {
+          hide("loading");
+          redirectToLogin();
+          return;
+        }
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const body = await res.json();
+        const items = body.data || [];
+        hide("loading");
+        if (items.length === 0) {
+          show("empty");
+          return;
+        }
+        const rows = document.getElementById("rows");
+        rows.innerHTML = "";
+        for (const item of items) {
+          // P1 fix (PR #27 review): build every cell with textContent — item
+          // fields come from the DB and must render as text, never as HTML.
+          const tr = document.createElement("tr");
+          const values = [item.id, item.name, item.description, item.category,
+                          String(item.quantity_total), String(item.quantity_available), item.availability];
+          for (const value of values) {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+          }
+          if (item.availability === "UNAVAILABLE") {
+            tr.lastChild.classList.add("unavailable");
+          }
+          tr.style.cursor = "pointer";
+          tr.addEventListener("click", () => { window.location.href = "/item.html?id=" + encodeURIComponent(item.id); });
+          rows.appendChild(tr);
+        }
+        show("catalog");
+      } catch (err) {
+        hide("loading");
+        const box = document.getElementById("error");
+        box.textContent = "The catalog could not be loaded. Please try again. (no server details shown)";
+        show("error");
+      }
+    }
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      // P2 fix (PR #27 review): only redirect on confirmed 204. On failure or
+      // network error the server credential may still be valid — show a safe
+      // failure and allow a controlled retry (F-01 contract §2.3).
+      hide("error");
+      try {
+        const res = await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Origin": window.location.origin },
+          body: "{}",
+          credentials: "same-origin",
+        });
+        if (res.status === 204) {
+          redirectToLogin();
+          return;
+        }
+      } catch (e) { /* network failure: fall through to the failure state */ }
+      const box = document.getElementById("error");
+      box.textContent = "Logout could not be confirmed. Please try again.";
+      show("error");
+    });
+
+    load();
+  </script>
+</body>
+</html>

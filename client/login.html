@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PEW-DIY — Sign in</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    form { margin: 1rem 0; }
+    label { display: block; margin: 0.5rem 0 0.25rem 0; }
+    input { padding: 0.4rem; width: 16rem; }
+    button { margin-top: 1rem; padding: 0.4rem 1rem; }
+    .state { margin: 1rem 0; padding: 1rem; border: 1px solid #ddd; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Sign in — PEW-DIY</h1>
+
+  <!--
+    Minimal login surface (dependency enabler for the F-02 catalog UI journey).
+    Full login UI states (AC-F01-11 / TEST-F01-13) belong to the F-01 UI track;
+    this page provides only the credential submit needed to reach the catalog.
+  -->
+  <form id="login-form">
+    <label for="username">Username</label>
+    <input id="username" name="username" autocomplete="username" required>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit" id="submit">Sign in</button>
+  </form>
+
+  <div id="error" class="state hidden">Invalid credentials.</div>
+  <div id="busy" class="state hidden">Signing in…</div>
+
+  <script>
+    const show = (id) => document.getElementById(id).classList.remove("hidden");
+    const hide = (id) => document.getElementById(id).classList.add("hidden");
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hide("error");
+      show("busy");
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Origin": window.location.origin },
+          body: JSON.stringify({
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value,
+          }),
+          credentials: "same-origin",
+        });
+        hide("busy");
+        if (res.ok) {
+          window.location.href = "/catalog.html";
+          return;
+        }
+        // Generic error for both unknown user and wrong password (F-01 policy).
+        show("error");
+      } catch (err) {
+        hide("busy");
+        show("error");
+      }
+    });
+  </script>
+</body>
+</html>

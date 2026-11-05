@@ -45,14 +45,15 @@ cp .env.example .env
 # 4. Apply migrations to the dev database
 npm run migrate
 
-# 5. Seed the demo accounts (B-A, B-B, C-A) — upsert-safe, rerun-friendly
+# 5. Seed the demo accounts (B-A, B-B, C-A) and synthetic equipment
+#    fixtures (E-ONE/E-MANY/E-ZERO) — upsert-safe, rerun-friendly
 npm run seed
 
-# 6. Run the test suite against the test database (39 tests)
+# 6. Run the test suite against the test database (50 tests)
 npm test
 
 # 7. Start the development server
-npm run dev   # http://localhost:3000
+npm run dev   # http://localhost:3000 → /login.html → /catalog.html
 ```
 
 **Environment loading:** scripts and tests load `.env` automatically via

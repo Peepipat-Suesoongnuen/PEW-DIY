@@ -28,6 +28,10 @@ export const PROTECTED_ROUTES: ReadonlyArray<{
 }> = [
   { method: "GET", path: "/api/auth/me", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "POST", path: "/api/auth/logout", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  // F-02 (contract f-02 §4): shared room catalog — both roles may read;
+  // no ownership predicate on the catalog itself.
+  { method: "GET", path: "/api/equipment", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "GET", path: "/api/equipment/{equipmentId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
 ];
 
 export function createAuthMiddleware(auth: AuthService, cookieName: string) {

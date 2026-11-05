@@ -10,8 +10,10 @@
 import express, { Request, Response, Router, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import { randomUUID } from "crypto";
+import path from "path";
 import { AuthService } from "../services/auth";
 import { createAuthMiddleware, AuthenticatedRequest } from "../services/authz";
+import { createEquipmentRouter } from "./equipment-routes";
 import { AppConfig } from "../config/config";
 
 export interface AppDeps {
@@ -152,6 +154,15 @@ export function createApp({ auth, config }: AppDeps): express.Application {
 
   app.use("/api", router);
 
+  // F-02 Equipment Catalog routes (GET /api/equipment, GET /api/equipment/:id).
+  // Mounted before the unknown-route 404 handler; shares the auth guard.
+  app.use("/api", createEquipmentRouter({ auth, cookieName: config.session.cookieName }));
+
+  // Static UI shell from client/ (F-02 catalog screens; framework-free
+  // placeholder per client/README — no framework decision is made here).
+  const clientDir = path.resolve(process.cwd(), "client");
+  app.use(express.static(clientDir));
+
   // Unknown /api routes: safe 404 without leaking implementation details.
   app.use("/api", (_req: Request, res: Response) => {
     res.status(404).json({
@@ -163,6 +174,8 @@ export function createApp({ auth, config }: AppDeps): express.Application {
   // failures to the shared JSON envelope and never leaks stack traces or
   // internal diagnostics (contract §3, AC-F01-05/14; PR #22 review, P2-2).
   // Without this, Express's default handler returns text/html with details.
+  // Database unavailability maps to 503 SERVICE_UNAVAILABLE per the shared
+  // convention (f-02 contract §4); other unexpected failures use safe 500.
   app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) {
       next(err);
@@ -175,6 +188,15 @@ export function createApp({ auth, config }: AppDeps): express.Application {
     if (type === "entity.parse.failed" || type === "entity.too.large") {
       res.status(400).json({
         error: { code: "VALIDATION_ERROR", message: "Invalid request body.", requestId },
+      });
+      return;
+    }
+    const errCode = typeof err === "object" && err !== null ? (err as { code?: string }).code : undefined;
+    const isDbUnavailable = ["ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "57P03", "08001", "08006"].includes(errCode ?? "")
+      || (typeof (err as { message?: string })?.message === "string" && /connection|timeout/i.test((err as { message: string }).message));
+    if (isDbUnavailable) {
+      res.status(503).json({
+        error: { code: "SERVICE_UNAVAILABLE", message: "Service temporarily unavailable.", requestId },
       });
       return;
     }
