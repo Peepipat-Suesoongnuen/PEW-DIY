@@ -67,14 +67,17 @@ The framework is an implementation/design choice, not a requirement. All UI-rela
 
 **API contracts are not modified** (scope control): the React client consumes `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`, `GET /api/equipment[/{id}]` exactly as specified.
 
-### 3.3 Tests — planned replacement, no coverage loss
+### 3.3 Tests — planned replacement and compatibility migration (no coverage loss)
+
+**Correction (PR #29 review):** not all tests are unaffected — several depend on the legacy page paths:
 
 | Existing | Impact |
 |---|---|
-| API/DB tests (`server/tests/*`, 51 tests) | **Unaffected** — they test server behavior, not UI technology |
+| API/DB tests (`server/tests/*` — auth, authz, catalog API, session, seed) | **Unaffected** — server behavior, not UI technology |
+| `server/tests/catalog.test.ts` UI page-serving assertions (`GET /login.html`, `/catalog.html`, `/item.html`) and the UI-to-API journey test | **Affected** — these assert legacy page paths; see compatibility plan §12.1 (kept passing through P1–P3) and retirement/updates at P4 |
+| `server/tests/restart-e2e.test.ts` readiness probe (`GET /login.html` on app start) | **Affected** — readiness probe migrates to the React entry point at P4 (§12.1) |
 | `server/tests/catalog-ui.test.ts` (jsdom, 4 tests) | **Proposed replacement** during migration: component tests (Vitest + React Testing Library) cover the same assertions (XSS-safe text rendering, logout failure states). *Do not delete before replacements pass.* |
 | Deferred browser E2E (TEST-F01-13, TEST-F02-07/08) | **Resolved tooling question:** Playwright (team decision) — strategy in §11 |
-| `restart-e2e.test.ts` | Unaffected |
 
 ### 3.4 Sprint Plan (Part D) — no allocation change
 
@@ -100,7 +103,6 @@ PEW-DIY/
 │   ├── index.html                 # Vite entry
 │   ├── package.json               # client dependencies (react, vite, tailwindcss, lucide-react, ...)
 │   ├── vite.config.ts             # build config + dev proxy → server API
-│   ├── tailwind.config.ts         # theme = centralized design tokens (§8)
 │   ├── tsconfig.json              # extends root conventions
 │   ├── src/
 │   │   ├── main.tsx               # app bootstrap
@@ -111,7 +113,7 @@ PEW-DIY/
 │   │   │   └── layout/            # AppShell, PageHeader
 │   │   ├── pages/                 # Login, Catalog, ItemDetail, ... (one per SDS §5 screen)
 │   │   ├── hooks/                 # useAuth, useCatalog, ...
-│   │   ├── styles/                # tailwind entry + token CSS variables
+│   │   ├── styles/                # tailwind entry + @theme design tokens (§7/§8)
 │   │   └── test/                  # component tests (Vitest + Testing Library)
 │   └── e2e/                       # (alternative location — see §11; root e2e/ proposed)
 ├── e2e/                           # Playwright specs (root — mirrors TokTickIT reference)
@@ -138,13 +140,57 @@ PEW-DIY/
 | Env | `VITE_*` vars only for public config (e.g., none secret — server holds secrets per SDS §8) |
 | Build | `vite build` → `client/dist` → served by Express |
 
+### 6.1 Development Ports, Trusted Origin, and Vite Proxy (PR #29 review)
+
+A proxy alone does **not** make the browser's `Origin` match the backend configuration. The current guard (`requireTrustedOrigin` in `server/src/routes/auth-routes.ts`) compares the request `Origin` header **exactly** against `config.appOrigin` (then `Referer` fallback) on every state-changing request, and `.env.example` currently defines `APP_ORIGIN=http://localhost:3000`. With a Vite dev server on another port, React UI requests would be rejected **403 FORBIDDEN before reaching login logic** (reproduced by the review). The guard is **not** weakened or bypassed for development — instead the trusted-origin value must match the origin the browser actually sends.
+
+| Item | Value |
+|---|---|
+| Backend dev port | **3000** (`PORT` in `.env`; unchanged) |
+| Vite frontend dev port | **5173** (Vite default) |
+| `APP_ORIGIN` — local dev **with** Vite dev server | `http://localhost:5173` (the browser's real origin) |
+| `APP_ORIGIN` — local run serving the built client/legacy pages from Express only | `http://localhost:3000` |
+| `APP_ORIGIN` — production | `https://<deployed-public-url>` (the URL users open; matches SDS §8.2 HTTPS deployment) |
+
+**Proxy behavior:** `vite.config.ts` sets `server.proxy: { "/api": "http://localhost:3000" }`. The proxy **forwards request headers unchanged**, so the backend receives the genuine browser `Origin: http://localhost:5173`. The Origin header is **not rewritten** by the proxy — rewriting it would defeat the guard's purpose. The browser sees one origin (5173), so cookies/session behave as same-origin; the backend validates that same value against `APP_ORIGIN`.
+
+**Frontend authentication interaction:** login/logout/fetch calls use `credentials: "same-origin"` and are sent to same-origin `/api/...` paths (through the proxy in dev, directly in production). Browsers attach `Origin` automatically on state-changing requests; non-browser clients must send `Origin` explicitly (existing rule, unchanged).
+
+**Verification gates (must all pass before migration is accepted):**
+1. Login from the React UI succeeds (200 + session cookie set).
+2. Logout from the React UI succeeds (204 confirmed; UI follows its failure-aware behavior otherwise).
+3. State-changing request with a **hostile Origin** is rejected 403 and the session is not affected.
+4. State-changing request with a **missing Origin** (and missing/foreign Referer) is rejected 403.
+5. Existing API and CSRF behavior remains intact — the backend test suite (incl. TEST-F01-15 cases) passes unchanged; the guard implementation is not modified.
+
 ## 7. Tailwind CSS Configuration
 
-- **Tailwind v4** (or v3 LTS at implementation time — pin one; record choice in the implementation PR).
-- `tailwind.config.ts` theme extends **only** the centralized design tokens (§8): colors, fonts, spacing scale, radii, shadows, breakpoints.
-- Component classes via `@apply` sparingly; prefer token-based utility composition for consistency.
-- Content paths cover `client/src/**/*.{ts,tsx}`.
-- No arbitrary one-off colors/spacing in components — everything references tokens (design-system rule).
+**Decision:** Tailwind CSS is Confirmed (team). **Version pinned at P1: Tailwind v4** (latest stable; record the exact patch version in the implementation PR). The v3/v4 configuration models are materially different — v4 does **not** auto-detect `tailwind.config.ts` (official upgrade guide: "JavaScript config files … are no longer detected automatically in v4"). The approaches are not interchangeable:
+
+### 7.1 Tailwind v4 (selected — CSS-first)
+
+- **Vite plugin integration:** `@tailwindcss/vite` plugin in `vite.config.ts` (no PostCSS/Tailwind config file required).
+- **Theme = CSS-first:** the centralized design tokens (§8) are defined with `@theme` in the CSS entry (`src/styles/theme.css`), e.g.
+  ```css
+  @import "tailwindcss";
+  @theme {
+    --color-primary: #313B7B;        /* Classic Navy — Confirmed */
+    --color-background: #FFFFFF;     /* Pure White — Confirmed */
+    /* …remaining §8 tokens (Proposed)… */
+  }
+  ```
+  Tokens become Tailwind utilities (`bg-primary`, `bg-background`, …) automatically.
+- **Legacy JS config (only if required later):** must be loaded **explicitly** via the CSS `@config "../../tailwind.config.js";` directive — it is never picked up automatically. Note: `corePlugins`, `safelist` and `separator` are not supported in v4 (v4 equivalents: `@source inline()` for safelisting). Do not plan on these options.
+- Content detection in v4 is automatic (source scanning of the project); no `content` paths array needed.
+
+### 7.2 Tailwind v3 (fallback — only if the team later requires v3)
+
+- PostCSS plugin (`tailwindcss` + `autoprefixer`); `tailwind.config.js`/`.ts` **is** auto-detected; theme extension via `theme.extend` with the §8 tokens; `content` paths required (`client/src/**/*.{ts,tsx}`).
+- If v3 is ever chosen instead, the theme values in §8 translate mechanically into `theme.extend`; do **not** assume the v4 `@theme` block works under v3.
+
+### 7.3 Token verification gate (P1)
+
+Custom design tokens must be proven live, not just declared: build the client and render a verification page/component that uses `bg-primary` and `bg-background`; assert the computed styles resolve to **`#313B7B`** (Classic Navy) and **`#FFFFFF`** (Pure White) — via component test (computed style) or a Playwright assertion. Record the evidence in the P1 PR. A configuration that compiles but renders default colors fails this gate.
 
 ## 8. Proposed Design System Specification
 
@@ -232,7 +278,8 @@ Responsive requirement (Confirmed): **Desktop, Tablet, Mobile**. Mapping to Tail
 | `catalog-journey.spec.ts` | list → detail → back; both roles; empty/missing states | TEST-F02-07, AC-F02-06 |
 | `ui-states.spec.ts` | loading/empty/401/error states (via route interception) | TEST-F02-08 |
 | `accessibility-smoke.spec.ts` | keyboard nav + contrast smoke (minimal, academic quality bar) | optional, Proposed |
-| Later sprints | request → checkout → loans journeys | F-04/F-05 specs |
+| `request-loans-journey.spec.ts` | **Sprint 1:** request → checkout → active loans journey (F-04/F-05) | TEST-F01-13 (extended), F-04/F-05 UI — **specs added when F-04/F-05 are ready, within Sprint 1, and complete before integrated release verification of Deliverable 1 (D1)** |
+| `return-history-journey.spec.ts` | **Sprint 2:** return + full history journeys (F-06/F-08) — existing later-sprint allocation unchanged | F-06/F-08 specs (Sprint 2) |
 
 - **Regression policy:** browser E2E runs before each PR once the migration lands (command documented in README); CI wiring at Lab 5 (R-05).
 - Component tests (Vitest + Testing Library) complement E2E for state-level assertions (replacement of the jsdom suite — §3.3).
@@ -251,6 +298,35 @@ Current state: `client/login.html`, `client/catalog.html`, `client/item.html` (p
 | **P5** | F-03..F-05 UI lands directly in React (existing contracts) | Feature PRs |
 
 **Risks and mitigations:**
+
+### 12.1 Legacy/React Compatibility and Page-Serving Migration Plan
+
+**Current state (verified):** `server/tests/catalog.test.ts` asserts `GET /login.html`, `/catalog.html`, `/item.html`; `server/tests/restart-e2e.test.ts` uses `GET /login.html` as its readiness probe. Express serves `client/` statically. These assertions must keep passing until replaced.
+
+**P1–P3 — coexistence (legacy pages keep working untouched):**
+
+| Surface | Served by | Paths |
+|---|---|---|
+| Functional UI (all three screens) | **Legacy HTML pages** (unchanged) | `/login.html`, `/catalog.html`, `/item.html` |
+| React app (growing) | Vite build `client/dist` served by Express | `/` (index.html) + React routes `/login`, `/catalog`, `/items/:id` — extension-less paths do not collide with the legacy `.html` paths |
+| API | Express routers (unchanged) | `/api/*` |
+
+- During P1–P3 the legacy pages remain the **serving source of truth** for the migrated screens; React pages are validated in parallel (component tests + Playwright). Existing tests keep passing because the legacy paths remain served.
+- Express static precedence: real files (`*.html`) always win over the SPA fallback (below) — a legacy page keeps its URL until it is retired.
+
+**P4 — test migration and retirement (no coverage loss):**
+
+| Existing assertion | Action at P4 |
+|---|---|
+| `catalog.test.ts` page-serving assertions (`/login.html`, `/catalog.html`, `/item.html`) | **Update** to the React entry (`GET /` → 200 `index.html`) and, where the assertion proved the UI→API journey, **replace with** Playwright `catalog-journey.spec.ts`/`auth-journey.spec.ts` (which cover the same AC via the real UI). Only retire the legacy assertions **after** the Playwright specs pass. |
+| `catalog.test.ts` UI-to-API-to-DB journey test | Replaced by Playwright journey specs (stronger evidence — real browser); API-level leg stays as the existing API tests |
+| `restart-e2e.test.ts` readiness probe `GET /login.html` | **Change to** `GET /` (React entry returns 200 `index.html`) — no new API endpoint is introduced (API contracts unchanged). If a health check is ever wanted, it requires a contract revision first, not part of this migration. |
+| `catalog-ui.test.ts` (jsdom) | Retired after component tests reproduce its assertions (already planned in §3.3) |
+
+**SPA routing (fallback) rules:**
+- Express adds a **history-API fallback** middleware: GET/HEAD requests that (a) accept `text/html`, (b) do **not** start with `/api/`, and (c) do not match an existing static file → serve `client/dist/index.html`. This makes **direct URL navigation and browser refresh work** for all supported React routes.
+- **`/api/*` must never fall through to `index.html`** — API paths continue to hit the API routers and return the existing API contract behavior, including the JSON 404 error envelope for unknown `/api` routes (unchanged).
+- Unknown non-API, non-static HTML paths return the SPA shell (client-side router shows its own not-found state); unknown `/api` paths return the safe JSON 404 — the two not-found behaviors remain distinct.
 
 | Risk | Mitigation |
 |---|---|
@@ -290,3 +366,4 @@ Current state: `client/login.html`, `client/catalog.html`, `client/item.html` (p
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Initial Architecture Change Proposal: team decisions recorded (§2), impact analysis (§3), conflicts (§4), proposed structure/design-system/Playwright strategy (§5–§11), migration plan (§12), document change list (§13) | Team decisions 2026-11-05 (React/Vite/Tailwind/Playwright/tokens/navy/white/responsive/custom components/Lucide); SDS §2.1/§2.2/§5; Sprint 1 contracts UI sections; PR #27 UI question thread; Issue #28 |
+| 2 — 2026-11-05 | PR #29 review (4 P2): (1) §11 Playwright mapping — F-04/F-05 request→checkout→loans journey corrected to **Sprint 1** (specs added when F-04/F-05 ready, complete before D1 integrated release verification); return/history stays Sprint 2; (2) §3.3/§12.1 — corrected "tests unaffected" overclaim: catalog.test.ts page-serving assertions and restart-e2e readiness probe identified as legacy-page-dependent; added Legacy/React compatibility & page-serving migration plan (P1–P3 coexistence, P4 assertion updates/retirement without coverage loss, SPA fallback rules incl. `/api/*` never served index.html); (3) §6.1 — ports + trusted-origin + Vite proxy configuration (backend 3000 / Vite 5173 / APP_ORIGIN dev+prod values, proxy forwards Origin unchanged, guard not weakened) with 5 verification gates; (4) §7 — Tailwind version-specific config: pin **v4** at P1, CSS-first `@theme` + `@tailwindcss/vite`, JS config only via explicit `@config` (v4 does not auto-detect it), v3/v4 separated, token verification gate for `#313B7B`/`#FFFFFF`; §5 structure line aligned | PR #29 review by L0u1sss; Tailwind official upgrade guide (`tailwindcss.com/docs/upgrade-guide#using-a-javascript-config-file`); `server/tests/catalog.test.ts`, `server/tests/restart-e2e.test.ts`, `server/src/routes/auth-routes.ts`, `.env.example` verified |
