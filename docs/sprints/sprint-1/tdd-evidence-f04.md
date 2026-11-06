@@ -1,18 +1,20 @@
 # F-04 Implementation and TDD Evidence
 
-> **Recorded:** 2026-11-06 | **Scope:** Issue #11 request UI/API/schema only | **Status:** Local working-tree candidate; independent peer review and F-05-dependent verification pending
+> **Recorded:** 2026-11-06 | **Revision:** 2 | **Scope:** Issue #11 request UI/API/schema only | **Status:** Implementation/test source at `6b4c35d`; documentation corrections local; independent peer review and F-05-dependent verification pending
 
 ## 1. Version and Environment
 
-Source base: `4e4e62c` (merged PR #35). The implementation under test includes **uncommitted local changes**; it is not represented by that base SHA alone. No new tested commit, PR approval, GitHub CI pass or issue completion is claimed. After the human commits/pushes this candidate, rerun/attach checks to that actual submitted SHA.
+Current submitted implementation/test source: **`6b4c35dc8d45f88217905b050db75fd7ad5ff5e4`**, based on `4e4e62c` (merged PR #35). During PR #36 remediation, a fresh-database server rerun verified that submitted code directly. Only documentation is changed in this remediation. No GitHub CI pass, teammate approval or issue completion is claimed.
 
-Changed source/test snapshot SHA-256: `e5550dddbd4aa9ad93fc880ff9ee96e04da40b36cedf5dd8b79c98b753affd97`. The file hashes in §6 identify the uncommitted candidate without inventing a commit history.
+**Historical provenance (rev 1):** the initial tests ran on uncommitted local changes before `6b4c35d` existed; the fingerprint below records that actual candidate instead of inventing a tested commit for the earlier run. All 19 recorded source/test file hashes were rechecked against the current working files and match. Client/browser results below remain those earlier fingerprinted runs; they were not rerun for these documentation-only edits.
 
-Actual local engines: Windows; Node.js 24.14.0 for server/build/Playwright; Node.js 24.15.0 via temporary npm runtime for client Vitest (jsdom's declared engine minimum); PostgreSQL **18.4**, isolated temporary local cluster and separate API/browser test databases. The selected product baseline is PostgreSQL17; **this environment did not verify PostgreSQL17**. No development/production DB or external data was used. No fake Loan table/residue schema was created to unlock dependency-gated cases.
+Changed source/test snapshot SHA-256: `e5550dddbd4aa9ad93fc880ff9ee96e04da40b36cedf5dd8b79c98b753affd97`. The file hashes in §6 identify the historical candidate and match the submitted implementation/test files; they are not relabelled as a different historical run.
+
+Actual local engines: Windows; Node.js 24.14.0 for server/build/Playwright; Node.js 24.15.0 via temporary npm runtime for client Vitest (jsdom's declared engine minimum); PostgreSQL **18.4**, isolated temporary local cluster and separate API/browser test databases. The selected product baseline is PostgreSQL17; **this environment did not independently verify PostgreSQL17**. The latest reviewer reports a separate PostgreSQL17.11 / Node24.19 run; that is attributed separately below. PostgreSQL18 is verified in this local environment, not unverified globally. No development/production DB or external data was used. No fake Loan table/residue schema was created to unlock dependency-gated cases.
 
 ## 2. User Decision and Implementation
 
-The user explicitly confirmed during this work session: **multiple units up to current available stock; no additional per-borrower cap; full return per loan**. SRS A-12/BR-01/BR-09 and OQ-02 resolution record it as a new 2026-11-06 decision, not a decision falsely attributed to prior PRs. Requests remain non-reserving (BR-12). Return implementation is still Sprint2.
+The user explicitly confirmed during this work session: **multiple units up to current available stock; no additional per-borrower cap; full return per loan**. SRS A-12/BR-01/BR-09 record that user-confirmed implementation choice as a new 2026-11-06 decision, not one falsely attributed to prior PRs. **PR #36 requests shared-team ratification before merge.** The user has said a confirmation exists and will supply its link/text; no such artifact has yet been received or found in Issue #11 comments, so team ratification is not claimed here. Requests remain non-reserving (BR-12). Return implementation is still Sprint2.
 
 - Migration002 creates only borrowing_requests, positive INTEGER quantity, non-cascading User/Equipment foreign keys and owner/item indexes.
 - POST /api/requests authenticates and requires Borrower before body validation, locks the Equipment row, re-reads stock, rejects unavailable/excess quantities, inserts the server-owned request and commits before success.
@@ -35,13 +37,21 @@ The RED/GREEN states were consecutive local edits during this session, not separ
 
 | Check / command | Actual result | Scope / limit |
 |---|---|---|
-| `npx vitest run` (root; isolated TEST_DATABASE_URL and required safe runtime settings supplied) | **85 passed, 6 skipped**, 11 test files passed | Includes 26 new F-04 unit/API cases and actual process-restart request assertions. The6 existing Loan-dependent availability/restart cases remain skipped until #12; no global acceptance completion claim. |
+| `npm test` (fresh isolated database; checked-in migrations only) | **85 passed, 6 skipped**, 11 test files passed | Reproduced directly at `6b4c35d` during PR #36 remediation. `borrowing_requests.created_at DEFAULT now()` is present, but `loans` is absent. See [raw output](pr36-clean-db-results.txt). |
 | `npx --yes --package=node@24.15.0 node node_modules/vitest/vitest.mjs run` (cwd client/) | **57 passed**, 7 files | Includes14 new F-04 UI/component cases; unit/component responses are explicitly mocked, not presented as DB evidence. |
 | `npx playwright test --config e2e/playwright.config.ts` | **42 passed** | Real browser/app/API/migrated DB at desktop1280×800, tablet768×1024, mobile390×844; includes6 F-04 scenario runs. |
 | `npm run build` | PASS | Server TypeScript production build |
 | `npm --prefix client run typecheck` and `npm --prefix client run build` | PASS | Client type check and production build |
 
 Real-DB/API tests: [borrowing-request.test.ts](../../../server/tests/borrowing-request.test.ts); domain RED/GREEN regression: [borrowing-request-unit.test.ts](../../../server/tests/borrowing-request-unit.test.ts); actual app process stop/start: [restart-e2e.test.ts](../../../server/tests/restart-e2e.test.ts); mocked UI tests: [borrowing-request.test.tsx](../../../client/src/test/borrowing-request.test.tsx); browser journey: [borrowing-request.spec.ts](../../../e2e/specs/borrowing-request.spec.ts). Commands used only isolated databases; reusable passwords/tokens/cookies are omitted. Browser passwords were generated transiently, passed through private process environment and never committed or printed.
+
+### Separate reviewer-reported run (not merged into the local result)
+
+[Latest PR #36 review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/36#pullrequestreview-5803634169) reports **91 passed / 0 skipped** on **PostgreSQL17.11 / Node24.19**, plus client57/57 and browser42/42. This is reviewer-reported evidence, not an independently reproduced run in this workspace. Its database relation inventory, setup SQL and raw output have not been supplied here.
+
+The fresh local probe shows `requests=borrowing_requests`, `loans=null`, `created_at default=now()` before `npm test`, followed by **85/6**. The six skips are controlled by `loanRelationsExist()` (`to_regclass` for BOTH relations), not by the timestamp default. Repairing `created_at` alone cannot switch that gate. The checked-in migration002 creates only requests; the Loan migration belongs to #12.
+
+Therefore **91/0 must remain a separately attributed reviewer result until the schema/setup evidence is reconciled**. Do not silently replace clean-database85/6 with91/0, invent Loan DDL to enable tests, or remove the existing PG18 evidence. Request the reviewer's relation inventory/setup/logs to determine why their six gated tests executed. Client/browser counts agree across the reports, but that does not establish identical database setup.
 
 ## 5. Per-STS Status and Remaining Scope
 
@@ -93,3 +103,10 @@ AC-F04-01/02/03/04/07/08/09/10 are verified for the implemented request-only can
 Use the checked-in dependency lockfiles and a compatible Node runtime. Create isolated development/test PostgreSQL databases, supply the documented configuration privately, run npm ci (root and client), npm run migrate, the synthetic seed with private seed inputs, client build and the commands above. `TEST_DATABASE_URL` must name an isolated test database: existing tests deliberately reset fixture data. Browser E2E must use the same selected APP_ORIGIN/PORT/E2E_BASE_URL and a separate seeded test database, not production.
 
 After #12 installs actual Loan migration/checkout behavior, re-run TEST-F04-06/07 and the6 skipped integration cases from a clean database using real migrations. Do not invent Loan DDL in this feature to manufacture a pass. Record resulting actual files/commands/SHA/results before promoting partial AC status.
+
+## 8. PR #36 Remediation Record
+
+- Reproduced the submitted source on a new database using real checked-in migrations; raw output records PostgreSQL18.4 / Node24.14.0, `DEFAULT now()`, no Loan relation, and85/6.
+- Preserved the reviewer-reported PG17.11 / Node24.19 result91/0 as a separate, unreconciled run rather than falsifying environment or counts.
+- Aligned F-03 quantity references and repaired malformed ASCII separators in the affected engineering documents.
+- Team-ratification provenance is explicitly pending the promised confirmation artifact; no confirmation comment, approval or merge is fabricated.

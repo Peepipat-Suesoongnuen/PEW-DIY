@@ -179,14 +179,14 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | A-06 | Assumption | All data is synthetic; no real payment, messaging, or external services are integrated. | Per course spec §5.3 |
 | A-07 | Design Decision | Requirement and deliverable documents are written in **English**. | **Confirmed** by team (2026-11-03) |
 | A-11 | Design Decision | **Non-reservation + Direct Checkout (Direction A):** (1) Sprint 1 uses Non-reservation + Direct Checkout; (2) a Borrowing Request does not reserve units and does not reduce Available Quantity (BR-12); only a committed Active Loan does; (3) Sprint 1 has no approval step before checkout (A-02); (4) an approval workflow is added in **Sprint 2 only** — its specification is deferred to the Sprint 2 contracts — and a pending request under it still does not reserve equipment (BR-12). | **Confirmed** by team (2026-11-06, Direction A) |
-| A-12 | Design Decision | **Quantity/return policy:** multiple units per request are permitted up to current availability, with no additional per-borrower cap; each loan is returned in full. Requests remain non-reserving under BR-12, so repeated requests do not consume stock. Return implementation remains Sprint 2. | **Confirmed** by user in the Issue #11 work session, 2026-11-06; resolves OQ-02 |
+| A-12 | Design Decision | **Quantity/return policy:** multiple units per request are permitted up to current availability, with no additional per-borrower cap; each loan is returned in full. Requests remain non-reserving under BR-12, so repeated requests do not consume stock. Return implementation remains Sprint 2. | **User-confirmed implementation choice**, 2026-11-06; **team ratification pending** PR #36 and a verifiable teammate confirmation artifact |
 
 ### 7.2 Assumptions (working assumptions to be validated)
 
 | ID | Type | Description | Resolution / Status |
 |---|---|---|---|
 | A-08 | Assumption | The system serves a single D.I.Y. Room (one inventory namespace; no multi-branch/multi-room support). | Open to challenge |
-| A-09 | Assumption | Quantity Tracking applies uniformly to item types; larger quantities follow the recorded quantity/return policy. | Quantity policy resolved by A-12; no additional item-category rule introduced |
+| A-09 | Assumption | Quantity Tracking applies uniformly to item types; larger quantities follow the recorded quantity/return policy. | Implementation choice recorded in A-12; team ratification pending; no additional category rule introduced |
 | A-10 | Assumption | "Availability" means lendable right now; repair/retired items are excluded from availability via catalog status. | Open to challenge |
 
 ### 7.3 Open Questions (not yet decided — do not treat as requirements)
@@ -194,7 +194,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | ID | Question | Impact | Target |
 |---|---|---|---|
 | OQ-01 | What is the actual initial equipment catalog? (Arduino Uno, ESP32, Breadboard, Jumper Wires, Sensors, Multimeter, Soldering Equipment are examples only, not confirmed) | Seed data content | Decide before Sprint 1 seed implementation |
-| OQ-02 | **Resolved 2026-11-06:** multiple units up to current availability; no additional per-borrower cap; full return per loan (A-12). Original coupled quantity/return question was raised in PR #15 and remained open through rev 3. | Request validation + future checkout/BR-09 return semantics | Decision supplied by user during Issue #11 implementation; no return implementation in this issue |
+| OQ-02 | **Choice recorded 2026-11-06; team ratification pending:** multiple units up to current availability; no additional per-borrower cap; full return per loan (A-12). Original coupled quantity/return question was raised in PR #15 and remained open through rev 3. | Request validation + future checkout/BR-09 return semantics | User supplied the choice during Issue #11 implementation; shared-team baseline closure requires ratification evidence per PR #36; no return implementation here |
 | OQ-03 | Are there loan-period differences by item category (e.g., tools 7 days, consumables same-day)? | BR-07 generalization | Decide before Sprint 2 |
 | OQ-04 | What happens to overdue loans beyond listing (reminders, suspension of borrowing rights)? | Out of scope currently; may extend BR-08 | Decide before Sprint 2 |
 | OQ-05 | Should returned items record condition (ok/damaged)? | Excluded for now (§3.2) | Revisit after Sprint 2 |
@@ -204,4 +204,6 @@ Each rule is stated as testable behavior with its rejection/edge case.
 
 *Document history: created in [D1-01] (Part A), rev 1 (commit `8252496`). Rev 2 (PR #15 review): added redeployment durability to NFR-04/BR-11 per `group_work_specs_v1.pdf` §5.1; split persistence/atomicity sprint allocation by function (request/checkout → Sprint 1, return → Sprint 2); added close-accounting guard to BR-09 and coupled-decision note to OQ-02. Rev 3 (2026-11-06, team decision Direction A): added BR-12 (non-reservation — requests never reserve or reduce Available Quantity) and A-11 (Non-reservation + Direct Checkout; Sprint 2 approval workflow whose pending requests do not reserve equipment). Existing FR/BR/NFR/A IDs are unchanged; no open question (OQ-01/OQ-02/OQ-03–OQ-06) is closed by this revision. FR/BR/NFR IDs are stable and will be referenced by Part B traceability, Part C SDS, and Sprint 1 contracts.*
 
-**Revision 4 ? 2026-11-06 (Issue #11 work-session user decision):** resolved OQ-02 as A-12 (multi-unit up to available stock, no additional per-borrower cap, full return per loan); elaborated BR-01 and fixed future BR-09 return policy. Existing requirement IDs preserved; return implementation remains Sprint 2. This records an explicit new decision, not a claim that earlier PRs had already resolved it.
+**Revision 4 — 2026-11-06 (Issue #11 work-session user decision):** resolved OQ-02 as A-12 (multi-unit up to available stock, no additional per-borrower cap, full return per loan); elaborated BR-01 and fixed future BR-09 return policy. Existing requirement IDs preserved; return implementation remains Sprint 2. This records an explicit new decision, not a claim that earlier PRs had already resolved it.
+
+**Revision 5 — 2026-11-06 (PR #36 provenance review):** distinguish the existing user-confirmed A-12 implementation choice from shared-team baseline ratification. Preserve the actual user decision and behavior; keep the team-confirmation evidence gate pending rather than inventing an Issue comment or peer approval.

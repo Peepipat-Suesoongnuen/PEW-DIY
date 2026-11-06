@@ -68,16 +68,16 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F04-01](f-04-borrowing-request.md) | [TEST-F04-01](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-02](f-04-borrowing-request.md) | [TEST-F04-02](f-04-borrowing-request.md), [TEST-F04-13](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-03](f-04-borrowing-request.md) | [TEST-F04-03](f-04-borrowing-request.md), [TEST-F04-04](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-04](f-04-borrowing-request.md) | [TEST-F04-05](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | PARTIAL ? F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | PARTIAL ? F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-07](f-04-borrowing-request.md) | [TEST-F04-08](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-08](f-04-borrowing-request.md) | [TEST-F04-09](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-09](f-04-borrowing-request.md) | [TEST-F04-10](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-10](f-04-borrowing-request.md) | [TEST-F04-11](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-01](f-04-borrowing-request.md) | [TEST-F04-01](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-02](f-04-borrowing-request.md) | [TEST-F04-02](f-04-borrowing-request.md), [TEST-F04-13](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-03](f-04-borrowing-request.md) | [TEST-F04-03](f-04-borrowing-request.md), [TEST-F04-04](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-04](f-04-borrowing-request.md) | [TEST-F04-05](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | PARTIAL — F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | PARTIAL — F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-07](f-04-borrowing-request.md) | [TEST-F04-08](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-08](f-04-borrowing-request.md) | [TEST-F04-09](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-09](f-04-borrowing-request.md) | [TEST-F04-10](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-10](f-04-borrowing-request.md) | [TEST-F04-11](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
 
 ### F-05
 

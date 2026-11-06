@@ -4,7 +4,7 @@
 >
 > **Deliverable:** D1-03 Part C — System-Level SDS | **Issue:** [#3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/3)
 >
-> **Revision:** 4, 2026-11-06 | **Status:** Draft for team decision and peer review
+> **Revision:** 5, 2026-11-06 | **Status:** Draft for team decision and peer review
 >
 > **Baseline:** [SRS](srs.md) rev 2 and [Feature Inventory](features.md) rev 1, present at commit `9d3c57b`
 >
@@ -164,7 +164,7 @@ At request creation, the application validates availability from the DB before p
 
 ### 3.4 Return, Dates, and Later-Sprint Extensions
 
-**Revision 4 resolution ? SRS A-12 (user decision, 2026-11-06):** multiple units up to current available stock; no additional per-borrower cap; full return per loan. Request-time quantity bounds are enforced by F-04. The alternatives below are historical design options; full-quantity return is selected, and no partial-return implementation is authorized by Issue #11.
+**Current A-12 choice (user decision, 2026-11-06; shared-team ratification pending PR #36):** multiple units up to current available stock; no additional per-borrower cap; full return per loan. Request-time quantity bounds are enforced by F-04. The alternatives below are historical design options; full-quantity return is selected, and no partial-return implementation is authorized by Issue #11.
 
 | Alternative awaiting team decision | Data and consistency impact |
 |---|---|
@@ -374,7 +374,7 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 | Question | Impact / next evidence required | Target |
 |---|---|---|
 | SRS OQ-01 | Team supplies actual initial catalog; until then fixtures remain labelled synthetic/proposed | Before Sprint 1 seed implementation |
-| SRS OQ-02 | **Resolved ? A-12:** multi-unit up to current stock, no additional per-borrower cap, full return per loan (explicit user decision 2026-11-06) | F-04 request validation now implemented; Loan/return behavior remains #12/Sprint 2 |
+| SRS OQ-02 | **User choice recorded; team ratification pending — A-12:** multi-unit up to current stock, no additional per-borrower cap, full return per loan (explicit user decision 2026-11-06) | F-04 request validation now implemented; Loan/return behavior remains #12/Sprint 2 |
 | SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + Vitest/Supertest (team decision D1; PR #22) | Closed — AC-C-01 now verifiable |
 | SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 now verifiable |
 | SDS-OQ-03 — calendar policy | Approve business timezone/date boundary representation consistent with BR-07/08 | Before checkout contract/tests |
@@ -399,4 +399,5 @@ This local document is not a claim that Issue #3 is Done. Resolve the decisions 
 | 1 — 2026-11-04 | Initial System-Level SDS; architecture/data/UI/API/access/configuration proposals, explicit decision gaps and AC review | Local baseline `9d3c57b`, SRS rev 2, Part B rev 1, Issues #1–#3 and original course PDFs |
 | 2 — 2026-11-04 | Tagged the NFR-08/NFR-09 verification row with `F-10` and added its coordination sentence for cross-document consistency with Part B; no design change | Peer review feedback on PR #17 (confirmed by reviewer); `docs/traceability.md` rows NFR-08 → F-10, NFR-09 → F-10 |
 | 3 — 2026-11-05 | Closed SDS-OQ-01/02 with the team-selected stack and authentication strategy (§2.1 update block, AD-C-07, §10) and recorded the client/server physical layout with unchanged monolith deployment (§2.2) | FIX-A #23; team decisions D1/D2 (2026-11-03/04); PR #22 implementation evidence |
-| 4 ? 2026-11-06 | Recorded the explicit Issue #11 user decision closing OQ-02 as SRS A-12; marked earlier return alternatives historical; no Loan/return implementation claimed | User work-session decision; SRS rev 4; F-04 request validation |
+| 4 — 2026-11-06 | Recorded the explicit Issue #11 user decision closing OQ-02 as SRS A-12; marked earlier return alternatives historical; no Loan/return implementation claimed | User work-session decision; SRS rev 4; F-04 request validation |
+| 5 — 2026-11-06 | Distinguished the recorded A-12 user choice from pending team-ratification evidence and repaired malformed ASCII separators; no behavioral change | PR #36 provenance review; SRS rev 5 |
