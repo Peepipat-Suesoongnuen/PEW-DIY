@@ -2,13 +2,13 @@
 
 > **Deliverable:** D1-05 Part E | **Implementation issue:** [D1-06.3 / #10](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/10)
 >
-> **Revision:** 2, 2026-11-06 | **Contract approval:** Pending team baseline approval and peer review — the Direction A points (Non-reservation + Direct Checkout) are **Confirmed** by team (2026-11-06); other draft proposals in this file remain unapproved | **Implementation status:** Implemented (Issue #10) | **Test status:** Partially executed — results in [tdd-evidence-f03.md](tdd-evidence-f03.md)
+> **Revision:** 3, 2026-11-06 | **Contract approval:** Pending team baseline approval and peer review — the Direction A points (Non-reservation + Direct Checkout) are **Confirmed** by team (2026-11-06); other draft proposals in this file remain unapproved | **Implementation status:** Implemented (Issue #10) | **Test status:** Partially executed — results in [tdd-evidence-f03.md](tdd-evidence-f03.md)
 >
 > **Execution status:** TEST-F03-01/03/05/06 executed (green) and TEST-F03-08 UI halves executed at component level — commands, outputs and RED→GREEN history in [tdd-evidence-f03.md](tdd-evidence-f03.md). TEST-F03-02 and the loan-fixture halves of AC-F03-03/AC-06.3-03 are **dependency-gated** on the Request/Loan schema owned by #11/#12 (auto-enable when present). TEST-F03-04/07/09/10/11 remain **PLANNED — NOT RUN** (need F-04/F-05 features or schema). The rev 1 statement below described the rev 1 baseline only: "Every test PLANNED — NOT RUN. No availability code, migration or executable test exists at this baseline." Rows without a recorded run remain **PLANNED — NOT RUN**; nothing is marked PASS without evidence.
 
 ## 1. Requirement Links, Scope, and Dependencies
 
-Sources: [SRS](../../srs.md) rev 2, [Feature Inventory](../../features.md) rev 1, [System SDS](../../system-sds.md) rev 2 §3.3/§6, and [sprint plan](../plan.md). The course basis is D1 §3.5 (PDF p.4) and group specification §8.2 (PDF p.10). Shared payload/access/error conventions and synthetic data are in [shared conventions](shared-conventions.md) and [fixtures](fixtures.md).
+Sources: [SRS](../../srs.md) rev 3, [Feature Inventory](../../features.md) rev 1, [System SDS](../../system-sds.md) rev 3 §3.3/§6, and [sprint plan](../plan.md). The course basis is D1 §3.5 (PDF p.4) and group specification §8.2 (PDF p.10). Shared payload/access/error conventions and synthetic data are in [shared conventions](shared-conventions.md) and [fixtures](fixtures.md).
 
 | Basis | F-03 responsibility / enforcement owner |
 |---|---|
@@ -85,9 +85,9 @@ The safe error envelope is the [shared](shared-conventions.md) `error.code/messa
 
 ## 6. Software Test Specification
 
-**Every row: PLANNED — NOT RUN; actual test file/command/result/tested SHA: NOT AVAILABLE.** Real DB integration is required for authoritative stock/persistence/transaction claims. Unit/component tests are complementary evidence. Fixture symbols, account roles and clean-reset procedures come from [fixtures](fixtures.md).
+**Rev 1 baseline (historical): at that baseline, every row was PLANNED — NOT RUN; actual test file/command/result/tested SHA: NOT AVAILABLE.** Retained verbatim as history per course spec §8.3 — it is **not** the current status; the per-row execution status in the table below is authoritative. Real DB integration is required for authoritative stock/persistence/transaction claims. Unit/component tests are complementary evidence. Fixture symbols, account roles and clean-reset procedures come from [fixtures](fixtures.md).
 
-**Execution status per row (rev 3, 2026-11-06 — PR #35 re-review):** the last column records `EXECUTED (green)` / `PARTIAL` / `DEPENDENCY-GATED` / `PLANNED — NOT RUN` with the actual test file, command, result and tested SHA (outputs and RED→GREEN history in [tdd-evidence-f03.md](tdd-evidence-f03.md)). Verified at SHA `5978061` (implementation `17d70bf`). The rev 1 sentence above is retained as history per course spec §8.3; rows without a recorded run remain **PLANNED — NOT RUN**.
+**Execution status per row (rev 3, 2026-11-06 — PR #35 re-review):** the last column records `EXECUTED (green)` / `PARTIAL` / `DEPENDENCY-GATED` / `PLANNED — NOT RUN` with the actual test file, command, result and tested SHA (outputs and RED→GREEN history in [tdd-evidence-f03.md](tdd-evidence-f03.md)). Verified at SHA `5978061` (implementation `17d70bf`); rows without a recorded run remain **PLANNED — NOT RUN**.
 
 | Test ID / linked AC | Level | Concrete precondition/input | Action | Expected result | Execution status (file · command · result · tested SHA) |
 |---|---|---|---|---|---|
@@ -109,7 +109,7 @@ Baselining resolved the non-reservation question via team decision (Direction A,
 
 The [Product Definition of Done](product-dod.md) applies. F-03 additionally requires all seven AC linked to actual meaningful tests, real-DB aggregate/post-checkout/rollback/restart evidence, matching UI/list/detail values, no private stock-detail leakage, and agreement with the reviewed F-04/F-05 transaction contracts. Preserve the intended failing stock-rule test and subsequent passing implementation versions; no stub assertion or screenshot alone proves availability correctness. Teammate review/integration/release remains required before declaring implementation Issue #10 complete.
 
-Open gates: SDS-OQ-01 engine/query/isolation/migration syntax; SDS-OQ-02 authentication through F-01; SRS OQ-01 catalog fixtures and OQ-02 multi-unit/limit/full-versus-partial-return policy. **Resolved (not a gate anymore): the non-reserving-requests review — team decision Direction A, 2026-11-06 (SRS BR-12/A-11).** The unconditional invariant is already confirmed and is not reopened. Returned-unit accounting is a later-sprint conditional design, not an implemented loan state here.
+Open gates: SRS OQ-01 catalog fixtures and OQ-02 multi-unit/limit/full-versus-partial-return policy; SDS-OQ-03 business timezone/date-boundary representation (per SDS §10; needed for F-05 due-date tests). **Resolved (not gates anymore):** SDS-OQ-01 (stack — resolved at SDS rev 3: Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + Vitest/Supertest, team decision D1/PR #22) and SDS-OQ-02 (authentication — server session + HttpOnly cookie + trusted-origin anti-CSRF, team decision D2/PR #22); and the non-reserving-requests review — team decision Direction A, 2026-11-06 (SRS BR-12/A-11). The unconditional invariant is already confirmed and is not reopened. Returned-unit accounting is a later-sprint conditional design, not an implemented loan state here.
 
 ## 8. Revision History
 
