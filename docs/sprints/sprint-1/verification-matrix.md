@@ -58,10 +58,10 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 |---|---|---|
 | [AC-F03-01](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-02](f-03-equipment-availability.md) | PARTIAL — TEST-F03-01 EXECUTED (green); TEST-F03-02 dependency-gated on #11/#12 schema ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
 | [AC-F03-02](f-03-equipment-availability.md) | [TEST-F03-03](f-03-equipment-availability.md) | EXECUTED (green) — TEST-F03-03 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-03](f-03-equipment-availability.md) | [TEST-F03-04](f-03-equipment-availability.md) | PLANNED — NOT RUN — TEST-F03-04 needs F-04/F-05 features; fixture-level halves dependency-gated on #11/#12 schema ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-03](f-03-equipment-availability.md) | [TEST-F03-04](f-03-equipment-availability.md) | DEPENDENCY-GATED / PLANNED — NOT RUN — fixture-level halves dependency-gated on #11/#12 schema; TEST-F03-04 needs F-04/F-05 features ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
 | [AC-F03-04](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-05](f-03-equipment-availability.md), [TEST-F03-06](f-03-equipment-availability.md) | EXECUTED (green) — TEST-F03-01/05/06 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
 | [AC-F03-05](f-03-equipment-availability.md) | [TEST-F03-07](f-03-equipment-availability.md), [TEST-F03-08](f-03-equipment-availability.md) | PARTIAL — TEST-F03-08 UI halves EXECUTED (client component tests); TEST-F03-07 PLANNED — NOT RUN (needs F-04/F-05 journeys) ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-06](f-03-equipment-availability.md) | [TEST-F03-09](f-03-equipment-availability.md), [TEST-F03-10](f-03-equipment-availability.md) | PLANNED — NOT RUN — TEST-F03-09 dependency-gated on #11/#12 schema; TEST-F03-10 needs F-05 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-06](f-03-equipment-availability.md) | [TEST-F03-09](f-03-equipment-availability.md), [TEST-F03-10](f-03-equipment-availability.md) | DEPENDENCY-GATED / PLANNED — NOT RUN — TEST-F03-09 dependency-gated on #11/#12 schema; TEST-F03-10 needs F-05 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
 | [AC-F03-07](f-03-equipment-availability.md) | [TEST-F03-10](f-03-equipment-availability.md), [TEST-F03-11](f-03-equipment-availability.md) | PLANNED — NOT RUN — needs F-05 (Issue #12) enforcement ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
 
 ### F-04
