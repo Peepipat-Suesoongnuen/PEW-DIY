@@ -6,6 +6,8 @@
 >
 > **Source baseline:** `c78ad95` — SRS rev 2, Part B rev 1, System SDS rev 2, Sprint Plan rev 3. English follows SRS A-07. No application code/tests, executed results, approved contract baseline or release is supplied by this documentation change.
 
+Current execution update (2026-11-07): F-05 is implemented locally; see [F-05 evidence](tdd-evidence-f05.md) for 115 server, 70 client and 51 browser passes. The revision1 source/status wording above records initial contract authoring, not the current implementation state. Shared-baseline review, team ratification and release remain pending.
+
 ## 1. Purpose and Authoritative Sources
 
 These contracts elaborate Sprint 1 before implementation: feature identity/requirements, design/workflow/rules, UI/API/data specifications, observable AC, Software Test Specification (STS), Product DoD and revision history. `project_deliverable_1_v1.pdf` §3.5 (PDF p.4) and `group_work_specs_v1.pdf` §7/§8.2 (PDF pp.9–10) define that obligation. Original PDFs were read from the team's local `D:/Software_Engineering/PEW-DIY/lab-document/` directory; no copies are added to Git.
@@ -44,8 +46,8 @@ Confirmed baseline rules remain in the SRS; new methods/paths/payload names, sch
 | SDS-OQ-01 | Stack selected in SDS rev 3 / PR #22; physical request schema implemented by #11 | Resolved stack choice; each feature still verifies its own runtime/query behavior |
 | SDS-OQ-02 | Server session + HttpOnly cookie + trusted-origin validation, idle60/absolute480 minutes (SDS rev 3 / PR #22) | Resolved; F-04 reuses the established guards |
 | SRS OQ-01 | Approved initial synthetic demo catalog content | F-02 seed; symbolic test catalog is a proposal, not a resolution; **Open** |
-| SRS OQ-02 | Choice recorded in A-12, explicit user decision 2026-11-06; team ratification pending PR #36: multi-unit up to current stock; no extra per-user cap; full return per loan | F-04 validation implemented; F-05/F-06 owners apply this policy in their future implementation/contracts |
-| SDS-OQ-03 | Business timezone and date-boundary representation | F-05 seven-calendar-day clock tests; **Open** |
+| SRS OQ-02 | Choice recorded in A-12, explicit user decision 2026-11-06; team ratification pending PR #36: multi-unit up to current stock; no extra per-user cap; full return per loan | F-04 request and F-05 full checkout implemented; F-06 return remains Sprint 2 |
+| SDS-OQ-03 | User explicitly confirmed Asia/Bangkok, UTC checkout instant and local calendar date +7 during #12 implementation (2026-11-07) | F-05 date-boundary tests executed; shared-baseline peer review pending |
 | Contract proposal review | Accept/revise route inventory, schema/validation/error choices and test parameters with affected IDs | All six contracts; **Pending independent team review** |
 
 At the original Part E revision these gates were open. Later PR #22/SDS rev 3 selected stack/auth, and the explicit Issue #11 user decision (2026-11-06) recorded the quantity choice as A-12; shared-team ratification evidence remains pending PR #36. Quantity1 examples remain test vectors; current policy permits multi-unit requests bounded by live stock, without reserving units. S2/S3 policies and hosting selection remain at their existing targets; no extra implementation is authorized to close them here.

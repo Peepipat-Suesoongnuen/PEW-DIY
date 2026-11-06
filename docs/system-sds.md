@@ -4,7 +4,7 @@
 >
 > **Deliverable:** D1-03 Part C — System-Level SDS | **Issue:** [#3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/3)
 >
-> **Revision:** 5, 2026-11-06 | **Status:** Draft for team decision and peer review
+> **Revision:** 6, 2026-11-07 | **Status:** Draft for team decision and peer review
 >
 > **Baseline:** [SRS](srs.md) rev 2 and [Feature Inventory](features.md) rev 1, present at commit `9d3c57b`
 >
@@ -173,7 +173,7 @@ At request creation, the application validates availability from the DB before p
 
 The partial-return schema is conditional, not part of the fixed core ERD. If selected, earlier partial returns live in Return records; keep Loan `returned_at`/`returned_by` unset until all units have returned. The loan stays active, contributes its remaining held quantity, and remains eligible for overdue calculation until closure. Either alternative must satisfy BR-09; closing a partially returned loan would incorrectly free held units. Do not implement a partial-return contract before OQ-02 is resolved.
 
-**Proposed date representation:** store event timestamps as UTC instants; calculate `due_on` as the checkout's calendar date in an explicitly chosen business timezone plus seven calendar days (A-03/BR-07). Overdue is derived as `active AND business_current_date > due_on` (BR-08); it is not a separately mutable loan status, and equality with the due date is not overdue. `APP_TIMEZONE=Asia/Bangkok` is a proposal for this university context, pending SDS-OQ-03; it is not an inferred team decision. The seven-day rule does not permit a client-selected due date or a category-specific period before OQ-03 is resolved. Date and timezone boundary tests belong in the feature contracts.
+**Date representation — user-confirmed for Issue #12 (2026-11-07):** store event timestamps as UTC instants; calculate `due_on` as the checkout's calendar date in `Asia/Bangkok` plus seven calendar days (A-03/BR-07). The user explicitly answered “ยืนยันใช้ Asia/Bangkok” in the implementation session, resolving SDS-OQ-03 for implementation; this is not fabricated teammate approval. Configure `APP_TIMEZONE=Asia/Bangkok`; an absent zone disables checkout with safe503, and an invalid zone fails startup. Overdue remains Sprint 2: its planned derivation is `active AND business_current_date > due_on` (BR-08), with equality not overdue. Clients cannot choose the due date. See [F-05 contract and execution evidence](sprints/sprint-1/f-05-checkout-active-loan.md) for local-midnight/month/year boundary tests. Shared-baseline peer review remains required.
 
 Sprint 2 adds return, overdue, catalog management/search, full history and Custodian all-loan views (F-06–F-08); Sprint 3 reporting (F-09) reads the same persisted catalog/loan data. No separate reporting database, scheduled overdue mutation, penalties, or notification service is needed by the current baseline.
 
@@ -313,7 +313,7 @@ Names below are logical proposals to map to the selected runtime, not existing a
 | `APP_ENV`, `PORT`, `LOG_LEVEL` | Non-secret environment/HTTP/log settings; validate allowed values |
 | `DATABASE_URL` or equivalent host/name/user/credential inputs | Secret if credentials are included; correct dev/test/deployed durable store |
 | `APP_ORIGIN`, optional explicit allowed origins | Non-secret origin and CORS/credential/CSRF configuration, matching chosen browser topology |
-| `APP_TIMEZONE` | Non-secret business date zone; `Asia/Bangkok` is proposed, pending SDS-OQ-03 |
+| `APP_TIMEZONE` | Non-secret business date zone; `Asia/Bangkok`, user-confirmed for #12; no host-zone fallback |
 | Session idle/absolute timeout inputs | Non-secret durations, required only for the chosen session policy; values pending SDS-OQ-02 |
 | Session-protection secret or token signing key, if required by selected library | Secret; choose only inputs used by the selected auth mechanism, no hard-coded defaults |
 | Demo credential seed inputs | Secret local/private inputs used only during explicit seed; never logged or stored as plaintext fixtures |
@@ -347,7 +347,7 @@ On any topology, replacing the application image/container must preserve the sam
 |---|---|---|
 | AD-C-01 — Confirmed basis | Quantity Tracking and exclusive-item protection | SRS A-01/A-04, BR-03 → Equipment quantities and held-unit invariant; no serial-level inventory |
 | AD-C-02 — Confirmed basis | Direct Checkout retains requests | SRS A-02, FR-11–FR-14 → persist intent then Custodian checkout; no approval subsystem |
-| AD-C-03 — Confirmed basis | Seven-calendar-day due date | SRS A-03/BR-07 → server-assigned date; timezone representation remains proposed |
+| AD-C-03 — Confirmed basis | Seven-calendar-day due date | SRS A-03/BR-07 → server-assigned date; Asia/Bangkok user-confirmed for #12 (rev 6) |
 | AD-C-04 — Proposed | Modular monolith with logical UI/API/DB boundaries | Fits course §5.1 and small team; business rules remain server-side without extra services |
 | AD-C-05 — Proposed | Derived availability and serialized Equipment writes | Avoid competing stock counters; enforce BR-03/NFR-05/06 with DB transactions, not browser state |
 | AD-C-06 — Proposed | One request → at most one loan; ownership through request | Prevent duplicate fulfillment and inconsistent borrower/item links; quantity/split fulfillment contract awaits OQ-02/[D1-05] |
@@ -377,7 +377,7 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 | SRS OQ-02 | **User choice recorded; team ratification pending — A-12:** multi-unit up to current stock, no additional per-borrower cap, full return per loan (explicit user decision 2026-11-06) | F-04 request validation now implemented; Loan/return behavior remains #12/Sprint 2 |
 | SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + Vitest/Supertest (team decision D1; PR #22) | Closed — AC-C-01 now verifiable |
 | SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 now verifiable |
-| SDS-OQ-03 — calendar policy | Approve business timezone/date boundary representation consistent with BR-07/08 | Before checkout contract/tests |
+| SDS-OQ-03 — calendar policy | **User-confirmed for implementation**: Asia/Bangkok calendar date +7, UTC event timestamps; 2026-11-07 session decision | Recorded in §3; shared-baseline peer review pending |
 | SDS-OQ-04 — hosting | Select GCP services/storage/secret delivery after actual Lab 5 guidance and access | Design candidate now; implementation in Lab 5 |
 | SRS OQ-03–OQ-06, A-08–A-10 | Keep later-sprint policy/assumptions visible; do not add category periods, penalties, damage workflow or new search requirements now | Per SRS targets |
 
@@ -401,3 +401,4 @@ This local document is not a claim that Issue #3 is Done. Resolve the decisions 
 | 3 — 2026-11-05 | Closed SDS-OQ-01/02 with the team-selected stack and authentication strategy (§2.1 update block, AD-C-07, §10) and recorded the client/server physical layout with unchanged monolith deployment (§2.2) | FIX-A #23; team decisions D1/D2 (2026-11-03/04); PR #22 implementation evidence |
 | 4 — 2026-11-06 | Recorded the explicit Issue #11 user decision closing OQ-02 as SRS A-12; marked earlier return alternatives historical; no Loan/return implementation claimed | User work-session decision; SRS rev 4; F-04 request validation |
 | 5 — 2026-11-06 | Distinguished the recorded A-12 user choice from pending team-ratification evidence and repaired malformed ASCII separators; no behavioral change | PR #36 provenance review; SRS rev 5 |
+| 6 — 2026-11-07 | Recorded the explicit Asia/Bangkok calendar decision for #12 and fail-closed configuration; no return/overdue scope added | User implementation-session confirmation; F-05 tests/evidence |

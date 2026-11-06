@@ -145,7 +145,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | Item | Impact | Target |
 |---|---|---|
 | SDS-OQ-01 (stack), SDS-OQ-02 (session/token) | Block Sprint 1 implementation and AC-C-01/04 closure | Immediately — before [D1-05] baseline |
-| SDS-OQ-03 (calendar/timezone policy) | F-05 checkout contract and BR-07/08 date-boundary tests | Before [D1-05] checkout contract |
+| SDS-OQ-03 (calendar/timezone policy) | User-confirmed Asia/Bangkok calendar date +7, UTC timestamps during #12 (2026-11-07); SDS rev6 and F-05 evidence | Implementation choice recorded; shared-baseline review pending |
 | **Demo video length conflict** — master spec §9 + `project_final_delivery_v1.pdf` §2 say ≤ 10 min; `project_final_delivery_v1.pdf` §3.5 says ≤ 4 min | Final Delivery rubric compliance | Confirm with instructor/TA; **plan ≤ 4 min meanwhile** (stricter limit satisfies both readings) — recorded per PR #20 review |
 | SRS OQ-01 (actual catalog) | Seed fixtures | Before Sprint 1 seed |
 | SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | Before [D1-05] baseline |

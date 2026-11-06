@@ -53,6 +53,13 @@ export function requestPath(id: string): string {
   return `/requests/${encodeURIComponent(id)}`;
 }
 
+export function loanPath(id: string): string { return `/loans/${encodeURIComponent(id)}`; }
+export function loanIdFromPathname(pathname: string): string | null {
+  const raw = pathname.match(/^\/loans\/([^/]+)\/?$/)?.[1];
+  if (!raw) return null;
+  try { return decodeURIComponent(raw); } catch { return raw; }
+}
+
 export function requestIdFromPathname(pathname: string): string | null {
   const raw = pathname.match(/^\/requests\/([^/]+)\/?$/)?.[1];
   if (!raw) return null;

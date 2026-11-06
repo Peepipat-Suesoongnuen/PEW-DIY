@@ -1,0 +1,26 @@
+{
+  "base_commit": "de63590be05c8bb22c594be2ac6affe69f73ad8c",
+  "candidate": "uncommitted Issue #12 source and tests",
+  "files": {
+    "client/src/App.tsx": "331c2a129b8f654ea63ed424867f3b3b108be4d9a62bdacf71143e4fce6db933",
+    "client/src/components/AppShell.tsx": "d2c6882d10de07706c6509fbfd290f77e90ee1005a198712a96d58646359e32c",
+    "client/src/components/CheckoutRequest.tsx": "ed88d733cd5c41b91159587c262318e2c7575f61118fd1bb6eb097519284bf14",
+    "client/src/components/LoanDetails.tsx": "cb6c629e13c302aa2a187fbe668502a7dfecf0bf5689790bbbc5eacbb7952907",
+    "client/src/lib/api.ts": "5b180a98660ad72cd7eb68dcc8a05e81eda8966a4aadc8ab28c16abc56cebd60",
+    "client/src/lib/paths.ts": "19e1c47c58c6f94d4015aade1deeb2e1cd7974f516d0e13a2cb17d9a18162209",
+    "client/src/pages/LoansPage.tsx": "55a99cfcd2b408ff0fcaaeb4472f224479ed1141fe97bacf15d0490a201d8ebc",
+    "client/src/pages/RequestsPage.tsx": "bd3e9380d72605c5c041eebd6b7cef4070a59d999cd5c8cdd077ae014c818165",
+    "client/src/test/loan.test.tsx": "3b5a7d0634515d23f43758da4018a6e6a8c3bcf9707294a4fe67cf954a2167db",
+    "e2e/specs/checkout.spec.ts": "de9500544c5c1c6fc8d82e3b8ecca825ed8239a623fe5c28a6c91ad5458670c2",
+    "server/src/config/config.ts": "d67c59ad61ee5ba7fba2d4d357c0730e8bddb55eafb222e5e03ba7e6dd268538",
+    "server/src/db/migrations.ts": "adbabbf8da85e7f3fd324baa91f6019fd185884f2a96a04591e6cf0413d34282",
+    "server/src/routes/auth-routes.ts": "ccecb498ec14ee2eca413dad9ea9eddce4ddd20d96ff1d16ea067e7ff4bbb9d7",
+    "server/src/routes/loan-routes.ts": "e53070d53bc384b9f2a3398e65413d8aaf5360c1abfa8b9de58e708663b82f0a",
+    "server/src/services/authz.ts": "ec1439ea0244e404774c0d8e58aa6c910476e813d9eee15782baebdf75c03d83",
+    "server/src/services/loan.ts": "584a8c59dd51493eea37ac05adac1a76762c1ea1cbdbf224c2ac409b9d3f2d64",
+    "server/tests/fixtures/loan-worker.ts": "c171d163fdf8851f8e73989aa4180670f9f4cf1de4fb528019ddead2f2e104e3",
+    "server/tests/harness.ts": "655396e5965b16ec5626d8c78b09250651fb125cc19b60cd3ab7dacb2c082b2f",
+    "server/tests/loan-unit.test.ts": "1d74ce9bb30e19761ad3cacf76296188552aa7e0ad0550b4a59a221abcc7e7ee",
+    "server/tests/loan.test.ts": "b5426884ba629a8001cb27dc792ce8d8e82bdf93a54fd725451dbf26c8f6a4e4"
+  }
+}

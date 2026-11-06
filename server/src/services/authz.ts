@@ -33,6 +33,9 @@ export const PROTECTED_ROUTES: ReadonlyArray<{
   { method: "GET", path: "/api/equipment", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/equipment/{equipmentId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "POST", path: "/api/requests", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/requests/{requestId}/checkout", allowedRoles: ["CUSTODIAN"] },
+  { method: "GET", path: "/api/loans", allowedRoles: ["BORROWER"] },
+  { method: "GET", path: "/api/loans/{loanId}", allowedRoles: ["BORROWER"] },
   { method: "GET", path: "/api/requests", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/requests/{requestId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
 ];

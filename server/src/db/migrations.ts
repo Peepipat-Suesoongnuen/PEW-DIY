@@ -2,12 +2,12 @@
  * Schema migrations — idempotent: safe to run repeatedly on the same database.
  *
  * Migration 001 (F-01 owns users/sessions; Equipment added by F-02).
- * BorrowingRequest is owned by F-04; Loan remains owned by F-05. Per the team decision
+ * Migration 002 (F-04) owns BorrowingRequest; migration003 (F-05) owns Loan.
+ * Per the team decision
  * on Issue #10 (2026-11-06 audit) and the feature-contract ownership split
  * (f-03 §4 line 68, f-04 §3 Data/migrations, f-05 §3 Data/migrations),
  * BorrowingRequest DDL belongs to F-04 (#11) and Loan DDL belongs to F-05
- * (#12). See the handover note below for the exact schema those migrations
- * must implement so the F-03 aggregate read keeps working.
+ * (#12). The retained handover note below documents the shared schema shape.
  *
  * Design notes (contract f-01-authentication.md §4, SDS §3.1/§7):
  * - `users.username` is unique under the recorded normalization policy
@@ -101,7 +101,23 @@ CREATE TABLE IF NOT EXISTS equipment (
 export async function migrate(client: Pick<PoolClient, "query">): Promise<void> {
   await client.query(MIGRATION_001_SQL);
   await client.query(MIGRATION_002_REQUESTS_SQL);
+  await client.query(MIGRATION_003_LOANS_SQL);
 }
+
+/** F-05: stock and request status derive from this durable relation. */
+export const MIGRATION_003_LOANS_SQL = `
+CREATE TABLE IF NOT EXISTS loans (
+  id TEXT PRIMARY KEY,
+  request_id TEXT NOT NULL UNIQUE REFERENCES borrowing_requests(id),
+  quantity_borrowed INTEGER NOT NULL CHECK (quantity_borrowed > 0),
+  checked_out_by TEXT NOT NULL REFERENCES users(id),
+  checkout_at TIMESTAMPTZ NOT NULL,
+  due_on DATE NOT NULL,
+  returned_at TIMESTAMPTZ,
+  returned_by TEXT REFERENCES users(id)
+);
+CREATE INDEX IF NOT EXISTS loans_active_request_idx ON loans(request_id) WHERE returned_at IS NULL;
+`;
 
 /** F-04 (#11): requests preserve history; no reservation/status counter or Loan DDL. */
 export const MIGRATION_002_REQUESTS_SQL = `
