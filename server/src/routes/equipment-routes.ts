@@ -12,7 +12,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/auth";
 import { createAuthMiddleware, AuthenticatedRequest } from "../services/authz";
-import { listEquipment, getEquipment } from "../services/catalog";
+import { listEquipment, getEquipment, AvailabilityIntegrityError } from "../services/catalog";
 
 export interface EquipmentRouteDeps {
   auth: AuthService;
@@ -38,6 +38,15 @@ export function createEquipmentRouter({ auth, cookieName }: EquipmentRouteDeps):
       const items = await listEquipment(auth.pool);
       res.json({ data: items });
     } catch (err) {
+      if (err instanceof AvailabilityIntegrityError) {
+        // f-03 §2/§4: corrupt persisted aggregate = safe 500 with a REDACTED
+        // diagnostic; never clamp, never publish negative quantities.
+        console.warn(`[availability] integrity violation on ${req.path} (requestId=${req.requestId})`);
+        res.status(500).json({
+          error: { code: "INTERNAL_ERROR", message: "Internal error.", requestId: req.requestId },
+        });
+        return;
+      }
       next(err);
     }
   });
@@ -60,6 +69,13 @@ export function createEquipmentRouter({ auth, cookieName }: EquipmentRouteDeps):
       }
       res.json({ data: item });
     } catch (err) {
+      if (err instanceof AvailabilityIntegrityError) {
+        console.warn(`[availability] integrity violation on ${req.path} (requestId=${req.requestId})`);
+        res.status(500).json({
+          error: { code: "INTERNAL_ERROR", message: "Internal error.", requestId: req.requestId },
+        });
+        return;
+      }
       next(err);
     }
   });

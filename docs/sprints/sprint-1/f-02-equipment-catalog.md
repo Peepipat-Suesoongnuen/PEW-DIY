@@ -2,9 +2,9 @@
 
 > **Deliverable:** D1-05 Part E | **Implementation issue:** [D1-06.2 / #9](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/9)
 >
-> **Revision:** 1, 2026-11-05 | **Status:** Draft proposals for team decision and peer review; not approved for implementation
+> **Revision:** 2 — 2026-11-06 | **Contract approval:** Pending team baseline approval and peer review | **Implementation status:** Implemented (Issue #9, PR #27) | **Test status:** Executed — results in [tdd-evidence-f02.md](tdd-evidence-f02.md) (`npm test`)
 >
-> **Execution status:** Every test below is **PLANNED — NOT RUN**. No application, migration or executable test exists at this baseline.
+> **Execution status:** F-02 test results (commands, outputs, RED→GREEN) are recorded in [tdd-evidence-f02.md](tdd-evidence-f02.md); the server suite passes 65/65 at the Issue #10 working tree (`npm test`, run 2026-11-06). STS rows below without a recorded per-row run remain **PLANNED — NOT RUN**; nothing is counted as PASS without evidence. The rev 1 statement described the rev 1 baseline only: "No application, migration or executable test exists at this baseline."
 
 ## 1. Requirement Links, Scope, and Dependencies
 
@@ -125,3 +125,4 @@ Open gates: SDS-OQ-01 stack/database/tools/physical schema/commands; SDS-OQ-02 F
 | Revision | Change | Basis / evidence status |
 |---|---|---|
 | 1 — 2026-11-05 | Initial F-02 feature design, proposed UI/API/data/seed behavior, eight AC and ten planned tests | D1-05; SRS rev 2, SDS rev 2, Part B rev 1, current sprint plan at baseline `c78ad95`; no implementation/test result |
+| 2 — 2026-11-06 | Documentation alignment (Issue #10 PR): status header split into Contract approval / Implementation / Test status with real evidence references; no contract text changed | tdd-evidence-f02.md (commands/results); PR #27; `npm test` run 2026-11-06 |

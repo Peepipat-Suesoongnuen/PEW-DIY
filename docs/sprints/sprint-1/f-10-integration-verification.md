@@ -1,8 +1,8 @@
 # F-10 — Sprint 1 Integration and Verification Contract
 
-> **Revision:** 1 — 2026-11-05 | **Status:** Proposed verification/evidence design; no execution or release claimed
+> **Revision:** 2 — 2026-11-06 | **Contract approval:** Pending team baseline approval and peer review | **Implementation status:** Not implemented (Issue #13) | **Test status:** NOT RUN — all STS cases **PLANNED / NOT RUN** (no execution or release claimed)
 >
-> Implementation Issue: [#13 / D1-06.6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/13), parent [#6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/6). All STS cases are **PLANNED / NOT RUN**.
+> Implementation Issue: [#13 / D1-06.6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/13), parent [#6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/6).
 
 ## 1. Responsibility, Requirements and Dependencies
 
@@ -67,3 +67,4 @@ Feature work targets `sprint/1-staging`, followed by a separate reviewed release
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Initial F-10 integrated journey, AC/STS, runner and evidence/release contract | Issue #5/#6/#13; Part B F-10; SRS NFR-08/09; PR #15/17/20; original PDFs §3.5/§3.6/§4.2 |
+| 2 — 2026-11-06 | Documentation alignment (Issue #10 PR): status header split into Contract approval / Implementation / Test status; no contract text changed | Evidence-state review 2026-11-06 (no execution or release claimed) |

@@ -11,7 +11,18 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { spawn, ChildProcess } from "child_process";
 import path from "path";
 import type { Pool } from "pg";
-import { createTestContext, requireTestDbUrl, TestContext } from "./harness";
+import { createPool } from "../src/db/pool";
+import { createTestContext, loanRelationsExist, requireTestDbUrl, TestContext } from "./harness";
+
+/** Gate: true once #11/#12 Request/Loan relations exist (see migrations.ts). */
+const HAS_LOAN_RELATIONS = await (async () => {
+  const probe = createPool(requireTestDbUrl());
+  try {
+    return await loanRelationsExist(probe);
+  } finally {
+    await probe.end();
+  }
+})();
 
 const PORT = 3123;
 const ORIGIN = `http://localhost:${PORT}`;
@@ -21,6 +32,7 @@ const START_TIMEOUT_MS = 20_000;
 let ctx: TestContext;
 let pool: Pool;
 let child: ChildProcess | undefined;
+let cookieForRestart = "";
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -77,6 +89,12 @@ async function login(username: string, password: string): Promise<string> {
 beforeAll(async () => {
   ctx = await createTestContext();
   pool = ctx.pool;
+  // Self-healing: clear loan-dependent debris before fixture rows are touched
+  // (borrowing_requests/loans reference users/equipment).
+  if (HAS_LOAN_RELATIONS) {
+    await pool.query(`DELETE FROM loans WHERE id = 'loan-f03-restart' OR request_id = 'req-f03-restart'`);
+    await pool.query(`DELETE FROM borrowing_requests WHERE id = 'req-f03-restart'`);
+  }
   // Isolated restart fixtures (unique ids avoid interference from other files).
   await pool.query(`DELETE FROM sessions WHERE user_id = 'u-restart-e2e'`);
   await pool.query(`DELETE FROM users WHERE id = 'u-restart-e2e' OR username = 'RESTART-E2E'`);
@@ -91,6 +109,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (child) await stopAppProcess(child);
+  if (HAS_LOAN_RELATIONS) {
+    await pool.query(`DELETE FROM loans WHERE id = 'loan-f03-restart'`);
+    await pool.query(`DELETE FROM borrowing_requests WHERE id = 'req-f03-restart'`);
+  }
   await pool.query(`DELETE FROM sessions WHERE user_id = 'u-restart-e2e'`);
   await pool.query(`DELETE FROM users WHERE id = 'u-restart-e2e'`);
   await pool.query(`DELETE FROM equipment WHERE id IN ('fixture-e-persist', 'fixture-e-persist-2')`);
@@ -129,6 +151,59 @@ describe("Application process restart against the same durable DB (AC-06.2-03)",
       expect(afterSnapshot).toEqual(snapshot);
       // no startup reseed: totals and names identical, no duplicate fixtures
       expect(afterBody.data.filter((i) => i.id === "fixture-e-persist")).toHaveLength(1);
+    },
+    90_000,
+  );
+});
+
+/**
+ * DEPENDENCY-GATED on the #11/#12 Request/Loan schema (team decision
+ * 2026-11-06, Issue #10 audit — "MOVE Migration 002"): the fixture rows below
+ * live in `borrowing_requests`/`loans`, which are created by #11/#12. The test
+ * runs unchanged (skipIf) as soon as those relations exist.
+ */
+describe.skipIf(!HAS_LOAN_RELATIONS)("Derived availability survives process restart (TEST-F03-09 / AC-06.3-05)", () => {
+  it(
+    "keeps the same derived quantity/label after a hard restart on the same store",
+    async () => {
+      // Persisted active loan fixture (TEST-F03-02 recipe): fixture-e-persist
+      // total 2, held 1 → 1/AVAILABLE. Availability is derived from persisted
+      // loan rows at read time — restart must recompute the same result.
+      await pool.query(`DELETE FROM loans WHERE id = 'loan-f03-restart'`);
+      await pool.query(`DELETE FROM borrowing_requests WHERE id = 'req-f03-restart'`);
+      await pool.query(
+        `INSERT INTO borrowing_requests (id, borrower_id, equipment_id, quantity_requested, created_at)
+         VALUES ('req-f03-restart', 'u-restart-e2e', 'fixture-e-persist', 1, now())`,
+      );
+      await pool.query(
+        `INSERT INTO loans (id, request_id, quantity_borrowed, checked_out_by, checkout_at, due_on)
+         VALUES ('loan-f03-restart', 'req-f03-restart', 1, 'u-restart-e2e', now(), current_date + 7)`,
+      );
+
+      const readAvailability = async () => {
+        const res = await fetch(`${ORIGIN}/api/equipment/fixture-e-persist`, {
+          headers: { Cookie: `pew_session=${cookieForRestart}` },
+        });
+        expect(res.status).toBe(200);
+        return (await res.json()) as {
+          data: { quantity_total: number; quantity_available: number; availability: string };
+        };
+      };
+
+      // --- process #1 ---
+      child = await startAppProcess();
+      cookieForRestart = await login("RESTART-E2E", "pw-restart");
+      expect(cookieForRestart).toBeTruthy();
+      const before = await readAvailability();
+      expect(before.data).toMatchObject({ quantity_total: 2, quantity_available: 1, availability: "AVAILABLE" });
+
+      // --- hard stop, then process #2 on the same durable store ---
+      await stopAppProcess(child);
+      child = undefined;
+      child = await startAppProcess();
+
+      const after = await readAvailability();
+      expect(after.data).toMatchObject({ quantity_total: 2, quantity_available: 1, availability: "AVAILABLE" });
     },
     90_000,
   );

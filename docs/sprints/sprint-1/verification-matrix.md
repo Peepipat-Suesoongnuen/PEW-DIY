@@ -1,6 +1,6 @@
 # Sprint 1 Planned Verification Matrix
 
-> **Revision:** 1 — 2026-11-05 | **Status:** Proposed mapping only; all STS cases **PLANNED / NOT RUN**
+> **Revision:** 2 — 2026-11-06 | **Contract approval:** pending team baseline approval (Direction A points **Confirmed** by team 2026-11-06) | **Status:** mapping only — execution status is recorded per row and stays **PLANNED / NOT RUN** unless a linked evidence file records an actual run
 
 ## 1. Reading and Evidence Rules
 
@@ -8,15 +8,17 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 `AC-Fxx-nn` and `TEST-Fxx-nn` are new contract namespaces; existing `AC-06.x-nn` and parent `AC-F-nn` remain unchanged. Complete corresponding decision gates before execution. A future result record must add actual test file/name, command, tested SHA, environment, expected/actual, status and artifact link; do not turn NOT RUN into PASS without evidence. A single planned STS row can generate several executable cases, so its row count is not a runtime pass count.
 
+**Execution status legend (rev 2):** `EXECUTED (green)` = ran with a recorded passing result in a linked evidence file · `PARTIAL` = some planned cases ran, others gated/not run · `PLANNED — NOT RUN` = no recorded run. Evidence files with commands, outputs and RED→GREEN history: [tdd-evidence-f01.md](tdd-evidence-f01.md), [tdd-evidence-f02.md](tdd-evidence-f02.md), [tdd-evidence-f03.md](tdd-evidence-f03.md). Implementation/test status is tracked separately from contract approval.
+
 | Contract | AC definitions | Planned STS rows | Current result |
 |---|---|---|---|
-| [f-01-authentication.md](f-01-authentication.md) | 12 | 16 | NOT RUN |
-| [f-02-equipment-catalog.md](f-02-equipment-catalog.md) | 8 | 10 | NOT RUN |
-| [f-03-equipment-availability.md](f-03-equipment-availability.md) | 7 | 11 | NOT RUN |
-| [f-04-borrowing-request.md](f-04-borrowing-request.md) | 10 | 14 | NOT RUN |
-| [f-05-checkout-active-loan.md](f-05-checkout-active-loan.md) | 12 | 16 | NOT RUN |
-| [f-10-integration-verification.md](f-10-integration-verification.md) | 8 | 10 | NOT RUN |
-| **Total** | **57** | **77** | **No runtime results** |
+| [f-01-authentication.md](f-01-authentication.md) | 12 | 16 | PARTIAL — implemented (Issue #8); executed results in [tdd-evidence-f01.md](tdd-evidence-f01.md); per-row mapping pending |
+| [f-02-equipment-catalog.md](f-02-equipment-catalog.md) | 8 | 10 | PARTIAL — implemented (Issue #9, PR #27); executed results in [tdd-evidence-f02.md](tdd-evidence-f02.md); per-row mapping pending |
+| [f-03-equipment-availability.md](f-03-equipment-availability.md) | 7 | 11 | PARTIAL — implemented (Issue #10); TEST-F03-01/03/05/06 + 08-UI executed, 02/09 dependency-gated on #11/#12 schema — [tdd-evidence-f03.md](tdd-evidence-f03.md) |
+| [f-04-borrowing-request.md](f-04-borrowing-request.md) | 10 | 14 | PLANNED — NOT RUN (not implemented; Issue #11) |
+| [f-05-checkout-active-loan.md](f-05-checkout-active-loan.md) | 12 | 16 | PLANNED — NOT RUN (not implemented; Issue #12) |
+| [f-10-integration-verification.md](f-10-integration-verification.md) | 8 | 10 | PLANNED — NOT RUN (not implemented; Issue #13) |
+| **Total** | **57** | **77** | **Partial runtime results — tdd-evidence-f01/f02/f03.md; per-row PASS mapping pending** |
 
 ## 2. Every Contract AC → Planned TEST
 
@@ -54,13 +56,13 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F03-01](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-02](f-03-equipment-availability.md) | NOT RUN |
-| [AC-F03-02](f-03-equipment-availability.md) | [TEST-F03-03](f-03-equipment-availability.md) | NOT RUN |
-| [AC-F03-03](f-03-equipment-availability.md) | [TEST-F03-04](f-03-equipment-availability.md) | NOT RUN |
-| [AC-F03-04](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-05](f-03-equipment-availability.md), [TEST-F03-06](f-03-equipment-availability.md) | NOT RUN |
-| [AC-F03-05](f-03-equipment-availability.md) | [TEST-F03-07](f-03-equipment-availability.md), [TEST-F03-08](f-03-equipment-availability.md) | NOT RUN |
-| [AC-F03-06](f-03-equipment-availability.md) | [TEST-F03-09](f-03-equipment-availability.md), [TEST-F03-10](f-03-equipment-availability.md) | NOT RUN |
-| [AC-F03-07](f-03-equipment-availability.md) | [TEST-F03-10](f-03-equipment-availability.md), [TEST-F03-11](f-03-equipment-availability.md) | NOT RUN |
+| [AC-F03-01](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-02](f-03-equipment-availability.md) | PARTIAL — TEST-F03-01 EXECUTED (green); TEST-F03-02 dependency-gated on #11/#12 schema ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-02](f-03-equipment-availability.md) | [TEST-F03-03](f-03-equipment-availability.md) | EXECUTED (green) — TEST-F03-03 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-03](f-03-equipment-availability.md) | [TEST-F03-04](f-03-equipment-availability.md) | PLANNED — NOT RUN — TEST-F03-04 needs F-04/F-05 features; fixture-level halves dependency-gated on #11/#12 schema ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-04](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-05](f-03-equipment-availability.md), [TEST-F03-06](f-03-equipment-availability.md) | EXECUTED (green) — TEST-F03-01/05/06 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-05](f-03-equipment-availability.md) | [TEST-F03-07](f-03-equipment-availability.md), [TEST-F03-08](f-03-equipment-availability.md) | PARTIAL — TEST-F03-08 UI halves EXECUTED (client component tests); TEST-F03-07 PLANNED — NOT RUN (needs F-04/F-05 journeys) ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-06](f-03-equipment-availability.md) | [TEST-F03-09](f-03-equipment-availability.md), [TEST-F03-10](f-03-equipment-availability.md) | PLANNED — NOT RUN — TEST-F03-09 dependency-gated on #11/#12 schema; TEST-F03-10 needs F-05 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-07](f-03-equipment-availability.md) | [TEST-F03-10](f-03-equipment-availability.md), [TEST-F03-11](f-03-equipment-availability.md) | PLANNED — NOT RUN — needs F-05 (Issue #12) enforcement ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
 
 ### F-04
 
@@ -136,6 +138,7 @@ The 31 requirement IDs below have Sprint 1 allocation in Part B/Part D (14 FR, 9
 | BR-07 | F-05 date assignment, timezone gate | [AC-F05-06](f-05-checkout-active-loan.md) |
 | BR-10 | F-01 | [AC-F01-10](f-01-authentication.md) |
 | BR-11 | F-10 coordinates S1 request/checkout/restart; return S2, redeployment Lab5 | [AC-F02-08](f-02-equipment-catalog.md), [AC-F03-06](f-03-equipment-availability.md), [AC-F04-07](f-04-borrowing-request.md), [AC-F05-09](f-05-checkout-active-loan.md), [AC-F10-03](f-10-integration-verification.md) |
+| BR-12 | F-04 request creation (no reserve/decrement); F-05 is the only decrement point | [AC-F03-03](f-03-equipment-availability.md), [AC-F04-06](f-04-borrowing-request.md) |
 | NFR-01 | F-01 all protected routes | [AC-F01-05](f-01-authentication.md), [AC-F02-03](f-02-equipment-catalog.md), [AC-F04-10](f-04-borrowing-request.md), [AC-F05-07](f-05-checkout-active-loan.md) |
 | NFR-02 | F-01 guards + feature operations | [AC-F01-08](f-01-authentication.md), [AC-F01-09](f-01-authentication.md), [AC-F04-04](f-04-borrowing-request.md), [AC-F04-05](f-04-borrowing-request.md), [AC-F04-10](f-04-borrowing-request.md), [AC-F05-07](f-05-checkout-active-loan.md), [AC-F05-08](f-05-checkout-active-loan.md) |
 | NFR-03 | F-01 | [AC-F01-10](f-01-authentication.md) |
