@@ -15,14 +15,17 @@ import path from "path";
 import { AuthService } from "../services/auth";
 import { createAuthMiddleware, AuthenticatedRequest } from "../services/authz";
 import { createEquipmentRouter } from "./equipment-routes";
+import { createRequestRouter } from "./request-routes";
+import type { BorrowingRequestService } from "../services/borrowing-request";
 import { AppConfig } from "../config/config";
 
 export interface AppDeps {
   auth: AuthService;
   config: AppConfig;
+  requests?: BorrowingRequestService;
 }
 
-export function createApp({ auth, config }: AppDeps): express.Application {
+export function createApp({ auth, config, requests }: AppDeps): express.Application {
   const app = express();
 
   // Request ID first so parser/guard failures also carry a correlation id
@@ -154,6 +157,7 @@ export function createApp({ auth, config }: AppDeps): express.Application {
   });
 
   app.use("/api", router);
+  app.use("/api", createRequestRouter(auth, config.session.cookieName, requests));
 
   // F-02 Equipment Catalog routes (GET /api/equipment, GET /api/equipment/:id).
   // Mounted before the unknown-route 404 handler; shares the auth guard.

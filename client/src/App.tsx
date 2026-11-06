@@ -4,6 +4,7 @@ import { SessionProvider, useSession } from "./lib/session";
 import { CatalogPage } from "./pages/CatalogPage";
 import { ItemDetailPage } from "./pages/ItemDetailPage";
 import { LoginPage } from "./pages/LoginPage";
+import { RequestsPage } from "./pages/RequestsPage";
 
 function ProtectedLayout() {
   const { user, status } = useSession();
@@ -41,6 +42,8 @@ export function App() {
         <Route element={<ProtectedLayout />}>
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/items/:id" element={<ItemDetailPage />} />
+          <Route path="/requests" element={<RequestsPage />} />
+          <Route path="/requests/:id" element={<RequestsPage />} />
         </Route>
         <Route path="/" element={<Navigate to="/catalog" replace />} />
         <Route path="*" element={<NotFoundPage />} />

@@ -41,14 +41,14 @@ Confirmed baseline rules remain in the SRS; new methods/paths/payload names, sch
 
 | Decision gate | Required recorded decision | Affected work / status |
 |---|---|---|
-| SDS-OQ-01 | UI/API/DB stack and supported versions, ID/text bounds, migration/test commands, engine-specific transaction/isolation/retry behavior | All contracts' implementation baseline; **Open** |
-| SDS-OQ-02 | Session/token mechanism, transport, exact expiry/revocation/current-user/logout and CSRF policy | F-01 and every protected feature; **Open** |
+| SDS-OQ-01 | Stack selected in SDS rev 3 / PR #22; physical request schema implemented by #11 | Resolved stack choice; each feature still verifies its own runtime/query behavior |
+| SDS-OQ-02 | Server session + HttpOnly cookie + trusted-origin validation, idle60/absolute480 minutes (SDS rev 3 / PR #22) | Resolved; F-04 reuses the established guards |
 | SRS OQ-01 | Approved initial synthetic demo catalog content | F-02 seed; symbolic test catalog is a proposal, not a resolution; **Open** |
-| SRS OQ-02 | One/multi-unit eligibility, per-borrower limits, fulfillment and full/partial-return implications | F-04/F-05 contract baseline, future F-06 accounting; **Open** |
+| SRS OQ-02 | Choice recorded in A-12, explicit user decision 2026-11-06; team ratification pending PR #36: multi-unit up to current stock; no extra per-user cap; full return per loan | F-04 validation implemented; F-05/F-06 owners apply this policy in their future implementation/contracts |
 | SDS-OQ-03 | Business timezone and date-boundary representation | F-05 seven-calendar-day clock tests; **Open** |
 | Contract proposal review | Accept/revise route inventory, schema/validation/error choices and test parameters with affected IDs | All six contracts; **Pending independent team review** |
 
-Prior PRs explicitly preserve these gates; none of their checked discussions selects an exact stack or authentication mechanism. Quantity1 examples are shared test vectors, not an implicit choice of a one-unit-only product. Multi-unit totals are not permission for arbitrary quantities. S2/S3 policies and hosting selection remain at their existing targets; no extra implementation is authorized to close them here.
+At the original Part E revision these gates were open. Later PR #22/SDS rev 3 selected stack/auth, and the explicit Issue #11 user decision (2026-11-06) recorded the quantity choice as A-12; shared-team ratification evidence remains pending PR #36. Quantity1 examples remain test vectors; current policy permits multi-unit requests bounded by live stock, without reserving units. S2/S3 policies and hosting selection remain at their existing targets; no extra implementation is authorized to close them here.
 
 ## 4. Spec-First Versioning and Verification Handoff
 
@@ -75,3 +75,4 @@ Issue #5 is not claimed Done: acceptance of the contracts, dependent team decisi
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Initial Part E source set with six contracts, shared conventions/fixtures, DoD and planned mappings | Source baseline c78ad95; Issue #5/#6/#8–#13; original PDFs and PR #15/#16/#17/#19/#20 |
+| 2 — 2026-11-06 | Reconciled current stack/auth and A-12 quantity resolutions; feature execution remains separately recorded with F-05-dependent cases partial | SDS rev 3/4; user decision in Issue #11 work session |

@@ -2,7 +2,7 @@
  * Schema migrations — idempotent: safe to run repeatedly on the same database.
  *
  * Migration 001 (F-01 owns users/sessions; Equipment added by F-02).
- * There is NO migration for BorrowingRequest/Loan here: per the team decision
+ * BorrowingRequest is owned by F-04; Loan remains owned by F-05. Per the team decision
  * on Issue #10 (2026-11-06 audit) and the feature-contract ownership split
  * (f-03 §4 line 68, f-04 §3 Data/migrations, f-05 §3 Data/migrations),
  * BorrowingRequest DDL belongs to F-04 (#11) and Loan DDL belongs to F-05
@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS equipment (
 /**
  * HANDOVER NOTE — Request/Loan DDL ownership (#11 / #12), team decision
  * 2026-11-06 (Issue #10 audit: "MOVE Migration 002").
+ * F-04 now installs borrowing_requests via MIGRATION_002_REQUESTS_SQL below.
+ * Only loans remains absent until #12; no F-05 schema is fabricated here.
  *
  * The F-03 aggregate read (services/catalog.ts) expects the D1-03 §3.1 shape
  * below and probes for these relations at runtime (`to_regclass`); until they
@@ -98,4 +100,18 @@ CREATE TABLE IF NOT EXISTS equipment (
 
 export async function migrate(client: Pick<PoolClient, "query">): Promise<void> {
   await client.query(MIGRATION_001_SQL);
+  await client.query(MIGRATION_002_REQUESTS_SQL);
 }
+
+/** F-04 (#11): requests preserve history; no reservation/status counter or Loan DDL. */
+export const MIGRATION_002_REQUESTS_SQL = `
+CREATE TABLE IF NOT EXISTS borrowing_requests (
+  id TEXT PRIMARY KEY,
+  borrower_id TEXT NOT NULL REFERENCES users(id),
+  equipment_id TEXT NOT NULL REFERENCES equipment(id),
+  quantity_requested INTEGER NOT NULL CHECK (quantity_requested > 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS borrowing_requests_owner_idx ON borrowing_requests(borrower_id, created_at);
+CREATE INDEX IF NOT EXISTS borrowing_requests_equipment_idx ON borrowing_requests(equipment_id);
+`;

@@ -97,6 +97,7 @@ beforeAll(async () => {
   }
   // Isolated restart fixtures (unique ids avoid interference from other files).
   await pool.query(`DELETE FROM sessions WHERE user_id = 'u-restart-e2e'`);
+  await pool.query(`DELETE FROM borrowing_requests WHERE borrower_id = 'u-restart-e2e'`);
   await pool.query(`DELETE FROM users WHERE id = 'u-restart-e2e' OR username = 'RESTART-E2E'`);
   const { hashPassword } = await import("../src/services/password");
   await pool.query(`INSERT INTO users (id, username, password_hash, role) VALUES ('u-restart-e2e', 'RESTART-E2E', $1, 'BORROWER')`, [
@@ -114,6 +115,7 @@ afterAll(async () => {
     await pool.query(`DELETE FROM borrowing_requests WHERE id = 'req-f03-restart'`);
   }
   await pool.query(`DELETE FROM sessions WHERE user_id = 'u-restart-e2e'`);
+  await pool.query(`DELETE FROM borrowing_requests WHERE borrower_id = 'u-restart-e2e'`);
   await pool.query(`DELETE FROM users WHERE id = 'u-restart-e2e'`);
   await pool.query(`DELETE FROM equipment WHERE id IN ('fixture-e-persist', 'fixture-e-persist-2')`);
   await pool.end();
@@ -134,6 +136,14 @@ describe("Application process restart against the same durable DB (AC-06.2-03)",
         .filter((i) => i.id.startsWith("fixture-e-persist"))
         .map((i) => ({ id: i.id, name: i.name, quantity_total: i.quantity_total }));
       expect(snapshot).toHaveLength(2);
+      // TEST-F04-08: create through the real HTTP API, then stop/start the
+      // actual application process without resetting or reseeding its DB.
+      const createdRequest = await fetch(`${ORIGIN}/api/requests`, {
+        method: "POST", headers: { Origin: ORIGIN, Cookie: `pew_session=${cookie}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ equipment_id: "fixture-e-persist", quantity_requested: 2 }),
+      });
+      expect(createdRequest.status).toBe(201);
+      const persistedRequest = await createdRequest.json() as { data: { id: string } };
 
       // --- hard stop the application process ---
       await stopAppProcess(child);
@@ -149,6 +159,11 @@ describe("Application process restart against the same durable DB (AC-06.2-03)",
         .filter((i) => i.id.startsWith("fixture-e-persist"))
         .map((i) => ({ id: i.id, name: i.name, quantity_total: i.quantity_total }));
       expect(afterSnapshot).toEqual(snapshot);
+      const requestAfterRestart = await fetch(`${ORIGIN}/api/requests/${encodeURIComponent(persistedRequest.data.id)}`, {
+        headers: { Cookie: `pew_session=${cookie}` },
+      });
+      expect(requestAfterRestart.status).toBe(200);
+      expect(await requestAfterRestart.json()).toEqual(persistedRequest);
       // no startup reseed: totals and names identical, no duplicate fixtures
       expect(afterBody.data.filter((i) => i.id === "fixture-e-persist")).toHaveLength(1);
     },
