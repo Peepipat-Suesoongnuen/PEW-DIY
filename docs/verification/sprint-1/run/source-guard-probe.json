@@ -1,10 +1,13 @@
 {
-  "command": "node scripts/verify-sprint1.mjs",
+  "probe_source_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "changed_file": "client/index.html",
   "actual_exit": 1,
-  "version_kind": "WORKING_TREE_CANDIDATE",
-  "tested_commit": null,
-  "steps_executed": 0,
-  "result": "PASS: default runner rejects uncommitted source before running suites",
-  "baseline_head": "2b76abbf7be1d6384ee4ae2dffa1808f71aeda82",
-  "scope": "Observed dirty-source regression probe before the authorized source commit; not the final clean-source run"
+  "status": "PASS",
+  "observed_version_kind": "WORKING_TREE_CANDIDATE",
+  "observed_tested_commit": null,
+  "source_dirty_files": [
+    "client/index.html"
+  ],
+  "started_steps": 0,
+  "error": "Source differs from HEAD; commit source before verification, or explicitly use --allow-working-tree for a non-commit candidate"
 }

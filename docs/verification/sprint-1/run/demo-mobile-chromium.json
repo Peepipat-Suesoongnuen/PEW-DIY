@@ -1,9 +1,9 @@
 {
   "test": "TEST-F10-01/02",
   "project": "mobile-chromium",
-  "item": "f10-browser-57cad084-68fa-4df2-8cc4-cbcdc76f4083",
-  "requestId": "2f2f36b9-06d0-441b-bef3-a35b8667bf67",
-  "loanId": "5e293483-394d-4497-b12a-11580e24e798",
+  "item": "f10-browser-0e9233af-9543-4cca-8da0-07f6df53af22",
+  "requestId": "0de4603c-f55b-4fde-a114-1aebe6a9732f",
+  "loanId": "52955202-c6b9-40c6-a106-380f137af310",
   "due_on": "2026-11-14",
   "requestStatus": "CHECKED_OUT",
   "quantity_available": 0,

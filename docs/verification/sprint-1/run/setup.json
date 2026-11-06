@@ -1,53 +1,53 @@
 {
-  "head_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
-  "tested_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
+  "head_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
   "version_kind": "CLEAN_SOURCE_COMMIT",
   "source_dirty_files": [],
-  "fingerprint_format": "SHA-256 of UTF-8 source with CRLF normalized to LF",
+  "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
   "node": "v24.15.0",
   "status": "LOCAL_REHEARSAL_PASS",
   "steps": [
     {
       "label": "root-ci",
       "exit_code": 0,
-      "duration_ms": 3192
+      "duration_ms": 3292
     },
     {
       "label": "client-ci",
       "exit_code": 0,
-      "duration_ms": 7516
+      "duration_ms": 7414
     },
     {
       "label": "chromium",
       "exit_code": 0,
-      "duration_ms": 846
+      "duration_ms": 882
     },
     {
       "label": "migrate",
       "exit_code": 0,
-      "duration_ms": 1431
+      "duration_ms": 1541
     },
     {
       "label": "seed",
       "exit_code": 0,
-      "duration_ms": 726
+      "duration_ms": 763
     },
     {
       "label": "build",
       "exit_code": 0,
-      "duration_ms": 471
+      "duration_ms": 495
     },
     {
       "label": "build-client",
       "exit_code": 0,
-      "duration_ms": 5357
+      "duration_ms": 6059
     }
   ],
   "starting_conditions": "Windows/Node/npm/PostgreSQL/tar installed; new source directory and application DBs; host package/browser caches may be warm",
   "other_student_reproduction": "PENDING",
-  "started_at": "2026-11-06T19:50:08.543Z",
+  "started_at": "2026-11-06T20:33:24.096Z",
   "postgresql": "18.4",
-  "duration_ms": 22417,
+  "duration_ms": 23746,
   "target_ms": 900000,
   "target_met": true,
   "checks": {
@@ -56,5 +56,5 @@
     "seeded_items": 3,
     "built_react_shell": true
   },
-  "completed_at": "2026-11-06T19:50:32.836Z"
+  "completed_at": "2026-11-06T20:33:49.785Z"
 }

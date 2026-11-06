@@ -8,7 +8,7 @@ Commit traceability for the reviewed rounds:
 |---|---|---|
 | Original submission | `2b76abb` | Original evidence; historical setup61.812s |
 | First remediation | `8bff092` | `43bcdfe`; local PG18 setup22.417s |
-| Latest remediation | Source commit authorized; exact tested SHA belongs in run/verification.json | Not yet regenerated; current `run/` remains the first-remediation record |
+| Latest remediation | `8fb84f4c0803b12cbdd65275e4361a0aaeb88a23` | This evidence-only descendant; source SHA remains `8fb84f4`; setup23.746s |
 
 The latest independent re-review reports164/70/54 and5 tooling tests on `43bcdfe`, Node24.19.0/PostgreSQL17.11. It confirms the earlier four fixes and requests matching setup provenance and complete source coverage. This is reviewer evidence, not a new local execution. The original61.812s, first remediation22.417s and reviewer's original11.957s are separate measurements.
 
@@ -109,3 +109,5 @@ The [independent PR38 review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/p
 Process AC-F10-04/05/06/07/08 now resolve to TEST-F10-04/05/06/07/08/09/10 artifact/process checks (suite/failure probe/setup/TDD/workflow/release/disclosure), not repeated E2E journey names. Human gates remain PARTIAL. Canonical fingerprints normalize CRLF to LF; audit checks both the tested Git blobs and current source and permits a later evidence-only descendant commit with identical source. The latest source must be committed before the default runner can label it CLEAN_SOURCE_COMMIT. Regenerating and committing evidence afterward does not require pretending an evidence commit tested itself.
 
 Latest remediation requires clean setup evidence from exactly the verification source commit before starting suites. The audit independently checks this relationship and the complete fingerprint key set, including HTML/CSS/configs/assets. Missing tracked files are dirty source rather than an ENOENT crash. NOT_RELEASED is stored as a pending check with an empty matched list; it does not count as a passing release check. Full Git history is required; shallow clones fail with an actionable prerequisite message. GitHub CI and branch protection remain known gaps, outside this remediation's authorization.
+
+Latest local round: clean source `8fb84f4c0803b12cbdd65275e4361a0aaeb88a23`, Node24.15.0/PostgreSQL18.4, setup23.746s;164 server,70 client,54 browser and11 tooling checks passed. Three real verifier preflight probes reject stale/candidate/missing-commit setup before any suite. Normal audit exits0 with41 structural checks; strict release audit exits2 NOT_RELEASED. See [setup preflight probes](run/setup-preflight-probes.json), [tooling log](run/helper-tests.txt) and [local PR description](pr38-description.md). The evidence-only commit containing these artifacts preserves the tested source; its identity is available from `git log -1 -- docs/verification/sprint-1/run/verification.json`.

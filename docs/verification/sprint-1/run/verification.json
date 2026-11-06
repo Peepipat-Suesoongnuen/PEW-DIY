@@ -1,18 +1,18 @@
 {
-  "started_at": "2026-11-06T19:50:56.689Z",
-  "head_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
-  "tested_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
+  "started_at": "2026-11-06T20:33:57.551Z",
+  "head_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
   "version_kind": "CLEAN_SOURCE_COMMIT",
   "source_dirty_files": [],
-  "fingerprint_format": "SHA-256 of UTF-8 source with CRLF normalized to LF",
+  "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
   "node": "v24.15.0",
   "steps": [
     {
       "label": "runner-failure-probe",
-      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-SZ8yj2 --config [temp]\\pewdiy-f10-runner-SZ8yj2\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-SZ8yj2\\result.json",
+      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-qoPN00 --config [temp]\\pewdiy-f10-runner-qoPN00\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-qoPN00\\result.json",
       "cwd": ".",
       "exit_code": 1,
-      "duration_ms": 549,
+      "duration_ms": 629,
       "log": "runner-failure-probe.txt"
     },
     {
@@ -20,7 +20,7 @@
       "command": "node node_modules\\typescript\\bin\\tsc",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 204,
+      "duration_ms": 237,
       "log": "server-build.txt"
     },
     {
@@ -28,7 +28,7 @@
       "command": "node client\\node_modules\\typescript\\bin\\tsc --noEmit",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 319,
+      "duration_ms": 345,
       "log": "client-typecheck.txt"
     },
     {
@@ -36,7 +36,7 @@
       "command": "node client\\node_modules\\vite\\bin\\vite.js build",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 558,
+      "duration_ms": 604,
       "log": "client-build.txt"
     },
     {
@@ -44,7 +44,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 289,
+      "duration_ms": 341,
       "log": "server-migration.txt"
     },
     {
@@ -52,7 +52,7 @@
       "command": "node node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\server.json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 11568,
+      "duration_ms": 12931,
       "log": "server-tests.txt"
     },
     {
@@ -60,7 +60,7 @@
       "command": "node client\\node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\client.json",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 4489,
+      "duration_ms": 4515,
       "log": "client-tests.txt"
     },
     {
@@ -68,7 +68,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 402,
+      "duration_ms": 440,
       "log": "browser-migration.txt"
     },
     {
@@ -76,7 +76,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/seed.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 376,
+      "duration_ms": 359,
       "log": "browser-seed.txt"
     },
     {
@@ -84,7 +84,7 @@
       "command": "node node_modules\\@playwright\\test\\cli.js test --config e2e/playwright.config.ts --workers=3 --reporter=json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 19769,
+      "duration_ms": 23395,
       "log": "browser-tests.txt"
     }
   ],
@@ -1667,6 +1667,7 @@
   },
   "readiness": "NOT_RELEASED",
   "error": null,
+  "setup_tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
   "postgresql": "18.4",
   "runner_failure_probe": {
     "status": "PASS",
@@ -1688,7 +1689,7 @@
     "TEST-F10-06": {
       "status": "PASS",
       "artifact": "setup.json",
-      "detail": "Local fresh-project rehearsal 22417ms; peer repetition pending"
+      "detail": "Local fresh-project rehearsal 23746ms; peer repetition pending"
     },
     "TEST-F10-07": {
       "status": "PASS",
@@ -4197,7 +4198,8 @@
               "file": "verification.json",
               "status": "PASS"
             }
-          ]
+          ],
+          "pending_check": null
         },
         {
           "kind": "process",
@@ -4208,7 +4210,8 @@
               "file": "runner-failure-probe.json",
               "status": "PASS"
             }
-          ]
+          ],
+          "pending_check": null
         }
       ]
     },
@@ -4227,11 +4230,12 @@
           "id": "TEST-F10-06",
           "matched": [
             {
-              "name": "TEST-F10-06: Local fresh-project rehearsal 22417ms; peer repetition pending",
+              "name": "TEST-F10-06: Local fresh-project rehearsal 23746ms; peer repetition pending",
               "file": "setup.json",
               "status": "PASS"
             }
-          ]
+          ],
+          "pending_check": null
         }
       ]
     },
@@ -4255,7 +4259,8 @@
               "file": "../test-excerpts.md",
               "status": "PASS"
             }
-          ]
+          ],
+          "pending_check": null
         },
         {
           "kind": "process",
@@ -4266,7 +4271,8 @@
               "file": "../workflow-and-contributions.md",
               "status": "PASS"
             }
-          ]
+          ],
+          "pending_check": null
         }
       ]
     },
@@ -4289,7 +4295,8 @@
               "file": "../workflow.json",
               "status": "PASS"
             }
-          ]
+          ],
+          "pending_check": null
         }
       ]
     },
@@ -4307,13 +4314,12 @@
         {
           "kind": "process",
           "id": "TEST-F10-09",
-          "matched": [
-            {
-              "name": "TEST-F10-09: Actual main release and release-version regression have not been supplied; strict audit remains required",
-              "file": "release-audit.json",
-              "status": "NOT_RELEASED"
-            }
-          ]
+          "matched": [],
+          "pending_check": {
+            "status": "NOT_RELEASED",
+            "artifact": "release-audit.json",
+            "detail": "Actual main release and release-version regression have not been supplied; strict audit remains required"
+          }
         },
         {
           "kind": "process",
@@ -4324,13 +4330,81 @@
               "file": "../workflow-and-contributions.md",
               "status": "PASS"
             }
-          ]
+          ],
+          "pending_check": null
         }
       ]
     }
   ],
   "status": "AUTOMATED_CHECKS_PASS",
   "source_sha256": {
+    ".env.example": "e2ebe350092cc2a182c735beefa463d6690ae317d3bd57b748a4a3d4af282f44",
+    ".gitignore": "380a0f1e4ced5a9fdacfa7ecbe08a51d0e241ceabd620418c6b8fc1d3dd3c129",
+    "client/catalog.html": "32879a2a50e5f74246ce69b7d51bba4c13cf66f4ff032affa9f89299d6f6fffd",
+    "client/index.html": "021ff7c5e822cb1c46a4da3a0911e90e6e3fea60ce1479d24628e67867817749",
+    "client/item.html": "15550a5c82e5bc354caec5488cd1f44b1226c014339e40b30b7ec7f0e3e63984",
+    "client/login.html": "3fe489401737aa2a623a8fc58fbec47f9b9d289b39408f36bdcc8461da5a763a",
+    "client/package-lock.json": "3ba503fde30e94ba374d4306bd4aa822020c2fcb533424b1c8e76660dfc71830",
+    "client/package.json": "c8a7a0be15f5f8d671665f0ce767494baf420be79e178089bdf56f58091cbc47",
+    "client/src/App.tsx": "2474c3976dd8f3c00d63c7b4ee49f915b8374c402a06ea43e1ae32f3f28165ae",
+    "client/src/components/AccountMenu.tsx": "991e80a08fc811a634ad5224244b97c43fc2e05899e8abb72d64dc11a88fbc68",
+    "client/src/components/Alert.tsx": "c18db4f65ba51861ffc219987b3feeacb18110765e0b533f3dff41717e64c0e0",
+    "client/src/components/AppShell.tsx": "b14d0d7f749be65b70802935c9ef99b9a0b57a21e7e4b093f4744dc5cb4f31a5",
+    "client/src/components/AvailabilityBadge.tsx": "6846376cc18b01588fbef16b0733493cb227c2cd764119c42c05e428d923f4ca",
+    "client/src/components/Button.tsx": "bd86a3f29e99c38a72713e70281a70b685528f499f3a7795c031aff399e7a01a",
+    "client/src/components/Card.tsx": "acdd820927bb14747919809d9169eed660d40b5a032c0c96d51008449f8799aa",
+    "client/src/components/CheckoutRequest.tsx": "ed88d733cd5c41b91159587c262318e2c7575f61118fd1bb6eb097519284bf14",
+    "client/src/components/DetailList.tsx": "9201d32af4e9b8a3ff995f405532071cfdf9a557cebeb0a57cfdd7b50b103498",
+    "client/src/components/EmptyState.tsx": "b94d50122d7a6741b3027ed208580eb9a01486354891c0164dafb4f1744d9a4a",
+    "client/src/components/Field.tsx": "832f52b9f85fca7baaeb13c211a426fb0f36d58e89e00be8e292d35d5e7068a0",
+    "client/src/components/ItemCard.tsx": "a9c31cadbdbe4d12fcdd29e667825bfba282e4974f1979b949bdb95fa3a0fd0e",
+    "client/src/components/Loading.tsx": "1ed39907029e2f63cb9fa400671b5ac6372de01f8c0f76f21cfec95809775900",
+    "client/src/components/LoanDetails.tsx": "cb6c629e13c302aa2a187fbe668502a7dfecf0bf5689790bbbc5eacbb7952907",
+    "client/src/components/RequestToBorrow.tsx": "237204ecd9b1796f60c3b2b1815f371946bdc4276fdfd757ed80b66096e8a322",
+    "client/src/components/Table.tsx": "e14ad21fe6c382b800b53ebbb3281a5548ab1944b304564411a30757df667b8e",
+    "client/src/lib/api.ts": "62146e989a1cd8b7d9616261cb9896f150ad58031d73fcb092d5ca0adca45866",
+    "client/src/lib/paths.ts": "6aae5d67d746c1f47e282ab3ab646e3a40868254407c80c5d27a61f514b6f09b",
+    "client/src/lib/session.tsx": "1cb8c946d1e2574e2fd4ce76c527405186c5eeeadaacfc07110191b3e30354dd",
+    "client/src/main.tsx": "7beaf76641f65715008e940b24b541720dbf47e0d8a5a156e0a1037aba0912c8",
+    "client/src/pages/CatalogPage.tsx": "122bb78db1a71d0a11a4a0393a2fdaaeebcbb585b8c5975d1be539bca7c217ed",
+    "client/src/pages/ItemDetailPage.tsx": "fa95298fac5d515aae71597b772b601a4e4df0cc23062d817dcccc71487f42a9",
+    "client/src/pages/LoansPage.tsx": "55a99cfcd2b408ff0fcaaeb4472f224479ed1141fe97bacf15d0490a201d8ebc",
+    "client/src/pages/LoginPage.tsx": "1f4fc748c80093a9f627c1ef4accef78882fb1408153c47bd20d833268f93008",
+    "client/src/pages/RequestsPage.tsx": "719269a3e6fe4314994b08fb867b81a420d494d3c38ce35dc94cef847409cff9",
+    "client/src/styles/tokens.css": "fc46390143901fa955dc3355657b91dd67a23b7a4742d76a04d53dcedb801930",
+    "client/src/test/account-menu.test.tsx": "5fc1a7c7db464cad2f3f65ecb872ba79791a40eb2211871ab8c3e06898d88c9e",
+    "client/src/test/api.test.ts": "887777e08eb37143b94d53f4167bab48433533c3b9e9b2f295889e97c37a58f8",
+    "client/src/test/borrowing-request.test.tsx": "d6f73d902cdc15fc01f012fa064c5f5a6044d42463b403876273f84c44038f64",
+    "client/src/test/catalog-page.test.tsx": "e8048d32497abe0cbd26911369a540511715b7e577f5c680a438dd64cff27300",
+    "client/src/test/components.test.tsx": "5dcab7b2270b9039facbd0c9e35dd4d6996fd5d94dbe20466d4d8fb705c53c28",
+    "client/src/test/item-detail-page.test.tsx": "92e8d3f305669d2d78f535397c88f0210781b3b67321ade7a6540fe94db25df6",
+    "client/src/test/loan.test.tsx": "3b5a7d0634515d23f43758da4018a6e6a8c3bcf9707294a4fe67cf954a2167db",
+    "client/src/test/login-page.test.tsx": "1b3a620a95c66d0f5c22cfba63eb8f1a1ceecfb870fad71c14706d80945f94f7",
+    "client/src/test/setup.ts": "50e6c4c172d1725b83c9689d0999bcd37095ab41f6e2212ad9467d5525e3c272",
+    "client/tsconfig.json": "d3eb07dcdb9aa20f700280724dc322d12cdac236e2edcdfad5e938c75d73c6ff",
+    "client/vite.config.ts": "557322b92c09ebd58b102bcac18737090633e87054525bebd43218db56716a3a",
+    "client/vitest.config.ts": "24976aaac146269be9d940d06bad5d724a0ce5b2f4064c8823afc242acdf8b55",
+    "e2e/pages/catalog.page.ts": "bf95ea780bbc1e6a996a17f666795f2c7bb3f0462b2e17721466a07b71e85cc9",
+    "e2e/pages/fixtures.ts": "ab3bacd32f713c59af9ce6e4cd6ccc6c2ba9385784bb2da70efa028b9017f6fd",
+    "e2e/pages/item.page.ts": "363328b6dd3c0a0891f0038072b66e7b8275d0bdf592c86dbfb41d90f94802cb",
+    "e2e/pages/login.page.ts": "84aaada78aeb2b23a626aa888df9ed6869f3802de918f26801fb60e5bfe22df0",
+    "e2e/playwright.config.ts": "54d514aa09c0d5654ab9e9e685c0792848e3ef23ece7d3feb22aa2cfbef24792",
+    "e2e/specs/auth-journey.spec.ts": "ed7a2c08d605396aba7ca092e3534864f5708498133fb2fa74a34b740d3b1581",
+    "e2e/specs/borrowing-request.spec.ts": "04ab35a47f2d2641659ee674aac888c8b1de0635de7a0dcfd209b25bb0e2ff19",
+    "e2e/specs/catalog-journey.spec.ts": "c047d9920239f091056eb051afe994b7bd41289184c1212efc7627fc995f3a21",
+    "e2e/specs/checkout.spec.ts": "de9500544c5c1c6fc8d82e3b8ecca825ed8239a623fe5c28a6c91ad5458670c2",
+    "e2e/specs/sprint1-integration.spec.ts": "b6e5e1d1c3ed8c3678917ed4bbc5cab46b5e7da3f71fae770e826bf1f1c07ca6",
+    "e2e/specs/ui-states.spec.ts": "bcae89908e029fb61098bf37c37fff24b9f9b2d93ce11bdcf0d0a540bc263fb5",
+    "e2e/tsconfig.json": "e8d9eec0e0e1aa4342a3e320fccac91ecbcc6495e097404e4399a666fc193c84",
+    "package-lock.json": "2bc5080695e65cf43a2a1310039f0162a3595cbcaf47db7d63e98882176cfe3c",
+    "package.json": "96f7aba7576d64155114111b1f1963425bb230555b6f011b9b7fa2fbb096f39c",
+    "scripts/audit-sprint1-evidence.mjs": "41a5ccbfc45aac4b14cb0429c19e00360971f5906dc35eb1c2267f6545302859",
+    "scripts/evidence-utils.mjs": "377e98859baf42663a3e1c775842f60c728d521b4b0f04ef8cbaa018658cf0b5",
+    "scripts/migrate-test.mjs": "b9f790f456b2532ee465eb4a44d8e6a66a84101e8095e32061f7467e64a43669",
+    "scripts/rehearse-setup.mjs": "d4a45bf16778ab273894e1fc66bb5a9eab7ab30b6a64f17e5406de374e725b69",
+    "scripts/sprint1-ac-map.json": "dd4eb2fe2e35111aac43bb0d90bf342ca5f6783ba0022ac82367b55dbb35aebc",
+    "scripts/tests/evidence.test.mjs": "98b11f980c7a62236e81d38e0438070c238e72ad2b8819269afbf5b7b6852d94",
+    "scripts/verify-sprint1.mjs": "a13a81a7178bca624c088b9ec33252c2c7eff35f04ec424c8e8f5671eec7f461",
     "server/src/config/config.ts": "bebb2c6b58bfc284078885065293bbedecc907e8b1701cad27362ad79507774a",
     "server/src/db/migrate.ts": "ffd0ac0325cea1ee7be6f1b78b6f851612d770360e70c60720e971f969c8d73a",
     "server/src/db/migrations.ts": "2885ac9df809eb7fb0739c87bf6de74bef75a2fbbed6f1d2a2e496c6d24e1b8f",
@@ -4364,65 +4438,8 @@
     "server/tests/restart-e2e.test.ts": "41f65693b281ab30e0abd90aa7f1545875955b1aad423c26f8e0d9ff4a55ee6a",
     "server/tests/session.test.ts": "faf8dd6f4ba348ee55e7febb0bff432f85f8076196e41f7f1129b80339513361",
     "server/tests/sprint1-integration.test.ts": "3fe56c6f3b8a492d8b26bc329c1e38f98efafbc97a570bbcfeac0084ad0bce22",
-    "client/src/App.tsx": "2474c3976dd8f3c00d63c7b4ee49f915b8374c402a06ea43e1ae32f3f28165ae",
-    "client/src/components/AccountMenu.tsx": "991e80a08fc811a634ad5224244b97c43fc2e05899e8abb72d64dc11a88fbc68",
-    "client/src/components/Alert.tsx": "c18db4f65ba51861ffc219987b3feeacb18110765e0b533f3dff41717e64c0e0",
-    "client/src/components/AppShell.tsx": "b14d0d7f749be65b70802935c9ef99b9a0b57a21e7e4b093f4744dc5cb4f31a5",
-    "client/src/components/AvailabilityBadge.tsx": "6846376cc18b01588fbef16b0733493cb227c2cd764119c42c05e428d923f4ca",
-    "client/src/components/Button.tsx": "bd86a3f29e99c38a72713e70281a70b685528f499f3a7795c031aff399e7a01a",
-    "client/src/components/Card.tsx": "acdd820927bb14747919809d9169eed660d40b5a032c0c96d51008449f8799aa",
-    "client/src/components/CheckoutRequest.tsx": "ed88d733cd5c41b91159587c262318e2c7575f61118fd1bb6eb097519284bf14",
-    "client/src/components/DetailList.tsx": "9201d32af4e9b8a3ff995f405532071cfdf9a557cebeb0a57cfdd7b50b103498",
-    "client/src/components/EmptyState.tsx": "b94d50122d7a6741b3027ed208580eb9a01486354891c0164dafb4f1744d9a4a",
-    "client/src/components/Field.tsx": "832f52b9f85fca7baaeb13c211a426fb0f36d58e89e00be8e292d35d5e7068a0",
-    "client/src/components/ItemCard.tsx": "a9c31cadbdbe4d12fcdd29e667825bfba282e4974f1979b949bdb95fa3a0fd0e",
-    "client/src/components/Loading.tsx": "1ed39907029e2f63cb9fa400671b5ac6372de01f8c0f76f21cfec95809775900",
-    "client/src/components/LoanDetails.tsx": "cb6c629e13c302aa2a187fbe668502a7dfecf0bf5689790bbbc5eacbb7952907",
-    "client/src/components/RequestToBorrow.tsx": "237204ecd9b1796f60c3b2b1815f371946bdc4276fdfd757ed80b66096e8a322",
-    "client/src/components/Table.tsx": "e14ad21fe6c382b800b53ebbb3281a5548ab1944b304564411a30757df667b8e",
-    "client/src/lib/api.ts": "62146e989a1cd8b7d9616261cb9896f150ad58031d73fcb092d5ca0adca45866",
-    "client/src/lib/paths.ts": "6aae5d67d746c1f47e282ab3ab646e3a40868254407c80c5d27a61f514b6f09b",
-    "client/src/lib/session.tsx": "1cb8c946d1e2574e2fd4ce76c527405186c5eeeadaacfc07110191b3e30354dd",
-    "client/src/main.tsx": "7beaf76641f65715008e940b24b541720dbf47e0d8a5a156e0a1037aba0912c8",
-    "client/src/pages/CatalogPage.tsx": "122bb78db1a71d0a11a4a0393a2fdaaeebcbb585b8c5975d1be539bca7c217ed",
-    "client/src/pages/ItemDetailPage.tsx": "fa95298fac5d515aae71597b772b601a4e4df0cc23062d817dcccc71487f42a9",
-    "client/src/pages/LoansPage.tsx": "55a99cfcd2b408ff0fcaaeb4472f224479ed1141fe97bacf15d0490a201d8ebc",
-    "client/src/pages/LoginPage.tsx": "1f4fc748c80093a9f627c1ef4accef78882fb1408153c47bd20d833268f93008",
-    "client/src/pages/RequestsPage.tsx": "719269a3e6fe4314994b08fb867b81a420d494d3c38ce35dc94cef847409cff9",
-    "client/src/test/account-menu.test.tsx": "5fc1a7c7db464cad2f3f65ecb872ba79791a40eb2211871ab8c3e06898d88c9e",
-    "client/src/test/api.test.ts": "887777e08eb37143b94d53f4167bab48433533c3b9e9b2f295889e97c37a58f8",
-    "client/src/test/borrowing-request.test.tsx": "d6f73d902cdc15fc01f012fa064c5f5a6044d42463b403876273f84c44038f64",
-    "client/src/test/catalog-page.test.tsx": "e8048d32497abe0cbd26911369a540511715b7e577f5c680a438dd64cff27300",
-    "client/src/test/components.test.tsx": "5dcab7b2270b9039facbd0c9e35dd4d6996fd5d94dbe20466d4d8fb705c53c28",
-    "client/src/test/item-detail-page.test.tsx": "92e8d3f305669d2d78f535397c88f0210781b3b67321ade7a6540fe94db25df6",
-    "client/src/test/loan.test.tsx": "3b5a7d0634515d23f43758da4018a6e6a8c3bcf9707294a4fe67cf954a2167db",
-    "client/src/test/login-page.test.tsx": "1b3a620a95c66d0f5c22cfba63eb8f1a1ceecfb870fad71c14706d80945f94f7",
-    "client/src/test/setup.ts": "50e6c4c172d1725b83c9689d0999bcd37095ab41f6e2212ad9467d5525e3c272",
-    "e2e/pages/catalog.page.ts": "bf95ea780bbc1e6a996a17f666795f2c7bb3f0462b2e17721466a07b71e85cc9",
-    "e2e/pages/fixtures.ts": "ab3bacd32f713c59af9ce6e4cd6ccc6c2ba9385784bb2da70efa028b9017f6fd",
-    "e2e/pages/item.page.ts": "363328b6dd3c0a0891f0038072b66e7b8275d0bdf592c86dbfb41d90f94802cb",
-    "e2e/pages/login.page.ts": "84aaada78aeb2b23a626aa888df9ed6869f3802de918f26801fb60e5bfe22df0",
-    "e2e/playwright.config.ts": "54d514aa09c0d5654ab9e9e685c0792848e3ef23ece7d3feb22aa2cfbef24792",
-    "e2e/specs/auth-journey.spec.ts": "ed7a2c08d605396aba7ca092e3534864f5708498133fb2fa74a34b740d3b1581",
-    "e2e/specs/borrowing-request.spec.ts": "04ab35a47f2d2641659ee674aac888c8b1de0635de7a0dcfd209b25bb0e2ff19",
-    "e2e/specs/catalog-journey.spec.ts": "c047d9920239f091056eb051afe994b7bd41289184c1212efc7627fc995f3a21",
-    "e2e/specs/checkout.spec.ts": "de9500544c5c1c6fc8d82e3b8ecca825ed8239a623fe5c28a6c91ad5458670c2",
-    "e2e/specs/sprint1-integration.spec.ts": "b6e5e1d1c3ed8c3678917ed4bbc5cab46b5e7da3f71fae770e826bf1f1c07ca6",
-    "e2e/specs/ui-states.spec.ts": "bcae89908e029fb61098bf37c37fff24b9f9b2d93ce11bdcf0d0a540bc263fb5",
-    "e2e/tsconfig.json": "e8d9eec0e0e1aa4342a3e320fccac91ecbcc6495e097404e4399a666fc193c84",
-    "scripts/audit-sprint1-evidence.mjs": "c4cc0c86be8f1415dd687c25ecbf62ba6db1d381a4a337b77ec7a226dd859f1e",
-    "scripts/evidence-utils.mjs": "da645b5d204421e8de471cdb47d9ad75b5d8ef0d43ad17aeb310fdaba5df6907",
-    "scripts/migrate-test.mjs": "b9f790f456b2532ee465eb4a44d8e6a66a84101e8095e32061f7467e64a43669",
-    "scripts/rehearse-setup.mjs": "bd8175c4dc260a698917939d1a7024d55a846acfd8c102016451b34be10f29b5",
-    "scripts/sprint1-ac-map.json": "dd4eb2fe2e35111aac43bb0d90bf342ca5f6783ba0022ac82367b55dbb35aebc",
-    "scripts/tests/evidence.test.mjs": "ddf1209b5dcc9a30addc4d30baadb5ccadd8976fe0b252acc0de6129d6e68c53",
-    "scripts/verify-sprint1.mjs": "1017aa9cef8f704d2baf79e0454cbe5066bea25b8e1ed888fdfb58bc7ddcfee6",
-    "package.json": "96f7aba7576d64155114111b1f1963425bb230555b6f011b9b7fa2fbb096f39c",
-    "package-lock.json": "2bc5080695e65cf43a2a1310039f0162a3595cbcaf47db7d63e98882176cfe3c",
-    "client/package.json": "c8a7a0be15f5f8d671665f0ce767494baf420be79e178089bdf56f58091cbc47",
-    "client/package-lock.json": "3ba503fde30e94ba374d4306bd4aa822020c2fcb533424b1c8e76660dfc71830",
-    "vitest.config.ts": "d1963ec8702244c73463fd046d527b2603f419c647bbfc99c389d3fc8062660a",
-    "client/vite.config.ts": "557322b92c09ebd58b102bcac18737090633e87054525bebd43218db56716a3a"
+    "tsconfig.json": "ae9d13ce32643d27624a4dbe651e48d6cbcaf769701a16cc231772f03d7138c3",
+    "vitest.config.ts": "d1963ec8702244c73463fd046d527b2603f419c647bbfc99c389d3fc8062660a"
   },
-  "completed_at": "2026-11-06T19:51:38.120Z"
+  "completed_at": "2026-11-06T20:34:44.976Z"
 }

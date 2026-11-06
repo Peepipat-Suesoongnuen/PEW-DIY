@@ -1,6 +1,6 @@
 {
-  "audited_at": "2026-11-06T19:52:15.381Z",
-  "audited_head": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
+  "audited_at": "2026-11-06T20:34:56.522Z",
+  "audited_head": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
   "checks": [
     {
       "label": "Full runner succeeded on the recorded source version",
@@ -23,11 +23,15 @@
       "status": "PASS"
     },
     {
-      "label": "Recorded source fingerprints match current files",
+      "label": "Complete source fingerprint key set and tested/current files match",
       "status": "PASS"
     },
     {
       "label": "51 actual two-process races preserve one success/one rejection",
+      "status": "PASS"
+    },
+    {
+      "label": "Setup is clean and matches the exact verified source commit",
       "status": "PASS"
     },
     {
@@ -173,9 +177,9 @@
     "release_peer_review",
     "Actual main release commit and release-version rerun"
   ],
-  "audit_source_sha256": "c4cc0c86be8f1415dd687c25ecbf62ba6db1d381a4a337b77ec7a226dd859f1e",
+  "audit_source_sha256": "41a5ccbfc45aac4b14cb0429c19e00360971f5906dc35eb1c2267f6545302859",
   "status": "AUTOMATED_EVIDENCE_PASS_WITH_HUMAN_GATES",
-  "tested_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
+  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
   "version_kind": "CLEAN_SOURCE_COMMIT",
   "main_remote": "7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c",
   "release_commit": null

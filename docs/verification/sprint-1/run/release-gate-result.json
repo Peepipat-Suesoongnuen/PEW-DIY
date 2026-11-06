@@ -1,7 +1,7 @@
 {
-  "command": "node scripts/audit-sprint1-evidence.mjs --require-release",
-  "expected_exit": 2,
-  "actual_exit": 2,
-  "meaning": "Clean committed source validated; missing main release correctly returns NOT_RELEASED",
-  "captured_at": "2026-11-06T19:52:23.848Z"
+  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "actual_exit_code": 2,
+  "expected_exit_code": 2,
+  "status": "NOT_RELEASED",
+  "meaning": "Strict release audit first passed complete source and exact setup commit checks; absent actual main release/human evidence correctly blocks release"
 }
