@@ -134,7 +134,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 
 | ID | Rule | Testable expectation | Sprint |
 |---|---|---|---|
-| BR-01 | A borrowing request may only be created for an item whose **Available Quantity ≥ 1** at the time of the request. | Requesting an unavailable item is rejected; no request is stored. | Sprint 1 |
+| BR-01 | A borrowing request may only be created for an item whose **Available Quantity ≥ 1** at the time of the request. Under A-12, the requested quantity is a positive integer not exceeding current Available Quantity. | Unavailable or insufficient quantity is rejected without a request; malformed quantities are rejected by validation. | Sprint 1 |
 | BR-02 | Checkout of an unavailable item should be **rejected**. | Checkout when Available Quantity = 0 is rejected; no loan is created and availability is unchanged. | Sprint 1 |
 | BR-03 | **Duplicate-active-loan prevention under Quantity Tracking:** Available Quantity must never fall below zero. For an item whose Total Quantity = 1 (a single exclusive unit), at most one Active Loan may exist at a time — the duplicate-loan rule is enforced as a special case of the quantity rule. | A second concurrent checkout of a single-unit item is rejected; competing attempts cannot oversell. | Sprint 1 |
 | BR-04 | Only a **Custodian** may perform checkout and return. | A Borrower calling checkout/return endpoints is rejected with a forbidden result, enforced server-side. | Sprint 1 |
@@ -142,7 +142,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | BR-06 | Only a **Custodian** may modify the catalog. | A Borrower calling catalog-write endpoints is rejected server-side. | Sprint 1 (enforcement) |
 | BR-07 | The **due date** of a loan is assigned automatically at checkout as **checkout date + 7 calendar days** (team decision). | A created loan's due date equals checkout date + 7 days. | Sprint 1 |
 | BR-08 | A loan is **Overdue** when the current date is later than its due date and no return has been recorded. | A loan past due date appears in the overdue list; a returned loan does not. | Sprint 2 |
-| BR-09 | Return closes exactly one Active Loan and increases Available Quantity by the returned quantity; quantity returned must be positive and not exceed the quantity held. When a loan closes, all quantity it held must be accounted for (returned) — otherwise held units would escape the Available Quantity formula of BR-03. Partial-return semantics, if multi-unit loans are allowed, will be fixed together with OQ-02. | After return, availability is restored; returning more than held is rejected; a loan cannot close while quantity is still held. | Sprint 2 |
+| BR-09 | Return closes exactly one Active Loan and restores all units it holds; **full-quantity return per loan** is selected in A-12 (partial returns are not selected). All held quantity must be accounted for at closure so held units cannot escape the BR-03 availability formula. | Full return restores availability; over/partial return is rejected under the selected policy; a loan cannot close while units remain held. | Sprint 2 |
 | BR-10 | Passwords shall be stored only as salted hashes; plaintext password storage is prohibited. | No plaintext password exists in database or seed data. | Sprint 1 |
 | BR-11 | All availability and loan state transitions shall be persisted and survive application restart **or redeployment**. Allocation by function: request/checkout persistence from Sprint 1; return persistence from Sprint 2 (FR-17). | After restart or redeployment, loans/availability read back identically. | Sprint 1 (request, checkout) / Sprint 2 (return) |
 | BR-12 | **Non-reservation:** a borrowing request — submitted or pending — does not reserve units and does not reduce Available Quantity; only a committed **Active Loan** reduces Available Quantity (BR-03). This rule binds every request state, including a pending request under the Sprint 2 approval workflow (A-11). | Creating one or more requests for an item leaves Available Quantity unchanged; the reduction occurs only when a checkout commits an Active Loan; a pending request does not reserve equipment. | Sprint 1 (rule; also binds the Sprint 2 approval workflow) |
@@ -179,13 +179,14 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | A-06 | Assumption | All data is synthetic; no real payment, messaging, or external services are integrated. | Per course spec §5.3 |
 | A-07 | Design Decision | Requirement and deliverable documents are written in **English**. | **Confirmed** by team (2026-11-03) |
 | A-11 | Design Decision | **Non-reservation + Direct Checkout (Direction A):** (1) Sprint 1 uses Non-reservation + Direct Checkout; (2) a Borrowing Request does not reserve units and does not reduce Available Quantity (BR-12); only a committed Active Loan does; (3) Sprint 1 has no approval step before checkout (A-02); (4) an approval workflow is added in **Sprint 2 only** — its specification is deferred to the Sprint 2 contracts — and a pending request under it still does not reserve equipment (BR-12). | **Confirmed** by team (2026-11-06, Direction A) |
+| A-12 | Design Decision | **Quantity/return policy:** multiple units per request are permitted up to current availability, with no additional per-borrower cap; each loan is returned in full. Requests remain non-reserving under BR-12, so repeated requests do not consume stock. Return implementation remains Sprint 2. | **Confirmed** by user in the Issue #11 work session, 2026-11-06; resolves OQ-02 |
 
 ### 7.2 Assumptions (working assumptions to be validated)
 
 | ID | Type | Description | Resolution / Status |
 |---|---|---|---|
 | A-08 | Assumption | The system serves a single D.I.Y. Room (one inventory namespace; no multi-branch/multi-room support). | Open to challenge |
-| A-09 | Assumption | Quantity Tracking applies uniformly to all item types (both unique tools and consumables) until the team revisits this; consumable units (e.g., jumper wires) may be issued in quantities > 1 per loan. | Open — see OQ-02 |
+| A-09 | Assumption | Quantity Tracking applies uniformly to item types; larger quantities follow the recorded quantity/return policy. | Quantity policy resolved by A-12; no additional item-category rule introduced |
 | A-10 | Assumption | "Availability" means lendable right now; repair/retired items are excluded from availability via catalog status. | Open to challenge |
 
 ### 7.3 Open Questions (not yet decided — do not treat as requirements)
@@ -193,7 +194,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | ID | Question | Impact | Target |
 |---|---|---|---|
 | OQ-01 | What is the actual initial equipment catalog? (Arduino Uno, ESP32, Breadboard, Jumper Wires, Sensors, Multimeter, Soldering Equipment are examples only, not confirmed) | Seed data content | Decide before Sprint 1 seed implementation |
-| OQ-02 | May one loan/request cover a quantity greater than 1 (e.g., 5 jumper wires), and is there a per-borrower quantity limit? **Coupled decision (raised in PR #15 review):** if multi-unit loans are allowed, BR-09 must define full-quantity vs partial return — a partial return must not close the loan while quantity is still held, or held units escape the Available Quantity formula (BR-03). | Request/loan data model + BR-09 return semantics | Decide before Sprint 1 contract ([D1-05]) |
+| OQ-02 | **Resolved 2026-11-06:** multiple units up to current availability; no additional per-borrower cap; full return per loan (A-12). Original coupled quantity/return question was raised in PR #15 and remained open through rev 3. | Request validation + future checkout/BR-09 return semantics | Decision supplied by user during Issue #11 implementation; no return implementation in this issue |
 | OQ-03 | Are there loan-period differences by item category (e.g., tools 7 days, consumables same-day)? | BR-07 generalization | Decide before Sprint 2 |
 | OQ-04 | What happens to overdue loans beyond listing (reminders, suspension of borrowing rights)? | Out of scope currently; may extend BR-08 | Decide before Sprint 2 |
 | OQ-05 | Should returned items record condition (ok/damaged)? | Excluded for now (§3.2) | Revisit after Sprint 2 |
@@ -202,3 +203,5 @@ Each rule is stated as testable behavior with its rejection/edge case.
 ---
 
 *Document history: created in [D1-01] (Part A), rev 1 (commit `8252496`). Rev 2 (PR #15 review): added redeployment durability to NFR-04/BR-11 per `group_work_specs_v1.pdf` §5.1; split persistence/atomicity sprint allocation by function (request/checkout → Sprint 1, return → Sprint 2); added close-accounting guard to BR-09 and coupled-decision note to OQ-02. Rev 3 (2026-11-06, team decision Direction A): added BR-12 (non-reservation — requests never reserve or reduce Available Quantity) and A-11 (Non-reservation + Direct Checkout; Sprint 2 approval workflow whose pending requests do not reserve equipment). Existing FR/BR/NFR/A IDs are unchanged; no open question (OQ-01/OQ-02/OQ-03–OQ-06) is closed by this revision. FR/BR/NFR IDs are stable and will be referenced by Part B traceability, Part C SDS, and Sprint 1 contracts.*
+
+**Revision 4 ? 2026-11-06 (Issue #11 work-session user decision):** resolved OQ-02 as A-12 (multi-unit up to available stock, no additional per-borrower cap, full return per loan); elaborated BR-01 and fixed future BR-09 return policy. Existing requirement IDs preserved; return implementation remains Sprint 2. This records an explicit new decision, not a claim that earlier PRs had already resolved it.

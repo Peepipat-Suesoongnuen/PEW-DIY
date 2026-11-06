@@ -27,6 +27,15 @@ export interface Equipment {
   availability: "AVAILABLE" | "UNAVAILABLE";
 }
 
+export interface BorrowingRequest {
+  id: string;
+  borrower_id: string;
+  equipment_id: string;
+  quantity_requested: number;
+  created_at: string;
+  status: "SUBMITTED" | "CHECKED_OUT";
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -98,5 +107,16 @@ export const api = {
   },
   getEquipment(id: string) {
     return apiFetch<{ data: Equipment }>(`/api/equipment/${encodeURIComponent(id)}`);
+  },
+  createRequest(equipment_id: string, quantity_requested: number) {
+    return apiFetch<{ data: BorrowingRequest }>("/api/requests", {
+      method: "POST", body: JSON.stringify({ equipment_id, quantity_requested }),
+    });
+  },
+  listRequests() {
+    return apiFetch<{ data: BorrowingRequest[] }>("/api/requests");
+  },
+  getRequest(id: string) {
+    return apiFetch<{ data: BorrowingRequest }>(`/api/requests/${encodeURIComponent(id)}`);
   },
 };

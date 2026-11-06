@@ -48,3 +48,13 @@ export function useItemRouteId(): string | null {
   const location = useLocation();
   return itemIdFromPathname(location.pathname);
 }
+
+export function requestPath(id: string): string {
+  return `/requests/${encodeURIComponent(id)}`;
+}
+
+export function requestIdFromPathname(pathname: string): string | null {
+  const raw = pathname.match(/^\/requests\/([^/]+)\/?$/)?.[1];
+  if (!raw) return null;
+  try { return decodeURIComponent(raw); } catch { return raw; }
+}

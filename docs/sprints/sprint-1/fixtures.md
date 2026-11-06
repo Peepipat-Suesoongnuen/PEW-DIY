@@ -55,3 +55,4 @@ Calendar test vectors for the **selected** timezone include a normal day, a chec
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Initial symbolic fixtures, decision parameters, clock/race/rollback preconditions | Issue #5; SRS OQ-01/OQ-02, BR-03/07; SDS §3/§4/§10 |
+| 2 ? 2026-11-06 | Recorded resolved quantity policy and concrete stock-boundary test vectors | User decision A-12 during Issue #11 implementation |

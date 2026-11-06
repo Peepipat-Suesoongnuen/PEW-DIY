@@ -7,9 +7,10 @@ import { Card } from "../components/Card";
 import { DetailList } from "../components/DetailList";
 import { EmptyState } from "../components/EmptyState";
 import { Loading } from "../components/Loading";
+import { RequestToBorrow } from "../components/RequestToBorrow";
 import { api, type Equipment } from "../lib/api";
 import { useItemRouteId } from "../lib/paths";
-import { useUnauthorizedRedirect } from "../lib/session";
+import { useSession, useUnauthorizedRedirect } from "../lib/session";
 
 type DetailState =
   | { kind: "loading" }
@@ -21,12 +22,11 @@ type DetailState =
  * Item Detail (ui-spec §3): item information card (DetailList + Badge +
  * Quantity Tracking display) with loading/missing/error states.
  *
- * Scope note (Issue #33, Responsibility Boundary): the "Request to borrow"
- * action panel (quantity input + submit + post-submit redirect, ui-spec §3.2)
- * is owned by #11 (F-04 Borrowing Request) and is deliberately not rendered
- * here — the server remains authoritative regardless of what the UI hides.
+ * F-04 (#11) adds the Borrower request panel defined by ui-spec §3.2.
+ * Backend stock/role checks remain authoritative.
  */
 export function ItemDetailPage() {
+  const { user } = useSession();
   // Route boundary (PR #34 review round 2): the id comes from the RAW pathname
   // decoded exactly once — useParams() would collapse the distinct opaque ids
   // `fixture/opaque` and `fixture%2Fopaque` into the same value.
@@ -118,6 +118,7 @@ export function ItemDetailPage() {
               ]}
             />
           </div>
+          {user?.role === "BORROWER" ? <RequestToBorrow item={state.item} refresh={(item) => setState({ kind: "loaded", item })} /> : null}
         </Card>
       ) : null}
     </section>

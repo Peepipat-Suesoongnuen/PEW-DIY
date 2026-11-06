@@ -32,6 +32,9 @@ export const PROTECTED_ROUTES: ReadonlyArray<{
   // no ownership predicate on the catalog itself.
   { method: "GET", path: "/api/equipment", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/equipment/{equipmentId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "POST", path: "/api/requests", allowedRoles: ["BORROWER"] },
+  { method: "GET", path: "/api/requests", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "GET", path: "/api/requests/{requestId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
 ];
 
 export function createAuthMiddleware(auth: AuthService, cookieName: string) {

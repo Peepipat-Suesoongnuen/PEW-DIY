@@ -77,3 +77,9 @@ for required configuration — a missing key stops startup (fail-closed).
 ## Project Status
 
 Initial project setup. Product requirements and implementation details are being defined by the team.
+
+## Borrowing Requests (F-04 / Issue #11)
+
+After `npm run migrate` and the existing synthetic seed, open the React app (`/login`), sign in as Borrower, open an available item, and submit a positive quantity up to its current availability. Success opens **My requests**, where list/detail reads survive reload. Custodian sees the **Submitted requests** queue but cannot create requests. Requests do not reserve stock; repeated requests have no additional per-borrower cap (SRS A-12).
+
+Migration 002 creates only `borrowing_requests`; Loan schema/checkout remain Issue #12. See [F-04 execution/TDD evidence](docs/sprints/sprint-1/tdd-evidence-f04.md) for actual checks, per-AC/STS status, and the still-gated fulfillment cases. No `.env` secret or demo password belongs in Git.

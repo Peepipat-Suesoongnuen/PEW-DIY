@@ -8,7 +8,7 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 `AC-Fxx-nn` and `TEST-Fxx-nn` are new contract namespaces; existing `AC-06.x-nn` and parent `AC-F-nn` remain unchanged. Complete corresponding decision gates before execution. A future result record must add actual test file/name, command, tested SHA, environment, expected/actual, status and artifact link; do not turn NOT RUN into PASS without evidence. A single planned STS row can generate several executable cases, so its row count is not a runtime pass count.
 
-**Execution status legend (rev 2):** `EXECUTED (green)` = ran with a recorded passing result in a linked evidence file · `PARTIAL` = some planned cases ran, others gated/not run · `PLANNED — NOT RUN` = no recorded run. Evidence files with commands, outputs and RED→GREEN history: [tdd-evidence-f01.md](tdd-evidence-f01.md), [tdd-evidence-f02.md](tdd-evidence-f02.md), [tdd-evidence-f03.md](tdd-evidence-f03.md). Implementation/test status is tracked separately from contract approval.
+**Execution status legend (rev 2):** `EXECUTED (green)` = ran with a recorded passing result in a linked evidence file · `PARTIAL` = some planned cases ran, others gated/not run · `PLANNED — NOT RUN` = no recorded run. Evidence files with commands, outputs and RED→GREEN history: [tdd-evidence-f01.md](tdd-evidence-f01.md), [tdd-evidence-f02.md](tdd-evidence-f02.md), [tdd-evidence-f03.md](tdd-evidence-f03.md), [tdd-evidence-f04.md](tdd-evidence-f04.md). Implementation/test status is tracked separately from contract approval.
 
 | Contract | AC definitions | Planned STS rows | Current result |
 |---|---|---|---|
@@ -68,16 +68,16 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F04-01](f-04-borrowing-request.md) | [TEST-F04-01](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-02](f-04-borrowing-request.md) | [TEST-F04-02](f-04-borrowing-request.md), [TEST-F04-13](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-03](f-04-borrowing-request.md) | [TEST-F04-03](f-04-borrowing-request.md), [TEST-F04-04](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-04](f-04-borrowing-request.md) | [TEST-F04-05](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-07](f-04-borrowing-request.md) | [TEST-F04-08](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-08](f-04-borrowing-request.md) | [TEST-F04-09](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-09](f-04-borrowing-request.md) | [TEST-F04-10](f-04-borrowing-request.md) | NOT RUN |
-| [AC-F04-10](f-04-borrowing-request.md) | [TEST-F04-11](f-04-borrowing-request.md) | NOT RUN |
+| [AC-F04-01](f-04-borrowing-request.md) | [TEST-F04-01](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-02](f-04-borrowing-request.md) | [TEST-F04-02](f-04-borrowing-request.md), [TEST-F04-13](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-03](f-04-borrowing-request.md) | [TEST-F04-03](f-04-borrowing-request.md), [TEST-F04-04](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-04](f-04-borrowing-request.md) | [TEST-F04-05](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | PARTIAL ? F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | PARTIAL ? F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-07](f-04-borrowing-request.md) | [TEST-F04-08](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-08](f-04-borrowing-request.md) | [TEST-F04-09](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-09](f-04-borrowing-request.md) | [TEST-F04-10](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-10](f-04-borrowing-request.md) | [TEST-F04-11](f-04-borrowing-request.md) | EXECUTED ? request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
 
 ### F-05
 
@@ -211,3 +211,7 @@ The seven parent criteria include actual build/TDD/review/release evidence; the 
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Initial complete planned contract AC/TEST, S1 requirement and existing Issue AC mapping | Issue #5; six Part E revision-1 contracts; Parts A–D; Issues #6/#8–#13 |
+
+F-04 update (2026-11-06): request-only actual execution is recorded above and in [F-04 evidence](tdd-evidence-f04.md); TEST-F04-06/07 remain partial until #12. No earlier feature status or deferred acceptance is promoted by this change.
+
+Revision 3 (2026-11-06): linked F-04 actual candidate results, preserving F-05-dependent partial AC/STS; added no new AC IDs or test-pass claims for other features.

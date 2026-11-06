@@ -7,9 +7,8 @@ import { AccountMenu } from "./AccountMenu";
 /**
  * AppShell: top navigation + centered content (ui-spec §2.1/§2.2, decision N-1).
  * Nav links rule (ui-spec §2.2): links for later-sprint screens appear ONLY
- * when their features land (no dead links) — My Requests/My Loans/Submitted
- * Requests entries are added by #11 (F-04) and #12 (F-05) when those screens
- * are implemented.
+ * when their features land: F-04 provides My/Submitted Requests;
+ * My Loans and checkout actions remain F-05 (#12).
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const { user } = useSession();
@@ -33,6 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <NavLink to="/catalog" className={navLinkClass}>
                 Catalog
               </NavLink>
+              <NavLink to="/requests" className={navLinkClass}>{user?.role === "CUSTODIAN" ? "Submitted requests" : "My requests"}</NavLink>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -52,6 +52,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="border-t border-border px-4 py-2 md:hidden">
             <NavLink to="/catalog" className={navLinkClass} onClick={() => setMenuOpen(false)}>
               Catalog
+            </NavLink>
+            <NavLink to="/requests" className={navLinkClass} onClick={() => setMenuOpen(false)}>
+              {user?.role === "CUSTODIAN" ? "Submitted requests" : "My requests"}
             </NavLink>
           </div>
         ) : null}

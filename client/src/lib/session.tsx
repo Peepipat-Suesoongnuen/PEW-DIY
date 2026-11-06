@@ -66,6 +66,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const clear = useCallback(() => setUser(null), []);
   const clearExpiredNotice = useCallback(() => setExpiredNotice(false), []);
+  const expire = useCallback(() => {
+    setExpiredNotice(true);
+    setUser(null);
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -76,15 +80,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signOut,
       clear,
       clearExpiredNotice,
-      /** 401 on a LATER call: mark the expiry + drop stale identity. */
-      expire: () => {
-        setExpiredNotice(true);
-        setUser(null);
-      },
+      expire,
     }),
-    // `expire` is intentionally recreated per render like `clear` — both only
-    // call stable setState setters.
-    [user, status, expiredNotice, signIn, signOut, clear, clearExpiredNotice],
+    // Stable callbacks keep protected-page effects from restarting a request
+    // or discarding a form when only current-user identity finishes loading.
+    [user, status, expiredNotice, signIn, signOut, clear, clearExpiredNotice, expire],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
