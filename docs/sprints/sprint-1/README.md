@@ -8,6 +8,8 @@
 
 Current execution update (2026-11-07): F-05 is implemented locally; see [F-05 evidence](tdd-evidence-f05.md) for 115 server, 70 client and 51 browser passes. The revision1 source/status wording above records initial contract authoring, not the current implementation state. Shared-baseline review, team ratification and release remain pending.
 
+Current F-10 verification (Issue #13, 7 November2026): [Part F evidence](../../verification/sprint-1/README.md) records164 server,70 client and54 browser passes with49/49 application AC and57 total AC result rows. Human/process criteria and the main release remain partial/pending. This supplements the historical F-05-only snapshot above.
+
 ## 1. Purpose and Authoritative Sources
 
 These contracts elaborate Sprint 1 before implementation: feature identity/requirements, design/workflow/rules, UI/API/data specifications, observable AC, Software Test Specification (STS), Product DoD and revision history. `project_deliverable_1_v1.pdf` §3.5 (PDF p.4) and `group_work_specs_v1.pdf` §7/§8.2 (PDF pp.9–10) define that obligation. Original PDFs were read from the team's local `D:/Software_Engineering/PEW-DIY/lab-document/` directory; no copies are added to Git.

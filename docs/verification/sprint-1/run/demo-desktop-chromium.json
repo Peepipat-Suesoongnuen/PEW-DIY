@@ -1,0 +1,19 @@
+{
+  "test": "TEST-F10-01/02",
+  "project": "desktop-chromium",
+  "item": "f10-browser-e591a847-52cb-436d-8ede-5a530d543c33",
+  "requestId": "99246602-9b73-4361-9ccc-4736d190d6f2",
+  "loanId": "98f4ce01-7741-45d2-b5a8-599636a88c79",
+  "due_on": "2026-11-14",
+  "requestStatus": "CHECKED_OUT",
+  "quantity_available": 0,
+  "outcomes": {
+    "create": 201,
+    "checkout": 201,
+    "repeated": 409,
+    "unavailable": 409,
+    "borrowerCheckout": 403,
+    "crossOwner": 403,
+    "logoutReplay": 401
+  }
+}

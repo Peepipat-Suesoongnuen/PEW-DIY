@@ -1,0 +1,19 @@
+{
+  "test": "TEST-F10-01/02",
+  "project": "mobile-chromium",
+  "item": "f10-browser-efbcb634-306a-4610-97f1-fb3ed92a3c9a",
+  "requestId": "73b7c818-24a4-4cfe-b342-255cbfa851f3",
+  "loanId": "1bcced35-2872-4f56-88a9-7f5e2865cd61",
+  "due_on": "2026-11-14",
+  "requestStatus": "CHECKED_OUT",
+  "quantity_available": 0,
+  "outcomes": {
+    "create": 201,
+    "checkout": 201,
+    "repeated": 409,
+    "unavailable": 409,
+    "borrowerCheckout": 403,
+    "crossOwner": 403,
+    "logoutReplay": 401
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "test": "TEST-F10-01/02",
+  "project": "tablet-chromium",
+  "item": "f10-browser-cee59872-53e4-43aa-b597-4407d3cf5161",
+  "requestId": "177182fb-55e6-49fb-97a1-a81eb195e18d",
+  "loanId": "16bfcf40-3a69-444e-aa7f-73724c86502a",
+  "due_on": "2026-11-14",
+  "requestStatus": "CHECKED_OUT",
+  "quantity_available": 0,
+  "outcomes": {
+    "create": 201,
+    "checkout": 201,
+    "repeated": 409,
+    "unavailable": 409,
+    "borrowerCheckout": 403,
+    "crossOwner": 403,
+    "logoutReplay": 401
+  }
+}

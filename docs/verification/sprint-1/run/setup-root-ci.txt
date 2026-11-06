@@ -1,0 +1,5 @@
+
+added 197 packages in 14s
+
+58 packages are looking for funding
+  run `npm fund` for details

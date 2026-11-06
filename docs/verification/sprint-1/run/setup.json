@@ -1,0 +1,56 @@
+{
+  "tested_commit": "5b064eacae5749b9f7d64090e86b742941b5c8d0",
+  "node": "v24.15.0",
+  "status": "LOCAL_REHEARSAL_PASS",
+  "steps": [
+    {
+      "label": "root-ci",
+      "exit_code": 0,
+      "duration_ms": 15663
+    },
+    {
+      "label": "client-ci",
+      "exit_code": 0,
+      "duration_ms": 12519
+    },
+    {
+      "label": "chromium",
+      "exit_code": 0,
+      "duration_ms": 16823
+    },
+    {
+      "label": "migrate",
+      "exit_code": 0,
+      "duration_ms": 2089
+    },
+    {
+      "label": "seed",
+      "exit_code": 0,
+      "duration_ms": 851
+    },
+    {
+      "label": "build",
+      "exit_code": 0,
+      "duration_ms": 681
+    },
+    {
+      "label": "build-client",
+      "exit_code": 0,
+      "duration_ms": 8823
+    }
+  ],
+  "starting_conditions": "Windows/Node/npm/PostgreSQL/tar installed; new source directory and application DBs; host package/browser caches may be warm",
+  "other_student_reproduction": "PENDING",
+  "started_at": "2026-11-06T18:51:20.297Z",
+  "postgresql": "18.4",
+  "duration_ms": 61812,
+  "target_ms": 900000,
+  "target_met": true,
+  "checks": {
+    "login": 200,
+    "catalog": 200,
+    "seeded_items": 3,
+    "built_react_shell": true
+  },
+  "completed_at": "2026-11-06T18:52:25.090Z"
+}

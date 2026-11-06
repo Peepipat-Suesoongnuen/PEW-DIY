@@ -14,12 +14,12 @@ A university equipment-borrowing system for the D.I.Y. Room, which supports stud
 
 ```text
 PEW-DIY/
-├── client/            # Frontend application (structure prepared; framework/UI comes with F-02+)
+├── client/            # React/Vite/Tailwind frontend
 ├── server/
 │   ├── src/           # Backend application: config, db, routes, services
 │   └── tests/         # Unit + API/integration tests (outside build output)
 ├── docs/              # SRS, SDS, feature inventory, traceability, sprint plans and contracts
-├── package.json       # Shared root configuration (single package)
+├── package.json       # Backend/verification configuration; client has its own lockfile
 └── AGENT.md           # Repository agent instructions
 ```
 
@@ -27,56 +27,62 @@ Deployment remains a modular monolith: one application container serves UI and A
 
 ## Development Setup (Sprint 1)
 
-Prerequisites: **Node.js 24.15+** (or 22.22.2+ / 26+ — matches the `jsdom`
-engine range used by the client test suite; earlier 24.x versions trigger an
-npm engine warning), **PostgreSQL 17+**, npm.
+Prerequisites: **Node.js24.15+ in the selected Node24 line**, npm, PostgreSQL17 (selected target; local PG18 verification is reported separately), and a PostgreSQL role able to create the local databases. Windows PowerShell examples follow; `psql` must be on PATH. Git is needed for verification/version identification. No Docker or GCP is required for Deliverable1.
 
-```bash
-# 1. Install dependencies
-npm install
-npm --prefix client install        # frontend app (React + Vite + Tailwind v4)
-npx playwright install chromium    # browser for the E2E suite (one-time)
+```powershell
+npm ci --no-audit
+npm --prefix client ci --no-audit
+npx playwright install chromium
 
-# 2. Create the two databases (dev and test — kept separate per SDS §4)
+# Use your local PostgreSQL admin/owner; configure PGHOST/PGPORT if needed.
 psql -U <admin> -c "CREATE DATABASE pewdiy_dev;"
 psql -U <admin> -c "CREATE DATABASE pewdiy_test;"
-
-# 3. Configure environment (auto-loaded by the app and test runner)
-cp .env.example .env
-#    Edit .env: DATABASE_URL, TEST_DATABASE_URL, APP_ORIGIN, and seed
-#    passwords (SEED_PASSWORD_BA/BB/CA — local only, never committed).
-
-# 4. Apply migrations to the dev database
+Copy-Item .env.example .env
+# Edit .env: DATABASE_URL -> pewdiy_dev, TEST_DATABASE_URL -> pewdiy_test.
+# Set APP_ORIGIN=http://localhost:3000 and APP_TIMEZONE=Asia/Bangkok.
+# Supply SEED_PASSWORD_BA, SEED_PASSWORD_BB and SEED_PASSWORD_CA privately
+# in .env or the current process. Never put passwords in Git or screenshots.
 npm run migrate
-
-# 5. Seed the demo accounts (B-A, B-B, C-A) and synthetic equipment
-#    fixtures (E-ONE/E-MANY/E-ZERO) — upsert-safe, rerun-friendly
 npm run seed
-
-# 6. Run the test suite against the test database (55 tests)
-npm test
-npm --prefix client test           # frontend component/page tests
-
-# 7. Build the frontend (client/dist — served by Express together with the
-#    legacy .html pages; see ARCH-01 section 12.1)
+npm run build
 npm run build:client
-
-# 8. Start the development server
-npm run dev   # http://localhost:3000 → React UI: /login, /catalog
-              #                        → legacy UI: /login.html, /catalog.html
-
-# Optional: run the Core UI E2E suite (Playwright, 3 viewports)
-npm run test:e2e
+npm run dev
 ```
 
-**Environment loading:** scripts and tests load `.env` automatically via
-`process.loadEnvFile()` (Node built-in). Explicitly exported environment
-variables take precedence over `.env` values. There is no built-in fallback
-for required configuration — a missing key stops startup (fail-closed).
+Open `/login`, sign in as B-A (Borrower), B-B (second Borrower) or C-A (Custodian), using the privately supplied seed password. The server serves the React app and legacy `.html` pages. Seed reruns preserve existing credentials/data; changing SEED_PASSWORD_* does **not** reset an existing account. Use a fresh demo database when supplying new seed passwords.
 
-## Project Status
+The setup timing target is a running seeded login/catalog within15 minutes from the documented installed-tool prerequisites, including dependency installation, DB creation, configuration, migration, seed, build and startup. A local timed rehearsal is [recorded here](docs/verification/sprint-1/run/setup.json); caches and the pending other-student repetition are disclosed. This does not claim a clean OS install in15 minutes.
 
-Initial project setup. Product requirements and implementation details are being defined by the team.
+### Tests and integrated verification
+
+Use the test database exclusively for tests. The direct server suite clears test fixtures and must never target a shared/production database. Migrate the test DB **before test discovery**, so relation-gated tests see the Loan schema:
+
+```powershell
+npm run migrate:test
+npm test
+npm --prefix client test
+npm --prefix client run typecheck
+```
+
+The complete F-10 runner uses fresh, isolated server/browser schemas inside TEST_DATABASE_URL, generates private seed passwords, builds, migrates, runs server/client/browser suites, records source fingerprints and audits all57 contract AC mappings. The test role needs CREATE SCHEMA privilege. Output is `docs/verification/sprint-1/run/`; no dev-data reset, Git write or release occurs.
+
+```powershell
+npm run verify:sprint1
+```
+
+For standalone E2E, point DATABASE_URL and TEST_DATABASE_URL at a separately migrated and freshly seeded disposable browser DB with matching private seed passwords, set APP_ORIGIN/E2E_BASE_URL to its app origin, then run `npm run test:e2e`. The F-05 browser scenarios create their own temporary schemas; the F-10 runner handles isolation/credentials automatically.
+
+An optional local README setup rehearsal runs npm ci in a new source directory, creates two fresh databases and checks actual seeded login/catalog plus the built React shell. It requires `tar` (bundled on current Windows) and CREATE DATABASE privilege on the dedicated test DB owner, and removes only its own generated databases/directory afterward:
+
+```powershell
+npm run rehearse:sprint1
+```
+
+Environment loading: app/scripts load optional `.env`; exported process variables take precedence. Missing required product configuration fails closed. Never include `.env`, password values, session cookies or private data in evidence.
+
+## Sprint 1 verification and handoff
+
+F-01 through F-05 are merged into sprint staging. [Part F evidence](docs/verification/sprint-1/README.md) contains scenarios, screenshots, actual AC/test results, TDD references, sampled workflow/review history, contributions/AI-use disclosure and known gaps. A verified local staging candidate is distinct from a reviewed main release. Human review, A-12 shared-team ratification, independent README repetition and the reviewed release remain explicit gates.
 
 ## Borrowing Requests (F-04 / Issue #11)
 

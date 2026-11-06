@@ -1,0 +1,23 @@
+5b064ea 2026-11-07T01:26:41+07:00 Peepipat-Suesoongnuen
+Merge pull request #37 from Peepipat-Suesoongnuen/feature/12-checkout-active-loan
+
+70e7b5e 2026-11-07T01:01:36+07:00 L0u1sss
+feat(F-05): implement atomic checkout and active loans (Refs #12)
+
+de63590 2026-11-07T00:23:14+07:00 Peepipat-Suesoongnuen
+Merge pull request #36 from Peepipat-Suesoongnuen/feature/11-borrowing-request
+
+a080fa0 2026-11-07T00:08:13+07:00 L0u1sss
+fix
+
+6b4c35d 2026-11-06T22:58:25+07:00 L0u1sss
+feat(F-04): implement borrowing requests with ownership and stock validation
+
+4e4e62c 2026-11-06T22:14:35+07:00 Phalat Amachayapha
+Merge pull request #35 from Peepipat-Suesoongnuen/feature/f-03-equipment-availability
+
+9466795 2026-11-06T22:01:59+07:00 Peepipat-Suesoongnuen
+docs(F-03): resolve final audit findings (Refs #10)
+
+39f2272 2026-11-06T21:16:52+07:00 Peepipat-Suesoongnuen
+docs(F-03): per-row AC/STS execution status aligned with evidence (PR #35 re-review P1)

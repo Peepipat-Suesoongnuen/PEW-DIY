@@ -219,7 +219,7 @@ describe("F-05 real PostgreSQL/API", () => {
       }
       console.log("F05 independent worker PIDs", workers.map((w) => w.proc.pid), "race outcomes", JSON.stringify(outcomes));
       if (process.env.F05_RACE_EVIDENCE) writeFileSync(process.env.F05_RACE_EVIDENCE, JSON.stringify({
-        workers: workers.map((w) => w.proc.pid), database: "isolated PostgreSQL 18.4", distinctRequestRaces: 50,
+        workers: workers.map((w) => w.proc.pid), database: "PostgreSQL " + (await pool.query("SHOW server_version")).rows[0].server_version, distinctRequestRaces: 50,
         sameRequestRaces: 1, outcomes, invariant: "one loan, held=1, available=0 in every race", timestamp: new Date().toISOString(),
       }, null, 2) + "\n");
     } finally { await Promise.all(workers.map((w) => w.stop())); }

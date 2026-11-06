@@ -4,6 +4,8 @@
 >
 > Basis: `project_deliverable_1_v1.pdf` §3.5–§3.6/§4.2; `group_work_specs_v1.pdf` §7–§8; [AGENT.md](../../../AGENT.md) §11–§13; [Sprint Plan](../plan.md). This checklist defines future evidence; creating these contracts does not satisfy it.
 
+Current local verification (Issue #13, 7 November2026): [Part F evidence](../../verification/sprint-1/README.md) records164 server,70 client and54 browser passes and all49 application AC checks. This does not check off shared-baseline approval, teammate reproduction, final board/disclosure, reviewed integration/main release or PDF submission. The checklist remains uncompleted until those actual artifacts exist.
+
 ## 1. Feature Completion
 
 - [ ] The feature contract revision and all dependent decisions are approved before implementation. FR/BR/NFR and existing Issue AC mappings agree with Parts A–D; no unresolved gate is silently treated as a decision.

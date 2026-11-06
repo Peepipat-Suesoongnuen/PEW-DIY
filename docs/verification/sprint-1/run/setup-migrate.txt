@@ -1,0 +1,5 @@
+
+> pew-diy@1.0.0 migrate
+> tsx server/src/db/migrate.ts
+
+Migration complete.
