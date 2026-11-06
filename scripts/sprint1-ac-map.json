@@ -991,14 +991,12 @@
     "ac": "AC-F10-04",
     "checks": [
       {
-        "suite": "browser",
-        "file": "sprint1-integration.spec.ts",
-        "name": "TEST-F10-01/02"
+        "kind": "process",
+        "id": "TEST-F10-04"
       },
       {
-        "suite": "server",
-        "file": "server/tests/sprint1-integration.test.ts",
-        "name": "anonymous "
+        "kind": "process",
+        "id": "TEST-F10-05"
       }
     ],
     "pending": [
@@ -1013,9 +1011,8 @@
     "ac": "AC-F10-05",
     "checks": [
       {
-        "suite": "browser",
-        "file": "sprint1-integration.spec.ts",
-        "name": "TEST-F10-01/02"
+        "kind": "process",
+        "id": "TEST-F10-06"
       }
     ],
     "pending": [
@@ -1029,14 +1026,12 @@
     "ac": "AC-F10-06",
     "checks": [
       {
-        "suite": "server",
-        "file": "server/tests/loan-unit.test.ts",
-        "name": "rejects an unavailable exclusive unit"
+        "kind": "process",
+        "id": "TEST-F10-07"
       },
       {
-        "suite": "server",
-        "file": "server/tests/auth-routes.test.ts",
-        "name": "neither Origin nor Referer"
+        "kind": "process",
+        "id": "TEST-F10-10"
       }
     ],
     "pending": [
@@ -1051,9 +1046,8 @@
     "ac": "AC-F10-07",
     "checks": [
       {
-        "suite": "browser",
-        "file": "sprint1-integration.spec.ts",
-        "name": "TEST-F10-01/02"
+        "kind": "process",
+        "id": "TEST-F10-08"
       }
     ],
     "pending": [
@@ -1067,9 +1061,12 @@
     "ac": "AC-F10-08",
     "checks": [
       {
-        "suite": "browser",
-        "file": "sprint1-integration.spec.ts",
-        "name": "TEST-F10-01/02"
+        "kind": "process",
+        "id": "TEST-F10-09"
+      },
+      {
+        "kind": "process",
+        "id": "TEST-F10-10"
       }
     ],
     "pending": [

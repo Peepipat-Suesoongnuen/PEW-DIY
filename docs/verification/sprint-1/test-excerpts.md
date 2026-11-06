@@ -1,6 +1,6 @@
 # Actual test excerpts and TDD provenance
 
-These are excerpts from executed tests, not pseudocode. Current results:164 server cases passed on Node24.15.0/PostgreSQL18.4. The tested staging product source is `5b064ea`; new verification tests are uncommitted and fingerprinted in [verification.json](run/verification.json).
+These are excerpts from executed tests, not pseudocode. Current results:164 server cases passed on Node24.15.0/PostgreSQL18.4. The original F-10 tests were submitted in PR #38 at `2b76abb`. Current remediation provenance (committed source versus explicitly dirty candidate) is recorded in [verification.json](run/verification.json); only a non-null tested_commit identifies a verified source commit.
 
 ## Domain rule: exclusive stock cannot produce a second loan
 

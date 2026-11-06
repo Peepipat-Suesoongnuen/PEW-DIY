@@ -5,18 +5,24 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertSourceVersion, createSanitizer, digestFile, writeEvidence, sanitizeArtifacts } from "./evidence-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const out = path.resolve(root, process.env.VERIFICATION_OUTPUT_DIR ?? "docs/verification/sprint-1/run");
 const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8", windowsHide: true }).trim();
 const json = async (file) => JSON.parse(await readFile(file, "utf8"));
-const digest = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
-const audit = { audited_at: new Date().toISOString(), tested_commit: git("rev-parse", "HEAD"), checks: [], pending: [],
+const digest = digestFile;
+const scrub = createSanitizer(root);
+const audit = { audited_at: new Date().toISOString(), audited_head: git("rev-parse", "HEAD"), checks: [], pending: [],
   audit_source_sha256: digest(fileURLToPath(import.meta.url)), status: "NOT_RUN" };
 function check(label, condition) { audit.checks.push({ label, status: condition ? "PASS" : "FAIL" }); if (!condition) throw new Error(label); }
 try {
   const run = await json(path.join(out, "verification.json"));
-  check("Full runner succeeded on this HEAD", run.status === "AUTOMATED_CHECKS_PASS" && run.tested_commit === audit.tested_commit);
+  const candidateAllowed = process.argv.includes("--allow-working-tree") && !process.argv.includes("--require-release");
+  assertSourceVersion(run, root, candidateAllowed);
+  audit.tested_commit = run.tested_commit;
+  audit.version_kind = run.version_kind;
+  check("Full runner succeeded on the recorded source version", run.status === "AUTOMATED_CHECKS_PASS");
   check("49/49 application AC have executed passing checks", run.application_coverage.total === 49 && run.application_coverage.passed === 49);
   check("57 unique contract AC have real result rows", run.ac_results.length === 57 && new Set(run.ac_results.map((r) => r.ac)).size === 57 && !run.ac_results.some((r) => r.status === "MISSING"));
   check("No failed/skipped/flaky product cases", Object.values(run.suites).every((s) => s.passed > 0 && !s.failed && !s.skipped && !s.flaky));
@@ -39,7 +45,7 @@ try {
     check(`PR${feature.pr}: independent author/reviewer and staging path`, feature.author !== feature.reviewer && feature.review_state === "APPROVED" && feature.merged && feature.base === "sprint/1-staging");
     git("cat-file", "-e", `${feature.head_sha}^{commit}`); git("cat-file", "-e", `${feature.merge_sha}^{commit}`);
     git("merge-base", "--is-ancestor", feature.head_sha, feature.merge_sha);
-    git("merge-base", "--is-ancestor", feature.merge_sha, audit.tested_commit);
+    git("merge-base", "--is-ancestor", feature.merge_sha, audit.audited_head);
   }
   check("At least two real Issue/PR/staging chains", workflow.sampled_features.length >= 2);
   for (const feature of workflow.sampled_features.filter((f) => f.pr !== 22)) git("merge-base", "--is-ancestor", workflow.contract_commit, feature.head_sha);
@@ -60,7 +66,9 @@ try {
     if (process.argv.includes("--require-release")) throw new Error("Release gate: RELEASE_REF is absent; staging verification is not a main release");
   }
   if (process.argv.includes("--require-release") && audit.pending.length) throw new Error("Release gate: unresolved human evidence checks");
-  const history = git("log", "-8", "--date=iso-strict", "--format=%h %ad %an%n%s%n");
+  // Public account attribution is in workflow.json; avoid republishing local
+  // Git author display names/personal identifiers in rendered evidence.
+  const history = git("log", "-8", "--date=iso-strict", "--format=%h %ad%n%s%n");
   await writeFile(path.join(out, "workflow-history.txt"), history + "\n");
   const { chromium } = await import("@playwright/test");
   const browser = await chromium.launch({ headless: true });
@@ -71,7 +79,8 @@ try {
     await mkdir(path.join(out, "screenshots"), { recursive: true });
     await page.screenshot({ path: path.join(out, "screenshots/workflow-history.png"), fullPage: true });
   } finally { await browser.close(); }
-  audit.status = "AUTOMATED_EVIDENCE_PASS_WITH_HUMAN_GATES";
+  audit.status = run.tested_commit ? "AUTOMATED_EVIDENCE_PASS_WITH_HUMAN_GATES" : "CANDIDATE_CHECKS_PASS_COMMIT_VERIFICATION_PENDING";
 } catch (error) { audit.status = error.message.startsWith("Release gate:") ? "NOT_RELEASED" : "FAIL"; audit.error = error.message; process.exitCode = audit.status === "NOT_RELEASED" ? 2 : 1; }
-await writeFile(path.join(out, process.argv.includes("--require-release") ? "release-audit.json" : "evidence-audit.json"), JSON.stringify(audit, null, 2) + "\n");
+await writeEvidence(path.join(out, process.argv.includes("--require-release") ? "release-audit.json" : "evidence-audit.json"), audit, scrub);
+await sanitizeArtifacts(out, scrub);
 console.log(JSON.stringify({ status: audit.status, checks: audit.checks.length, pending: audit.pending, error: audit.error }, null, 2));

@@ -8,18 +8,19 @@ import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { randomBytes } from "node:crypto";
 import pg from "pg";
+import { createSanitizer, sourceState, writeEvidence, sanitizeArtifacts } from "./evidence-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 try { process.loadEnvFile(path.join(root, ".env")); } catch { /* optional */ }
 const out = path.resolve(root, process.env.VERIFICATION_OUTPUT_DIR ?? "docs/verification/sprint-1/run");
 await mkdir(out, { recursive: true });
-const report = { tested_commit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(), node: process.version,
+const report = { ...sourceState(root), node: process.version,
   status: "NOT_RUN", steps: [], starting_conditions: "Windows/Node/npm/PostgreSQL/tar installed; new source directory and application DBs; host package/browser caches may be warm",
   other_student_reproduction: "PENDING", started_at: new Date().toISOString() };
 let temp, admin, child;
 const names = [];
 const secrets = [process.env.TEST_DATABASE_URL].filter(Boolean);
-const scrub = (s) => secrets.reduce((a, b) => a.replaceAll(b, "[private configuration]"), String(s));
+const scrub = createSanitizer(root, secrets);
 async function command(label, executable, args, cwd, env) {
   const started = Date.now(); console.log(`[setup] ${label}`);
   const proc = spawn(executable, args, { cwd, env, stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
@@ -28,7 +29,7 @@ async function command(label, executable, args, cwd, env) {
   let code;
   try { code = await new Promise((resolve, reject) => { proc.once("error", reject); proc.once("close", resolve); }); }
   finally { clearTimeout(timer); }
-  await writeFile(path.join(out, `setup-${label}.txt`), scrub(output));
+  await writeEvidence(path.join(out, `setup-${label}.txt`), output, scrub);
   report.steps.push({ label, exit_code: code, duration_ms: Date.now() - started });
   if (code !== 0) throw new Error(`${label} failed; see setup-${label}.txt`);
 }
@@ -105,6 +106,7 @@ finally {
     await rm(resolved, { recursive: true, force: true });
   }
   report.completed_at = new Date().toISOString();
-  await writeFile(path.join(out, "setup.json"), JSON.stringify(report, null, 2) + "\n");
+  await writeEvidence(path.join(out, "setup.json"), report, scrub);
+  await sanitizeArtifacts(out, scrub);
   console.log(`[setup] ${report.status}; other-student repetition remains pending`);
 }

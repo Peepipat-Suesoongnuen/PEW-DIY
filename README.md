@@ -69,6 +69,8 @@ The complete F-10 runner uses fresh, isolated server/browser schemas inside TEST
 ```powershell
 npm run verify:sprint1
 ```
+Commit application/test/verification source before a commit-verification run. The runner refuses dirty source by default; `npm run verify:sprint1 -- --allow-working-tree` is an explicit local-candidate mode with `tested_commit=null`, never a clean-commit claim. Audit uses canonical LF-normalized hashes and the tested Git blobs, so a later evidence-only commit can retain valid evidence without a self-referential SHA. `npm run audit:sprint1 -- --allow-working-tree` inspects a local candidate; the strict release audit never accepts this override.
+
 
 For standalone E2E, point DATABASE_URL and TEST_DATABASE_URL at a separately migrated and freshly seeded disposable browser DB with matching private seed passwords, set APP_ORIGIN/E2E_BASE_URL to its app origin, then run `npm run test:e2e`. The F-05 browser scenarios create their own temporary schemas; the F-10 runner handles isolation/credentials automatically.
 
