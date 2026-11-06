@@ -1,9 +1,9 @@
 {
   "test": "TEST-F10-01/02",
   "project": "tablet-chromium",
-  "item": "f10-browser-cee59872-53e4-43aa-b597-4407d3cf5161",
-  "requestId": "177182fb-55e6-49fb-97a1-a81eb195e18d",
-  "loanId": "16bfcf40-3a69-444e-aa7f-73724c86502a",
+  "item": "f10-browser-4c836c25-976b-44ea-9fde-b5da0304a27b",
+  "requestId": "f01ca808-249a-4b9d-a142-8039819940df",
+  "loanId": "6f7d6c66-7c0b-48a4-b0fc-ab523e551d35",
   "due_on": "2026-11-14",
   "requestStatus": "CHECKED_OUT",
   "quantity_available": 0,

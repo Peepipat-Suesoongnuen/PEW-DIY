@@ -1,0 +1,13 @@
+✔ canonical source hashes tolerate CRLF checkout conversion but detect content changes (1.1875ms)
+✔ portable artifacts remove mixed-slash workspace, home, cache and temp paths without corrupting JSON or web URLs (1.5715ms)
+✔ candidate evidence cannot silently pass committed-source audit (26.4537ms)
+✔ evidence-only descendant HEAD is accepted only with matching source and tested Git blob (164.35ms)
+✔ dirty-source state never labels a working-tree candidate as a clean commit (2596.2764ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2862.536

@@ -1,1 +1,1 @@
-JSON report written to C:/Users/phala/AppData/Local/Temp/pewdiy-f10-runner-h0kSkP/result.json
+JSON report written to [temp]/pewdiy-f10-runner-SZ8yj2/result.json

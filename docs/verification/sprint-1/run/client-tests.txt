@@ -1,1 +1,1 @@
-JSON report written to D:/Software_Engineering/PEW-DIY/PEW-DIY/docs/verification/sprint-1/run/client.json
+JSON report written to docs/verification/sprint-1/run/client.json

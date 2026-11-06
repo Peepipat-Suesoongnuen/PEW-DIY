@@ -1,9 +1,9 @@
 {
-  "audited_at": "2026-11-06T19:02:41.605Z",
-  "tested_commit": "5b064eacae5749b9f7d64090e86b742941b5c8d0",
+  "audited_at": "2026-11-06T19:52:15.381Z",
+  "audited_head": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
   "checks": [
     {
-      "label": "Full runner succeeded on this HEAD",
+      "label": "Full runner succeeded on the recorded source version",
       "status": "PASS"
     },
     {
@@ -173,8 +173,10 @@
     "release_peer_review",
     "Actual main release commit and release-version rerun"
   ],
-  "audit_source_sha256": "be6a435a24e0619598e4e584af338d7e9fb4763c457fb1027c2c3977570a531e",
+  "audit_source_sha256": "c4cc0c86be8f1415dd687c25ecbf62ba6db1d381a4a337b77ec7a226dd859f1e",
   "status": "AUTOMATED_EVIDENCE_PASS_WITH_HUMAN_GATES",
+  "tested_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
+  "version_kind": "CLEAN_SOURCE_COMMIT",
   "main_remote": "7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c",
   "release_commit": null
 }

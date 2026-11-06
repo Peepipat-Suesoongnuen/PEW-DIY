@@ -1,87 +1,90 @@
 {
-  "started_at": "2026-11-06T19:01:19.261Z",
-  "tested_commit": "5b064eacae5749b9f7d64090e86b742941b5c8d0",
-  "version_kind": "HEAD product source plus uncommitted verification files, identified by fingerprints",
+  "started_at": "2026-11-06T19:50:56.689Z",
+  "head_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
+  "tested_commit": "8bff0926fc0b00a4dbb79d4cb79c091db658a2e7",
+  "version_kind": "CLEAN_SOURCE_COMMIT",
+  "source_dirty_files": [],
+  "fingerprint_format": "SHA-256 of UTF-8 source with CRLF normalized to LF",
   "node": "v24.15.0",
   "steps": [
     {
       "label": "runner-failure-probe",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe node_modules/vitest/vitest.mjs run --root C:\\Users\\phala\\AppData\\Local\\Temp\\pewdiy-f10-runner-h0kSkP --config C:\\Users\\phala\\AppData\\Local\\Temp\\pewdiy-f10-runner-h0kSkP\\vitest.config.mjs --reporter=json --outputFile=C:\\Users\\phala\\AppData\\Local\\Temp\\pewdiy-f10-runner-h0kSkP\\result.json",
+      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-SZ8yj2 --config [temp]\\pewdiy-f10-runner-SZ8yj2\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-SZ8yj2\\result.json",
       "cwd": ".",
       "exit_code": 1,
-      "duration_ms": 541,
+      "duration_ms": 549,
       "log": "runner-failure-probe.txt"
     },
     {
       "label": "server-build",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe node_modules/typescript/bin/tsc",
+      "command": "node node_modules\\typescript\\bin\\tsc",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 197,
+      "duration_ms": 204,
       "log": "server-build.txt"
     },
     {
       "label": "client-typecheck",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe client/node_modules/typescript/bin/tsc --noEmit",
+      "command": "node client\\node_modules\\typescript\\bin\\tsc --noEmit",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 309,
+      "duration_ms": 319,
       "log": "client-typecheck.txt"
     },
     {
       "label": "client-build",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe client/node_modules/vite/bin/vite.js build",
+      "command": "node client\\node_modules\\vite\\bin\\vite.js build",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 538,
+      "duration_ms": 558,
       "log": "client-build.txt"
     },
     {
       "label": "server-migration",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe node_modules/tsx/dist/cli.mjs server/src/db/migrate.ts",
+      "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 301,
+      "duration_ms": 289,
       "log": "server-migration.txt"
     },
     {
       "label": "server-tests",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe node_modules/vitest/vitest.mjs run --reporter=json --outputFile=D:\\Software_Engineering\\PEW-DIY\\PEW-DIY\\docs\\verification\\sprint-1\\run\\server.json",
+      "command": "node node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\server.json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 11998,
+      "duration_ms": 11568,
       "log": "server-tests.txt"
     },
     {
       "label": "client-tests",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe client/node_modules/vitest/vitest.mjs run --reporter=json --outputFile=D:\\Software_Engineering\\PEW-DIY\\PEW-DIY\\docs\\verification\\sprint-1\\run\\client.json",
+      "command": "node client\\node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\client.json",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 4412,
+      "duration_ms": 4489,
       "log": "client-tests.txt"
     },
     {
       "label": "browser-migration",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe node_modules/tsx/dist/cli.mjs server/src/db/migrate.ts",
+      "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 454,
+      "duration_ms": 402,
       "log": "browser-migration.txt"
     },
     {
       "label": "browser-seed",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe node_modules/tsx/dist/cli.mjs server/src/db/seed.ts",
+      "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/seed.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 373,
+      "duration_ms": 376,
       "log": "browser-seed.txt"
     },
     {
       "label": "browser-tests",
-      "command": "C:/Users/phala/AppData/Local/npm-cache/_npx/1c56de6e9acc34f8/node_modules/node/bin/node.exe node_modules/@playwright/test/cli.js test --config e2e/playwright.config.ts --workers=3 --reporter=json",
+      "command": "node node_modules\\@playwright\\test\\cli.js test --config e2e/playwright.config.ts --workers=3 --reporter=json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 20399,
+      "duration_ms": 19769,
       "log": "browser-tests.txt"
     }
   ],
@@ -1670,6 +1673,43 @@
     "observed_exit": 1,
     "numFailedTests": 1,
     "meaning": "isolated assertion failure propagates nonzero; never included in product suite"
+  },
+  "process_checks": {
+    "TEST-F10-04": {
+      "status": "PASS",
+      "artifact": "verification.json",
+      "detail": "Actual suite counts checked; 57 AC and 77 STS IDs exactly match definitions"
+    },
+    "TEST-F10-05": {
+      "status": "PASS",
+      "artifact": "runner-failure-probe.json",
+      "detail": "Intended isolated assertion failure returned exit 1"
+    },
+    "TEST-F10-06": {
+      "status": "PASS",
+      "artifact": "setup.json",
+      "detail": "Local fresh-project rehearsal 22417ms; peer repetition pending"
+    },
+    "TEST-F10-07": {
+      "status": "PASS",
+      "artifact": "../test-excerpts.md",
+      "detail": "Actual excerpts and historical local RED records retained; human authenticity review pending"
+    },
+    "TEST-F10-08": {
+      "status": "PASS",
+      "artifact": "../workflow.json",
+      "detail": "Independent feature review identities, staging paths and real Git ancestry checked; release chain pending"
+    },
+    "TEST-F10-09": {
+      "status": "NOT_RELEASED",
+      "artifact": "release-audit.json",
+      "detail": "Actual main release and release-version regression have not been supplied; strict audit remains required"
+    },
+    "TEST-F10-10": {
+      "status": "PASS",
+      "artifact": "../workflow-and-contributions.md",
+      "detail": "Both accounts and AI disclosure documented; human confirmation pending"
+    }
   },
   "ac_results": [
     {
@@ -4149,87 +4189,24 @@
       ],
       "checks": [
         {
-          "suite": "browser",
-          "file": "sprint1-integration.spec.ts",
-          "name": "TEST-F10-01/02",
+          "kind": "process",
+          "id": "TEST-F10-04",
           "matched": [
             {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "desktop-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
-            {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "tablet-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
-            {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "mobile-chromium",
-              "status": "passed",
-              "attempts": 1
+              "name": "TEST-F10-04: Actual suite counts checked; 57 AC and 77 STS IDs exactly match definitions",
+              "file": "verification.json",
+              "status": "PASS"
             }
           ]
         },
         {
-          "suite": "server",
-          "file": "server/tests/sprint1-integration.test.ts",
-          "name": "anonymous ",
+          "kind": "process",
+          "id": "TEST-F10-05",
           "matched": [
             {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
-            },
-            {
-              "file": "server/tests/sprint1-integration.test.ts",
-              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
-              "status": "passed"
+              "name": "TEST-F10-05: Intended isolated assertion failure returned exit 1",
+              "file": "runner-failure-probe.json",
+              "status": "PASS"
             }
           ]
         }
@@ -4246,30 +4223,13 @@
       ],
       "checks": [
         {
-          "suite": "browser",
-          "file": "sprint1-integration.spec.ts",
-          "name": "TEST-F10-01/02",
+          "kind": "process",
+          "id": "TEST-F10-06",
           "matched": [
             {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "desktop-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
-            {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "tablet-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
-            {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "mobile-chromium",
-              "status": "passed",
-              "attempts": 1
+              "name": "TEST-F10-06: Local fresh-project rehearsal 22417ms; peer repetition pending",
+              "file": "setup.json",
+              "status": "PASS"
             }
           ]
         }
@@ -4287,26 +4247,24 @@
       ],
       "checks": [
         {
-          "suite": "server",
-          "file": "server/tests/loan-unit.test.ts",
-          "name": "rejects an unavailable exclusive unit",
+          "kind": "process",
+          "id": "TEST-F10-07",
           "matched": [
             {
-              "file": "server/tests/loan-unit.test.ts",
-              "name": "F-05 checkout invariant (TEST-F05-15) rejects an unavailable exclusive unit",
-              "status": "passed"
+              "name": "TEST-F10-07: Actual excerpts and historical local RED records retained; human authenticity review pending",
+              "file": "../test-excerpts.md",
+              "status": "PASS"
             }
           ]
         },
         {
-          "suite": "server",
-          "file": "server/tests/auth-routes.test.ts",
-          "name": "neither Origin nor Referer",
+          "kind": "process",
+          "id": "TEST-F10-10",
           "matched": [
             {
-              "file": "server/tests/auth-routes.test.ts",
-              "name": "Regression — missing anti-CSRF evidence (TEST-F01-15, review round 2) logout with neither Origin nor Referer is denied 403 and does NOT revoke the session",
-              "status": "passed"
+              "name": "TEST-F10-10: Both accounts and AI disclosure documented; human confirmation pending",
+              "file": "../workflow-and-contributions.md",
+              "status": "PASS"
             }
           ]
         }
@@ -4323,30 +4281,13 @@
       ],
       "checks": [
         {
-          "suite": "browser",
-          "file": "sprint1-integration.spec.ts",
-          "name": "TEST-F10-01/02",
+          "kind": "process",
+          "id": "TEST-F10-08",
           "matched": [
             {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "desktop-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
-            {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "tablet-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
-            {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "mobile-chromium",
-              "status": "passed",
-              "attempts": 1
+              "name": "TEST-F10-08: Independent feature review identities, staging paths and real Git ancestry checked; release chain pending",
+              "file": "../workflow.json",
+              "status": "PASS"
             }
           ]
         }
@@ -4364,30 +4305,24 @@
       ],
       "checks": [
         {
-          "suite": "browser",
-          "file": "sprint1-integration.spec.ts",
-          "name": "TEST-F10-01/02",
+          "kind": "process",
+          "id": "TEST-F10-09",
           "matched": [
             {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "desktop-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
+              "name": "TEST-F10-09: Actual main release and release-version regression have not been supplied; strict audit remains required",
+              "file": "release-audit.json",
+              "status": "NOT_RELEASED"
+            }
+          ]
+        },
+        {
+          "kind": "process",
+          "id": "TEST-F10-10",
+          "matched": [
             {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "tablet-chromium",
-              "status": "passed",
-              "attempts": 1
-            },
-            {
-              "file": "e2e/sprint1-integration.spec.ts",
-              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
-              "project": "mobile-chromium",
-              "status": "passed",
-              "attempts": 1
+              "name": "TEST-F10-10: Both accounts and AI disclosure documented; human confirmation pending",
+              "file": "../workflow-and-contributions.md",
+              "status": "PASS"
             }
           ]
         }
@@ -4396,96 +4331,98 @@
   ],
   "status": "AUTOMATED_CHECKS_PASS",
   "source_sha256": {
-    "server/src/config/config.ts": "d67c59ad61ee5ba7fba2d4d357c0730e8bddb55eafb222e5e03ba7e6dd268538",
-    "server/src/db/migrate.ts": "8c2673b1eacd37a0bf676ab40a6a7203d580fbbf2899ddd1805fb35927a619a9",
-    "server/src/db/migrations.ts": "adbabbf8da85e7f3fd324baa91f6019fd185884f2a96a04591e6cf0413d34282",
-    "server/src/db/pool.ts": "e4687641534af244104ab18e8399bf242568cef2eb1832819cf9d80963b688ad",
-    "server/src/db/seed.ts": "c79a6536f74352250acaacd91c5ea369ee9d21842c490a1d1f6e9724a252c2a2",
-    "server/src/index.ts": "b4e794cc2b9221c6f2eb6d43258a236dbccf1c59f5f77ff82157e484095f8553",
-    "server/src/routes/auth-routes.ts": "ccecb498ec14ee2eca413dad9ea9eddce4ddd20d96ff1d16ea067e7ff4bbb9d7",
-    "server/src/routes/equipment-routes.ts": "7bcd2fb4c82d6d1f2f3b7090d74318e8dcb1aa3916094d11e01c6bb8ecfe83da",
-    "server/src/routes/loan-routes.ts": "6f4da0ad6c2dac07434b224c72c37152f0b077eeeae5d4d60e66de3ae650c459",
-    "server/src/routes/request-routes.ts": "c0f466dcb1d2d3318b00a2b6c1bac60b7ee47e42017bb550f819a6a63d52268f",
-    "server/src/services/auth.ts": "02c8f09531c88d585cb22087cf33002f5f8421c1a2ef0940315ebd307595603c",
-    "server/src/services/authz.ts": "ec1439ea0244e404774c0d8e58aa6c910476e813d9eee15782baebdf75c03d83",
-    "server/src/services/borrowing-request.ts": "de40a8f37499ec736f9f2a99e9d3109217f74ca0d73114c38ce3ff18bb20834a",
-    "server/src/services/catalog.ts": "363ab4ac432bfd3b345a9052ef9286bafd33d9f8c5c6332037c1aec5053f0d49",
-    "server/src/services/loan.ts": "807d1a2452fc097e01c2552c20f689aa893e6cb1ee1d71e97b0f7f1d4577d1a4",
-    "server/src/services/password.ts": "70936e72b961b0668d495d93a41d2c03f2d1fe20a9d91901dcbd1f43d55d4dbd",
-    "server/src/services/session.ts": "32a9ffa7118d1e35db804592ec0fa18a0931588ad006287a6294e4680a54289c",
-    "server/tests/auth-routes.test.ts": "c12233ca4e1bb420f63b0a37c6e2c1f59fbaf837f6038010770e0db544a27241",
-    "server/tests/auth.test.ts": "e08a2ea8f1c3150e19c90130f5db8fa9317301fcb5ae856c2a18a760792597ef",
-    "server/tests/authz.test.ts": "5a38e1e9a3bcf63dc154eaab4c337b991a51b95c703e697b87a701ba21ac2094",
-    "server/tests/availability.test.ts": "3f336af00d7827924015f0cc1c9cdf40c64ccb2ffa9f22457b1b929bcf7e38f1",
-    "server/tests/borrowing-request-unit.test.ts": "96ca89b51259cc42839aab42c93e2f5530d07066c5888091de4f26d54abb9e02",
-    "server/tests/borrowing-request.test.ts": "46a95e9bd4fd716b7429adc34862b122ee1f9ac2e2d2381cbd6d773e1645807e",
-    "server/tests/catalog-ui.test.ts": "f6a8751d8392f30413518c3ffa40845224971f6ff4b3c7c8d110684f5f284b53",
-    "server/tests/catalog.test.ts": "8ca063d51d743371d33f6607005cbd5edcef538c1388177775b8b5ee99aa3d2e",
-    "server/tests/fixtures/loan-worker.ts": "5311db0ab7c9810a96bb70fb5200200aaeaf1e36585dcc8266c71d88f4eb79f4",
-    "server/tests/harness.ts": "655396e5965b16ec5626d8c78b09250651fb125cc19b60cd3ab7dacb2c082b2f",
-    "server/tests/loan-unit.test.ts": "6a92f90295f27832fb13e9582f54ccdea3b4fb111d62f64c8607fe4e30691dec",
-    "server/tests/loan.test.ts": "a9e3bc2718e38c41362ff27f5a12d417dcc00b70e11504bcafdb4b834a59c5e4",
-    "server/tests/password.test.ts": "95586931793f9c9da29687ebd3ec2d1939d72cd7b67ee033c3cf3b8868a14ab6",
-    "server/tests/restart-e2e.test.ts": "394db30a28c0f4b023224394cf9b9baa7b2b2bb27f71995edd2ed185b8f52cb9",
-    "server/tests/session.test.ts": "e057c1fedfaf2d9d6f3e65e1b86d2e8c4ceb40b8c882d59c05013ea7adc95051",
+    "server/src/config/config.ts": "bebb2c6b58bfc284078885065293bbedecc907e8b1701cad27362ad79507774a",
+    "server/src/db/migrate.ts": "ffd0ac0325cea1ee7be6f1b78b6f851612d770360e70c60720e971f969c8d73a",
+    "server/src/db/migrations.ts": "2885ac9df809eb7fb0739c87bf6de74bef75a2fbbed6f1d2a2e496c6d24e1b8f",
+    "server/src/db/pool.ts": "156f8b05e62efaa67fe3f0c31aa7272015bf7af51e7dbecf28850d5e348062f3",
+    "server/src/db/seed.ts": "56e18bf0dafff358763f8c67ff0c1ba71c9f3d49f28db0ac145af108e10a59c2",
+    "server/src/index.ts": "8abb7d0b34f83d929e49fc3608e663ac1d378dcdcd51c0cfea624ff600b7287b",
+    "server/src/routes/auth-routes.ts": "6ed8ed757cfffc63242fbbd53fbddf48ed67d13f3ba85d9a12969b7c44ea3aa7",
+    "server/src/routes/equipment-routes.ts": "77f79d6adba22f68aabfb561abb88efffceb92e2eb5f3f23abe482bfc55476b5",
+    "server/src/routes/loan-routes.ts": "e53070d53bc384b9f2a3398e65413d8aaf5360c1abfa8b9de58e708663b82f0a",
+    "server/src/routes/request-routes.ts": "9d4e24d855c23c4da6dffa56ad32e301ec513d2caff83d0ea32ab47d0953ebcd",
+    "server/src/services/auth.ts": "e7a02cac2bed895b65b3d09d2f24c22909a8215a3f9c433a68dc8ee6d41ed4d3",
+    "server/src/services/authz.ts": "cb673ef590e0a69a5bbe6538f3565486e84604dd7b1b39100306176b67b9da33",
+    "server/src/services/borrowing-request.ts": "b830492b3c74829cfb195bdf4c61807b07279a8feb00f5e21e2598d6b14abdfa",
+    "server/src/services/catalog.ts": "a5cf3ed5bd934a672b7e016fd338bd699220af84c390fb32eac8c519cc2d82bc",
+    "server/src/services/loan.ts": "584a8c59dd51493eea37ac05adac1a76762c1ea1cbdbf224c2ac409b9d3f2d64",
+    "server/src/services/password.ts": "a5674009aeeb69c98734844d4bb2afe101c0eaca7acd1081361c810ba31d845c",
+    "server/src/services/session.ts": "ddde7178d6e17af4d16dcf7745b8507c678686684bcad3aaa562bc221db4e642",
+    "server/tests/auth-routes.test.ts": "2f985950b250e84ccc6e161930fe3c3797fbc0dd9e2d054a0a23bfb8c218b4c6",
+    "server/tests/auth.test.ts": "78b790d6d56ba32cd9cbe5b2b56c4beba1b00cad5e17ce0464e26ac08b6c5a31",
+    "server/tests/authz.test.ts": "6c954fbe52893eb6e9dc242cee4f160f062c4a1775d2cece01ba595f3018a354",
+    "server/tests/availability.test.ts": "34e3b25729013a41cb7531af1144ea46dc66b10a17fa143cc476d91c58607f81",
+    "server/tests/borrowing-request-unit.test.ts": "577adfecd38b73326630b8da7a3b20cbbcfb93baf6610668873a8d024acedc23",
+    "server/tests/borrowing-request.test.ts": "0a82246a9b477ce1c598473bb9cf6c8e06a07b975067a8ed4c0c064ab65f1ab2",
+    "server/tests/catalog-ui.test.ts": "0e9c31528024d92b5e22070c6126334e4db909890c3fe3d0e35c26919de42b40",
+    "server/tests/catalog.test.ts": "511618f35a02940f06b7ed9261c9fa63e671bb33632ae50afb8177eaa375893c",
+    "server/tests/fixtures/loan-worker.ts": "c171d163fdf8851f8e73989aa4180670f9f4cf1de4fb528019ddead2f2e104e3",
+    "server/tests/harness.ts": "46dccfe229b1577aff1ed972fd5f9518ee80c15a0cb31a2cd71169e88e923b90",
+    "server/tests/loan-unit.test.ts": "1d74ce9bb30e19761ad3cacf76296188552aa7e0ad0550b4a59a221abcc7e7ee",
+    "server/tests/loan.test.ts": "5765e6f86b83025ba0415e49d5ee99de9dfed95011d1f58f893bb4b9846f3231",
+    "server/tests/password.test.ts": "133d5935116de0f5b6e59e2986658a15b1684083b17efca8ea2c04c38832ebc6",
+    "server/tests/restart-e2e.test.ts": "41f65693b281ab30e0abd90aa7f1545875955b1aad423c26f8e0d9ff4a55ee6a",
+    "server/tests/session.test.ts": "faf8dd6f4ba348ee55e7febb0bff432f85f8076196e41f7f1129b80339513361",
     "server/tests/sprint1-integration.test.ts": "3fe56c6f3b8a492d8b26bc329c1e38f98efafbc97a570bbcfeac0084ad0bce22",
-    "client/src/App.tsx": "331c2a129b8f654ea63ed424867f3b3b108be4d9a62bdacf71143e4fce6db933",
-    "client/src/components/AccountMenu.tsx": "af38970977a6678f1c657fce1ebdbbec1f2886614e72777d15a1ea5145372ab1",
-    "client/src/components/Alert.tsx": "b58ae1f12b30eefe65366c4269a93b0be3db3c2043843cb1e865eaaf9fdaca85",
-    "client/src/components/AppShell.tsx": "d2c6882d10de07706c6509fbfd290f77e90ee1005a198712a96d58646359e32c",
-    "client/src/components/AvailabilityBadge.tsx": "9b7e90c4e9baa33fa7841a3e4144ff167737ecd3cd51067ba023b3a8231f6211",
-    "client/src/components/Button.tsx": "5e93b5ab2d8b365305684b6b05b14f94ebaec5d5bb25b7982aa4556e0e011ecc",
-    "client/src/components/Card.tsx": "59e2d83f9681f429c784cf7379d39f0bdd621e86bc0d17c83e39262b08aebef5",
-    "client/src/components/CheckoutRequest.tsx": "5a53859575f6bdb1da253839204bbfc1164732ead43cb4abf4ac75062ad74269",
-    "client/src/components/DetailList.tsx": "705699b1ac6b29ec695449c15e9626e1216a45138b361a36382a04ce66e59dd6",
-    "client/src/components/EmptyState.tsx": "5bb10c0fd496340c5ed8a5d31b848c5b1b5d98a0f3998dfd0ab884e635cda28a",
-    "client/src/components/Field.tsx": "3d90007c23848b24423b795ccc746d236bbc3f19660a119f877b9b1f56975daf",
-    "client/src/components/ItemCard.tsx": "9c749baacfc2e51aaf55cf0506ed1896641e24b6b02a949d1b241380873e3d77",
-    "client/src/components/Loading.tsx": "ac0374a4f472e6be0b2051d722e47e4c473a404071568400f785ebd83efbbb1d",
-    "client/src/components/LoanDetails.tsx": "d70611e39bbd86194ace1ee71cdfd8cfd42a79c2f8ef8750835a88761411d363",
-    "client/src/components/RequestToBorrow.tsx": "085a2df16f860a1ccfaabf69b7c4dc18653ac98517698ba59c00527c28888bb4",
-    "client/src/components/Table.tsx": "ebba26c4f02e74d97d3c0c8243bec6b711970abda74a5eedb8c3c20977e2c7c8",
-    "client/src/lib/api.ts": "5b180a98660ad72cd7eb68dcc8a05e81eda8966a4aadc8ab28c16abc56cebd60",
-    "client/src/lib/paths.ts": "19e1c47c58c6f94d4015aade1deeb2e1cd7974f516d0e13a2cb17d9a18162209",
-    "client/src/lib/session.tsx": "f04d3279ec98c4979bfa828c9fdee68e7b012a6b71c57f8f2b158349d07b369c",
-    "client/src/main.tsx": "9d78eac5ba912f176e34c4a6e90c24bcd752335d46353ccb6ddad17de78e640d",
-    "client/src/pages/CatalogPage.tsx": "6539b1dd5b62cbb71707b632c92944d2627df6d9d0b12833ff94b73729a3bc6f",
-    "client/src/pages/ItemDetailPage.tsx": "3f714c6f1f82e7685bb757fa017d9d000ffa251748647e440ccd48970b991ca2",
-    "client/src/pages/LoansPage.tsx": "296ff713901aecf1fc18354932e2ddf74358badbe4769005bc854c9a6a7a8e91",
-    "client/src/pages/LoginPage.tsx": "2ff1fc0ca0c0e14fa911a76ac47736bea22d5a630d505d464392418c590cf27e",
-    "client/src/pages/RequestsPage.tsx": "bd3e9380d72605c5c041eebd6b7cef4070a59d999cd5c8cdd077ae014c818165",
-    "client/src/test/account-menu.test.tsx": "6208fe37b783ae18e778ad48efedd8273f37ecbca700d90e479cc2ddb0dc0783",
-    "client/src/test/api.test.ts": "94ec0c80b1f60210c1c7def686ed44e1318d1da0431fe1ab65c6baaa39cb6d3c",
-    "client/src/test/borrowing-request.test.tsx": "e910ab2a77df9898b531a513a2184f2da835c0e44037de38dd559b6806e7b94c",
-    "client/src/test/catalog-page.test.tsx": "65599f1e9ac22760d6ed2ec40c36456f94847b4bedb477acb0ca6270d8bad881",
-    "client/src/test/components.test.tsx": "f60593508eba1ea36b031e85697f77a2f5ac504df98cd2c94f8860786b843c20",
-    "client/src/test/item-detail-page.test.tsx": "a8337fbcf3e379f961dffe61528abf88a578396d5608910caad446bd807e6c57",
-    "client/src/test/loan.test.tsx": "662f6520f76c33e0f60f2d8e09069fcfd214591841e42c8f9bc6479aca1c45e0",
-    "client/src/test/login-page.test.tsx": "1cacfe89a35d085d5f3d13b03eeac70066efcda7d85f4015e40b772b7c540ec9",
-    "client/src/test/setup.ts": "face4f4083e652b125c314f224047feead2c5cce70d1fbe3ab10760918134d2b",
-    "e2e/pages/catalog.page.ts": "c5f6a405889a5c65a1e4d4fc91d4ca06278951ebddef850833dcd962e3a5d314",
-    "e2e/pages/fixtures.ts": "9a77c20c1f4c41b7941f73be4b102cb8aa9bb2e5f690e5719e59de0c06377d05",
-    "e2e/pages/item.page.ts": "9b2a6d8f741b600eb8eeff619e293ecba502f70170a0e72a0e772039a21d50de",
-    "e2e/pages/login.page.ts": "61eea844df672815cc35b9ed69788865b06894eddebf3e3b8409a35301b279f4",
-    "e2e/playwright.config.ts": "ffc889a1a56cc86029415423304ff0156989751b7a8c6f44ce2053dd5e95e302",
-    "e2e/specs/auth-journey.spec.ts": "30e08bb4155ff1c523761254cfc8238124083060eb3aaf108f2833235ea5f57f",
-    "e2e/specs/borrowing-request.spec.ts": "bbbb444bad32e94085b1dede870d773c2644f4b27492044e321ff1d21aa8d2e9",
-    "e2e/specs/catalog-journey.spec.ts": "84cdcdb39fc7a36af43b0e9d59656a05b69d714e79fce2f09ff16321bf99ce68",
-    "e2e/specs/checkout.spec.ts": "e5a0a42b7428f64aa4c837a89839036c82303c0a3efcce4243c5e9ff23b11679",
+    "client/src/App.tsx": "2474c3976dd8f3c00d63c7b4ee49f915b8374c402a06ea43e1ae32f3f28165ae",
+    "client/src/components/AccountMenu.tsx": "991e80a08fc811a634ad5224244b97c43fc2e05899e8abb72d64dc11a88fbc68",
+    "client/src/components/Alert.tsx": "c18db4f65ba51861ffc219987b3feeacb18110765e0b533f3dff41717e64c0e0",
+    "client/src/components/AppShell.tsx": "b14d0d7f749be65b70802935c9ef99b9a0b57a21e7e4b093f4744dc5cb4f31a5",
+    "client/src/components/AvailabilityBadge.tsx": "6846376cc18b01588fbef16b0733493cb227c2cd764119c42c05e428d923f4ca",
+    "client/src/components/Button.tsx": "bd86a3f29e99c38a72713e70281a70b685528f499f3a7795c031aff399e7a01a",
+    "client/src/components/Card.tsx": "acdd820927bb14747919809d9169eed660d40b5a032c0c96d51008449f8799aa",
+    "client/src/components/CheckoutRequest.tsx": "ed88d733cd5c41b91159587c262318e2c7575f61118fd1bb6eb097519284bf14",
+    "client/src/components/DetailList.tsx": "9201d32af4e9b8a3ff995f405532071cfdf9a557cebeb0a57cfdd7b50b103498",
+    "client/src/components/EmptyState.tsx": "b94d50122d7a6741b3027ed208580eb9a01486354891c0164dafb4f1744d9a4a",
+    "client/src/components/Field.tsx": "832f52b9f85fca7baaeb13c211a426fb0f36d58e89e00be8e292d35d5e7068a0",
+    "client/src/components/ItemCard.tsx": "a9c31cadbdbe4d12fcdd29e667825bfba282e4974f1979b949bdb95fa3a0fd0e",
+    "client/src/components/Loading.tsx": "1ed39907029e2f63cb9fa400671b5ac6372de01f8c0f76f21cfec95809775900",
+    "client/src/components/LoanDetails.tsx": "cb6c629e13c302aa2a187fbe668502a7dfecf0bf5689790bbbc5eacbb7952907",
+    "client/src/components/RequestToBorrow.tsx": "237204ecd9b1796f60c3b2b1815f371946bdc4276fdfd757ed80b66096e8a322",
+    "client/src/components/Table.tsx": "e14ad21fe6c382b800b53ebbb3281a5548ab1944b304564411a30757df667b8e",
+    "client/src/lib/api.ts": "62146e989a1cd8b7d9616261cb9896f150ad58031d73fcb092d5ca0adca45866",
+    "client/src/lib/paths.ts": "6aae5d67d746c1f47e282ab3ab646e3a40868254407c80c5d27a61f514b6f09b",
+    "client/src/lib/session.tsx": "1cb8c946d1e2574e2fd4ce76c527405186c5eeeadaacfc07110191b3e30354dd",
+    "client/src/main.tsx": "7beaf76641f65715008e940b24b541720dbf47e0d8a5a156e0a1037aba0912c8",
+    "client/src/pages/CatalogPage.tsx": "122bb78db1a71d0a11a4a0393a2fdaaeebcbb585b8c5975d1be539bca7c217ed",
+    "client/src/pages/ItemDetailPage.tsx": "fa95298fac5d515aae71597b772b601a4e4df0cc23062d817dcccc71487f42a9",
+    "client/src/pages/LoansPage.tsx": "55a99cfcd2b408ff0fcaaeb4472f224479ed1141fe97bacf15d0490a201d8ebc",
+    "client/src/pages/LoginPage.tsx": "1f4fc748c80093a9f627c1ef4accef78882fb1408153c47bd20d833268f93008",
+    "client/src/pages/RequestsPage.tsx": "719269a3e6fe4314994b08fb867b81a420d494d3c38ce35dc94cef847409cff9",
+    "client/src/test/account-menu.test.tsx": "5fc1a7c7db464cad2f3f65ecb872ba79791a40eb2211871ab8c3e06898d88c9e",
+    "client/src/test/api.test.ts": "887777e08eb37143b94d53f4167bab48433533c3b9e9b2f295889e97c37a58f8",
+    "client/src/test/borrowing-request.test.tsx": "d6f73d902cdc15fc01f012fa064c5f5a6044d42463b403876273f84c44038f64",
+    "client/src/test/catalog-page.test.tsx": "e8048d32497abe0cbd26911369a540511715b7e577f5c680a438dd64cff27300",
+    "client/src/test/components.test.tsx": "5dcab7b2270b9039facbd0c9e35dd4d6996fd5d94dbe20466d4d8fb705c53c28",
+    "client/src/test/item-detail-page.test.tsx": "92e8d3f305669d2d78f535397c88f0210781b3b67321ade7a6540fe94db25df6",
+    "client/src/test/loan.test.tsx": "3b5a7d0634515d23f43758da4018a6e6a8c3bcf9707294a4fe67cf954a2167db",
+    "client/src/test/login-page.test.tsx": "1b3a620a95c66d0f5c22cfba63eb8f1a1ceecfb870fad71c14706d80945f94f7",
+    "client/src/test/setup.ts": "50e6c4c172d1725b83c9689d0999bcd37095ab41f6e2212ad9467d5525e3c272",
+    "e2e/pages/catalog.page.ts": "bf95ea780bbc1e6a996a17f666795f2c7bb3f0462b2e17721466a07b71e85cc9",
+    "e2e/pages/fixtures.ts": "ab3bacd32f713c59af9ce6e4cd6ccc6c2ba9385784bb2da70efa028b9017f6fd",
+    "e2e/pages/item.page.ts": "363328b6dd3c0a0891f0038072b66e7b8275d0bdf592c86dbfb41d90f94802cb",
+    "e2e/pages/login.page.ts": "84aaada78aeb2b23a626aa888df9ed6869f3802de918f26801fb60e5bfe22df0",
+    "e2e/playwright.config.ts": "54d514aa09c0d5654ab9e9e685c0792848e3ef23ece7d3feb22aa2cfbef24792",
+    "e2e/specs/auth-journey.spec.ts": "ed7a2c08d605396aba7ca092e3534864f5708498133fb2fa74a34b740d3b1581",
+    "e2e/specs/borrowing-request.spec.ts": "04ab35a47f2d2641659ee674aac888c8b1de0635de7a0dcfd209b25bb0e2ff19",
+    "e2e/specs/catalog-journey.spec.ts": "c047d9920239f091056eb051afe994b7bd41289184c1212efc7627fc995f3a21",
+    "e2e/specs/checkout.spec.ts": "de9500544c5c1c6fc8d82e3b8ecca825ed8239a623fe5c28a6c91ad5458670c2",
     "e2e/specs/sprint1-integration.spec.ts": "b6e5e1d1c3ed8c3678917ed4bbc5cab46b5e7da3f71fae770e826bf1f1c07ca6",
-    "e2e/specs/ui-states.spec.ts": "8c9f96759f30a59720419b70bd570af7587e3ba2cb37a09fcc4e99ebf055fddf",
-    "e2e/tsconfig.json": "306f7ad7a0485e1a33ec690d58b16b5993de3b9f13e77522157999e031b50fae",
-    "scripts/audit-sprint1-evidence.mjs": "be6a435a24e0619598e4e584af338d7e9fb4763c457fb1027c2c3977570a531e",
+    "e2e/specs/ui-states.spec.ts": "bcae89908e029fb61098bf37c37fff24b9f9b2d93ce11bdcf0d0a540bc263fb5",
+    "e2e/tsconfig.json": "e8d9eec0e0e1aa4342a3e320fccac91ecbcc6495e097404e4399a666fc193c84",
+    "scripts/audit-sprint1-evidence.mjs": "c4cc0c86be8f1415dd687c25ecbf62ba6db1d381a4a337b77ec7a226dd859f1e",
+    "scripts/evidence-utils.mjs": "da645b5d204421e8de471cdb47d9ad75b5d8ef0d43ad17aeb310fdaba5df6907",
     "scripts/migrate-test.mjs": "b9f790f456b2532ee465eb4a44d8e6a66a84101e8095e32061f7467e64a43669",
-    "scripts/rehearse-setup.mjs": "ef06dfeaa26e7cf144636c34bdf776fc9bb2a21ae51a1305b07322a6af806db0",
-    "scripts/sprint1-ac-map.json": "eea28698a73bf208a9253fd610ad91633fa78e02b334721a6a8f6fd20052b4e8",
-    "scripts/verify-sprint1.mjs": "06b177b7c03cfa18162350cdc25f6e4afd0351f349ad707d474a4ab60a0fe13b",
-    "package.json": "cc15b8cbba66f2757ec2d28b04cda71df8ca8404c8347f91765c32f26bc00d88",
-    "package-lock.json": "e1e9ccdd7ddbf55a57d63384de64f8152309d4f3074391f10f6eb8a96e383c7e",
-    "client/package.json": "5a3a7031216f93170e227f1ca5db9697d65ee00277e10d9198f3ead6a0ee6db8",
-    "client/package-lock.json": "084b307a30b414f52540fe75194d9f71cb9027a661d3622daa36e973379e16fb",
-    "vitest.config.ts": "40e8c4a771067d820a27e3902ecc0bf72df80d074a8e6cf2f500ba98a1413f26",
-    "client/vite.config.ts": "2f29cbacb9aa5a212a9e993899f5d093c614a80128851a5bf524b197576436f0"
+    "scripts/rehearse-setup.mjs": "bd8175c4dc260a698917939d1a7024d55a846acfd8c102016451b34be10f29b5",
+    "scripts/sprint1-ac-map.json": "dd4eb2fe2e35111aac43bb0d90bf342ca5f6783ba0022ac82367b55dbb35aebc",
+    "scripts/tests/evidence.test.mjs": "ddf1209b5dcc9a30addc4d30baadb5ccadd8976fe0b252acc0de6129d6e68c53",
+    "scripts/verify-sprint1.mjs": "1017aa9cef8f704d2baf79e0454cbe5066bea25b8e1ed888fdfb58bc7ddcfee6",
+    "package.json": "96f7aba7576d64155114111b1f1963425bb230555b6f011b9b7fa2fbb096f39c",
+    "package-lock.json": "2bc5080695e65cf43a2a1310039f0162a3595cbcaf47db7d63e98882176cfe3c",
+    "client/package.json": "c8a7a0be15f5f8d671665f0ce767494baf420be79e178089bdf56f58091cbc47",
+    "client/package-lock.json": "3ba503fde30e94ba374d4306bd4aa822020c2fcb533424b1c8e76660dfc71830",
+    "vitest.config.ts": "d1963ec8702244c73463fd046d527b2603f419c647bbfc99c389d3fc8062660a",
+    "client/vite.config.ts": "557322b92c09ebd58b102bcac18737090633e87054525bebd43218db56716a3a"
   },
-  "completed_at": "2026-11-06T19:01:58.968Z"
+  "completed_at": "2026-11-06T19:51:38.120Z"
 }

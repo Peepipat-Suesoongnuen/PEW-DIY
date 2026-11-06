@@ -2,6 +2,6 @@
   "command": "node scripts/audit-sprint1-evidence.mjs --require-release",
   "expected_exit": 2,
   "actual_exit": 2,
-  "meaning": "release gate correctly refuses absent main release",
-  "captured_at": "2026-11-06T19:04:12.492Z"
+  "meaning": "Clean committed source validated; missing main release correctly returns NOT_RELEASED",
+  "captured_at": "2026-11-06T19:52:23.848Z"
 }
