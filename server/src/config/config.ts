@@ -25,6 +25,8 @@ function loadDotEnv(): void {
 loadDotEnv();
 
 export interface AppConfig {
+  /** No implicit host-zone fallback; absent policy disables checkout. */
+  appTimezone?: string;
   databaseUrl: string;
   port: number;
   /** Trusted browser origin for anti-CSRF origin enforcement (cookie mode). */
@@ -55,7 +57,9 @@ function requiredPositiveInt(name: string, env: NodeJS.ProcessEnv): number {
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
+  if (env.APP_TIMEZONE) new Intl.DateTimeFormat("en-US", { timeZone: env.APP_TIMEZONE }).format();
   return {
+    appTimezone: env.APP_TIMEZONE || undefined,
     databaseUrl: required("DATABASE_URL", env),
     port: requiredPositiveInt("PORT", env),
     appOrigin: required("APP_ORIGIN", env),

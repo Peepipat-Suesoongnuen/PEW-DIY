@@ -36,6 +36,11 @@ export interface BorrowingRequest {
   status: "SUBMITTED" | "CHECKED_OUT";
 }
 
+export interface Loan {
+  id: string; request_id: string; borrower_id: string; equipment_id: string;
+  quantity_borrowed: number; checked_out_by: string; checkout_at: string; due_on: string; status: "ACTIVE";
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -90,6 +95,11 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
 }
 
 export const api = {
+  checkout(requestId: string) {
+    return apiFetch<{ data: Loan }>(`/api/requests/${encodeURIComponent(requestId)}/checkout`, { method: "POST", body: "{}" });
+  },
+  listLoans() { return apiFetch<{ data: Loan[] }>("/api/loans"); },
+  getLoan(id: string) { return apiFetch<{ data: Loan }>(`/api/loans/${encodeURIComponent(id)}`); },
   login(username: string, password: string) {
     return apiFetch<{ data: { user: User } }>("/api/auth/login", {
       method: "POST",

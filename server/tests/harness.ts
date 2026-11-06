@@ -26,6 +26,9 @@ export const PROTECTED_ROUTE_INVENTORY: ReadonlyArray<{
   sampleBody?: Record<string, unknown>;
 }> = [
   { method: "GET", path: "/api/auth/me" },
+  { method: "POST", path: "/api/requests/fixture-r-one/checkout", sampleBody: {} },
+  { method: "GET", path: "/api/loans" },
+  { method: "GET", path: "/api/loans/fixture-loan" },
   { method: "POST", path: "/api/auth/logout", sampleBody: {} },
   // F-02 catalog routes (registered so TEST-F01-05/06/09 expand automatically).
   { method: "GET", path: "/api/equipment" },

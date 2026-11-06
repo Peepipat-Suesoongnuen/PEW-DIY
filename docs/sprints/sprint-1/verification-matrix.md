@@ -15,8 +15,8 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 | [f-01-authentication.md](f-01-authentication.md) | 12 | 16 | PARTIAL — implemented (Issue #8); executed results in [tdd-evidence-f01.md](tdd-evidence-f01.md); per-row mapping pending |
 | [f-02-equipment-catalog.md](f-02-equipment-catalog.md) | 8 | 10 | PARTIAL — implemented (Issue #9, PR #27); executed results in [tdd-evidence-f02.md](tdd-evidence-f02.md); per-row mapping pending |
 | [f-03-equipment-availability.md](f-03-equipment-availability.md) | 7 | 11 | PARTIAL — implemented (Issue #10); TEST-F03-01/03/05/06 + 08-UI executed, 02/09 dependency-gated on #11/#12 schema — [tdd-evidence-f03.md](tdd-evidence-f03.md) |
-| [f-04-borrowing-request.md](f-04-borrowing-request.md) | 10 | 14 | PLANNED — NOT RUN (not implemented; Issue #11) |
-| [f-05-checkout-active-loan.md](f-05-checkout-active-loan.md) | 12 | 16 | PLANNED — NOT RUN (not implemented; Issue #12) |
+| [f-04-borrowing-request.md](f-04-borrowing-request.md) | 10 | 14 | Implemented PR #36; [historical F-04 results](tdd-evidence-f04.md); fulfilled-state behavior additionally verified by #12 ([evidence](tdd-evidence-f05.md)) |
+| [f-05-checkout-active-loan.md](f-05-checkout-active-loan.md) | 12 | 16 | EXECUTED locally — implemented #12; [per-STS evidence](tdd-evidence-f05.md); peer review/baseline/release pending |
 | [f-10-integration-verification.md](f-10-integration-verification.md) | 8 | 10 | PLANNED — NOT RUN (not implemented; Issue #13) |
 | **Total** | **57** | **77** | **Partial runtime results — tdd-evidence-f01/f02/f03.md; per-row PASS mapping pending** |
 
@@ -72,8 +72,8 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 | [AC-F04-02](f-04-borrowing-request.md) | [TEST-F04-02](f-04-borrowing-request.md), [TEST-F04-13](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
 | [AC-F04-03](f-04-borrowing-request.md) | [TEST-F04-03](f-04-borrowing-request.md), [TEST-F04-04](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
 | [AC-F04-04](f-04-borrowing-request.md) | [TEST-F04-05](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | PARTIAL — F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | PARTIAL — F-05-dependent portion gated ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | EXECUTED locally — #12 transition coverage ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | EXECUTED locally — #12 transition coverage ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
 | [AC-F04-07](f-04-borrowing-request.md) | [TEST-F04-08](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
 | [AC-F04-08](f-04-borrowing-request.md) | [TEST-F04-09](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
 | [AC-F04-09](f-04-borrowing-request.md) | [TEST-F04-10](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
@@ -83,18 +83,18 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F05-01](f-05-checkout-active-loan.md) | [TEST-F05-01](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-02](f-05-checkout-active-loan.md) | [TEST-F05-02](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-03](f-05-checkout-active-loan.md) | [TEST-F05-03](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-04](f-05-checkout-active-loan.md) | [TEST-F05-04](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-05](f-05-checkout-active-loan.md) | [TEST-F05-06](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-06](f-05-checkout-active-loan.md) | [TEST-F05-07](f-05-checkout-active-loan.md), [TEST-F05-08](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-07](f-05-checkout-active-loan.md) | [TEST-F05-09](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-08](f-05-checkout-active-loan.md) | [TEST-F05-10](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-09](f-05-checkout-active-loan.md) | [TEST-F05-11](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-10](f-05-checkout-active-loan.md) | [TEST-F05-12](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-11](f-05-checkout-active-loan.md) | [TEST-F05-13](f-05-checkout-active-loan.md) | NOT RUN |
-| [AC-F05-12](f-05-checkout-active-loan.md) | [TEST-F05-14](f-05-checkout-active-loan.md) | NOT RUN |
+| [AC-F05-01](f-05-checkout-active-loan.md) | [TEST-F05-01](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-02](f-05-checkout-active-loan.md) | [TEST-F05-02](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-03](f-05-checkout-active-loan.md) | [TEST-F05-03](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-04](f-05-checkout-active-loan.md) | [TEST-F05-04](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-05](f-05-checkout-active-loan.md) | [TEST-F05-06](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-06](f-05-checkout-active-loan.md) | [TEST-F05-07](f-05-checkout-active-loan.md), [TEST-F05-08](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-07](f-05-checkout-active-loan.md) | [TEST-F05-09](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-08](f-05-checkout-active-loan.md) | [TEST-F05-10](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-09](f-05-checkout-active-loan.md) | [TEST-F05-11](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-10](f-05-checkout-active-loan.md) | [TEST-F05-12](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-11](f-05-checkout-active-loan.md) | [TEST-F05-13](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-12](f-05-checkout-active-loan.md) | [TEST-F05-14](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
 
 ### F-10
 
@@ -215,3 +215,5 @@ The seven parent criteria include actual build/TDD/review/release evidence; the 
 F-04 update (2026-11-06): request-only actual execution is recorded above and in [F-04 evidence](tdd-evidence-f04.md); TEST-F04-06/07 remain partial until #12. No earlier feature status or deferred acceptance is promoted by this change.
 
 Revision 3 (2026-11-06): linked F-04 actual candidate results, preserving F-05-dependent partial AC/STS; added no new AC IDs or test-pass claims for other features.
+
+F-05 execution update (2026-11-07): all 16 STS designs have actual local coverage in [F-05 evidence](tdd-evidence-f05.md), with 115 server / 70 client / 51 browser cases passing. F-04 submitted-to-fulfilled and staff queue exclusion are now additionally exercised by `server/tests/loan.test.ts`; earlier request-only evidence is preserved. Loan-dependent F-03 cases run with the actual migration003 on a fresh DB; no historical run is relabeled. Shared-baseline approval, teammate ratification, integration and release remain pending.

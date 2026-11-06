@@ -33,6 +33,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 Catalog
               </NavLink>
               <NavLink to="/requests" className={navLinkClass}>{user?.role === "CUSTODIAN" ? "Submitted requests" : "My requests"}</NavLink>
+              {user?.role === "BORROWER" ? <NavLink to="/loans" className={navLinkClass}>My loans</NavLink> : null}
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -50,6 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         {menuOpen ? (
           <div className="border-t border-border px-4 py-2 md:hidden">
+            {user?.role === "BORROWER" ? <NavLink to="/loans" className={navLinkClass} onClick={() => setMenuOpen(false)}>My loans</NavLink> : null}
             <NavLink to="/catalog" className={navLinkClass} onClick={() => setMenuOpen(false)}>
               Catalog
             </NavLink>
