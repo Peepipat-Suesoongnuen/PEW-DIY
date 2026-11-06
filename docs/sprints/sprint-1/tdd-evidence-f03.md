@@ -73,11 +73,20 @@ serves correct values; on the current test DB (relations present from the
 pre-MOVE development migration) the gated tests run and pass against the
 linkage path. Both code paths therefore execute real reads.
 
+**Important limitation (PR #35 review P2):** the residue-DB results above only
+prove the linkage code path works against a schema-shaped database — they are
+**not** evidence that integration is ready on a clean deployment. The gated
+tests stay **DEPENDENCY-GATED / blocked** in release and issue tracking until
+#11/#12 ship their real migrations, and a full re-run on a **clean DB after
+`npm run migrate`** is required before any AC-F03/AC-06.3 row dependent on
+them may leave the gated state.
+
 ## Test results (post-MOVE, all suites)
 
 | Suite | Command | Result |
 |---|---|---|
-| Server (runnable F-03 tests + existing suite) | `npm test` | **65/65 passed** (9 files) — with the pre-MOVE residue relations present, the 5 gated tests also execute and pass; on a clean DB they skip until #11/#12 ship DDL |
+| **Clean-DB state (authoritative for deployment readiness)** | `npx vitest run server/tests/availability.test.ts` against a fresh DB (no Request/Loan relations) | **4 passed \| 5 skipped** — runnable = TEST-F03-01/03/05/06; the 5 gated tests correctly skip until #11/#12 ship DDL |
+| Server suite (runnable F-03 tests + existing suite) | `npm test` | **65/65 passed** (9 files) — **caveat:** this run used the local test DB that still contains empty pre-MOVE residue relations, so the 5 gated tests executed against the linkage path here; this number must not be read as clean-deployment integration readiness (see limitation above) |
 | Client | `npm --prefix client test` | **43/43 passed** |
 | Core UI E2E (3 viewports) | `npm run test:e2e` | **36/36 passed** |
 | Builds / typecheck | `npm run build`, `build:client`, client `tsc --noEmit` | exit 0 |
@@ -106,4 +115,4 @@ linkage path. Both code paths therefore execute real reads.
 - **No stored availability counter** (f-03 §4): values are derived at read time; "update after checkout" therefore requires no availability write — a committed loan row changes the next fresh read (gated test), and the real checkout trigger is F-05's transaction (Issue #12, "ผูกกับ #12" per Issue #10 task 3).
 - **No clamping** (f-03 §2): `held > total` raises `AvailabilityIntegrityError` → safe 500; `max(0, …)` is deliberately absent.
 - **OQ-02 unchanged:** every scenario uses quantity-one loans (f-03 §2); no multi-unit policy is assumed.
-- **Dev/test DB residue:** the pre-MOVE development migration left empty `borrowing_requests`/`loans` tables in the local dev/test databases (0 rows — verified). Left in place deliberately (no DROP without team sign-off); #11/#12 migrations should assert shape or the team may drop the empty residue before landing their DDL.
+- **Dev/test DB residue:** the pre-MOVE development migration left empty `borrowing_requests`/`loans` tables in the local dev/test databases (0 rows — verified). Left in place deliberately (no DROP without team sign-off); #11/#12 migrations should assert shape or the team may drop the empty residue before landing their DDL. Per the limitation above, any gated test that passes on these residue relations must be **re-run on a clean DB after the real #11/#12 migrations** before its AC status may change.
