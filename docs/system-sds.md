@@ -55,6 +55,16 @@ Before [D1-05] is baselined, record the team's exact selections and rationale in
 | Identity transport | Server session + HttpOnly cookie (SameSite=Lax) + trusted-origin anti-CSRF; idle/absolute expiry; durable revocation in DB | PR #22 `server/src/services/session.ts`, `auth-routes.ts`; tests TEST-F01-07/08/15/16 |
 | Test tooling | Vitest + Supertest | PR #22 `server/tests` (39 tests) |
 
+**Update (UI-02, Issue #33 — frontend selection recorded per ARCH-01 P1 gate):**
+the Web UI layer is now selected and implemented: **React + Vite + TypeScript +
+Tailwind CSS v4 (CSS-first `@theme` tokens) + Lucide Icons** (Approved team
+decisions; ARCH-01 proposal PR #29). The built client (`client/dist`) is served
+by the same Express application (SPA history fallback for non-`/api` HTML
+navigations; legacy `.html` pages coexist until migration phase P4 — ARCH-01
+§12.1). Component/page tests: Vitest + Testing Library (`client/src/test`);
+Core UI E2E: Playwright (`e2e/`, three confirmed viewports). Evidence:
+`docs/sprints/sprint-1/ui-02-evidence.md`.
+
 ### 2.2 Logical Architecture — Proposed Modular Monolith
 
 The course permits a modular monolith: UI, API/application, and database are logical responsibilities, not a requirement for three servers or containers. One application can serve the UI and API; the database remains a durable store.

@@ -10,6 +10,7 @@
 import express, { Request, Response, Router, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import { randomUUID } from "crypto";
+import { existsSync } from "fs";
 import path from "path";
 import { AuthService } from "../services/auth";
 import { createAuthMiddleware, AuthenticatedRequest } from "../services/authz";
@@ -158,16 +159,51 @@ export function createApp({ auth, config }: AppDeps): express.Application {
   // Mounted before the unknown-route 404 handler; shares the auth guard.
   app.use("/api", createEquipmentRouter({ auth, cookieName: config.session.cookieName }));
 
-  // Static UI shell from client/ (F-02 catalog screens; framework-free
-  // placeholder per client/README — no framework decision is made here).
+  // Static UI (UI-02, ARCH-01 §12.1 coexistence plan):
+  // - The React application build is served from client/dist (index.html at
+  //   "/", hashed assets under /assets) — `vite build` output.
+  // - The legacy framework-free pages (client/*.html, F-02) keep being served
+  //   at their .html paths until they are retired at migration phase P4.
+  // - `index: false` on client/ keeps its Vite source entry (client/index.html)
+  //   from shadowing the built app shell at "/".
+  // Real files always win over the SPA fallback below.
+  const clientDistDir = path.resolve(process.cwd(), "client", "dist");
+  app.use(express.static(clientDistDir));
   const clientDir = path.resolve(process.cwd(), "client");
-  app.use(express.static(clientDir));
+  app.use(express.static(clientDir, { index: false }));
 
   // Unknown /api routes: safe 404 without leaking implementation details.
   app.use("/api", (_req: Request, res: Response) => {
     res.status(404).json({
       error: { code: "NOT_FOUND", message: "Resource not found.", requestId: "n/a" },
     });
+  });
+
+  // SPA history fallback (ARCH-01 §12.1): GET/HEAD navigations that accept
+  // HTML, are not /api/* and matched no real file receive the React app shell
+  // so direct URLs and browser refreshes work for all client routes. /api/*
+  // can never fall through to index.html — the JSON 404 above handles it
+  // first. Without a client build (fresh clone), requests fall through to the
+  // default 404 instead.
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      next();
+      return;
+    }
+    if (req.path.startsWith("/api/")) {
+      next();
+      return;
+    }
+    if (!req.accepts("html")) {
+      next();
+      return;
+    }
+    const appShell = path.join(clientDistDir, "index.html");
+    if (!existsSync(appShell)) {
+      next();
+      return;
+    }
+    res.sendFile(appShell);
   });
 
   // Safe error handler — LAST. Converts body-parser and unexpected auth/storage

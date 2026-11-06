@@ -30,3 +30,7 @@ node_modules/
 
 # Build output
 dist/
+
+# Playwright artifacts (UI-02 e2e)
+test-results/
+playwright-report/
