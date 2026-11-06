@@ -1,6 +1,6 @@
 # PR38 review remediation
 
-Review target: `2b76abbf7be1d6384ee4ae2dffa1808f71aeda82`; [review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5805879906). The user authorized two local commits only; no push or GitHub write.
+Review target: `2b76abbf7be1d6384ee4ae2dffa1808f71aeda82`; [review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5805879906). The previous agent authorization covered two local commits only and excluded push and GitHub writes. Actual repository state is separate: GitHub PR38 now has reviewed head `43bcdfe`, so the first remediation was subsequently published. This new local remediation does not itself authorize any further push or remote PR edit.
 
 | Finding | Remediation | Verification |
 |---|---|---|
@@ -14,3 +14,19 @@ The complete server/client/browser regression remains164/70/54. Native tooling r
 The PR38 reviewer separately reports164/70/54 on Node24.19.0/PostgreSQL17.11, setup11.957s (warm cache). Local reruns use Node24.15.0/PostgreSQL18.4. Reviewer results are attributed in pr38-reviewer-results.json and not presented as local PG17 execution. CI/branch protection remain outside this bounded F10 remediation. Issue13 remains open for human gates and reviewed main release.
 
 Release audit behavior: invalid/candidate source exits1; committed matching source with absent main release/human approvals exits2 NOT_RELEASED. An evidence-only commit must retain the tested source SHA, not rewrite it to pretend the evidence commit tested itself.
+
+## Latest independent re-review (review 5806364064)
+
+Reviewed head: `43bcdfe`; [review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5806364064). The reviewer confirms the previous four P2 findings are fixed. This round addresses:
+
+| Finding | Change |
+|---|---|
+| P2-1 stale setup evidence | Require CLEAN_SOURCE_COMMIT and exact setup/verification tested_commit equality, successful rehearsal and valid duration before any suite/DB connection; independently enforce the same setup relationship in audit |
+| P2-2 omitted product files | Share a complete manifest across dirty-source guard, fingerprints and audit; include HTML/CSS/config/assets and root configuration; audit exact key sets, tested Git blobs and current files |
+| P3-1/2/3 traceability | Separate original2b76abb, first source8bff092 and published evidence43bcdfe; distinguish authorization from actual GitHub state; prepare updated PR text locally |
+| P3-4 CI/protection | Record as known gap; no repository setting changes |
+| P3-5 missing files | ENOENT produces a dirty source entry, including staged/unstaged deletions |
+| P3-6 historical SHAs | Explicit full-history prerequisite with actionable shallow-clone failure |
+| P3-7 release status | NOT_RELEASED is pending and absent from matched/pass checks; affected AC stays PARTIAL |
+
+New regression tests reproduce omitted HTML/config/CSS changes, new assets, deleted files, incomplete hash maps and mismatched/candidate setup. Binary asset hashes are byte-exact. The initial RED run had5 passed/5 failed, including the actual false-clean HTML/deletion cases. The user authorized two additional local commits for this round (source/docs, then regenerated evidence), with no push or GitHub write. Full verification will run after the clean source commit; old artifacts must not be presented as this round's results.

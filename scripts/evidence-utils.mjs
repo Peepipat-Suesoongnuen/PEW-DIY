@@ -44,33 +44,70 @@ export async function sanitizeArtifacts(dir, scrub) {
     }
   }
 }
-export function sourceState(root) {
-  const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8", windowsHide: true }).trim();
-  const files = [...git("ls-files", "-z").split("\0"), ...git("ls-files", "--others", "--exclude-standard", "-z").split("\0")]
-    .filter((n) => /^(server\/|client\/(src\/|.*config)|e2e\/|scripts\/)|^(package(?:-lock)?\.json|client\/package(?:-lock)?\.json|vitest\.config\.ts)$/.test(n))
-    .filter((n) => /\.(mjs|cjs|js|ts|tsx|json)$/.test(n));
-  const dirty = [];
-  for (const name of new Set(files)) {
-    let blob;
-    try { blob = execFileSync("git", ["show", `HEAD:${name}`], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); } catch { dirty.push(name); continue; }
-    if (canonicalHash(readFileSync(path.join(root, name), "utf8")) !== canonicalHash(blob)) dirty.push(name);
+const gitText = (root, ...args) => execFileSync("git", args, { cwd: root, encoding: "utf8", windowsHide: true, stdio: ["ignore", "pipe", "pipe"] }).trim();
+// All product/test/tooling trees, regardless of extension (HTML/CSS/assets included).
+// Root build/package/environment configuration is included; documentation/evidence
+// is excluded so that a source-preserving evidence commit can follow a tested commit.
+const relevant = (name) => Boolean(name) && !/\.md$/i.test(name) &&
+  (/^(server|client|e2e|scripts)\//.test(name) || !name.includes("/"));
+export function sourceFiles(root, commit) {
+  const lists = commit
+    ? [gitText(root, "ls-tree", "-r", "--name-only", "-z", commit)]
+    : [gitText(root, "ls-tree", "-r", "--name-only", "-z", "HEAD"), gitText(root, "ls-files", "-z"), gitText(root, "ls-files", "--others", "--exclude-standard", "-z")];
+  return [...new Set(lists.flatMap((list) => list.split("\0")).filter(relevant))].sort();
+}
+export function hashSource(name, bytes) {
+  return /\.(?:[cm]?js|tsx?|json|html|css|svg|txt|ya?ml)$|(?:^|\/)(?:\.env[^/]*|\.gitignore|\.gitattributes|\.npmrc)$/.test(name)
+    ? canonicalHash(bytes.toString("utf8")) : createHash("sha256").update(bytes).digest("hex");
+}
+function currentHash(root, name) {
+  try { return hashSource(name, readFileSync(path.join(root, name))); }
+  catch (error) { if (error.code === "ENOENT") return null; throw error; }
+}
+export function sourceFingerprints(root) {
+  return Object.fromEntries(sourceFiles(root).map((name) => [name, currentHash(root, name)]));
+}
+export function assertFullHistory(root) {
+  if (gitText(root, "rev-parse", "--is-shallow-repository") === "true") {
+    throw new Error("Full Git history is required for workflow/TDD ancestry; use a full clone or git fetch --unshallow before rehearsal, verification and audit");
   }
-  const head = git("rev-parse", "HEAD");
+}
+export function assertSetupEvidence(setup, state) {
+  if (setup.version_kind !== "CLEAN_SOURCE_COMMIT") throw new Error("Setup evidence must be from a clean source commit; rerun rehearse:sprint1");
+  if (!state.tested_commit || !setup.tested_commit || setup.tested_commit !== state.tested_commit) throw new Error("Setup evidence commit must exactly match verification tested_commit; rerun rehearse:sprint1 on this source commit");
+  if (setup.status !== "LOCAL_REHEARSAL_PASS" || setup.target_met !== true || !Number.isFinite(setup.duration_ms) || setup.duration_ms < 0 || setup.duration_ms > 900000) {
+    throw new Error("Setup evidence did not pass the 15-minute target; rerun rehearse:sprint1");
+  }
+}
+export function sourceState(root) {
+  const dirty = [];
+  for (const name of sourceFiles(root)) {
+    let blob;
+    try { blob = execFileSync("git", ["show", `HEAD:${name}`], { cwd: root, stdio: ["ignore", "pipe", "pipe"] }); } catch { dirty.push(name); continue; }
+    if (currentHash(root, name) !== hashSource(name, blob)) dirty.push(name);
+  }
+  const head = gitText(root, "rev-parse", "HEAD");
   return { head_commit: head, tested_commit: dirty.length ? null : head,
     version_kind: dirty.length ? "WORKING_TREE_CANDIDATE" : "CLEAN_SOURCE_COMMIT",
-    source_dirty_files: dirty.sort(), fingerprint_format: "SHA-256 of UTF-8 source with CRLF normalized to LF" };
+    source_dirty_files: dirty.sort(), fingerprint_format: "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest" };
 }
 export function assertSourceVersion(run, root, allowCandidate = false) {
   const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
   if (!run.tested_commit && !allowCandidate) throw new Error("Verification source is an uncommitted candidate; commit source and rerun verify:sprint1");
+  const expected = sourceFiles(root, run.tested_commit || undefined);
+  const actual = Object.keys(run.source_sha256 ?? {}).sort();
+  if (JSON.stringify(expected) !== JSON.stringify(actual) || JSON.stringify(sourceFiles(root)) !== JSON.stringify(actual)) {
+    throw new Error("Source fingerprint key set is incomplete or differs from tested/current product files; rerun rehearsal and verification");
+  }
+  if (run.tested_commit && (run.version_kind !== "CLEAN_SOURCE_COMMIT" || sourceState(root).source_dirty_files.length)) throw new Error("Committed evidence requires clean source; dirty source detected relative to HEAD");
   if (run.tested_commit) {
     execFileSync("git", ["merge-base", "--is-ancestor", run.tested_commit, head], { cwd: root, stdio: "ignore" });
     for (const [name, hash] of Object.entries(run.source_sha256 ?? {})) {
-      const blob = execFileSync("git", ["show", `${run.tested_commit}:${name}`], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-      if (canonicalHash(blob) !== hash) throw new Error("Fingerprint differs from tested source commit: " + name);
+      const blob = execFileSync("git", ["show", `${run.tested_commit}:${name}`], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
+      if (hashSource(name, blob) !== hash) throw new Error("Fingerprint differs from tested source commit: " + name);
     }
   }
-  if (!Object.keys(run.source_sha256 ?? {}).length || !Object.entries(run.source_sha256).every(([name, hash]) => digestFile(path.join(root, name)) === hash)) {
+  if (!actual.length || !Object.entries(run.source_sha256).every(([name, hash]) => hash !== null && currentHash(root, name) === hash)) {
     throw new Error("Recorded source fingerprints do not match current source");
   }
   return head;

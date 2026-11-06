@@ -67,14 +67,19 @@ npm --prefix client run typecheck
 The complete F-10 runner uses fresh, isolated server/browser schemas inside TEST_DATABASE_URL, generates private seed passwords, builds, migrates, runs server/client/browser suites, records source fingerprints and audits all57 contract AC mappings. The test role needs CREATE SCHEMA privilege. Output is `docs/verification/sprint-1/run/`; no dev-data reset, Git write or release occurs.
 
 ```powershell
+npm run rehearse:sprint1
 npm run verify:sprint1
+npm run audit:sprint1
 ```
-Commit application/test/verification source before a commit-verification run. The runner refuses dirty source by default; `npm run verify:sprint1 -- --allow-working-tree` is an explicit local-candidate mode with `tested_commit=null`, never a clean-commit claim. Audit uses canonical LF-normalized hashes and the tested Git blobs, so a later evidence-only commit can retain valid evidence without a self-referential SHA. `npm run audit:sprint1 -- --allow-working-tree` inspects a local candidate; the strict release audit never accepts this override.
+Commit application/test/verification source first, then run **rehearse:sprint1 -> verify:sprint1 -> audit:sprint1** on that same clean source commit. Verification rejects setup evidence unless it is CLEAN_SOURCE_COMMIT, names the exact verification tested_commit, and passed the 15-minute target. This preflight runs before any DB connection or suite. Rehearse again after every new source commit, including a source-preserving evidence commit when starting a new verification run.
 
+The complete manifest includes product/test/tooling trees (HTML, CSS, configs and binary assets) plus root configuration, excluding Markdown and generated documentation/evidence. Text fingerprints normalize CRLF to LF; binary assets are byte-exact. Audit requires the exact complete key set and checks tested Git blobs, current files and dirty source relative to HEAD. A later source-preserving evidence commit can retain a previous valid run without a self-referential SHA.
+
+**Full Git history is required** for sampled workflow and historical TDD ancestry checks. Use a full clone, or run `git fetch --unshallow` for an existing shallow clone before reproduction. The scripts report this prerequisite explicitly. A dirty source is rejected by default; `--allow-working-tree` cannot bypass the requirement for clean, matching setup evidence and cannot produce an integrated PASS. Strict release audit never accepts candidate provenance.
 
 For standalone E2E, point DATABASE_URL and TEST_DATABASE_URL at a separately migrated and freshly seeded disposable browser DB with matching private seed passwords, set APP_ORIGIN/E2E_BASE_URL to its app origin, then run `npm run test:e2e`. The F-05 browser scenarios create their own temporary schemas; the F-10 runner handles isolation/credentials automatically.
 
-An optional local README setup rehearsal runs npm ci in a new source directory, creates two fresh databases and checks actual seeded login/catalog plus the built React shell. It requires `tar` (bundled on current Windows) and CREATE DATABASE privilege on the dedicated test DB owner, and removes only its own generated databases/directory afterward:
+The required local README setup rehearsal runs npm ci in a new source directory, creates two fresh databases and checks actual seeded login/catalog plus the built React shell. It requires `tar` (bundled on current Windows) and CREATE DATABASE privilege on the dedicated test DB owner, and removes only its own generated databases/directory afterward:
 
 ```powershell
 npm run rehearse:sprint1

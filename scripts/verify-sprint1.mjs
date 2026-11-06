@@ -1,14 +1,13 @@
 /** F-10: real suites, isolated schemas, machine-readable outcomes, no Git writes. */
 import { spawn, execFileSync } from "node:child_process";
 import { mkdir, mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { randomBytes, randomUUID, createHash } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import path from "node:path";
 import os from "node:os";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import net from "node:net";
 import pg from "pg";
-import { createSanitizer, digestFile, sourceState, sanitizeArtifacts, writeEvidence } from "./evidence-utils.mjs";
+import { createSanitizer, sourceFingerprints, sourceState, assertSetupEvidence, assertFullHistory, sanitizeArtifacts, writeEvidence } from "./evidence-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = (p) => path.relative(root, p).replaceAll("\\", "/");
@@ -71,18 +70,15 @@ async function failureHarness(env) {
 function suiteCases(result) {
   return result.testResults.flatMap((file) => file.assertionResults.map((t) => ({ file: relative(path.resolve(file.name)), name: t.fullName, status: t.status })));
 }
-function sourceHashes(dir, acc = {}) {
-  for (const entry of readdirSync(path.join(root, dir), { withFileTypes: true })) {
-    const name = `${dir}/${entry.name}`;
-    if (["node_modules", "dist", "run"].includes(entry.name)) continue;
-    if (entry.isDirectory()) sourceHashes(name, acc);
-    else if (/\.(?:[cm]?js|tsx?|json)$/.test(name)) acc[name] = digestFile(path.join(root, name));
-  }
-  return acc;
-}
-
 try {
   if (!report.tested_commit && !process.argv.includes("--allow-working-tree")) throw new Error("Source differs from HEAD; commit source before verification, or explicitly use --allow-working-tree for a non-commit candidate");
+  assertFullHistory(root);
+  // Fail closed before opening a DB connection or starting any suite.
+  let setup;
+  try { setup = JSON.parse(await readFile(path.join(out, "setup.json"), "utf8")); }
+  catch { throw new Error("Setup evidence is missing or invalid; run rehearse:sprint1 before verify:sprint1 on this clean source commit"); }
+  assertSetupEvidence(setup, report);
+  report.setup_tested_commit = setup.tested_commit;
   if (!process.env.TEST_DATABASE_URL) throw new Error("TEST_DATABASE_URL is required; use a dedicated disposable test database");
   const [major, minor] = process.versions.node.split(".").map(Number);
   if (major === 24 && minor < 15) throw new Error("Client jsdom requires Node24.15+; see README prerequisites");
@@ -141,7 +137,6 @@ try {
   if (JSON.stringify([...actualIds].sort()) !== JSON.stringify(mapping.map((r) => r.ac).sort())) throw new Error("AC mapping does not exactly match contract definitions");
   const mappedPlanned = new Set(mapping.flatMap((r) => r.planned_tests ?? []));
   if (mapping.some((r) => !r.planned_tests?.length) || JSON.stringify([...plannedIds].sort()) !== JSON.stringify([...mappedPlanned].sort())) throw new Error("Planned STS mapping does not exactly match contract definitions");
-  const setup = JSON.parse(await readFile(path.join(out, "setup.json"), "utf8"));
   const workflow = JSON.parse(await readFile(path.join(root, "docs/verification/sprint-1/workflow.json"), "utf8"));
   const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
   const validWorkflow = workflow.sampled_features.length >= 2 && workflow.sampled_features.every((f) => {
@@ -161,10 +156,10 @@ try {
   for (const doc of ["test-excerpts.md", "workflow-and-contributions.md"]) if ((await readFile(path.join(root, "docs/verification/sprint-1", doc), "utf8")).length < 100) throw new Error("Process evidence is absent");
   report.ac_results = mapping.map((row) => {
     const checks = row.checks.map((check) => check.kind === "process"
-      ? { ...check, matched: report.process_checks[check.id] && report.process_checks[check.id].status !== "FAIL" ? [{ name: check.id + ": " + report.process_checks[check.id].detail, file: report.process_checks[check.id].artifact, status: report.process_checks[check.id].status }] : [] }
+      ? { ...check, matched: report.process_checks[check.id]?.status === "PASS" ? [{ name: check.id + ": " + report.process_checks[check.id].detail, file: report.process_checks[check.id].artifact, status: "PASS" }] : [], pending_check: report.process_checks[check.id]?.status === "NOT_RELEASED" ? report.process_checks[check.id] : null }
       : { ...check, matched: report.suites[check.suite].cases.filter((t) => t.file.endsWith(check.file) && t.name.includes(check.name) && t.status === "passed") });
-    const matched = checks.every((c) => c.matched.length);
-    return { ac: row.ac, planned_tests: row.planned_tests, status: !matched ? "MISSING" : row.pending?.length ? "PARTIAL" : "PASS", pending: row.pending ?? [], checks };
+    const accounted = checks.every((c) => c.matched.length || (c.pending_check && row.pending?.length));
+    return { ac: row.ac, planned_tests: row.planned_tests, status: !accounted ? "MISSING" : row.pending?.length ? "PARTIAL" : "PASS", pending: row.pending ?? [], checks };
   });
   const app = report.ac_results.filter((r) => !r.ac.startsWith("AC-F10"));
   report.application_coverage = { total: app.length, passed: app.filter((r) => r.status === "PASS").length,
@@ -182,10 +177,7 @@ try {
     }
     await admin.end();
   }
-  report.source_sha256 = { ...sourceHashes("server"), ...sourceHashes("client/src"), ...sourceHashes("e2e"), ...sourceHashes("scripts") };
-  for (const name of ["package.json", "package-lock.json", "client/package.json", "client/package-lock.json", "vitest.config.ts", "client/vite.config.ts"]) {
-    report.source_sha256[name] = digestFile(path.join(root, name));
-  }
+  report.source_sha256 = sourceFingerprints(root);
   report.completed_at = new Date().toISOString();
   await writeEvidence(path.join(out, "verification.json"), report, scrub);
   if (report.ac_results) {

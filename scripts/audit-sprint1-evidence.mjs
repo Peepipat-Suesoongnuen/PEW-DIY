@@ -1,11 +1,9 @@
 /** Structural evidence audit; human review and a main release are separate gates. */
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { readFileSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { assertSourceVersion, createSanitizer, digestFile, writeEvidence, sanitizeArtifacts } from "./evidence-utils.mjs";
+import { assertSourceVersion, assertSetupEvidence, assertFullHistory, createSanitizer, digestFile, writeEvidence, sanitizeArtifacts } from "./evidence-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const out = path.resolve(root, process.env.VERIFICATION_OUTPUT_DIR ?? "docs/verification/sprint-1/run");
@@ -17,6 +15,7 @@ const audit = { audited_at: new Date().toISOString(), audited_head: git("rev-par
   audit_source_sha256: digest(fileURLToPath(import.meta.url)), status: "NOT_RUN" };
 function check(label, condition) { audit.checks.push({ label, status: condition ? "PASS" : "FAIL" }); if (!condition) throw new Error(label); }
 try {
+  assertFullHistory(root);
   const run = await json(path.join(out, "verification.json"));
   const candidateAllowed = process.argv.includes("--allow-working-tree") && !process.argv.includes("--require-release");
   assertSourceVersion(run, root, candidateAllowed);
@@ -27,10 +26,12 @@ try {
   check("57 unique contract AC have real result rows", run.ac_results.length === 57 && new Set(run.ac_results.map((r) => r.ac)).size === 57 && !run.ac_results.some((r) => r.status === "MISSING"));
   check("No failed/skipped/flaky product cases", Object.values(run.suites).every((s) => s.passed > 0 && !s.failed && !s.skipped && !s.flaky));
   check("Runner nonzero failure is an actual isolated assertion", run.runner_failure_probe.status === "PASS" && run.runner_failure_probe.observed_exit !== 0);
-  check("Recorded source fingerprints match current files", Object.entries(run.source_sha256).every(([name, hash]) => digest(path.join(root, name)) === hash));
+  check("Complete source fingerprint key set and tested/current files match", true); // assertSourceVersion above validates all three.
   const races = await json(path.join(out, "races.json"));
   check("51 actual two-process races preserve one success/one rejection", races.workers.length === 2 && races.workers[0] !== races.workers[1] && races.outcomes.length === 51 && races.outcomes.every((o) => o[0] === 201 && o[1] === 409));
   const setup = await json(path.join(out, "setup.json"));
+  assertSetupEvidence(setup, run);
+  check("Setup is clean and matches the exact verified source commit", setup.tested_commit === run.tested_commit && run.setup_tested_commit === setup.tested_commit);
   check("Local fresh-source/DB rehearsal meets 15-minute target", setup.status === "LOCAL_REHEARSAL_PASS" && setup.target_met && setup.duration_ms <= 900000);
   for (const project of ["desktop-chromium", "tablet-chromium", "mobile-chromium"]) {
     const demo = await json(path.join(out, `demo-${project}.json`));

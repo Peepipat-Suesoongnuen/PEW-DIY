@@ -8,7 +8,7 @@ import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { randomBytes } from "node:crypto";
 import pg from "pg";
-import { createSanitizer, sourceState, writeEvidence, sanitizeArtifacts } from "./evidence-utils.mjs";
+import { createSanitizer, sourceState, assertFullHistory, writeEvidence, sanitizeArtifacts } from "./evidence-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 try { process.loadEnvFile(path.join(root, ".env")); } catch { /* optional */ }
@@ -34,6 +34,8 @@ async function command(label, executable, args, cwd, env) {
   if (code !== 0) throw new Error(`${label} failed; see setup-${label}.txt`);
 }
 try {
+  assertFullHistory(root);
+  if (!report.tested_commit) throw new Error("Setup requires clean source; commit source before rehearse:sprint1");
   if (!process.env.TEST_DATABASE_URL) throw new Error("TEST_DATABASE_URL to a disposable test database is required; its owner must allow CREATE DATABASE for this rehearsal");
   const npmCli = process.env.NPM_CLI_PATH ?? (process.env.npm_execpath ? path.join(path.dirname(process.env.npm_execpath), "npm-cli.js") : "");
   if (!npmCli || !existsSync(npmCli)) throw new Error("Run via npm run rehearse:sprint1 or supply NPM_CLI_PATH for the installed npm CLI");
