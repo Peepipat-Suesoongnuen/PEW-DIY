@@ -41,7 +41,7 @@
 | FR-20 Inventory reports/summaries | F-09 | Sprint 3; sprint 3 contracts |
 | FR-21 Borrower borrow/return history | F-08 | Sprint 2; sprint 2 contracts |
 
-## 3. Business Rules (BR-01 – BR-11)
+## 3. Business Rules (BR-01 – BR-12)
 
 | Requirement | Feature or responsibility | Sprint and verification |
 |---|---|---|
@@ -56,6 +56,7 @@
 | BR-09 Return closes loan, restores availability; all held qty accounted at close | F-06 | Sprint 2; sprint 2 contracts — semantics for partial return gated by OQ-02 |
 | BR-10 Passwords stored as salted hashes only | F-01 | Sprint 1; AC/TEST — [D1-05] (DB/seed inspection test) |
 | BR-11 Persist all state transitions; survive restart **or redeployment** | F-10 (verification), F-05 (S1 request/checkout), F-06 (S2 return) | Sprint 1 (request/checkout, restart): AC/TEST — [D1-05]; Sprint 2 (return): sprint 2 contracts; redeployment: Lab 5 |
+| BR-12 Request — submitted or pending — never reserves units or reduces Available Quantity; only a committed Active Loan does | F-04 (request creation), F-05 (sole decrement point), F-03 (data) | Sprint 1 (rule binds the Sprint 2 approval workflow too): AC/TEST — [D1-05] (request leaves availability unchanged) |
 
 ## 4. Non-Functional Requirements (NFR-01 – NFR-09)
 

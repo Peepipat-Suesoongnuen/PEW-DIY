@@ -1,7 +1,13 @@
 /**
- * Schema migration 001 — users + sessions (F-01 owns these tables only;
- * Request/Loan/Equipment schemas belong to F-02/F-04/F-05 and must not be
- * created here). Idempotent: safe to run repeatedly on the same database.
+ * Schema migrations — idempotent: safe to run repeatedly on the same database.
+ *
+ * Migration 001 (F-01 owns users/sessions; Equipment added by F-02).
+ * There is NO migration for BorrowingRequest/Loan here: per the team decision
+ * on Issue #10 (2026-11-06 audit) and the feature-contract ownership split
+ * (f-03 §4 line 68, f-04 §3 Data/migrations, f-05 §3 Data/migrations),
+ * BorrowingRequest DDL belongs to F-04 (#11) and Loan DDL belongs to F-05
+ * (#12). See the handover note below for the exact schema those migrations
+ * must implement so the F-03 aggregate read keeps working.
  *
  * Design notes (contract f-01-authentication.md §4, SDS §3.1/§7):
  * - `users.username` is unique under the recorded normalization policy
@@ -54,6 +60,41 @@ CREATE TABLE IF NOT EXISTS equipment (
   CONSTRAINT equipment_quantity_nonnegative CHECK (quantity_total >= 0)
 );
 `;
+
+/**
+ * HANDOVER NOTE — Request/Loan DDL ownership (#11 / #12), team decision
+ * 2026-11-06 (Issue #10 audit: "MOVE Migration 002").
+ *
+ * The F-03 aggregate read (services/catalog.ts) expects the D1-03 §3.1 shape
+ * below and probes for these relations at runtime (`to_regclass`); until they
+ * exist, held units are definitionally zero ("no loans possible yet" — the
+ * documented pre-F-04/F-05 boundary) and the real-DB loan-dependent tests are
+ * dependency-gated (skipped) in server/tests/availability.test.ts and
+ * restart-e2e.test.ts.
+ *
+ * #11 / F-04 — `borrowing_requests` (f-04 §3 Data/migrations):
+ *   id TEXT PK · borrower_id TEXT NOT NULL REFERENCES users(id) ·
+ *   equipment_id TEXT NOT NULL REFERENCES equipment(id) ·
+ *   quantity_requested INTEGER NOT NULL CHECK (quantity_requested > 0) ·
+ *   created_at TIMESTAMPTZ NOT NULL
+ *   Indexes: equipment_id (item lookup) + borrower_id (owner lookup —
+ *   f-04 specifies "owner/item lookup indexes"; only the item index was
+ *   prototyped here, the owner index is part of #11's migration).
+ *   No status column (status derives from the Loan relation), no
+ *   cascade-delete (preserve history).
+ *
+ * #12 / F-05 — `loans` (f-05 §3 Data/migrations):
+ *   id TEXT PK · request_id TEXT NOT NULL UNIQUE REFERENCES
+ *   borrowing_requests(id) · quantity_borrowed INTEGER NOT NULL CHECK
+ *   (quantity_borrowed > 0) · checked_out_by TEXT NOT NULL REFERENCES
+ *   users(id) · checkout_at TIMESTAMPTZ NOT NULL · due_on DATE NOT NULL ·
+ *   returned_at TIMESTAMPTZ NULL · returned_by TEXT NULL REFERENCES users(id)
+ *   (nullable return pair = later lifecycle; unset in S1).
+ *   Uniqueness of request_id = "at most one loan per request" (D1-03).
+ *
+ * The CHECKs are D1-03's positive-quantity integrity rules (they back Issue
+ * #10 AC-06.3-03 at the data layer and are re-verified by the gated tests).
+ */
 
 export async function migrate(client: Pick<PoolClient, "query">): Promise<void> {
   await client.query(MIGRATION_001_SQL);

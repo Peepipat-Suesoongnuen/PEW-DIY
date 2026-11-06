@@ -1,8 +1,8 @@
 # F-05 — Checkout and Active Loan Contract
 
-> **Revision:** 1 — 2026-11-05 | **Status:** Proposed draft; stack, quantity and calendar gates unresolved
+> **Revision:** 2 — 2026-11-06 | **Contract approval:** Pending team baseline approval and peer review — Direction A points **Confirmed** by team (2026-11-06) | **Implementation status:** Not implemented (Issue #12) | **Test status:** NOT RUN — all STS cases **PLANNED / NOT RUN**
 >
-> Implementation Issue: [#12 / D1-06.5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/12); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). All STS cases are **PLANNED / NOT RUN**.
+> Implementation Issue: [#12 / D1-06.5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/12); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). Remaining gates: quantity policy (SRS OQ-02) and business timezone (SDS-OQ-03); the stack gate is resolved per SDS rev 3 (rev 1 wording "stack … gates unresolved" is superseded).
 
 ## 1. Identity, Requirements and Dependencies
 
@@ -89,3 +89,4 @@ Satisfy [Product DoD](product-dod.md) and all mapped AC/tests with exact tested 
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Initial proposed F-05 transaction/UI/API/schema/AC/STS contract | Issue #5/#12; SRS rev 2; SDS rev 2; PR #15/17; plan rev 3 and PR #20 calendar gate |
+| 2 — 2026-11-06 | Documentation alignment (Issue #10 PR): Direction A recorded as confirmed (non-reservation + Direct Checkout, SRS BR-12/A-11); status header split into Contract approval / Implementation / Test status; no contract text changed | Team decision Direction A (2026-11-06); SDS rev 3 (stack gate resolved) |

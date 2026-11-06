@@ -53,6 +53,20 @@ export async function resetTestDb(pool: Pool): Promise<void> {
   await pool.query("DELETE FROM users");
 }
 
+/**
+ * True when the Request/Loan relations owned by #11/#12 exist (see the
+ * handover note in src/db/migrations.ts). Used to dependency-gate the real-DB
+ * loan-dependent tests until those migrations land (team decision 2026-11-06,
+ * Issue #10 audit: "MOVE Migration 002").
+ */
+export async function loanRelationsExist(db: Pick<Pool, "query">): Promise<boolean> {
+  const res = await db.query(
+    `SELECT to_regclass('loans') AS loans, to_regclass('borrowing_requests') AS requests`,
+  );
+  const row = res.rows[0] as { loans: unknown; requests: unknown };
+  return row.loans !== null && row.requests !== null;
+}
+
 export function configForTests(): ReturnType<typeof loadConfig> {
   return loadConfig({
     ...process.env,

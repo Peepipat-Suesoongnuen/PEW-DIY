@@ -145,6 +145,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | BR-09 | Return closes exactly one Active Loan and increases Available Quantity by the returned quantity; quantity returned must be positive and not exceed the quantity held. When a loan closes, all quantity it held must be accounted for (returned) — otherwise held units would escape the Available Quantity formula of BR-03. Partial-return semantics, if multi-unit loans are allowed, will be fixed together with OQ-02. | After return, availability is restored; returning more than held is rejected; a loan cannot close while quantity is still held. | Sprint 2 |
 | BR-10 | Passwords shall be stored only as salted hashes; plaintext password storage is prohibited. | No plaintext password exists in database or seed data. | Sprint 1 |
 | BR-11 | All availability and loan state transitions shall be persisted and survive application restart **or redeployment**. Allocation by function: request/checkout persistence from Sprint 1; return persistence from Sprint 2 (FR-17). | After restart or redeployment, loans/availability read back identically. | Sprint 1 (request, checkout) / Sprint 2 (return) |
+| BR-12 | **Non-reservation:** a borrowing request — submitted or pending — does not reserve units and does not reduce Available Quantity; only a committed **Active Loan** reduces Available Quantity (BR-03). This rule binds every request state, including a pending request under the Sprint 2 approval workflow (A-11). | Creating one or more requests for an item leaves Available Quantity unchanged; the reduction occurs only when a checkout commits an Active Loan; a pending request does not reserve equipment. | Sprint 1 (rule; also binds the Sprint 2 approval workflow) |
 
 ---
 
@@ -171,12 +172,13 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | ID | Type | Description | Resolution / Status |
 |---|---|---|---|
 | A-01 | Design Decision | **Inventory Tracking = Quantity Tracking** — items are tracked as aggregate quantities, not individual serial units. | **Confirmed** by team (2026-11-03) |
-| A-02 | Design Decision | **Borrowing Approval = Direct Checkout** — no separate approval step before checkout; a request proceeds to checkout directly. | **Confirmed** by team (2026-11-03) |
+| A-02 | Design Decision | **Borrowing Approval = Direct Checkout** — no separate approval step before checkout; a request proceeds to checkout directly. *(Sprint 1 scope: the Sprint 2 approval workflow is recorded in A-11.)* | **Confirmed** by team (2026-11-03; Sprint 1 scoping confirmed 2026-11-06, Direction A) |
 | A-03 | Design Decision | Due date is assigned automatically as **checkout date + 7 calendar days**; overdue is computed from this date. | **Confirmed** by team (2026-11-03) |
 | A-04 | Design Decision | Under Quantity Tracking, the theme's "duplicate active loan for the same exclusive item" rule is enforced as a quantity rule (BR-03): single-unit items allow at most one active loan; in general Available Quantity must not fall below zero. | **Confirmed** by team (2026-11-03) |
 | A-05 | Assumption | Seeded demo accounts (Borrower/Custodian) are sufficient; self-registration and password recovery are not required. | Per course spec §5.2 |
 | A-06 | Assumption | All data is synthetic; no real payment, messaging, or external services are integrated. | Per course spec §5.3 |
 | A-07 | Design Decision | Requirement and deliverable documents are written in **English**. | **Confirmed** by team (2026-11-03) |
+| A-11 | Design Decision | **Non-reservation + Direct Checkout (Direction A):** (1) Sprint 1 uses Non-reservation + Direct Checkout; (2) a Borrowing Request does not reserve units and does not reduce Available Quantity (BR-12); only a committed Active Loan does; (3) Sprint 1 has no approval step before checkout (A-02); (4) an approval workflow is added in **Sprint 2 only** — its specification is deferred to the Sprint 2 contracts — and a pending request under it still does not reserve equipment (BR-12). | **Confirmed** by team (2026-11-06, Direction A) |
 
 ### 7.2 Assumptions (working assumptions to be validated)
 
@@ -199,4 +201,4 @@ Each rule is stated as testable behavior with its rejection/edge case.
 
 ---
 
-*Document history: created in [D1-01] (Part A), rev 1 (commit `8252496`). Rev 2 (PR #15 review): added redeployment durability to NFR-04/BR-11 per `group_work_specs_v1.pdf` §5.1; split persistence/atomicity sprint allocation by function (request/checkout → Sprint 1, return → Sprint 2); added close-accounting guard to BR-09 and coupled-decision note to OQ-02. FR/BR/NFR IDs are stable and will be referenced by Part B traceability, Part C SDS, and Sprint 1 contracts.*
+*Document history: created in [D1-01] (Part A), rev 1 (commit `8252496`). Rev 2 (PR #15 review): added redeployment durability to NFR-04/BR-11 per `group_work_specs_v1.pdf` §5.1; split persistence/atomicity sprint allocation by function (request/checkout → Sprint 1, return → Sprint 2); added close-accounting guard to BR-09 and coupled-decision note to OQ-02. Rev 3 (2026-11-06, team decision Direction A): added BR-12 (non-reservation — requests never reserve or reduce Available Quantity) and A-11 (Non-reservation + Direct Checkout; Sprint 2 approval workflow whose pending requests do not reserve equipment). Existing FR/BR/NFR/A IDs are unchanged; no open question (OQ-01/OQ-02/OQ-03–OQ-06) is closed by this revision. FR/BR/NFR IDs are stable and will be referenced by Part B traceability, Part C SDS, and Sprint 1 contracts.*

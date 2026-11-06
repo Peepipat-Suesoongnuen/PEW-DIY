@@ -26,7 +26,7 @@ Base fixture has no requests/loans: availability is 1/3/0 respectively. Empty-ca
 | Key / scenario | Construction and observable state |
 |---|---|
 | R-ONE-A | B-A creates a quantity-1 request for E-ONE while it is available; `SUBMITTED`, no Loan |
-| R-ONE-B | B-B also creates a quantity-1 request before either checkout; under the proposed non-reservation model E-ONE remains available |
+| R-ONE-B | B-B also creates a quantity-1 request before either checkout; under the confirmed non-reservation model (Direction A, 2026-11-06) E-ONE remains available |
 | L-ONE | C-A checks out R-ONE-A; one ACTIVE Loan, quantity 1, E-ONE availability 0; R-ONE-B remains unfulfilled |
 | R-MANY-A | B-A requests one unit of E-MANY; quantity 1 avoids deciding multi-unit policy, but eligibility/limit decisions still gate implementation |
 | Aggregate-held case | In an isolated valid fixture, two active one-unit loans for E-MANY hold 2; available = 1. Use eligible separate Borrower owners as approved by OQ-02; no partial return is implied. |

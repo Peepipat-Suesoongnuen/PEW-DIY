@@ -1,8 +1,8 @@
 # F-04 — Borrowing Request Contract
 
-> **Revision:** 1 — 2026-11-05 | **Status:** Proposed draft; quantity/stack/auth gates unresolved
+> **Revision:** 2 — 2026-11-06 | **Contract approval:** Pending team baseline approval and peer review — Direction A points (non-reservation + Direct Checkout) **Confirmed** by team (2026-11-06) | **Implementation status:** Not implemented (Issue #11) | **Test status:** NOT RUN — all STS cases **PLANNED / NOT RUN**
 >
-> Implementation Issue: [#11 / D1-06.4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/11); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). All STS cases are **PLANNED / NOT RUN**.
+> Implementation Issue: [#11 / D1-06.4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/11); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). Remaining gates: quantity policy (SRS OQ-02); stack/auth decisions are recorded in SDS rev 3 (rev 1 wording "quantity/stack/auth gates unresolved" is superseded).
 
 ## 1. Identity, Requirements and Dependencies
 
@@ -14,7 +14,7 @@ PR #17 discussion records agreement that only a Borrower creates a request in cu
 
 Borrower selects an available item → enters an approved quantity → submits → API derives borrower from authenticated principal → verifies equipment, quantity policy and current availability in a DB transaction → inserts a request → returns the committed record. UI opens My Requests and supports reload/persisted retrieval. Submitted requests are directly eligible for Custodian checkout; there is no approve/reject transition.
 
-**Proposed representation:** request `status` is `SUBMITTED` without a linked loan and `CHECKED_OUT` when F-05 creates its unique linked loan. The request itself does not decrement availability or reserve stock. More than one Borrower can request an available single-unit item before checkout; F-05 resolves competition using current stock. One request targets one equipment type; maximum units/per-borrower limits and fulfillment policy remain OQ-02. Successful submission never guarantees future stock.
+**Proposed representation:** request `status` is `SUBMITTED` without a linked loan and `CHECKED_OUT` when F-05 creates its unique linked loan. **Confirmed (Direction A, 2026-11-06; SRS BR-12): the request itself does not decrement availability or reserve stock** — including any pending request under the Sprint 2 approval workflow (which is deferred to the Sprint 2 contracts). More than one Borrower can request an available single-unit item before checkout; F-05 resolves competition using current stock. One request targets one equipment type; maximum units/per-borrower limits and fulfillment policy remain OQ-02. Successful submission never guarantees future stock.
 
 Business gates: BR-01 rejects availability 0 with no stored request. Validate integer quantity > 0; exact permitted maximum, multi-unit eligibility and any additional requested-versus-available check must be settled by OQ-02, not silently inferred here. Use the Equipment-first transaction/lock and post-lock stock read proposed in SDS §3.3 so a concurrent checkout cannot invalidate the availability check before request insertion. Roll back on insert/DB failure. Do not derive authoritative owner/stock from UI state.
 
@@ -77,3 +77,4 @@ Satisfy [Product DoD](product-dod.md), all feature AC and actual mapped verifica
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Initial F-04 proposed workflow/UI/API/data/AC/STS contract | Issue #5/#11; SRS rev 2; SDS rev 2; PR #17 role discussion; plan rev 3 |
+| 2 — 2026-11-06 | Documentation alignment (Issue #10 PR): Direction A recorded as confirmed (non-reservation + Direct Checkout, SRS BR-12/A-11 — Sprint 2 approval workflow is deferred to the Sprint 2 contracts and its pending requests do not reserve units); status header split into Contract approval / Implementation / Test status | Team decision Direction A (2026-11-06); SDS rev 3 (stack/auth decisions) |

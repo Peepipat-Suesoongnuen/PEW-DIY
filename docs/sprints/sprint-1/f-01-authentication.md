@@ -4,9 +4,9 @@
 >
 > **Implementation issue:** [#8 — D1-06.1](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/8) · **Contract issue:** [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5)
 >
-> **Revision:** 1, 2026-11-05 · **Status:** Draft proposed contract, pending team decisions and peer review
+> **Revision:** 2 — 2026-11-06 · **Contract approval:** Pending team baseline approval and peer review · **Implementation status:** Implemented (Issue #8) · **Test status:** Executed — results in [tdd-evidence-f01.md](tdd-evidence-f01.md) (`npm test`)
 >
-> **Execution status:** All test specifications below are **PLANNED — NOT RUN**. No application, credential mechanism, migration, or test implementation is delivered by this contract.
+> **Execution status:** F-01 test results (commands, outputs, RED→GREEN) are recorded in [tdd-evidence-f01.md](tdd-evidence-f01.md); the server suite passes 65/65 at the Issue #10 working tree (`npm test`, run 2026-11-06). STS rows below without a recorded per-row run remain **PLANNED — NOT RUN**; nothing is counted as PASS without evidence. The rev 1 statement described the rev 1 baseline only: "No application, credential mechanism, migration, or test implementation is delivered by this contract."
 
 ## 1. Identity, Requirement Links, and Boundaries
 
@@ -152,3 +152,4 @@ This feature must satisfy every applicable [Product DoD](product-dod.md) gate pl
 | Revision | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Proposed F-01 design/API/data contract, 12 AC and 16 planned STS rows; explicit stack/auth decision gates | SRS rev 2; Part B F-01; SDS rev 2; Part D rev 3; D1-05 Part E scope |
+| 2 — 2026-11-06 | Documentation alignment (Issue #10 PR): status header split into Contract approval / Implementation / Test status with real evidence references; no contract text changed | tdd-evidence-f01.md (commands/results); `npm test` run 2026-11-06 |

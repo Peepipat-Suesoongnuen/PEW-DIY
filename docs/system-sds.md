@@ -134,7 +134,7 @@ stateDiagram-v2
     ActiveLoan --> ReturnedLoan: Custodian return, Sprint 2
 ```
 
-The diagram shows domain progression; request and loan remain distinct persisted records. A submitted request expresses intent and, **as a proposal**, does not reserve units or reduce availability. Concurrent requests can therefore outnumber stock; successful request creation does not promise successful checkout. Checkout rechecks availability and may reject a previously submitted request. No separate approve/reject/cancel/expiry step is added by this SDS.
+The diagram shows domain progression; request and loan remain distinct persisted records. A submitted request expresses intent and — **Confirmed by team decision (Direction A, 2026-11-06; SRS BR-12/A-11)** — does not reserve units or reduce availability; only a committed Active Loan reduces Available Quantity. Concurrent requests can therefore outnumber stock; successful request creation does not promise successful checkout. Checkout rechecks availability and may reject a previously submitted request. No separate approve/reject/cancel/expiry step exists in Sprint 1; per the same team decision, an approval workflow is added in **Sprint 2 only** (specification deferred to the Sprint 2 contracts) and its pending requests still do not reserve units.
 
 ### 3.3 Availability Invariant and Checkout Transaction
 
@@ -160,7 +160,7 @@ Every writer affecting held units or total quantity (checkout, later return, tot
 
 For example, if PostgreSQL is selected, row locks can serialize writers to the same Equipment row; the proposed implementation would use a fresh post-lock read under an appropriate isolation level and retry transaction failures safely. This is an example, not a database selection. [PostgreSQL row-level locking documentation](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) describes the lock behavior.
 
-At request creation, the application validates availability from the DB before persisting the request (BR-01); use the same equipment lock to make that check and insert consistent with checkout. No inventory decrement occurs at this step under the non-reservation proposal. Later quantity reductions must reject `new_total < held` under the lock. A repeated checkout returns a safe conflict and never creates a duplicate loan; after an uncertain network response the UI re-fetches request state before retrying.
+At request creation, the application validates availability from the DB before persisting the request (BR-01); use the same equipment lock to make that check and insert consistent with checkout. No inventory decrement occurs at this step under the confirmed non-reservation model (Direction A, 2026-11-06; SRS BR-12). Later quantity reductions must reject `new_total < held` under the lock. A repeated checkout returns a safe conflict and never creates a duplicate loan; after an uncertain network response the UI re-fetches request state before retrying.
 
 ### 3.4 Return, Dates, and Later-Sprint Extensions
 

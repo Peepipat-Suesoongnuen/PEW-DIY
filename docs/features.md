@@ -29,7 +29,7 @@ Stakeholder needs derived from the SRS §1.1 problem statement.
 | F-01 | Authentication and Role-Based Access Control | Login / logout / current-user identity; two roles (Borrower, Custodian) enforced server-side; ownership checks; salted-hash credentials | Sprint 1 | FR-01–FR-05 | BR-04, BR-05, BR-06, BR-10 | NFR-01, NFR-02, NFR-03 | — (foundation) | [D1-06.1] |
 | F-02 | Equipment Catalog (seed and read) | Catalog items (name, description, category, total quantity); reproducible synthetic seed data; list/detail views for both roles | Sprint 1 | FR-06, FR-08 | — | NFR-07 (verify S3), NFR-08 (part) | F-01 | [D1-06.2] |
 | F-03 | Equipment Availability | Compute and display Available Quantity (`Total − held`, never below zero); availability data used by request/checkout gates | Sprint 1 | FR-07 | BR-02\*, BR-03\* | NFR-05\* | F-02 | [D1-06.3] |
-| F-04 | Borrowing Request | Borrower submits a request for an available item and views own requests; custodian views submitted requests | Sprint 1 | FR-11, FR-12, FR-13 | BR-01, BR-05 | — | F-01, F-03 | [D1-06.4] |
+| F-04 | Borrowing Request | Borrower submits a request for an available item and views own requests; custodian views submitted requests | Sprint 1 | FR-11, FR-12, FR-13 | BR-01, BR-05, BR-12 | — | F-01, F-02, F-03 | [D1-06.4] |
 | F-05 | Checkout and Active Loan | Custodian records checkout: creates persistent Active Loan with due date (**checkout + 7 days**, A-03/BR-07) and updates availability atomically; borrower views own active loans | Sprint 1 | FR-14, FR-15, FR-16 (active) | BR-02, BR-03, BR-07, BR-11 | NFR-04 (S1), NFR-05, NFR-06 (S1) | F-01, F-03, F-04 | [D1-06.5] |
 | F-06 | Return | Custodian records return: closes the Active Loan and restores availability atomically | Sprint 2 | FR-17 | BR-09 | NFR-04 (S2), NFR-06 (S2) | F-05 | Part B only¹ |
 | F-07 | Overdue Status | Compute overdue (now > due date, no return recorded) and present the overdue list to custodians | Sprint 2 | FR-19 | BR-08 | — | F-05 | Part B only¹ |
@@ -60,7 +60,7 @@ Not part of the product — tracked here to prevent scope creep: real payment ga
 | Requirement set | Count | Mapped to a feature/responsibility | Uncovered |
 |---|---|---|---|
 | Functional Requirements (FR-01–FR-21) | 21 | 21 | 0 |
-| Business Rules (BR-01–BR-11) | 11 | 11 | 0 |
+| Business Rules (BR-01–BR-12) | 12 | 12 | 0 |
 | Non-Functional Requirements (NFR-01–NFR-09) | 9 | 9 | 0 |
 
 Detailed rows: see `docs/traceability.md`. No requirement is intentionally left uncovered.

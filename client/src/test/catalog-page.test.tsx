@@ -247,6 +247,38 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     expect(equipmentCalls.filter((u) => u === "/api/equipment/fixture%2Fopaque")).toHaveLength(1);
   });
 
+  it("never renders unreceived quantities as zero while loading or after failure (TEST-F03-08)", async () => {
+    // Delayed read first: the loading state must not fabricate a 0 stock level
+    // (f-03 §3 "Loading/failed fetch is not zero stock").
+    let release: (value: Response) => void = () => undefined;
+    const gate = new Promise<Response>((resolve) => {
+      release = resolve;
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "u1", username: "B-A", role: "BORROWER" } } });
+        }
+        return gate;
+      }),
+    );
+    renderCatalog();
+
+    expect(await screen.findByText("Loading catalog…")).toBeInTheDocument();
+    expect(screen.queryByText(/available of/)).not.toBeInTheDocument();
+    expect(screen.queryByText("UNAVAILABLE")).not.toBeInTheDocument();
+
+    // Then a failed refresh: the error state shows no stock figure at all —
+    // an old/absent quantity is never labelled as confirmed current (f-03 §3).
+    release(jsonResponse(503, { error: { code: "SERVICE_UNAVAILABLE", message: "Service temporarily unavailable.", requestId: "req-8" } }));
+    expect(await screen.findByText("Something went wrong. Please try again.")).toBeInTheDocument();
+    expect(screen.queryByText(/available of/)).not.toBeInTheDocument();
+    expect(screen.queryByText("0")).not.toBeInTheDocument();
+    expect(screen.queryByText("UNAVAILABLE")).not.toBeInTheDocument();
+  });
+
   it("clears stale state and returns to Login on 401", async () => {
     vi.stubGlobal(
       "fetch",
