@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Alert } from "../components/Alert";
 import { AvailabilityBadge, QuantityDisplay } from "../components/AvailabilityBadge";
 import { Card } from "../components/Card";
@@ -8,6 +8,7 @@ import { DetailList } from "../components/DetailList";
 import { EmptyState } from "../components/EmptyState";
 import { Loading } from "../components/Loading";
 import { api, type Equipment } from "../lib/api";
+import { useItemRouteId } from "../lib/paths";
 import { useUnauthorizedRedirect } from "../lib/session";
 
 type DetailState =
@@ -26,7 +27,10 @@ type DetailState =
  * here — the server remains authoritative regardless of what the UI hides.
  */
 export function ItemDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  // Route boundary (PR #34 review round 2): the id comes from the RAW pathname
+  // decoded exactly once — useParams() would collapse the distinct opaque ids
+  // `fixture/opaque` and `fixture%2Fopaque` into the same value.
+  const id = useItemRouteId();
   const [state, setState] = useState<DetailState>({ kind: "loading" });
   const onUnauthorized = useUnauthorizedRedirect();
 

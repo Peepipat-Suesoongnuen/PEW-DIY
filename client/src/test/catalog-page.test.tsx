@@ -1,8 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { CatalogPage } from "../pages/CatalogPage";
+import { ItemDetailPage } from "../pages/ItemDetailPage";
+import { useItemRouteId } from "../lib/paths";
 import { SessionProvider } from "../lib/session";
 import type { Equipment } from "../lib/api";
 
@@ -52,7 +54,8 @@ afterEach(() => {
 });
 
 function DetailStub() {
-  const { id } = useParams<{ id: string }>();
+  // Same route-boundary reader as the real ItemDetailPage (lib/paths.ts).
+  const id = useItemRouteId();
   return <div>DETAIL_ID:{id}</div>;
 }
 
@@ -158,6 +161,90 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     // Clicking round-trips: the router decodes the param back to the opaque id.
     await user.click(links[0]);
     expect(await screen.findByText("DETAIL_ID:fixture#opaque")).toBeInTheDocument();
+  });
+
+  it("keeps the distinct opaque ids `fixture/opaque` and `fixture%2Fopaque` separate across the full round-trip (PR #34 review round 2)", async () => {
+    const slashItem = {
+      id: "fixture/opaque",
+      name: "Slash fixture",
+      description: "First fixture",
+      category: "Synthetic",
+      quantity_total: 1,
+      quantity_available: 1,
+      availability: "AVAILABLE" as const,
+    };
+    const percentItem = {
+      id: "fixture%2Fopaque",
+      name: "Percent fixture",
+      description: "Second fixture",
+      category: "Synthetic",
+      quantity_total: 2,
+      quantity_available: 2,
+      availability: "AVAILABLE" as const,
+    };
+    // Both ids exist at the same time and are only distinguishable by their
+    // encoding: the API contract encodes each id once per request.
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/auth/me")) {
+        return jsonResponse(200, { data: { user: { id: "u1", username: "B-A", role: "BORROWER" } } });
+      }
+      if (url === "/api/equipment") {
+        return jsonResponse(200, { data: [slashItem, percentItem] });
+      }
+      if (url === "/api/equipment/fixture%252Fopaque") {
+        return jsonResponse(200, { data: percentItem });
+      }
+      if (url === "/api/equipment/fixture%2Fopaque") {
+        return jsonResponse(200, { data: slashItem });
+      }
+      return jsonResponse(404, { error: { code: "NOT_FOUND", message: "Resource not found.", requestId: "n/a" } });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/catalog"]}>
+        <SessionProvider>
+          <Routes>
+            <Route path="/login" element={<div>LOGIN_PAGE</div>} />
+            <Route path="/catalog" element={<CatalogPage />} />
+            <Route path="/items/:id" element={<ItemDetailPage />} />
+          </Routes>
+        </SessionProvider>
+      </MemoryRouter>,
+    );
+
+    // Links encode each id exactly once (distinct hrefs for distinct ids).
+    const percentLinks = await screen.findAllByRole("link", { name: "View Percent fixture" });
+    for (const link of percentLinks) {
+      expect(link).toHaveAttribute("href", "/items/fixture%252Fopaque");
+    }
+    const slashLinks = await screen.findAllByRole("link", { name: "View Slash fixture" });
+    for (const link of slashLinks) {
+      expect(link).toHaveAttribute("href", "/items/fixture%2Fopaque");
+    }
+
+    // Open the second item (id contains the literal characters `%2F`) — the
+    // detail must show ITS data, not the first item's (the reported bug).
+    await user.click(percentLinks[0]);
+    expect(await screen.findByRole("heading", { name: "Percent fixture" })).toBeInTheDocument();
+    expect(screen.getByText("Second fixture")).toBeInTheDocument();
+    expect(screen.queryByText("Slash fixture")).not.toBeInTheDocument();
+
+    // Back and open the first item (id contains a literal slash).
+    await user.click(screen.getByRole("link", { name: "Back to catalog" }));
+    const slashLinksAgain = await screen.findAllByRole("link", { name: "View Slash fixture" });
+    await user.click(slashLinksAgain[0]);
+    expect(await screen.findByRole("heading", { name: "Slash fixture" })).toBeInTheDocument();
+    expect(screen.getByText("First fixture")).toBeInTheDocument();
+    expect(screen.queryByText("Percent fixture")).not.toBeInTheDocument();
+
+    // Each detail request carried its own id, encoded exactly once.
+    const equipmentCalls = fetchMock.mock.calls
+      .map(([u]) => String(u))
+      .filter((u) => u.startsWith("/api/equipment/"));
+    expect(equipmentCalls.filter((u) => u === "/api/equipment/fixture%252Fopaque")).toHaveLength(1);
+    expect(equipmentCalls.filter((u) => u === "/api/equipment/fixture%2Fopaque")).toHaveLength(1);
   });
 
   it("clears stale state and returns to Login on 401", async () => {
