@@ -1,0 +1,187 @@
+{
+  "audited_at": "2026-11-07T12:49:44.117Z",
+  "audited_head": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "checks": [
+    {
+      "label": "Full runner succeeded on the recorded source version",
+      "status": "PASS"
+    },
+    {
+      "label": "49/49 application AC have executed passing checks",
+      "status": "PASS"
+    },
+    {
+      "label": "57 unique contract AC have real result rows",
+      "status": "PASS"
+    },
+    {
+      "label": "No failed/skipped/flaky product cases",
+      "status": "PASS"
+    },
+    {
+      "label": "Runner nonzero failure is an actual isolated assertion",
+      "status": "PASS"
+    },
+    {
+      "label": "Complete source fingerprint key set and tested/current files match",
+      "status": "PASS"
+    },
+    {
+      "label": "51 actual two-process races preserve one success/one rejection",
+      "status": "PASS"
+    },
+    {
+      "label": "Setup is clean and matches the exact verified source commit",
+      "status": "PASS"
+    },
+    {
+      "label": "Local fresh-source/DB rehearsal meets 15-minute target",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: actual integrated journey and backend denials",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: borrower-request PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: custodian-checkout PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: stock-rejection PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: borrower-loan PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: availability-zero PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: cross-owner-forbidden PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "desktop-chromium: logout PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: actual integrated journey and backend denials",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: borrower-request PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: custodian-checkout PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: stock-rejection PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: borrower-loan PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: availability-zero PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: cross-owner-forbidden PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "tablet-chromium: logout PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: actual integrated journey and backend denials",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: borrower-request PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: custodian-checkout PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: stock-rejection PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: borrower-loan PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: availability-zero PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: cross-owner-forbidden PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "mobile-chromium: logout PNG",
+      "status": "PASS"
+    },
+    {
+      "label": "PR22: independent author/reviewer and staging path",
+      "status": "PASS"
+    },
+    {
+      "label": "PR36: independent author/reviewer and staging path",
+      "status": "PASS"
+    },
+    {
+      "label": "PR37: independent author/reviewer and staging path",
+      "status": "PASS"
+    },
+    {
+      "label": "At least two real Issue/PR/staging chains",
+      "status": "PASS"
+    },
+    {
+      "label": "Part F README.md exists",
+      "status": "PASS"
+    },
+    {
+      "label": "Part F test-excerpts.md exists",
+      "status": "PASS"
+    },
+    {
+      "label": "Part F workflow-and-contributions.md exists",
+      "status": "PASS"
+    },
+    {
+      "label": "Part F release-handoff.md exists",
+      "status": "PASS"
+    }
+  ],
+  "pending": [
+    "a12_ratification",
+    "readme_peer_reproduction",
+    "tdd_authenticity_review",
+    "contribution_disclosure",
+    "final_board",
+    "feature13_review_integration",
+    "release_peer_review",
+    "Actual main release commit and release-version rerun"
+  ],
+  "audit_source_sha256": "7eac1121da6508a76d510169aadd7154cdd918b52931a5b64c6d4f3d0fe4d87b",
+  "status": "NOT_RELEASED",
+  "tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "version_kind": "CLEAN_SOURCE_COMMIT",
+  "main_remote": "7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c",
+  "release_commit": null,
+  "error": "Release gate: RELEASE_REF is absent; staging verification is not a main release"
+}

@@ -1,0 +1,4445 @@
+{
+  "started_at": "2026-11-07T12:47:56.184Z",
+  "head_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "version_kind": "CLEAN_SOURCE_COMMIT",
+  "source_dirty_files": [],
+  "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
+  "node": "v24.15.0",
+  "steps": [
+    {
+      "label": "runner-failure-probe",
+      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-WU7nAF --config [temp]\\pewdiy-f10-runner-WU7nAF\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-WU7nAF\\result.json",
+      "cwd": ".",
+      "exit_code": 1,
+      "duration_ms": 3040,
+      "log": "runner-failure-probe.txt"
+    },
+    {
+      "label": "server-build",
+      "command": "node node_modules\\typescript\\bin\\tsc",
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_ms": 487,
+      "log": "server-build.txt"
+    },
+    {
+      "label": "client-typecheck",
+      "command": "node client\\node_modules\\typescript\\bin\\tsc --noEmit",
+      "cwd": "client",
+      "exit_code": 0,
+      "duration_ms": 653,
+      "log": "client-typecheck.txt"
+    },
+    {
+      "label": "client-build",
+      "command": "node client\\node_modules\\vite\\bin\\vite.js build",
+      "cwd": "client",
+      "exit_code": 0,
+      "duration_ms": 6901,
+      "log": "client-build.txt"
+    },
+    {
+      "label": "server-migration",
+      "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_ms": 1057,
+      "log": "server-migration.txt"
+    },
+    {
+      "label": "server-tests",
+      "command": "node node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\server.json",
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_ms": 26204,
+      "log": "server-tests.txt"
+    },
+    {
+      "label": "client-tests",
+      "command": "node client\\node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\client.json",
+      "cwd": "client",
+      "exit_code": 0,
+      "duration_ms": 17178,
+      "log": "client-tests.txt"
+    },
+    {
+      "label": "browser-migration",
+      "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_ms": 306,
+      "log": "browser-migration.txt"
+    },
+    {
+      "label": "browser-seed",
+      "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/seed.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_ms": 354,
+      "log": "browser-seed.txt"
+    },
+    {
+      "label": "browser-tests",
+      "command": "node node_modules\\@playwright\\test\\cli.js test --config e2e/playwright.config.ts --workers=3 --reporter=json",
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_ms": 22052,
+      "log": "browser-tests.txt"
+    }
+  ],
+  "suites": {
+    "server": {
+      "passed": 164,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "POST /api/auth/login (TEST-F01-01/02/03) returns 200 with data.user and sets a session cookie (TEST-F01-01)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "POST /api/auth/login (TEST-F01-01/02/03) returns 401 INVALID_CREDENTIALS for unknown user and wrong password identically (TEST-F01-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "POST /api/auth/login (TEST-F01-01/02/03) returns 400 VALIDATION_ERROR for malformed or extra-field payloads (TEST-F01-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "GET /api/auth/me (TEST-F01-04/05) returns 200 with user identity when authenticated (TEST-F01-04)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "GET /api/auth/me (TEST-F01-04/05) returns 401 UNAUTHENTICATED without a session (TEST-F01-05)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "POST /api/auth/logout (TEST-F01-06/07) returns 204, clears cookie, and denies replay (TEST-F01-07)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "POST /api/auth/logout (TEST-F01-06/07) returns 401 for logout without authentication (TEST-F01-05)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "Regression — safe error envelopes (TEST-F01-03/06/14) malformed JSON body returns 400 JSON envelope, never HTML (TEST-F01-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "Regression — safe error envelopes (TEST-F01-03/06/14) object-typed session cookie is denied with 401 JSON, not 500 HTML (TEST-F01-06)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "Regression — safe error envelopes (TEST-F01-03/06/14) auth storage failure returns safe 500/503 JSON without internal details (TEST-F01-14)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "Regression — anti-CSRF origin enforcement (TEST-F01-15) cross-origin logout is denied 403 and does NOT revoke the session (forced-logout defense)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "Regression — anti-CSRF origin enforcement (TEST-F01-15) same-origin state-changing request is allowed",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "Regression — missing anti-CSRF evidence (TEST-F01-15, review round 2) logout with neither Origin nor Referer is denied 403 and does NOT revoke the session",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth.test.ts",
+          "name": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) logs in a seeded Borrower and returns a fresh session with correct identity (TEST-F01-01)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth.test.ts",
+          "name": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) returns identical INVALID_CREDENTIALS for unknown user and wrong password (AC-F01-02, TEST-F01-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth.test.ts",
+          "name": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) rejects malformed payloads and extra identity/role/expiry fields with VALIDATION_ERROR (AC-F01-03, TEST-F01-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth.test.ts",
+          "name": "AuthService.currentUser (AC-F01-04, TEST-F01-04) derives identity from the session, not client-supplied claims",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth.test.ts",
+          "name": "AuthService.logout (AC-F01-06, TEST-F01-07) revokes server-side and denies replay (TEST-F01-07)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth.test.ts",
+          "name": "AuthService.logout (AC-F01-06, TEST-F01-07) revocation survives application restart (TEST-F01-16)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/auth.test.ts",
+          "name": "AuthService secrets hygiene (AC-F01-10, TEST-F01-12) login result and stored rows never expose password or hash",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "PROTECTED_ROUTES registry (TEST-F01-05 route-parameterized) lists every protected route with at least one allowed role",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "PROTECTED_ROUTES registry (TEST-F01-05 route-parameterized) marks /api/auth/me and /api/auth/logout as accessible to both roles",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "requireAuth deny-by-default (AC-F01-05) returns 401 UNAUTHENTICATED without a session and does not call next()",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "requireAuth deny-by-default (AC-F01-05) returns 401 for an invalid/tampered session id (fail-closed, no DB call)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "requireRole enforcement (AC-F01-08, BR-04/BR-06) returns 403 FORBIDDEN for wrong role and passes correct role",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "requireRole enforcement (AC-F01-08, BR-04/BR-06) returns 401 (not 403) when unauthenticated (deny-by-default)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "verifyOwnership record-scope guard (AC-F01-09, BR-05) grants access to the owner and denies another borrower (403 semantics)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/authz.test.ts",
+          "name": "verifyOwnership record-scope guard (AC-F01-09, BR-05) denies ownership check without authentication",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Availability derivation (TEST-F03-01 / TEST-F03-05) computes total minus held with exact zero/positive boundaries (TEST-F03-01)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Availability derivation (TEST-F03-01 / TEST-F03-05) rejects invalid aggregate inputs explicitly — never clamps (TEST-F03-05)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Derived availability over persisted stock (TEST-F03-03, clean fixtures) shows correct values for clean fixtures as both roles, list and detail agreeing (TEST-F03-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Invalid aggregate state is a safe internal error (TEST-F03-06) returns 500 INTERNAL_ERROR with requestId and leaks no quantity/stack/loan data",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) aggregates all active loans for the item without exposing loan/borrower details (TEST-F03-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) a submitted request alone leaves availability unchanged (non-reservation; AC-F03-03 first half)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) a committed quantity-one loan flips E-ONE from 1/AVAILABLE to 0/UNAVAILABLE on fresh reads (AC-F03-03 second half, fixture-level)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) a fully returned loan contributes zero held units (edge; D1-03 §3.3)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/availability.test.ts",
+          "name": "Non-negative data-layer constraints — dependency-gated on #11/#12 schema (AC-06.3-03) rejects non-positive loan and request quantities at the database boundary",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request-unit.test.ts",
+          "name": "BR-01 request availability (TEST-F04-13) rejects unavailable equipment before persisting a request",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request-unit.test.ts",
+          "name": "BR-01 request availability (TEST-F04-13) accepts an available item without reserving its units",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL persists server-owned request fields, opaque item ID and fresh retrieval (TEST-F04-01)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects unavailable equipment without persistence (TEST-F04-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity undefined (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity 0 (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity -1 (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity 1.5 (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity null (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity true (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity 1 (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects invalid quantity 2147483648 (TEST-F04-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects injected borrower_id (TEST-F04-04)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects injected status (TEST-F04-04)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects injected created_at (TEST-F04-04)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects injected id (TEST-F04-04)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects injected loan_id (TEST-F04-04)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rejects absent equipment and malformed body (TEST-F04-03/04)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL filters lists and forbids another borrower's detail (TEST-F04-05/14)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL allows the submitted queue, denies Custodian creation before input validation (TEST-F04-06)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL does not reserve units for repeated or competing requests (TEST-F04-07 request half; BR-12)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL enforces approved multi-unit bounds with no additional per-user cap (TEST-F04-10)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL denies all anonymous routes and hostile-origin submissions (TEST-F04-11)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL rolls back an inserted request on failure and permits a clean retry (TEST-F04-12)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL denies invalid and logged-out credentials on every new request route",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "F-04 real API/PostgreSQL repeated migrations preserve requests and foreign keys protect their history",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog-ui.test.ts",
+          "name": "catalog.html rendering safety (P1 XSS regression) renders HTML-bearing item fields as text — no element creation, no script execution",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog-ui.test.ts",
+          "name": "catalog.html logout failure handling (P2 regression) failed logout (503) shows a safe failure with retry — no redirect, session page stays",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog-ui.test.ts",
+          "name": "catalog.html logout failure handling (P2 regression) network-error logout also reports failure without redirect (uncertain outcome)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog-ui.test.ts",
+          "name": "catalog.html logout failure handling (P2 regression) confirmed logout (204) redirects to login",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) lists seeded items for both roles with correct fields and no private data (TEST-F02-01)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) E-ONE detail matches its list entry for both roles (TEST-F02-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) empty catalog returns data=[] and unknown id returns safe 404 (TEST-F02-03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Authentication on catalog routes (TEST-F02-04) rejects absent/invalid/logged-out credentials with 401 and no catalog data",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Seed idempotency and validation (TEST-F02-05/06) re-seeding produces no duplicates and preserves totals and identity rows (TEST-F02-05 catalog/identity portion)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Seed idempotency and validation (TEST-F02-05/06) rejects negative total and fractional quantity at the typed boundary; zero total is valid (TEST-F02-06)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Availability derivation and UI serving (TEST-F02-07/08 backend portion) availability label derives from total minus held (no loans held yet → available=total)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Availability derivation and UI serving (TEST-F02-07/08 backend portion) catalog and item UI pages are served (UI journey harness; browser E2E deferred with TEST-F01-13)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Availability derivation and UI serving (TEST-F02-07/08 backend portion) UI-to-API-to-DB journey: login page -> login API -> catalog page -> catalog API -> item page -> detail API (Borrower flow)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Safe failure and restart persistence (TEST-F02-09/10) catalog DB failure yields safe 503 for list/detail and recovery returns real data (TEST-F02-09)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/catalog.test.ts",
+          "name": "Safe failure and restart persistence (TEST-F02-09/10) catalog survives a new application instance on the same DB (TEST-F02-10 instance-level portion)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) rejects an unavailable exclusive unit",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) allows the available exclusive unit",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 1/2/1",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities -1/0/1",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 3/-1/1",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 3/0/0",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 3/0/1.5",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-11-06T16:59:59Z (TEST-F05-07)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-11-06T17:00:00Z (TEST-F05-07)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-12-27T17:00:00Z (TEST-F05-07)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2028-02-22T17:00:00Z (TEST-F05-07)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "F-05 checkout invariant (TEST-F05-15) uses an explicit zone across DST rather than 168 hours",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API completes the previously deferred request/queue transitions (TEST-F04-06/07)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API commits correct server fields and due date; fresh request/queue/loan/stock reads (TEST-F05-01/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API rejects unavailable and repeated requests without mutation (TEST-F05-02/03)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API rolls back failure after INSERT, forbids dirty availability reads, then retries (TEST-F05-06 / F03-10)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API enforces authentication, role, ownership and trusted origin (TEST-F05-09/10)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API rejects injected fields, non-object bodies and malformed IDs (TEST-F05-13)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API fulfills multiple units with no extra borrower cap and checks stock again (TEST-F05-14/16)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API fails closed when business timezone has not been configured",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API backs the relation with FK, unique and positive-quantity constraints",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API restricts Borrower reads to active records, with no return endpoint",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API persists API-created loan across two actual app processes (TEST-F05-11)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/loan.test.ts",
+          "name": "F-05 real PostgreSQL/API serializes N=50 independent two-worker races and a same-request race (TEST-F05-04/05)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/password.test.ts",
+          "name": "password hashing service (BR-10, NFR-03) produces a salted argon2 hash that is not the plaintext and differs for equal inputs",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/password.test.ts",
+          "name": "password hashing service (BR-10, NFR-03) verifies the correct password and rejects wrong ones (library comparison only)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/password.test.ts",
+          "name": "password hashing service (BR-10, NFR-03) fails closed on a corrupted/invalid stored hash instead of authenticating",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/password.test.ts",
+          "name": "password hashing service (BR-10, NFR-03) dummy hash used for timing equalization is a hash but never matches user input",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/restart-e2e.test.ts",
+          "name": "Application process restart against the same durable DB (AC-06.2-03) catalog and session survive a full process stop/start (TEST-F02-10 process-restart evidence)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/restart-e2e.test.ts",
+          "name": "Derived availability survives process restart (TEST-F03-09 / AC-06.3-05) keeps the same derived quantity/label after a hard restart on the same store",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/session.test.ts",
+          "name": "SessionStore (D2: server session, durable revocation) creates a session whose raw id resolves to the correct user (TEST-F01-01 support)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/session.test.ts",
+          "name": "SessionStore (D2: server session, durable revocation) does not store the raw session id anywhere (digest-only persistence)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/session.test.ts",
+          "name": "SessionStore (D2: server session, durable revocation) rejects unknown, empty and tampered session ids (TEST-F01-05/06 support)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/session.test.ts",
+          "name": "SessionStore (D2: server session, durable revocation) revocation denies replay immediately and survives application restart (TEST-F01-07, TEST-F01-16)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/session.test.ts",
+          "name": "SessionStore (D2: server session, durable revocation) enforces idle expiry at the boundary using the injectable clock (TEST-F01-08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/session.test.ts",
+          "name": "SessionStore (D2: server session, durable revocation) enforces the absolute cap even with continuous activity (TEST-F01-08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/session.test.ts",
+          "name": "SessionStore (D2: server session, durable revocation) sliding idle extension never exceeds the absolute cap",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB keeps the HTTP probe inventory complete against the protected role matrix",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB configured HTTPS cookies have Secure/HttpOnly/SameSite attributes (TEST-F01-15)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB actual seed reruns preserve existing requests, loans, stock and identities (TEST-F02-05 complete)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests is forbidden by server (TEST-F10-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests/{requestId}/checkout is forbidden by server (TEST-F10-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans is forbidden by server (TEST-F10-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans/{loanId} is forbidden by server (TEST-F10-02)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB owner query tampering cannot widen request/loan scope (TEST-F10-02 / TEST-F01-10)",
+          "status": "passed"
+        },
+        {
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "F10 complete protected-route inventory on production HTTP/real DB restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+          "status": "passed"
+        }
+      ]
+    },
+    "client": {
+      "passed": 70,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "file": "client/src/test/account-menu.test.tsx",
+          "name": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) shows current username and role",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/account-menu.test.tsx",
+          "name": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) signs out and returns to Login on confirmed success",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/account-menu.test.tsx",
+          "name": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) keeps the session page with a safe retry message on logout failure — no redirect",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/account-menu.test.tsx",
+          "name": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) clears stale identity and returns to Login on a 401 logout (session already invalid)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/api.test.ts",
+          "name": "api client (safe error mapping — shared-conventions) maps the JSON error envelope to ApiError with code and requestId",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/api.test.ts",
+          "name": "api client (safe error mapping — shared-conventions) never surfaces raw non-JSON error bodies (proxy error pages)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/api.test.ts",
+          "name": "api client (safe error mapping — shared-conventions) maps network failures to a safe NETWORK_ERROR (uncertain outcome)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/api.test.ts",
+          "name": "api client (safe error mapping — shared-conventions) returns the data envelope for successful reads",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/api.test.ts",
+          "name": "api client (safe error mapping — shared-conventions) encodes opaque ids with URL-significant characters in the detail URL (PR #34 P2-2)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) submits an opaque item ID and redirects to persisted own request display",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) rejects invalid quantity  without an API mutation",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) rejects invalid quantity 0 without an API mutation",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) rejects invalid quantity -1 without an API mutation",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) rejects invalid quantity 1.5 without an API mutation",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) rejects invalid quantity 4 without an API mutation",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) disables duplicate submission and shows no success before the server commits",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) preserves input and refreshes authoritative stock after a conflict",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) redirects to login after protected submission returns 401",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) keeps safe input and never shows success or raw diagnostics after a service failure",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) disables retry when stock cannot be refreshed after conflict",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) hides borrowing controls from Custodians and unavailable items",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) shows empty own/queue states and safe detail denial",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "F-04 request UI (TEST-F04-09) decodes each request ID exactly once at the route boundary",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "CatalogPage (ui-spec §2 / f-02 §3 states) loads and renders item fields with availability badges",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "CatalogPage (ui-spec §2 / f-02 §3 states) renders a dedicated empty state for an empty catalog (not an error)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "CatalogPage (ui-spec §2 / f-02 §3 states) shows a generic retry message with requestId on server failure — never a false-empty",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "CatalogPage (ui-spec §2 / f-02 §3 states) encodes opaque ids with URL-significant characters and round-trips them to the detail route (PR #34 P2-2)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "CatalogPage (ui-spec §2 / f-02 §3 states) keeps the distinct opaque ids `fixture/opaque` and `fixture%2Fopaque` separate across the full round-trip (PR #34 review round 2)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "CatalogPage (ui-spec §2 / f-02 §3 states) never renders unreceived quantities as zero while loading or after failure (TEST-F03-08)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "CatalogPage (ui-spec §2 / f-02 §3 states) clears stale state and returns to Login on 401",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Button renders a primary action and handles clicks",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Button loading disables the button and marks it busy (no duplicate submits)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Field (Input/Label/FieldError) links label and input, and links the error via aria-describedby",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Field (Input/Label/FieldError) renders without an error and without aria-invalid",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "AvailabilityBadge (handoff component for #10) renders text + color semantics for AVAILABLE (never color alone)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "AvailabilityBadge (handoff component for #10) renders UNAVAILABLE text for unavailable items",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "QuantityDisplay (handoff component for #10) shows available-of-total Quantity Tracking wording with bold available",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Alert failure alert exposes role=alert",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Alert confirmation exposes role=status and shows requestId as muted text",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "EmptyState shows a dedicated empty message distinct from errors",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Loading announces loading via role=status",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Card / DetailList / Table Card renders its title",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Card / DetailList / Table DetailList uses dl/dt/dd semantics",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "Card / DetailList / Table Table header cells use th scope=col",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "ItemCard (mobile list) is a whole-card link with accessible name and key fields",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/components.test.tsx",
+          "name": "ItemCard (mobile list) encodes opaque ids with URL-significant characters in the detail link (PR #34 P2-2)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/item-detail-page.test.tsx",
+          "name": "ItemDetailPage (ui-spec §3, minus F-04 request panel) renders item information with badge and Quantity Tracking display",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/item-detail-page.test.tsx",
+          "name": "ItemDetailPage (ui-spec §3, minus F-04 request panel) shows a missing-item state with a back link on 404",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/item-detail-page.test.tsx",
+          "name": "ItemDetailPage (ui-spec §3, minus F-04 request panel) renders an empty description as muted 'No description'",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/item-detail-page.test.tsx",
+          "name": "ItemDetailPage (ui-spec §3, minus F-04 request panel) returns to Login on 401",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI shows committed loan and refreshes the submitted queue",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI prevents duplicate clicks and success before the response",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI reconciles failure 409 without blind retry or false success",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI reconciles failure 500 without blind retry or false success",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI reconciles failure 0 without blind retry or false success",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI expires the session on checkout401",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI does not render checkout for Borrower",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI reads own active loans and an opaque-ID detail",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI handles empty active loans and reload",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI handles loan-read error 403 safely",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI handles loan-read error 404 safely",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI handles loan-read error 503 safely",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI denies the staff general-loan page before requesting private records",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "LoginPage (ui-spec §1) validates empty fields inline without calling the API",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "LoginPage (ui-spec §1) shows one generic message for invalid credentials, preserving username and clearing password",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "LoginPage (ui-spec §1) navigates to the catalog after a successful sign-in",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "LoginPage (ui-spec §1) shows a generic safe message with requestId on server failure (503) and clears the password while keeping the username",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "LoginPage (ui-spec §1) clears the password on a network failure while keeping the username",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "LoginPage (ui-spec §1) clears the password when client-side validation fails (preserve only safe input)",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "LoginPage (ui-spec §1) password toggle is keyboard reachable in tab order and announces its state",
+          "status": "passed"
+        }
+      ]
+    },
+    "browser": {
+      "passed": 54,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "cases": [
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "login as Borrower lands on the catalog; sign out returns to Login",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "invalid login shows one generic message and never reveals account existence",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "a 401 during browsing clears stale state and returns to Login with a notice",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "login as Borrower lands on the catalog; sign out returns to Login",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "invalid login shows one generic message and never reveals account existence",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "a 401 during browsing clears stale state and returns to Login with a notice",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "login as Borrower lands on the catalog; sign out returns to Login",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "invalid login shows one generic message and never reveals account existence",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/auth-journey.spec.ts",
+          "name": "a 401 during browsing clears stale state and returns to Login with a notice",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/borrowing-request.spec.ts",
+          "name": "multi-unit submit, reload, own detail, cross-owner denial and Custodian queue",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/borrowing-request.spec.ts",
+          "name": "unavailable item has no submit form and rejects direct API requests",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/borrowing-request.spec.ts",
+          "name": "multi-unit submit, reload, own detail, cross-owner denial and Custodian queue",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/borrowing-request.spec.ts",
+          "name": "unavailable item has no submit form and rejects direct API requests",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/borrowing-request.spec.ts",
+          "name": "multi-unit submit, reload, own detail, cross-owner denial and Custodian queue",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/borrowing-request.spec.ts",
+          "name": "unavailable item has no submit form and rejects direct API requests",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "list → detail → back keeps the same persisted item (Borrower)",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "Custodian sees the same catalog data without a Borrower request action",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "responsive surfaces match the viewport (AC-7 matrix)",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "a missing item shows the missing state with a way back",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "list → detail → back keeps the same persisted item (Borrower)",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "Custodian sees the same catalog data without a Borrower request action",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "responsive surfaces match the viewport (AC-7 matrix)",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "a missing item shows the missing state with a way back",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "list → detail → back keeps the same persisted item (Borrower)",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "Custodian sees the same catalog data without a Borrower request action",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "responsive surfaces match the viewport (AC-7 matrix)",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/catalog-journey.spec.ts",
+          "name": "a missing item shows the missing state with a way back",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/checkout.spec.ts",
+          "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "loading state is shown while the catalog request is in flight",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "empty catalog renders a dedicated empty state, not an error",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "server failure shows a generic retry message with requestId — never false-empty",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "401 during browsing returns to Login with the expired-session notice",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "serving contract: app shell at / and /api unknown routes stay JSON (AC-1)",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "loading state is shown while the catalog request is in flight",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "empty catalog renders a dedicated empty state, not an error",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "server failure shows a generic retry message with requestId — never false-empty",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "401 during browsing returns to Login with the expired-session notice",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "serving contract: app shell at / and /api unknown routes stay JSON (AC-1)",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "loading state is shown while the catalog request is in flight",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "empty catalog renders a dedicated empty state, not an error",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "server failure shows a generic retry message with requestId — never false-empty",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "401 during browsing returns to Login with the expired-session notice",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-states.spec.ts",
+          "name": "serving contract: app shell at / and /api unknown routes stay JSON (AC-1)",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        }
+      ]
+    }
+  },
+  "application_coverage": {
+    "total": 49,
+    "passed": 49,
+    "meaning": "executed behavioral checks mapped to F01-F05 application AC; excludes human process/release gates"
+  },
+  "readiness": "NOT_RELEASED",
+  "error": null,
+  "setup_tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "postgresql": "18.4",
+  "runner_failure_probe": {
+    "status": "PASS",
+    "observed_exit": 1,
+    "numFailedTests": 1,
+    "meaning": "isolated assertion failure propagates nonzero; never included in product suite"
+  },
+  "process_checks": {
+    "TEST-F10-04": {
+      "status": "PASS",
+      "artifact": "verification.json",
+      "detail": "Actual suite counts checked; 57 AC and 77 STS IDs exactly match definitions"
+    },
+    "TEST-F10-05": {
+      "status": "PASS",
+      "artifact": "runner-failure-probe.json",
+      "detail": "Intended isolated assertion failure returned exit 1"
+    },
+    "TEST-F10-06": {
+      "status": "PASS",
+      "artifact": "setup.json",
+      "detail": "Local fresh-project rehearsal 38044ms; peer repetition pending"
+    },
+    "TEST-F10-07": {
+      "status": "PASS",
+      "artifact": "../test-excerpts.md",
+      "detail": "Actual excerpts and historical local RED records retained; human authenticity review pending"
+    },
+    "TEST-F10-08": {
+      "status": "PASS",
+      "artifact": "../workflow.json",
+      "detail": "Independent feature review identities, staging paths and real Git ancestry checked; release chain pending"
+    },
+    "TEST-F10-09": {
+      "status": "NOT_RELEASED",
+      "artifact": "release-audit.json",
+      "detail": "Actual main release and release-version regression have not been supplied; strict audit remains required"
+    },
+    "TEST-F10-10": {
+      "status": "PASS",
+      "artifact": "../workflow-and-contributions.md",
+      "detail": "Both accounts and AI disclosure documented; human confirmation pending"
+    }
+  },
+  "ac_results": [
+    {
+      "ac": "AC-F01-01",
+      "planned_tests": [
+        "TEST-F01-01",
+        "TEST-F01-04"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "sets a session cookie",
+          "matched": [
+            {
+              "file": "server/tests/auth-routes.test.ts",
+              "name": "POST /api/auth/login (TEST-F01-01/02/03) returns 200 with data.user and sets a session cookie (TEST-F01-01)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/auth.test.ts",
+          "name": "fresh session with correct identity",
+          "matched": [
+            {
+              "file": "server/tests/auth.test.ts",
+              "name": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) logs in a seeded Borrower and returns a fresh session with correct identity (TEST-F01-01)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-02",
+      "planned_tests": [
+        "TEST-F01-02",
+        "TEST-F01-12"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "wrong password identically",
+          "matched": [
+            {
+              "file": "server/tests/auth-routes.test.ts",
+              "name": "POST /api/auth/login (TEST-F01-01/02/03) returns 401 INVALID_CREDENTIALS for unknown user and wrong password identically (TEST-F01-02)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "auth-journey.spec.ts",
+          "name": "invalid login",
+          "matched": [
+            {
+              "file": "e2e/auth-journey.spec.ts",
+              "name": "invalid login shows one generic message and never reveals account existence",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/auth-journey.spec.ts",
+              "name": "invalid login shows one generic message and never reveals account existence",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/auth-journey.spec.ts",
+              "name": "invalid login shows one generic message and never reveals account existence",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-03",
+      "planned_tests": [
+        "TEST-F01-03"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/auth.test.ts",
+          "name": "malformed payloads and extra",
+          "matched": [
+            {
+              "file": "server/tests/auth.test.ts",
+              "name": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) rejects malformed payloads and extra identity/role/expiry fields with VALIDATION_ERROR (AC-F01-03, TEST-F01-03)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "malformed JSON body",
+          "matched": [
+            {
+              "file": "server/tests/auth-routes.test.ts",
+              "name": "Regression — safe error envelopes (TEST-F01-03/06/14) malformed JSON body returns 400 JSON envelope, never HTML (TEST-F01-03)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-04",
+      "planned_tests": [
+        "TEST-F01-04",
+        "TEST-F01-09"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/auth.test.ts",
+          "name": "derives identity from the session",
+          "matched": [
+            {
+              "file": "server/tests/auth.test.ts",
+              "name": "AuthService.currentUser (AC-F01-04, TEST-F01-04) derives identity from the session, not client-supplied claims",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02",
+          "matched": [
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-05",
+      "planned_tests": [
+        "TEST-F01-05",
+        "TEST-F01-06",
+        "TEST-F01-07",
+        "TEST-F01-08",
+        "TEST-F01-16"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "anonymous ",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "invalid ",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "expired ",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "revoked ",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-06",
+      "planned_tests": [
+        "TEST-F01-07",
+        "TEST-F01-13",
+        "TEST-F01-14",
+        "TEST-F01-16"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "clears cookie, and denies replay",
+          "matched": [
+            {
+              "file": "server/tests/auth-routes.test.ts",
+              "name": "POST /api/auth/logout (TEST-F01-06/07) returns 204, clears cookie, and denies replay (TEST-F01-07)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/account-menu.test.tsx",
+          "name": "logout failure",
+          "matched": [
+            {
+              "file": "client/src/test/account-menu.test.tsx",
+              "name": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) keeps the session page with a safe retry message on logout failure — no redirect",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02",
+          "matched": [
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-07",
+      "planned_tests": [
+        "TEST-F01-08"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/session.test.ts",
+          "name": "idle expiry at the boundary",
+          "matched": [
+            {
+              "file": "server/tests/session.test.ts",
+              "name": "SessionStore (D2: server session, durable revocation) enforces idle expiry at the boundary using the injectable clock (TEST-F01-08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/session.test.ts",
+          "name": "absolute cap",
+          "matched": [
+            {
+              "file": "server/tests/session.test.ts",
+              "name": "SessionStore (D2: server session, durable revocation) enforces the absolute cap even with continuous activity (TEST-F01-08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/session.test.ts",
+              "name": "SessionStore (D2: server session, durable revocation) sliding idle extension never exceeds the absolute cap",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-08",
+      "planned_tests": [
+        "TEST-F01-09"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "wrong role ",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests/{requestId}/checkout is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans/{loanId} is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-09",
+      "planned_tests": [
+        "TEST-F01-10"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "owner query tampering",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB owner query tampering cannot widen request/loan scope (TEST-F10-02 / TEST-F01-10)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "enforces authentication, role, ownership",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API enforces authentication, role, ownership and trusted origin (TEST-F05-09/10)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-10",
+      "planned_tests": [
+        "TEST-F01-11",
+        "TEST-F01-12"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/password.test.ts",
+          "name": "salted argon2",
+          "matched": [
+            {
+              "file": "server/tests/password.test.ts",
+              "name": "password hashing service (BR-10, NFR-03) produces a salted argon2 hash that is not the plaintext and differs for equal inputs",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/auth.test.ts",
+          "name": "never expose password or hash",
+          "matched": [
+            {
+              "file": "server/tests/auth.test.ts",
+              "name": "AuthService secrets hygiene (AC-F01-10, TEST-F01-12) login result and stored rows never expose password or hash",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-11",
+      "planned_tests": [
+        "TEST-F01-13",
+        "TEST-F01-14"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "client",
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "server failure (503)",
+          "matched": [
+            {
+              "file": "client/src/test/login-page.test.tsx",
+              "name": "LoginPage (ui-spec §1) shows a generic safe message with requestId on server failure (503) and clears the password while keeping the username",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/login-page.test.tsx",
+          "name": "validates empty fields",
+          "matched": [
+            {
+              "file": "client/src/test/login-page.test.tsx",
+              "name": "LoginPage (ui-spec §1) validates empty fields inline without calling the API",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/account-menu.test.tsx",
+          "name": "signs out and returns",
+          "matched": [
+            {
+              "file": "client/src/test/account-menu.test.tsx",
+              "name": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) signs out and returns to Login on confirmed success",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "auth-journey.spec.ts",
+          "name": "401 during browsing",
+          "matched": [
+            {
+              "file": "e2e/auth-journey.spec.ts",
+              "name": "a 401 during browsing clears stale state and returns to Login with a notice",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/auth-journey.spec.ts",
+              "name": "a 401 during browsing clears stale state and returns to Login with a notice",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/auth-journey.spec.ts",
+              "name": "a 401 during browsing clears stale state and returns to Login with a notice",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F01-12",
+      "planned_tests": [
+        "TEST-F01-15"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/auth-routes.test.ts",
+          "name": "neither Origin nor Referer",
+          "matched": [
+            {
+              "file": "server/tests/auth-routes.test.ts",
+              "name": "Regression — missing anti-CSRF evidence (TEST-F01-15, review round 2) logout with neither Origin nor Referer is denied 403 and does NOT revoke the session",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "configured HTTPS cookies",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB configured HTTPS cookies have Secure/HttpOnly/SameSite attributes (TEST-F01-15)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-01",
+      "planned_tests": [
+        "TEST-F02-01",
+        "TEST-F02-02",
+        "TEST-F02-07"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/catalog.test.ts",
+          "name": "lists seeded items for both roles",
+          "matched": [
+            {
+              "file": "server/tests/catalog.test.ts",
+              "name": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) lists seeded items for both roles with correct fields and no private data (TEST-F02-01)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/catalog.test.ts",
+          "name": "detail matches its list",
+          "matched": [
+            {
+              "file": "server/tests/catalog.test.ts",
+              "name": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) E-ONE detail matches its list entry for both roles (TEST-F02-02)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "catalog-journey.spec.ts",
+          "name": "list → detail",
+          "matched": [
+            {
+              "file": "e2e/catalog-journey.spec.ts",
+              "name": "list → detail → back keeps the same persisted item (Borrower)",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/catalog-journey.spec.ts",
+              "name": "list → detail → back keeps the same persisted item (Borrower)",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/catalog-journey.spec.ts",
+              "name": "list → detail → back keeps the same persisted item (Borrower)",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-02",
+      "planned_tests": [
+        "TEST-F02-03",
+        "TEST-F02-08"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/catalog.test.ts",
+          "name": "empty catalog returns",
+          "matched": [
+            {
+              "file": "server/tests/catalog.test.ts",
+              "name": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) empty catalog returns data=[] and unknown id returns safe 404 (TEST-F02-03)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "dedicated empty state",
+          "matched": [
+            {
+              "file": "client/src/test/catalog-page.test.tsx",
+              "name": "CatalogPage (ui-spec §2 / f-02 §3 states) renders a dedicated empty state for an empty catalog (not an error)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/item-detail-page.test.tsx",
+          "name": "missing-item state",
+          "matched": [
+            {
+              "file": "client/src/test/item-detail-page.test.tsx",
+              "name": "ItemDetailPage (ui-spec §3, minus F-04 request panel) shows a missing-item state with a back link on 404",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-03",
+      "planned_tests": [
+        "TEST-F02-01",
+        "TEST-F02-04"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "anonymous GET /api/equipment",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "expired GET /api/equipment",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "revoked GET /api/equipment",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/catalog.test.ts",
+          "name": "both roles with correct fields",
+          "matched": [
+            {
+              "file": "server/tests/catalog.test.ts",
+              "name": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) lists seeded items for both roles with correct fields and no private data (TEST-F02-01)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-04",
+      "planned_tests": [
+        "TEST-F02-05"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "actual seed reruns preserve",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB actual seed reruns preserve existing requests, loans, stock and identities (TEST-F02-05 complete)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-05",
+      "planned_tests": [
+        "TEST-F02-06"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/catalog.test.ts",
+          "name": "rejects negative total and fractional",
+          "matched": [
+            {
+              "file": "server/tests/catalog.test.ts",
+              "name": "Seed idempotency and validation (TEST-F02-05/06) rejects negative total and fractional quantity at the typed boundary; zero total is valid (TEST-F02-06)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-06",
+      "planned_tests": [
+        "TEST-F02-07",
+        "TEST-F02-08"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "client",
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "never renders unreceived quantities",
+          "matched": [
+            {
+              "file": "client/src/test/catalog-page.test.tsx",
+              "name": "CatalogPage (ui-spec §2 / f-02 §3 states) never renders unreceived quantities as zero while loading or after failure (TEST-F03-08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "catalog-journey.spec.ts",
+          "name": "Custodian sees the same catalog",
+          "matched": [
+            {
+              "file": "e2e/catalog-journey.spec.ts",
+              "name": "Custodian sees the same catalog data without a Borrower request action",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/catalog-journey.spec.ts",
+              "name": "Custodian sees the same catalog data without a Borrower request action",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/catalog-journey.spec.ts",
+              "name": "Custodian sees the same catalog data without a Borrower request action",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "ui-states.spec.ts",
+          "name": "server failure",
+          "matched": [
+            {
+              "file": "e2e/ui-states.spec.ts",
+              "name": "server failure shows a generic retry message with requestId — never false-empty",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/ui-states.spec.ts",
+              "name": "server failure shows a generic retry message with requestId — never false-empty",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/ui-states.spec.ts",
+              "name": "server failure shows a generic retry message with requestId — never false-empty",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-07",
+      "planned_tests": [
+        "TEST-F02-08",
+        "TEST-F02-09"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/catalog.test.ts",
+          "name": "catalog DB failure yields safe 503",
+          "matched": [
+            {
+              "file": "server/tests/catalog.test.ts",
+              "name": "Safe failure and restart persistence (TEST-F02-09/10) catalog DB failure yields safe 503 for list/detail and recovery returns real data (TEST-F02-09)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "server failure",
+          "matched": [
+            {
+              "file": "client/src/test/catalog-page.test.tsx",
+              "name": "CatalogPage (ui-spec §2 / f-02 §3 states) shows a generic retry message with requestId on server failure — never a false-empty",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F02-08",
+      "planned_tests": [
+        "TEST-F02-10"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/restart-e2e.test.ts",
+          "name": "catalog and session survive a full process stop/start",
+          "matched": [
+            {
+              "file": "server/tests/restart-e2e.test.ts",
+              "name": "Application process restart against the same durable DB (AC-06.2-03) catalog and session survive a full process stop/start (TEST-F02-10 process-restart evidence)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "restart preserves all domain fields",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F03-01",
+      "planned_tests": [
+        "TEST-F03-01",
+        "TEST-F03-02"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/availability.test.ts",
+          "name": "computes total minus held",
+          "matched": [
+            {
+              "file": "server/tests/availability.test.ts",
+              "name": "Availability derivation (TEST-F03-01 / TEST-F03-05) computes total minus held with exact zero/positive boundaries (TEST-F03-01)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/availability.test.ts",
+          "name": "aggregates all active loans",
+          "matched": [
+            {
+              "file": "server/tests/availability.test.ts",
+              "name": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) aggregates all active loans for the item without exposing loan/borrower details (TEST-F03-02)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F03-02",
+      "planned_tests": [
+        "TEST-F03-03"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/availability.test.ts",
+          "name": "both roles, list and detail agreeing",
+          "matched": [
+            {
+              "file": "server/tests/availability.test.ts",
+              "name": "Derived availability over persisted stock (TEST-F03-03, clean fixtures) shows correct values for clean fixtures as both roles, list and detail agreeing (TEST-F03-03)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F03-03",
+      "planned_tests": [
+        "TEST-F03-04"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "previously deferred request/queue",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API completes the previously deferred request/queue transitions (TEST-F04-06/07)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02",
+          "matched": [
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F03-04",
+      "planned_tests": [
+        "TEST-F03-01",
+        "TEST-F03-05",
+        "TEST-F03-06"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/availability.test.ts",
+          "name": "never clamps",
+          "matched": [
+            {
+              "file": "server/tests/availability.test.ts",
+              "name": "Availability derivation (TEST-F03-01 / TEST-F03-05) rejects invalid aggregate inputs explicitly — never clamps (TEST-F03-05)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/availability.test.ts",
+          "name": "leaks no quantity/stack/loan data",
+          "matched": [
+            {
+              "file": "server/tests/availability.test.ts",
+              "name": "Invalid aggregate state is a safe internal error (TEST-F03-06) returns 500 INTERNAL_ERROR with requestId and leaks no quantity/stack/loan data",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F03-05",
+      "planned_tests": [
+        "TEST-F03-07",
+        "TEST-F03-08"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "client",
+          "file": "client/src/test/catalog-page.test.tsx",
+          "name": "never renders unreceived quantities",
+          "matched": [
+            {
+              "file": "client/src/test/catalog-page.test.tsx",
+              "name": "CatalogPage (ui-spec §2 / f-02 §3 states) never renders unreceived quantities as zero while loading or after failure (TEST-F03-08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "checkout.spec.ts",
+          "name": "F-05 normal",
+          "matched": [
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02",
+          "matched": [
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F03-06",
+      "planned_tests": [
+        "TEST-F03-09",
+        "TEST-F03-10"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "rolls back failure after INSERT",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API rolls back failure after INSERT, forbids dirty availability reads, then retries (TEST-F05-06 / F03-10)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "restart preserves all domain fields",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/catalog.test.ts",
+          "name": "catalog DB failure",
+          "matched": [
+            {
+              "file": "server/tests/catalog.test.ts",
+              "name": "Safe failure and restart persistence (TEST-F02-09/10) catalog DB failure yields safe 503 for list/detail and recovery returns real data (TEST-F02-09)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F03-07",
+      "planned_tests": [
+        "TEST-F03-10",
+        "TEST-F03-11"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "rolls back failure after INSERT",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API rolls back failure after INSERT, forbids dirty availability reads, then retries (TEST-F05-06 / F03-10)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "N=50 independent",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API serializes N=50 independent two-worker races and a same-request race (TEST-F05-04/05)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "checkout.spec.ts",
+          "name": "F-05 normal",
+          "matched": [
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-01",
+      "planned_tests": [
+        "TEST-F04-01",
+        "TEST-F04-12"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "persists server-owned request fields",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL persists server-owned request fields, opaque item ID and fresh retrieval (TEST-F04-01)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-02",
+      "planned_tests": [
+        "TEST-F04-02",
+        "TEST-F04-13"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "rejects unavailable equipment",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects unavailable equipment without persistence (TEST-F04-02)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-03",
+      "planned_tests": [
+        "TEST-F04-03",
+        "TEST-F04-04",
+        "TEST-F04-12",
+        "TEST-F04-14"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "rejects invalid quantity",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity undefined (TEST-F04-03)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity 0 (TEST-F04-03)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity -1 (TEST-F04-03)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity 1.5 (TEST-F04-03)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity null (TEST-F04-03)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity true (TEST-F04-03)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity 1 (TEST-F04-03)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects invalid quantity 2147483648 (TEST-F04-03)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "rejects injected",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects injected borrower_id (TEST-F04-04)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects injected status (TEST-F04-04)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects injected created_at (TEST-F04-04)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects injected id (TEST-F04-04)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects injected loan_id (TEST-F04-04)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "absent equipment and malformed",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL rejects absent equipment and malformed body (TEST-F04-03/04)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-04",
+      "planned_tests": [
+        "TEST-F04-05",
+        "TEST-F04-14"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "filters lists and forbids",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL filters lists and forbids another borrower's detail (TEST-F04-05/14)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-05",
+      "planned_tests": [
+        "TEST-F04-06"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "previously deferred request/queue",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API completes the previously deferred request/queue transitions (TEST-F04-06/07)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "submitted queue",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL allows the submitted queue, denies Custodian creation before input validation (TEST-F04-06)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-06",
+      "planned_tests": [
+        "TEST-F04-07"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "previously deferred request/queue",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API completes the previously deferred request/queue transitions (TEST-F04-06/07)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-07",
+      "planned_tests": [
+        "TEST-F04-08"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/restart-e2e.test.ts",
+          "name": "catalog and session survive a full process stop/start",
+          "matched": [
+            {
+              "file": "server/tests/restart-e2e.test.ts",
+              "name": "Application process restart against the same durable DB (AC-06.2-03) catalog and session survive a full process stop/start (TEST-F02-10 process-restart evidence)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "restart preserves all domain fields",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-08",
+      "planned_tests": [
+        "TEST-F04-09"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "browser",
+          "file": "borrowing-request.spec.ts",
+          "name": "multi-unit submit",
+          "matched": [
+            {
+              "file": "e2e/borrowing-request.spec.ts",
+              "name": "multi-unit submit, reload, own detail, cross-owner denial and Custodian queue",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/borrowing-request.spec.ts",
+              "name": "multi-unit submit, reload, own detail, cross-owner denial and Custodian queue",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/borrowing-request.spec.ts",
+              "name": "multi-unit submit, reload, own detail, cross-owner denial and Custodian queue",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/borrowing-request.test.tsx",
+          "name": "conflict",
+          "matched": [
+            {
+              "file": "client/src/test/borrowing-request.test.tsx",
+              "name": "F-04 request UI (TEST-F04-09) preserves input and refreshes authoritative stock after a conflict",
+              "status": "passed"
+            },
+            {
+              "file": "client/src/test/borrowing-request.test.tsx",
+              "name": "F-04 request UI (TEST-F04-09) disables retry when stock cannot be refreshed after conflict",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-09",
+      "planned_tests": [
+        "TEST-F04-10"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "multi-unit bounds",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL enforces approved multi-unit bounds with no additional per-user cap (TEST-F04-10)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "no extra borrower cap",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API fulfills multiple units with no extra borrower cap and checks stock again (TEST-F05-14/16)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F04-10",
+      "planned_tests": [
+        "TEST-F04-11"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/borrowing-request.test.ts",
+          "name": "anonymous routes and hostile-origin",
+          "matched": [
+            {
+              "file": "server/tests/borrowing-request.test.ts",
+              "name": "F-04 real API/PostgreSQL denies all anonymous routes and hostile-origin submissions (TEST-F04-11)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "anonymous POST /api/requests",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-01",
+      "planned_tests": [
+        "TEST-F05-01",
+        "TEST-F05-16"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "correct server fields and due date",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API commits correct server fields and due date; fresh request/queue/loan/stock reads (TEST-F05-01/08)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02",
+          "matched": [
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-02",
+      "planned_tests": [
+        "TEST-F05-02",
+        "TEST-F05-15"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "rejects unavailable and repeated",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API rejects unavailable and repeated requests without mutation (TEST-F05-02/03)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "checkout.spec.ts",
+          "name": "F-05 normal",
+          "matched": [
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-03",
+      "planned_tests": [
+        "TEST-F05-03",
+        "TEST-F05-05"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "rejects unavailable and repeated",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API rejects unavailable and repeated requests without mutation (TEST-F05-02/03)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "same-request race",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API serializes N=50 independent two-worker races and a same-request race (TEST-F05-04/05)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-04",
+      "planned_tests": [
+        "TEST-F05-04",
+        "TEST-F05-05",
+        "TEST-F05-15",
+        "TEST-F05-16"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "N=50 independent",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API serializes N=50 independent two-worker races and a same-request race (TEST-F05-04/05)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-05",
+      "planned_tests": [
+        "TEST-F05-06"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "rolls back failure after INSERT",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API rolls back failure after INSERT, forbids dirty availability reads, then retries (TEST-F05-06 / F03-10)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-06",
+      "planned_tests": [
+        "TEST-F05-07",
+        "TEST-F05-08"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan-unit.test.ts",
+          "name": "seven business calendar days",
+          "matched": [
+            {
+              "file": "server/tests/loan-unit.test.ts",
+              "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-11-06T16:59:59Z (TEST-F05-07)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/loan-unit.test.ts",
+              "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-11-06T17:00:00Z (TEST-F05-07)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/loan-unit.test.ts",
+              "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-12-27T17:00:00Z (TEST-F05-07)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/loan-unit.test.ts",
+              "name": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2028-02-22T17:00:00Z (TEST-F05-07)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "correct server fields and due date",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API commits correct server fields and due date; fresh request/queue/loan/stock reads (TEST-F05-01/08)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-07",
+      "planned_tests": [
+        "TEST-F05-09"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "enforces authentication, role, ownership",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API enforces authentication, role, ownership and trusted origin (TEST-F05-09/10)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "anonymous POST /api/requests/fixture-r-one/checkout",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-08",
+      "planned_tests": [
+        "TEST-F05-10"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "enforces authentication, role, ownership",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API enforces authentication, role, ownership and trusted origin (TEST-F05-09/10)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "owner query tampering",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB owner query tampering cannot widen request/loan scope (TEST-F10-02 / TEST-F01-10)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-09",
+      "planned_tests": [
+        "TEST-F05-11"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "restart preserves all domain fields",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "persists API-created loan",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API persists API-created loan across two actual app processes (TEST-F05-11)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-10",
+      "planned_tests": [
+        "TEST-F05-12"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "browser",
+          "file": "checkout.spec.ts",
+          "name": "F-05 hold",
+          "matched": [
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "checkout.spec.ts",
+          "name": "F-05 fail",
+          "matched": [
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        },
+        {
+          "suite": "browser",
+          "file": "checkout.spec.ts",
+          "name": "F-05 normal",
+          "matched": [
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/checkout.spec.ts",
+              "name": "F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        },
+        {
+          "suite": "client",
+          "file": "client/src/test/loan.test.tsx",
+          "name": "reconciles failure",
+          "matched": [
+            {
+              "file": "client/src/test/loan.test.tsx",
+              "name": "F-05 checkout and active-loan UI reconciles failure 409 without blind retry or false success",
+              "status": "passed"
+            },
+            {
+              "file": "client/src/test/loan.test.tsx",
+              "name": "F-05 checkout and active-loan UI reconciles failure 500 without blind retry or false success",
+              "status": "passed"
+            },
+            {
+              "file": "client/src/test/loan.test.tsx",
+              "name": "F-05 checkout and active-loan UI reconciles failure 0 without blind retry or false success",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-11",
+      "planned_tests": [
+        "TEST-F05-13"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "rejects injected fields",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API rejects injected fields, non-object bodies and malformed IDs (TEST-F05-13)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F05-12",
+      "planned_tests": [
+        "TEST-F05-14"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "no extra borrower cap",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API fulfills multiple units with no extra borrower cap and checks stock again (TEST-F05-14/16)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-01",
+      "planned_tests": [
+        "TEST-F10-01"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "browser",
+          "file": "sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02",
+          "matched": [
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-02",
+      "planned_tests": [
+        "TEST-F10-02"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "browser",
+          "file": "sprint1-integration.spec.ts",
+          "name": "TEST-F10-01/02",
+          "matched": [
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "desktop-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "tablet-chromium",
+              "status": "passed",
+              "attempts": 1
+            },
+            {
+              "file": "e2e/sprint1-integration.spec.ts",
+              "name": "TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout",
+              "project": "mobile-chromium",
+              "status": "passed",
+              "attempts": 1
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "wrong role ",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests/{requestId}/checkout is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            },
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans/{loanId} is forbidden by server (TEST-F10-02)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "suite": "server",
+          "file": "server/tests/loan.test.ts",
+          "name": "N=50 independent",
+          "matched": [
+            {
+              "file": "server/tests/loan.test.ts",
+              "name": "F-05 real PostgreSQL/API serializes N=50 independent two-worker races and a same-request race (TEST-F05-04/05)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-03",
+      "planned_tests": [
+        "TEST-F10-03"
+      ],
+      "status": "PASS",
+      "pending": [],
+      "checks": [
+        {
+          "suite": "server",
+          "file": "server/tests/sprint1-integration.test.ts",
+          "name": "restart preserves all domain fields",
+          "matched": [
+            {
+              "file": "server/tests/sprint1-integration.test.ts",
+              "name": "F10 complete protected-route inventory on production HTTP/real DB restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-04",
+      "planned_tests": [
+        "TEST-F10-04",
+        "TEST-F10-05"
+      ],
+      "status": "PARTIAL",
+      "pending": [
+        "Human assessment of process/evidence AC; release-version rerun"
+      ],
+      "checks": [
+        {
+          "kind": "process",
+          "id": "TEST-F10-04",
+          "matched": [
+            {
+              "name": "TEST-F10-04: Actual suite counts checked; 57 AC and 77 STS IDs exactly match definitions",
+              "file": "verification.json",
+              "status": "PASS"
+            }
+          ],
+          "pending_check": null
+        },
+        {
+          "kind": "process",
+          "id": "TEST-F10-05",
+          "matched": [
+            {
+              "name": "TEST-F10-05: Intended isolated assertion failure returned exit 1",
+              "file": "runner-failure-probe.json",
+              "status": "PASS"
+            }
+          ],
+          "pending_check": null
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-05",
+      "planned_tests": [
+        "TEST-F10-06"
+      ],
+      "status": "PARTIAL",
+      "pending": [
+        "Other student repeats README setup from prerequisites in <=15 minutes; local timed rehearsal recorded separately"
+      ],
+      "checks": [
+        {
+          "kind": "process",
+          "id": "TEST-F10-06",
+          "matched": [
+            {
+              "name": "TEST-F10-06: Local fresh-project rehearsal 38044ms; peer repetition pending",
+              "file": "setup.json",
+              "status": "PASS"
+            }
+          ],
+          "pending_check": null
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-06",
+      "planned_tests": [
+        "TEST-F10-07",
+        "TEST-F10-10"
+      ],
+      "status": "PARTIAL",
+      "pending": [
+        "Human authenticity review of historical local RED logs; no RED SHA was committed"
+      ],
+      "checks": [
+        {
+          "kind": "process",
+          "id": "TEST-F10-07",
+          "matched": [
+            {
+              "name": "TEST-F10-07: Actual excerpts and historical local RED records retained; human authenticity review pending",
+              "file": "../test-excerpts.md",
+              "status": "PASS"
+            }
+          ],
+          "pending_check": null
+        },
+        {
+          "kind": "process",
+          "id": "TEST-F10-10",
+          "matched": [
+            {
+              "name": "TEST-F10-10: Both accounts and AI disclosure documented; human confirmation pending",
+              "file": "../workflow-and-contributions.md",
+              "status": "PASS"
+            }
+          ],
+          "pending_check": null
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-07",
+      "planned_tests": [
+        "TEST-F10-08"
+      ],
+      "status": "PARTIAL",
+      "pending": [
+        "Reviewed feature13 PR and reviewed staging-to-main release; at least two sampled feature chains documented separately"
+      ],
+      "checks": [
+        {
+          "kind": "process",
+          "id": "TEST-F10-08",
+          "matched": [
+            {
+              "name": "TEST-F10-08: Independent feature review identities, staging paths and real Git ancestry checked; release chain pending",
+              "file": "../workflow.json",
+              "status": "PASS"
+            }
+          ],
+          "pending_check": null
+        }
+      ]
+    },
+    {
+      "ac": "AC-F10-08",
+      "planned_tests": [
+        "TEST-F10-09",
+        "TEST-F10-10"
+      ],
+      "status": "PARTIAL",
+      "pending": [
+        "Actual release SHA/tag and release-version regression; both-student disclosure confirmation; A-12 team ratification"
+      ],
+      "checks": [
+        {
+          "kind": "process",
+          "id": "TEST-F10-09",
+          "matched": [],
+          "pending_check": {
+            "status": "NOT_RELEASED",
+            "artifact": "release-audit.json",
+            "detail": "Actual main release and release-version regression have not been supplied; strict audit remains required"
+          }
+        },
+        {
+          "kind": "process",
+          "id": "TEST-F10-10",
+          "matched": [
+            {
+              "name": "TEST-F10-10: Both accounts and AI disclosure documented; human confirmation pending",
+              "file": "../workflow-and-contributions.md",
+              "status": "PASS"
+            }
+          ],
+          "pending_check": null
+        }
+      ]
+    }
+  ],
+  "status": "AUTOMATED_CHECKS_PASS",
+  "source_sha256": {
+    ".env.example": "e2ebe350092cc2a182c735beefa463d6690ae317d3bd57b748a4a3d4af282f44",
+    ".gitignore": "380a0f1e4ced5a9fdacfa7ecbe08a51d0e241ceabd620418c6b8fc1d3dd3c129",
+    "client/catalog.html": "32879a2a50e5f74246ce69b7d51bba4c13cf66f4ff032affa9f89299d6f6fffd",
+    "client/index.html": "021ff7c5e822cb1c46a4da3a0911e90e6e3fea60ce1479d24628e67867817749",
+    "client/item.html": "15550a5c82e5bc354caec5488cd1f44b1226c014339e40b30b7ec7f0e3e63984",
+    "client/login.html": "3fe489401737aa2a623a8fc58fbec47f9b9d289b39408f36bdcc8461da5a763a",
+    "client/package-lock.json": "3ba503fde30e94ba374d4306bd4aa822020c2fcb533424b1c8e76660dfc71830",
+    "client/package.json": "c8a7a0be15f5f8d671665f0ce767494baf420be79e178089bdf56f58091cbc47",
+    "client/src/App.tsx": "2474c3976dd8f3c00d63c7b4ee49f915b8374c402a06ea43e1ae32f3f28165ae",
+    "client/src/components/AccountMenu.tsx": "991e80a08fc811a634ad5224244b97c43fc2e05899e8abb72d64dc11a88fbc68",
+    "client/src/components/Alert.tsx": "c18db4f65ba51861ffc219987b3feeacb18110765e0b533f3dff41717e64c0e0",
+    "client/src/components/AppShell.tsx": "b14d0d7f749be65b70802935c9ef99b9a0b57a21e7e4b093f4744dc5cb4f31a5",
+    "client/src/components/AvailabilityBadge.tsx": "6846376cc18b01588fbef16b0733493cb227c2cd764119c42c05e428d923f4ca",
+    "client/src/components/Button.tsx": "bd86a3f29e99c38a72713e70281a70b685528f499f3a7795c031aff399e7a01a",
+    "client/src/components/Card.tsx": "acdd820927bb14747919809d9169eed660d40b5a032c0c96d51008449f8799aa",
+    "client/src/components/CheckoutRequest.tsx": "ed88d733cd5c41b91159587c262318e2c7575f61118fd1bb6eb097519284bf14",
+    "client/src/components/DetailList.tsx": "9201d32af4e9b8a3ff995f405532071cfdf9a557cebeb0a57cfdd7b50b103498",
+    "client/src/components/EmptyState.tsx": "b94d50122d7a6741b3027ed208580eb9a01486354891c0164dafb4f1744d9a4a",
+    "client/src/components/Field.tsx": "832f52b9f85fca7baaeb13c211a426fb0f36d58e89e00be8e292d35d5e7068a0",
+    "client/src/components/ItemCard.tsx": "a9c31cadbdbe4d12fcdd29e667825bfba282e4974f1979b949bdb95fa3a0fd0e",
+    "client/src/components/Loading.tsx": "1ed39907029e2f63cb9fa400671b5ac6372de01f8c0f76f21cfec95809775900",
+    "client/src/components/LoanDetails.tsx": "cb6c629e13c302aa2a187fbe668502a7dfecf0bf5689790bbbc5eacbb7952907",
+    "client/src/components/RequestToBorrow.tsx": "237204ecd9b1796f60c3b2b1815f371946bdc4276fdfd757ed80b66096e8a322",
+    "client/src/components/Table.tsx": "e14ad21fe6c382b800b53ebbb3281a5548ab1944b304564411a30757df667b8e",
+    "client/src/lib/api.ts": "62146e989a1cd8b7d9616261cb9896f150ad58031d73fcb092d5ca0adca45866",
+    "client/src/lib/paths.ts": "6aae5d67d746c1f47e282ab3ab646e3a40868254407c80c5d27a61f514b6f09b",
+    "client/src/lib/session.tsx": "1cb8c946d1e2574e2fd4ce76c527405186c5eeeadaacfc07110191b3e30354dd",
+    "client/src/main.tsx": "7beaf76641f65715008e940b24b541720dbf47e0d8a5a156e0a1037aba0912c8",
+    "client/src/pages/CatalogPage.tsx": "122bb78db1a71d0a11a4a0393a2fdaaeebcbb585b8c5975d1be539bca7c217ed",
+    "client/src/pages/ItemDetailPage.tsx": "fa95298fac5d515aae71597b772b601a4e4df0cc23062d817dcccc71487f42a9",
+    "client/src/pages/LoansPage.tsx": "55a99cfcd2b408ff0fcaaeb4472f224479ed1141fe97bacf15d0490a201d8ebc",
+    "client/src/pages/LoginPage.tsx": "1f4fc748c80093a9f627c1ef4accef78882fb1408153c47bd20d833268f93008",
+    "client/src/pages/RequestsPage.tsx": "719269a3e6fe4314994b08fb867b81a420d494d3c38ce35dc94cef847409cff9",
+    "client/src/styles/tokens.css": "fc46390143901fa955dc3355657b91dd67a23b7a4742d76a04d53dcedb801930",
+    "client/src/test/account-menu.test.tsx": "5fc1a7c7db464cad2f3f65ecb872ba79791a40eb2211871ab8c3e06898d88c9e",
+    "client/src/test/api.test.ts": "887777e08eb37143b94d53f4167bab48433533c3b9e9b2f295889e97c37a58f8",
+    "client/src/test/borrowing-request.test.tsx": "d6f73d902cdc15fc01f012fa064c5f5a6044d42463b403876273f84c44038f64",
+    "client/src/test/catalog-page.test.tsx": "e8048d32497abe0cbd26911369a540511715b7e577f5c680a438dd64cff27300",
+    "client/src/test/components.test.tsx": "5dcab7b2270b9039facbd0c9e35dd4d6996fd5d94dbe20466d4d8fb705c53c28",
+    "client/src/test/item-detail-page.test.tsx": "92e8d3f305669d2d78f535397c88f0210781b3b67321ade7a6540fe94db25df6",
+    "client/src/test/loan.test.tsx": "3b5a7d0634515d23f43758da4018a6e6a8c3bcf9707294a4fe67cf954a2167db",
+    "client/src/test/login-page.test.tsx": "1b3a620a95c66d0f5c22cfba63eb8f1a1ceecfb870fad71c14706d80945f94f7",
+    "client/src/test/setup.ts": "50e6c4c172d1725b83c9689d0999bcd37095ab41f6e2212ad9467d5525e3c272",
+    "client/tsconfig.json": "d3eb07dcdb9aa20f700280724dc322d12cdac236e2edcdfad5e938c75d73c6ff",
+    "client/vite.config.ts": "557322b92c09ebd58b102bcac18737090633e87054525bebd43218db56716a3a",
+    "client/vitest.config.ts": "24976aaac146269be9d940d06bad5d724a0ce5b2f4064c8823afc242acdf8b55",
+    "e2e/pages/catalog.page.ts": "bf95ea780bbc1e6a996a17f666795f2c7bb3f0462b2e17721466a07b71e85cc9",
+    "e2e/pages/fixtures.ts": "ab3bacd32f713c59af9ce6e4cd6ccc6c2ba9385784bb2da70efa028b9017f6fd",
+    "e2e/pages/item.page.ts": "363328b6dd3c0a0891f0038072b66e7b8275d0bdf592c86dbfb41d90f94802cb",
+    "e2e/pages/login.page.ts": "84aaada78aeb2b23a626aa888df9ed6869f3802de918f26801fb60e5bfe22df0",
+    "e2e/playwright.config.ts": "54d514aa09c0d5654ab9e9e685c0792848e3ef23ece7d3feb22aa2cfbef24792",
+    "e2e/specs/auth-journey.spec.ts": "ed7a2c08d605396aba7ca092e3534864f5708498133fb2fa74a34b740d3b1581",
+    "e2e/specs/borrowing-request.spec.ts": "04ab35a47f2d2641659ee674aac888c8b1de0635de7a0dcfd209b25bb0e2ff19",
+    "e2e/specs/catalog-journey.spec.ts": "c047d9920239f091056eb051afe994b7bd41289184c1212efc7627fc995f3a21",
+    "e2e/specs/checkout.spec.ts": "de9500544c5c1c6fc8d82e3b8ecca825ed8239a623fe5c28a6c91ad5458670c2",
+    "e2e/specs/sprint1-integration.spec.ts": "b6e5e1d1c3ed8c3678917ed4bbc5cab46b5e7da3f71fae770e826bf1f1c07ca6",
+    "e2e/specs/ui-states.spec.ts": "bcae89908e029fb61098bf37c37fff24b9f9b2d93ce11bdcf0d0a540bc263fb5",
+    "e2e/tsconfig.json": "e8d9eec0e0e1aa4342a3e320fccac91ecbcc6495e097404e4399a666fc193c84",
+    "package-lock.json": "2bc5080695e65cf43a2a1310039f0162a3595cbcaf47db7d63e98882176cfe3c",
+    "package.json": "96f7aba7576d64155114111b1f1963425bb230555b6f011b9b7fa2fbb096f39c",
+    "scripts/audit-sprint1-evidence.mjs": "7eac1121da6508a76d510169aadd7154cdd918b52931a5b64c6d4f3d0fe4d87b",
+    "scripts/evidence-utils.mjs": "050f1e0def803547ea095c9ee72ea201b4f7970953f9e47f7010ba1059f7a2b4",
+    "scripts/migrate-test.mjs": "b9f790f456b2532ee465eb4a44d8e6a66a84101e8095e32061f7467e64a43669",
+    "scripts/rehearse-setup.mjs": "d4a45bf16778ab273894e1fc66bb5a9eab7ab30b6a64f17e5406de374e725b69",
+    "scripts/sprint1-ac-map.json": "dd4eb2fe2e35111aac43bb0d90bf342ca5f6783ba0022ac82367b55dbb35aebc",
+    "scripts/tests/evidence.test.mjs": "5d2c3713229e66529435f95d8bac4639221b9599b15c7b7742cb463348317eb9",
+    "scripts/verify-sprint1.mjs": "a37e1cbe248d33ea831a3f13cb06d58a875015cacd4a777f4fe6bf5ee98f6f8a",
+    "server/src/config/config.ts": "bebb2c6b58bfc284078885065293bbedecc907e8b1701cad27362ad79507774a",
+    "server/src/db/migrate.ts": "ffd0ac0325cea1ee7be6f1b78b6f851612d770360e70c60720e971f969c8d73a",
+    "server/src/db/migrations.ts": "2885ac9df809eb7fb0739c87bf6de74bef75a2fbbed6f1d2a2e496c6d24e1b8f",
+    "server/src/db/pool.ts": "156f8b05e62efaa67fe3f0c31aa7272015bf7af51e7dbecf28850d5e348062f3",
+    "server/src/db/seed.ts": "56e18bf0dafff358763f8c67ff0c1ba71c9f3d49f28db0ac145af108e10a59c2",
+    "server/src/index.ts": "8abb7d0b34f83d929e49fc3608e663ac1d378dcdcd51c0cfea624ff600b7287b",
+    "server/src/routes/auth-routes.ts": "6ed8ed757cfffc63242fbbd53fbddf48ed67d13f3ba85d9a12969b7c44ea3aa7",
+    "server/src/routes/equipment-routes.ts": "77f79d6adba22f68aabfb561abb88efffceb92e2eb5f3f23abe482bfc55476b5",
+    "server/src/routes/loan-routes.ts": "e53070d53bc384b9f2a3398e65413d8aaf5360c1abfa8b9de58e708663b82f0a",
+    "server/src/routes/request-routes.ts": "9d4e24d855c23c4da6dffa56ad32e301ec513d2caff83d0ea32ab47d0953ebcd",
+    "server/src/services/auth.ts": "e7a02cac2bed895b65b3d09d2f24c22909a8215a3f9c433a68dc8ee6d41ed4d3",
+    "server/src/services/authz.ts": "cb673ef590e0a69a5bbe6538f3565486e84604dd7b1b39100306176b67b9da33",
+    "server/src/services/borrowing-request.ts": "b830492b3c74829cfb195bdf4c61807b07279a8feb00f5e21e2598d6b14abdfa",
+    "server/src/services/catalog.ts": "a5cf3ed5bd934a672b7e016fd338bd699220af84c390fb32eac8c519cc2d82bc",
+    "server/src/services/loan.ts": "584a8c59dd51493eea37ac05adac1a76762c1ea1cbdbf224c2ac409b9d3f2d64",
+    "server/src/services/password.ts": "a5674009aeeb69c98734844d4bb2afe101c0eaca7acd1081361c810ba31d845c",
+    "server/src/services/session.ts": "ddde7178d6e17af4d16dcf7745b8507c678686684bcad3aaa562bc221db4e642",
+    "server/tests/auth-routes.test.ts": "2f985950b250e84ccc6e161930fe3c3797fbc0dd9e2d054a0a23bfb8c218b4c6",
+    "server/tests/auth.test.ts": "78b790d6d56ba32cd9cbe5b2b56c4beba1b00cad5e17ce0464e26ac08b6c5a31",
+    "server/tests/authz.test.ts": "6c954fbe52893eb6e9dc242cee4f160f062c4a1775d2cece01ba595f3018a354",
+    "server/tests/availability.test.ts": "34e3b25729013a41cb7531af1144ea46dc66b10a17fa143cc476d91c58607f81",
+    "server/tests/borrowing-request-unit.test.ts": "577adfecd38b73326630b8da7a3b20cbbcfb93baf6610668873a8d024acedc23",
+    "server/tests/borrowing-request.test.ts": "0a82246a9b477ce1c598473bb9cf6c8e06a07b975067a8ed4c0c064ab65f1ab2",
+    "server/tests/catalog-ui.test.ts": "0e9c31528024d92b5e22070c6126334e4db909890c3fe3d0e35c26919de42b40",
+    "server/tests/catalog.test.ts": "511618f35a02940f06b7ed9261c9fa63e671bb33632ae50afb8177eaa375893c",
+    "server/tests/fixtures/loan-worker.ts": "c171d163fdf8851f8e73989aa4180670f9f4cf1de4fb528019ddead2f2e104e3",
+    "server/tests/harness.ts": "46dccfe229b1577aff1ed972fd5f9518ee80c15a0cb31a2cd71169e88e923b90",
+    "server/tests/loan-unit.test.ts": "1d74ce9bb30e19761ad3cacf76296188552aa7e0ad0550b4a59a221abcc7e7ee",
+    "server/tests/loan.test.ts": "5765e6f86b83025ba0415e49d5ee99de9dfed95011d1f58f893bb4b9846f3231",
+    "server/tests/password.test.ts": "133d5935116de0f5b6e59e2986658a15b1684083b17efca8ea2c04c38832ebc6",
+    "server/tests/restart-e2e.test.ts": "41f65693b281ab30e0abd90aa7f1545875955b1aad423c26f8e0d9ff4a55ee6a",
+    "server/tests/session.test.ts": "faf8dd6f4ba348ee55e7febb0bff432f85f8076196e41f7f1129b80339513361",
+    "server/tests/sprint1-integration.test.ts": "3fe56c6f3b8a492d8b26bc329c1e38f98efafbc97a570bbcfeac0084ad0bce22",
+    "tsconfig.json": "ae9d13ce32643d27624a4dbe651e48d6cbcaf769701a16cc231772f03d7138c3",
+    "vitest.config.ts": "d1963ec8702244c73463fd046d527b2603f419c647bbfc99c389d3fc8062660a"
+  },
+  "completed_at": "2026-11-07T12:49:17.903Z"
+}

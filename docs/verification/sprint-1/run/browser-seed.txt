@@ -1,0 +1,7 @@
+Seeded B-A (BORROWER)
+Seeded B-B (BORROWER)
+Seeded C-A (CUSTODIAN)
+Seeded equipment fixture-e-one (Synthetic single-unit fixture)
+Seeded equipment fixture-e-many (Synthetic pooled fixture)
+Seeded equipment fixture-e-zero (Synthetic zero-stock fixture)
+Seed complete.

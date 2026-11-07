@@ -1,0 +1,1080 @@
+[
+  {
+    "ac": "AC-F01-01",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/auth-routes.test.ts",
+        "name": "sets a session cookie"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/auth.test.ts",
+        "name": "fresh session with correct identity"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-01",
+      "TEST-F01-04"
+    ]
+  },
+  {
+    "ac": "AC-F01-02",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/auth-routes.test.ts",
+        "name": "wrong password identically"
+      },
+      {
+        "suite": "browser",
+        "file": "auth-journey.spec.ts",
+        "name": "invalid login"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-02",
+      "TEST-F01-12"
+    ]
+  },
+  {
+    "ac": "AC-F01-03",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/auth.test.ts",
+        "name": "malformed payloads and extra"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/auth-routes.test.ts",
+        "name": "malformed JSON body"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-03"
+    ]
+  },
+  {
+    "ac": "AC-F01-04",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/auth.test.ts",
+        "name": "derives identity from the session"
+      },
+      {
+        "suite": "browser",
+        "file": "sprint1-integration.spec.ts",
+        "name": "TEST-F10-01/02"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-04",
+      "TEST-F01-09"
+    ]
+  },
+  {
+    "ac": "AC-F01-05",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "anonymous "
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "invalid "
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "expired "
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "revoked "
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-05",
+      "TEST-F01-06",
+      "TEST-F01-07",
+      "TEST-F01-08",
+      "TEST-F01-16"
+    ]
+  },
+  {
+    "ac": "AC-F01-06",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/auth-routes.test.ts",
+        "name": "clears cookie, and denies replay"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/account-menu.test.tsx",
+        "name": "logout failure"
+      },
+      {
+        "suite": "browser",
+        "file": "sprint1-integration.spec.ts",
+        "name": "TEST-F10-01/02"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-07",
+      "TEST-F01-13",
+      "TEST-F01-14",
+      "TEST-F01-16"
+    ]
+  },
+  {
+    "ac": "AC-F01-07",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/session.test.ts",
+        "name": "idle expiry at the boundary"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/session.test.ts",
+        "name": "absolute cap"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-08"
+    ]
+  },
+  {
+    "ac": "AC-F01-08",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "wrong role "
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-09"
+    ]
+  },
+  {
+    "ac": "AC-F01-09",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "owner query tampering"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "enforces authentication, role, ownership"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-10"
+    ]
+  },
+  {
+    "ac": "AC-F01-10",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/password.test.ts",
+        "name": "salted argon2"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/auth.test.ts",
+        "name": "never expose password or hash"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-11",
+      "TEST-F01-12"
+    ]
+  },
+  {
+    "ac": "AC-F01-11",
+    "checks": [
+      {
+        "suite": "client",
+        "file": "client/src/test/login-page.test.tsx",
+        "name": "server failure (503)"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/login-page.test.tsx",
+        "name": "validates empty fields"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/account-menu.test.tsx",
+        "name": "signs out and returns"
+      },
+      {
+        "suite": "browser",
+        "file": "auth-journey.spec.ts",
+        "name": "401 during browsing"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-13",
+      "TEST-F01-14"
+    ]
+  },
+  {
+    "ac": "AC-F01-12",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/auth-routes.test.ts",
+        "name": "neither Origin nor Referer"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "configured HTTPS cookies"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F01-15"
+    ]
+  },
+  {
+    "ac": "AC-F02-01",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/catalog.test.ts",
+        "name": "lists seeded items for both roles"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/catalog.test.ts",
+        "name": "detail matches its list"
+      },
+      {
+        "suite": "browser",
+        "file": "catalog-journey.spec.ts",
+        "name": "list → detail"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-01",
+      "TEST-F02-02",
+      "TEST-F02-07"
+    ]
+  },
+  {
+    "ac": "AC-F02-02",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/catalog.test.ts",
+        "name": "empty catalog returns"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/catalog-page.test.tsx",
+        "name": "dedicated empty state"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/item-detail-page.test.tsx",
+        "name": "missing-item state"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-03",
+      "TEST-F02-08"
+    ]
+  },
+  {
+    "ac": "AC-F02-03",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "anonymous GET /api/equipment"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "expired GET /api/equipment"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "revoked GET /api/equipment"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/catalog.test.ts",
+        "name": "both roles with correct fields"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-01",
+      "TEST-F02-04"
+    ]
+  },
+  {
+    "ac": "AC-F02-04",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "actual seed reruns preserve"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-05"
+    ]
+  },
+  {
+    "ac": "AC-F02-05",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/catalog.test.ts",
+        "name": "rejects negative total and fractional"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-06"
+    ]
+  },
+  {
+    "ac": "AC-F02-06",
+    "checks": [
+      {
+        "suite": "client",
+        "file": "client/src/test/catalog-page.test.tsx",
+        "name": "never renders unreceived quantities"
+      },
+      {
+        "suite": "browser",
+        "file": "catalog-journey.spec.ts",
+        "name": "Custodian sees the same catalog"
+      },
+      {
+        "suite": "browser",
+        "file": "ui-states.spec.ts",
+        "name": "server failure"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-07",
+      "TEST-F02-08"
+    ]
+  },
+  {
+    "ac": "AC-F02-07",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/catalog.test.ts",
+        "name": "catalog DB failure yields safe 503"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/catalog-page.test.tsx",
+        "name": "server failure"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-08",
+      "TEST-F02-09"
+    ]
+  },
+  {
+    "ac": "AC-F02-08",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/restart-e2e.test.ts",
+        "name": "catalog and session survive a full process stop/start"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "restart preserves all domain fields"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F02-10"
+    ]
+  },
+  {
+    "ac": "AC-F03-01",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/availability.test.ts",
+        "name": "computes total minus held"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/availability.test.ts",
+        "name": "aggregates all active loans"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F03-01",
+      "TEST-F03-02"
+    ]
+  },
+  {
+    "ac": "AC-F03-02",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/availability.test.ts",
+        "name": "both roles, list and detail agreeing"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F03-03"
+    ]
+  },
+  {
+    "ac": "AC-F03-03",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "previously deferred request/queue"
+      },
+      {
+        "suite": "browser",
+        "file": "sprint1-integration.spec.ts",
+        "name": "TEST-F10-01/02"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F03-04"
+    ]
+  },
+  {
+    "ac": "AC-F03-04",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/availability.test.ts",
+        "name": "never clamps"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/availability.test.ts",
+        "name": "leaks no quantity/stack/loan data"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F03-01",
+      "TEST-F03-05",
+      "TEST-F03-06"
+    ]
+  },
+  {
+    "ac": "AC-F03-05",
+    "checks": [
+      {
+        "suite": "client",
+        "file": "client/src/test/catalog-page.test.tsx",
+        "name": "never renders unreceived quantities"
+      },
+      {
+        "suite": "browser",
+        "file": "checkout.spec.ts",
+        "name": "F-05 normal"
+      },
+      {
+        "suite": "browser",
+        "file": "sprint1-integration.spec.ts",
+        "name": "TEST-F10-01/02"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F03-07",
+      "TEST-F03-08"
+    ]
+  },
+  {
+    "ac": "AC-F03-06",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "rolls back failure after INSERT"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "restart preserves all domain fields"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/catalog.test.ts",
+        "name": "catalog DB failure"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F03-09",
+      "TEST-F03-10"
+    ]
+  },
+  {
+    "ac": "AC-F03-07",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "rolls back failure after INSERT"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "N=50 independent"
+      },
+      {
+        "suite": "browser",
+        "file": "checkout.spec.ts",
+        "name": "F-05 normal"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F03-10",
+      "TEST-F03-11"
+    ]
+  },
+  {
+    "ac": "AC-F04-01",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "persists server-owned request fields"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-01",
+      "TEST-F04-12"
+    ]
+  },
+  {
+    "ac": "AC-F04-02",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "rejects unavailable equipment"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-02",
+      "TEST-F04-13"
+    ]
+  },
+  {
+    "ac": "AC-F04-03",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "rejects invalid quantity"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "rejects injected"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "absent equipment and malformed"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-03",
+      "TEST-F04-04",
+      "TEST-F04-12",
+      "TEST-F04-14"
+    ]
+  },
+  {
+    "ac": "AC-F04-04",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "filters lists and forbids"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-05",
+      "TEST-F04-14"
+    ]
+  },
+  {
+    "ac": "AC-F04-05",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "previously deferred request/queue"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "submitted queue"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-06"
+    ]
+  },
+  {
+    "ac": "AC-F04-06",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "previously deferred request/queue"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-07"
+    ]
+  },
+  {
+    "ac": "AC-F04-07",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/restart-e2e.test.ts",
+        "name": "catalog and session survive a full process stop/start"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "restart preserves all domain fields"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-08"
+    ]
+  },
+  {
+    "ac": "AC-F04-08",
+    "checks": [
+      {
+        "suite": "browser",
+        "file": "borrowing-request.spec.ts",
+        "name": "multi-unit submit"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/borrowing-request.test.tsx",
+        "name": "conflict"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-09"
+    ]
+  },
+  {
+    "ac": "AC-F04-09",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "multi-unit bounds"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "no extra borrower cap"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-10"
+    ]
+  },
+  {
+    "ac": "AC-F04-10",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/borrowing-request.test.ts",
+        "name": "anonymous routes and hostile-origin"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "anonymous POST /api/requests"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F04-11"
+    ]
+  },
+  {
+    "ac": "AC-F05-01",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "correct server fields and due date"
+      },
+      {
+        "suite": "browser",
+        "file": "sprint1-integration.spec.ts",
+        "name": "TEST-F10-01/02"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-01",
+      "TEST-F05-16"
+    ]
+  },
+  {
+    "ac": "AC-F05-02",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "rejects unavailable and repeated"
+      },
+      {
+        "suite": "browser",
+        "file": "checkout.spec.ts",
+        "name": "F-05 normal"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-02",
+      "TEST-F05-15"
+    ]
+  },
+  {
+    "ac": "AC-F05-03",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "rejects unavailable and repeated"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "same-request race"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-03",
+      "TEST-F05-05"
+    ]
+  },
+  {
+    "ac": "AC-F05-04",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "N=50 independent"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-04",
+      "TEST-F05-05",
+      "TEST-F05-15",
+      "TEST-F05-16"
+    ]
+  },
+  {
+    "ac": "AC-F05-05",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "rolls back failure after INSERT"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-06"
+    ]
+  },
+  {
+    "ac": "AC-F05-06",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan-unit.test.ts",
+        "name": "seven business calendar days"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "correct server fields and due date"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-07",
+      "TEST-F05-08"
+    ]
+  },
+  {
+    "ac": "AC-F05-07",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "enforces authentication, role, ownership"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "anonymous POST /api/requests/fixture-r-one/checkout"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-09"
+    ]
+  },
+  {
+    "ac": "AC-F05-08",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "enforces authentication, role, ownership"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "owner query tampering"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-10"
+    ]
+  },
+  {
+    "ac": "AC-F05-09",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "restart preserves all domain fields"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "persists API-created loan"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-11"
+    ]
+  },
+  {
+    "ac": "AC-F05-10",
+    "checks": [
+      {
+        "suite": "browser",
+        "file": "checkout.spec.ts",
+        "name": "F-05 hold"
+      },
+      {
+        "suite": "browser",
+        "file": "checkout.spec.ts",
+        "name": "F-05 fail"
+      },
+      {
+        "suite": "browser",
+        "file": "checkout.spec.ts",
+        "name": "F-05 normal"
+      },
+      {
+        "suite": "client",
+        "file": "client/src/test/loan.test.tsx",
+        "name": "reconciles failure"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-12"
+    ]
+  },
+  {
+    "ac": "AC-F05-11",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "rejects injected fields"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-13"
+    ]
+  },
+  {
+    "ac": "AC-F05-12",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "no extra borrower cap"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F05-14"
+    ]
+  },
+  {
+    "ac": "AC-F10-01",
+    "checks": [
+      {
+        "suite": "browser",
+        "file": "sprint1-integration.spec.ts",
+        "name": "TEST-F10-01/02"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F10-01"
+    ]
+  },
+  {
+    "ac": "AC-F10-02",
+    "checks": [
+      {
+        "suite": "browser",
+        "file": "sprint1-integration.spec.ts",
+        "name": "TEST-F10-01/02"
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "wrong role "
+      },
+      {
+        "suite": "server",
+        "file": "server/tests/loan.test.ts",
+        "name": "N=50 independent"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F10-02"
+    ]
+  },
+  {
+    "ac": "AC-F10-03",
+    "checks": [
+      {
+        "suite": "server",
+        "file": "server/tests/sprint1-integration.test.ts",
+        "name": "restart preserves all domain fields"
+      }
+    ],
+    "planned_tests": [
+      "TEST-F10-03"
+    ]
+  },
+  {
+    "ac": "AC-F10-04",
+    "checks": [
+      {
+        "kind": "process",
+        "id": "TEST-F10-04"
+      },
+      {
+        "kind": "process",
+        "id": "TEST-F10-05"
+      }
+    ],
+    "pending": [
+      "Human assessment of process/evidence AC; release-version rerun"
+    ],
+    "planned_tests": [
+      "TEST-F10-04",
+      "TEST-F10-05"
+    ]
+  },
+  {
+    "ac": "AC-F10-05",
+    "checks": [
+      {
+        "kind": "process",
+        "id": "TEST-F10-06"
+      }
+    ],
+    "pending": [
+      "Other student repeats README setup from prerequisites in <=15 minutes; local timed rehearsal recorded separately"
+    ],
+    "planned_tests": [
+      "TEST-F10-06"
+    ]
+  },
+  {
+    "ac": "AC-F10-06",
+    "checks": [
+      {
+        "kind": "process",
+        "id": "TEST-F10-07"
+      },
+      {
+        "kind": "process",
+        "id": "TEST-F10-10"
+      }
+    ],
+    "pending": [
+      "Human authenticity review of historical local RED logs; no RED SHA was committed"
+    ],
+    "planned_tests": [
+      "TEST-F10-07",
+      "TEST-F10-10"
+    ]
+  },
+  {
+    "ac": "AC-F10-07",
+    "checks": [
+      {
+        "kind": "process",
+        "id": "TEST-F10-08"
+      }
+    ],
+    "pending": [
+      "Reviewed feature13 PR and reviewed staging-to-main release; at least two sampled feature chains documented separately"
+    ],
+    "planned_tests": [
+      "TEST-F10-08"
+    ]
+  },
+  {
+    "ac": "AC-F10-08",
+    "checks": [
+      {
+        "kind": "process",
+        "id": "TEST-F10-09"
+      },
+      {
+        "kind": "process",
+        "id": "TEST-F10-10"
+      }
+    ],
+    "pending": [
+      "Actual release SHA/tag and release-version regression; both-student disclosure confirmation; A-12 team ratification"
+    ],
+    "planned_tests": [
+      "TEST-F10-09",
+      "TEST-F10-10"
+    ]
+  }
+]

@@ -1,6 +1,6 @@
 # F-10 — Sprint 1 Integration and Verification Contract
 
-> **Revision:** 2 — 2026-11-06 | **Contract approval:** Pending team baseline approval and peer review | **Implementation status:** Not implemented (Issue #13) | **Test status:** NOT RUN — all STS cases **PLANNED / NOT RUN** (no execution or release claimed)
+> **Revision:** 4 — 2026-11-07 | **Contract approval:** Shared-baseline/peer acceptance pending | **Implementation status:** Local verification tooling, integrated tests and Part F evidence implemented on #13; not integrated/released | **Test status:** Actual outcomes below; human/release gates remain PARTIAL/NOT RELEASED
 >
 > Implementation Issue: [#13 / D1-06.6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/13), parent [#6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/6).
 
@@ -19,8 +19,8 @@ Run domain journey through real UI → API → migrated persistent database usin
 | UI | Exercise existing F-01–F-05 pages and shared loading/empty/error states; no new product page |
 | API | Call the complete [shared inventory](shared-conventions.md); no new product endpoint/payload |
 | Data/migrations | Run F-01/F-02/F-04/F-05 migrations and approved seed; no new domain table or destructive production reset |
-| Verification tooling | Later add real suite/runner, executable clean setup steps, coverage/result mapping and evidence audits once stack is selected; commands are not invented here |
-| Evidence | Record actual files/results/SHAs and human reviews; proposed future location `docs/verification/sprint-1/` may be fixed during implementation |
+| Verification tooling | Implemented `npm run verify:sprint1`, `npm run audit:sprint1`, `npm run rehearse:sprint1` and `npm run migrate:test`; README pins prerequisites and database isolation |
+| Evidence | Actual files/results/SHAs, source-commit/candidate provenance and canonical fingerprints and observed review metadata in [Part F evidence](../../verification/sprint-1/README.md) |
 
 Normal journey: seed → B-A login/current-user → catalog E-ONE available1 → request qty1 → own-request read → logout → C-A login → submitted queue → checkout → created active loan/availability0 → B-A login in separate identity context → own-loan reload/read. Rejection: R-ONE-B cannot checkout after stock is held; direct Borrower checkout and cross-owner request/loan reads are denied by backend. Restarts retain DB contents and require legitimate reauthentication under selected lifecycle.
 
@@ -43,7 +43,7 @@ Normal journey: seed → B-A login/current-user → catalog E-ONE available1 →
 
 ## 4. Software Test Specification
 
-All rows are PLANNED / NOT RUN. Automated artifact checks supplement, rather than replace, human verification of reviews/contributions and authenticity. None is claimed implemented by this documentation issue.
+The original STS design below is retained. Actual execution is recorded per ID after the table and in [Part F evidence](../../verification/sprint-1/README.md). Automated artifact checks supplement human assessment; passing application tests do not approve contributions, ratify policy or create a main release.
 
 | Test ID | Linked AC | Level | Preconditions / input | Action | Expected result |
 |---|---|---|---|---|---|
@@ -60,7 +60,26 @@ All rows are PLANNED / NOT RUN. Automated artifact checks supplement, rather tha
 
 ## 5. Product DoD and Release Handoff
 
-Complete the [Product DoD](product-dod.md). Planned tests and evidence audits require actual commands/files after SDS-OQ-01; no toolchain is selected by this contract. Retain required checks and never count manual review or a skipped gate as a passing automated application test. On a different merge/release SHA, rerun applicable verification and record that actual SHA.
+### Current execution — 7 November2026
+
+The original F-10 increment was committed/pushed as `2b76abb` and submitted in PR #38. Current remediation source/candidate provenance is identified by [source fingerprints](../../verification/sprint-1/run/verification.json), with no clean-commit claim while tested_commit is null. Functional results: server164 passed/0 failed/0 skipped, client70 passed, browser54 passed/0 flaky, build/typecheck PASS on Node24.15.0/PostgreSQL18.4. All49 F-01–F-05 application AC map to actual passing checks; all57 contract AC have result rows, with process/release portions explicitly partial. New tests use real PostgreSQL, actual production HTTP processes and isolated synthetic data. Race evidence now queries the actual PostgreSQL version instead of hardcoding18.4; assertions and behavior are unchanged.
+
+| STS | Actual result and evidence |
+|---|---|
+| TEST-F10-01 | EXECUTED PASS — complete real UI/API/DB journey and persisted retrieval on3 viewports, `e2e/specs/sprint1-integration.spec.ts`; [demo records/images](../../verification/sprint-1/README.md) |
+| TEST-F10-02 | EXECUTED PASS — stock/duplicate/owner/role/lifecycle denials, complete10-route anonymous/invalid/expired/revoked HTTP probes and identity-tampering browser checks; [actual cases](../../verification/sprint-1/run/verification.json) |
+| TEST-F10-03 | EXECUTED PASS — actual production-process stop/start without reset/reseed; all domain fields/stock unchanged, old logged-out credentials denied on every route and fresh login retrieves own data |
+| TEST-F10-04 | PARTIAL — all49 application AC have executed passing checks,57 total AC result rows; human/process/release portions not falsely promoted; [AC results](../../verification/sprint-1/run/ac-results.md) |
+| TEST-F10-05 | EXECUTED PASS — isolated assertion actually fails and returns nonzero; clean product suites separately pass; [probe](../../verification/sprint-1/run/runner-failure-probe.json) |
+| TEST-F10-06 | PARTIAL — fresh-source/dependency-install/DB rehearsal below900s (latest actual duration in setup.json; original historical run61.812s), actual login/catalog/built shell checked; installed tools and potentially warm caches disclosed; other-student README repetition pending |
+| TEST-F10-07 | PARTIAL — actual source excerpts and existing GREEN Git objects verified; original local RED outputs/provenance retained, no invented RED SHA; human authenticity review pending |
+| TEST-F10-08 | PARTIAL — at least2 actual independently reviewed feature→staging chains plus reciprocal auth sample and Git ancestry verified; feature13 review/integration and reviewed main release absent |
+| TEST-F10-09 | NOT RELEASED — remote main remains bootstrap `7bf6c8d`; no actual release SHA/tag/regression exists. Strict release audit exits2 instead of reporting release PASS |
+| TEST-F10-10 | PARTIAL — files, source hashes, images, AC mappings, reviews and contribution/AI disclosure audited; both students' confirmation and final board evidence pending |
+
+See the [concrete feature PR and release handoff](../../verification/sprint-1/release-handoff.md). A-12 is user-confirmed; shared-team ratification remains pending. The user's account-identification reply does not ratify the quantity policy. OQ-01 synthetic catalog, final board status, human confirmation, full A–F PDF assembly and release remain disclosed gaps. The user committed/pushed the original work and opened PR #38; no merge/main release/tag is claimed. Further remediation commits require the authorization recorded in AGENT.md.
+
+Complete the [Product DoD](product-dod.md). Toolchain decisions come from the SDS and actual runtime versions are recorded in the evidence pack. Retain required checks and never count manual review or a skipped gate as a passing automated application test. On a different merge/release SHA, rerun applicable verification and record that actual SHA.
 
 Feature work targets `sprint/1-staging`, followed by a separate reviewed release PR to `main`. Human Reviewer performs merges; no current instruction authorizes this contract-writing task to push, publish, review, merge or alter GitHub status. Real deployment/recreated-container read-back is Lab 5 after deployment exists, preserving BR-11/NFR-04 rather than dropping the obligation.
 
@@ -68,3 +87,5 @@ Feature work targets `sprint/1-staging`, followed by a separate reviewed release
 |---|---|---|
 | 1 — 2026-11-05 | Initial F-10 integrated journey, AC/STS, runner and evidence/release contract | Issue #5/#6/#13; Part B F-10; SRS NFR-08/09; PR #15/17/20; original PDFs §3.5/§3.6/§4.2 |
 | 2 — 2026-11-06 | Documentation alignment (Issue #10 PR): status header split into Contract approval / Implementation / Test status; no contract text changed | Evidence-state review 2026-11-06 (no execution or release claimed) |
+| 3 — 2026-11-07 | Added actual F-10 tooling/tests/evidence and per-STS outcomes; retained process/release gates, version/source provenance and truthful counts | Issue #13; [Part F pack](../../verification/sprint-1/README.md); PR #36/#37 integration checked, not a main release |
+| 4 — 2026-11-07 | PR38 review fixes: canonical committed-source provenance and dirty guard, portable artifacts, accurate submitted-PR wording, process AC mapped to artifact checks, attributed PG17 reviewer results | [PR38 review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5805879906); [current evidence](../../verification/sprint-1/README.md) |

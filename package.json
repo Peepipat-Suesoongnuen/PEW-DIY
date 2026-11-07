@@ -15,6 +15,10 @@
     "build:client": "npm --prefix client run build",
     "dev": "tsx server/src/index.ts",
     "migrate": "tsx server/src/db/migrate.ts",
+    "migrate:test": "node --import tsx scripts/migrate-test.mjs",
+    "verify:sprint1": "node scripts/verify-sprint1.mjs",
+    "audit:sprint1": "node scripts/audit-sprint1-evidence.mjs",
+    "rehearse:sprint1": "node scripts/rehearse-setup.mjs",
     "seed": "tsx server/src/db/seed.ts"
   },
   "repository": {

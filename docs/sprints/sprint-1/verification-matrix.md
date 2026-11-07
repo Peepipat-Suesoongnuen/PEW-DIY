@@ -1,6 +1,6 @@
 # Sprint 1 Planned Verification Matrix
 
-> **Revision:** 2 — 2026-11-06 | **Contract approval:** pending team baseline approval (Direction A points **Confirmed** by team 2026-11-06) | **Status:** mapping only — execution status is recorded per row and stays **PLANNED / NOT RUN** unless a linked evidence file records an actual run
+> **Revision:** 5 — 2026-11-07 | **Contract approval:** shared-baseline/human gates pending | **Execution:** actual local candidate results; application tests are distinct from human/release completion
 
 ## 1. Reading and Evidence Rules
 
@@ -12,13 +12,13 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 | Contract | AC definitions | Planned STS rows | Current result |
 |---|---|---|---|
-| [f-01-authentication.md](f-01-authentication.md) | 12 | 16 | PARTIAL — implemented (Issue #8); executed results in [tdd-evidence-f01.md](tdd-evidence-f01.md); per-row mapping pending |
-| [f-02-equipment-catalog.md](f-02-equipment-catalog.md) | 8 | 10 | PARTIAL — implemented (Issue #9, PR #27); executed results in [tdd-evidence-f02.md](tdd-evidence-f02.md); per-row mapping pending |
-| [f-03-equipment-availability.md](f-03-equipment-availability.md) | 7 | 11 | PARTIAL — implemented (Issue #10); TEST-F03-01/03/05/06 + 08-UI executed, 02/09 dependency-gated on #11/#12 schema — [tdd-evidence-f03.md](tdd-evidence-f03.md) |
-| [f-04-borrowing-request.md](f-04-borrowing-request.md) | 10 | 14 | Implemented PR #36; [historical F-04 results](tdd-evidence-f04.md); fulfilled-state behavior additionally verified by #12 ([evidence](tdd-evidence-f05.md)) |
-| [f-05-checkout-active-loan.md](f-05-checkout-active-loan.md) | 12 | 16 | EXECUTED locally — implemented #12; [per-STS evidence](tdd-evidence-f05.md); peer review/baseline/release pending |
-| [f-10-integration-verification.md](f-10-integration-verification.md) | 8 | 10 | PLANNED — NOT RUN (not implemented; Issue #13) |
-| **Total** | **57** | **77** | **Partial runtime results — tdd-evidence-f01/f02/f03.md; per-row PASS mapping pending** |
+| [f-01-authentication.md](f-01-authentication.md) | 12 | 16 | EXECUTED — actual application AC mapped to passing checks; baseline approval separate ([F-10 evidence](../../verification/sprint-1/README.md)) |
+| [f-02-equipment-catalog.md](f-02-equipment-catalog.md) | 8 | 10 | EXECUTED — actual application AC mapped to passing checks; baseline approval separate ([F-10 evidence](../../verification/sprint-1/README.md)) |
+| [f-03-equipment-availability.md](f-03-equipment-availability.md) | 7 | 11 | EXECUTED — actual application AC mapped to passing checks; baseline approval separate ([F-10 evidence](../../verification/sprint-1/README.md)) |
+| [f-04-borrowing-request.md](f-04-borrowing-request.md) | 10 | 14 | EXECUTED — actual application AC mapped to passing checks; baseline approval separate ([F-10 evidence](../../verification/sprint-1/README.md)) |
+| [f-05-checkout-active-loan.md](f-05-checkout-active-loan.md) | 12 | 16 | EXECUTED — actual application AC mapped to passing checks; baseline approval separate ([F-10 evidence](../../verification/sprint-1/README.md)) |
+| [f-10-integration-verification.md](f-10-integration-verification.md) | 8 | 10 | PARTIAL — local tooling/evidence executed; review and release pending ([F-10 evidence](../../verification/sprint-1/README.md)) |
+| **Total** | **57** | **77** | **49 application AC PASS; F-10 3 PASS /5 PARTIAL; not released** |
 
 ## 2. Every Contract AC → Planned TEST
 
@@ -26,88 +26,88 @@ This index connects the [Part B baseline](../../traceability.md) and existing Gi
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F01-01](f-01-authentication.md) | [TEST-F01-01](f-01-authentication.md), [TEST-F01-04](f-01-authentication.md) | NOT RUN |
-| [AC-F01-02](f-01-authentication.md) | [TEST-F01-02](f-01-authentication.md), [TEST-F01-12](f-01-authentication.md) | NOT RUN |
-| [AC-F01-03](f-01-authentication.md) | [TEST-F01-03](f-01-authentication.md) | NOT RUN |
-| [AC-F01-04](f-01-authentication.md) | [TEST-F01-04](f-01-authentication.md), [TEST-F01-09](f-01-authentication.md) | NOT RUN |
-| [AC-F01-05](f-01-authentication.md) | [TEST-F01-05](f-01-authentication.md), [TEST-F01-06](f-01-authentication.md), [TEST-F01-07](f-01-authentication.md), [TEST-F01-08](f-01-authentication.md), [TEST-F01-16](f-01-authentication.md) | NOT RUN |
-| [AC-F01-06](f-01-authentication.md) | [TEST-F01-07](f-01-authentication.md), [TEST-F01-13](f-01-authentication.md), [TEST-F01-14](f-01-authentication.md), [TEST-F01-16](f-01-authentication.md) | NOT RUN |
-| [AC-F01-07](f-01-authentication.md) | [TEST-F01-08](f-01-authentication.md) | NOT RUN |
-| [AC-F01-08](f-01-authentication.md) | [TEST-F01-09](f-01-authentication.md) | NOT RUN |
-| [AC-F01-09](f-01-authentication.md) | [TEST-F01-10](f-01-authentication.md) | NOT RUN |
-| [AC-F01-10](f-01-authentication.md) | [TEST-F01-11](f-01-authentication.md), [TEST-F01-12](f-01-authentication.md) | NOT RUN |
-| [AC-F01-11](f-01-authentication.md) | [TEST-F01-13](f-01-authentication.md), [TEST-F01-14](f-01-authentication.md) | NOT RUN |
-| [AC-F01-12](f-01-authentication.md) | [TEST-F01-15](f-01-authentication.md) | NOT RUN |
+| [AC-F01-01](f-01-authentication.md) | [TEST-F01-01](f-01-authentication.md), [TEST-F01-04](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-02](f-01-authentication.md) | [TEST-F01-02](f-01-authentication.md), [TEST-F01-12](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-03](f-01-authentication.md) | [TEST-F01-03](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-04](f-01-authentication.md) | [TEST-F01-04](f-01-authentication.md), [TEST-F01-09](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-05](f-01-authentication.md) | [TEST-F01-05](f-01-authentication.md), [TEST-F01-06](f-01-authentication.md), [TEST-F01-07](f-01-authentication.md), [TEST-F01-08](f-01-authentication.md), [TEST-F01-16](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-06](f-01-authentication.md) | [TEST-F01-07](f-01-authentication.md), [TEST-F01-13](f-01-authentication.md), [TEST-F01-14](f-01-authentication.md), [TEST-F01-16](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-07](f-01-authentication.md) | [TEST-F01-08](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-08](f-01-authentication.md) | [TEST-F01-09](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-09](f-01-authentication.md) | [TEST-F01-10](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-10](f-01-authentication.md) | [TEST-F01-11](f-01-authentication.md), [TEST-F01-12](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-11](f-01-authentication.md) | [TEST-F01-13](f-01-authentication.md), [TEST-F01-14](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F01-12](f-01-authentication.md) | [TEST-F01-15](f-01-authentication.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
 
 ### F-02
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F02-01](f-02-equipment-catalog.md) | [TEST-F02-01](f-02-equipment-catalog.md), [TEST-F02-02](f-02-equipment-catalog.md), [TEST-F02-07](f-02-equipment-catalog.md) | NOT RUN |
-| [AC-F02-02](f-02-equipment-catalog.md) | [TEST-F02-03](f-02-equipment-catalog.md), [TEST-F02-08](f-02-equipment-catalog.md) | NOT RUN |
-| [AC-F02-03](f-02-equipment-catalog.md) | [TEST-F02-01](f-02-equipment-catalog.md), [TEST-F02-04](f-02-equipment-catalog.md) | NOT RUN |
-| [AC-F02-04](f-02-equipment-catalog.md) | [TEST-F02-05](f-02-equipment-catalog.md) | NOT RUN |
-| [AC-F02-05](f-02-equipment-catalog.md) | [TEST-F02-06](f-02-equipment-catalog.md) | NOT RUN |
-| [AC-F02-06](f-02-equipment-catalog.md) | [TEST-F02-07](f-02-equipment-catalog.md), [TEST-F02-08](f-02-equipment-catalog.md) | NOT RUN |
-| [AC-F02-07](f-02-equipment-catalog.md) | [TEST-F02-08](f-02-equipment-catalog.md), [TEST-F02-09](f-02-equipment-catalog.md) | NOT RUN |
-| [AC-F02-08](f-02-equipment-catalog.md) | [TEST-F02-10](f-02-equipment-catalog.md) | NOT RUN |
+| [AC-F02-01](f-02-equipment-catalog.md) | [TEST-F02-01](f-02-equipment-catalog.md), [TEST-F02-02](f-02-equipment-catalog.md), [TEST-F02-07](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F02-02](f-02-equipment-catalog.md) | [TEST-F02-03](f-02-equipment-catalog.md), [TEST-F02-08](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F02-03](f-02-equipment-catalog.md) | [TEST-F02-01](f-02-equipment-catalog.md), [TEST-F02-04](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F02-04](f-02-equipment-catalog.md) | [TEST-F02-05](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F02-05](f-02-equipment-catalog.md) | [TEST-F02-06](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F02-06](f-02-equipment-catalog.md) | [TEST-F02-07](f-02-equipment-catalog.md), [TEST-F02-08](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F02-07](f-02-equipment-catalog.md) | [TEST-F02-08](f-02-equipment-catalog.md), [TEST-F02-09](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F02-08](f-02-equipment-catalog.md) | [TEST-F02-10](f-02-equipment-catalog.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
 
 ### F-03
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F03-01](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-02](f-03-equipment-availability.md) | PARTIAL — TEST-F03-01 EXECUTED (green); TEST-F03-02 dependency-gated on #11/#12 schema ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-02](f-03-equipment-availability.md) | [TEST-F03-03](f-03-equipment-availability.md) | EXECUTED (green) — TEST-F03-03 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-03](f-03-equipment-availability.md) | [TEST-F03-04](f-03-equipment-availability.md) | DEPENDENCY-GATED / PLANNED — NOT RUN — fixture-level halves dependency-gated on #11/#12 schema; TEST-F03-04 needs F-04/F-05 features ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-04](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-05](f-03-equipment-availability.md), [TEST-F03-06](f-03-equipment-availability.md) | EXECUTED (green) — TEST-F03-01/05/06 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-05](f-03-equipment-availability.md) | [TEST-F03-07](f-03-equipment-availability.md), [TEST-F03-08](f-03-equipment-availability.md) | PARTIAL — TEST-F03-08 UI halves EXECUTED (client component tests); TEST-F03-07 PLANNED — NOT RUN (needs F-04/F-05 journeys) ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-06](f-03-equipment-availability.md) | [TEST-F03-09](f-03-equipment-availability.md), [TEST-F03-10](f-03-equipment-availability.md) | DEPENDENCY-GATED / PLANNED — NOT RUN — TEST-F03-09 dependency-gated on #11/#12 schema; TEST-F03-10 needs F-05 ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
-| [AC-F03-07](f-03-equipment-availability.md) | [TEST-F03-10](f-03-equipment-availability.md), [TEST-F03-11](f-03-equipment-availability.md) | PLANNED — NOT RUN — needs F-05 (Issue #12) enforcement ([tdd-evidence-f03.md](tdd-evidence-f03.md)) |
+| [AC-F03-01](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-02](f-03-equipment-availability.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F03-02](f-03-equipment-availability.md) | [TEST-F03-03](f-03-equipment-availability.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F03-03](f-03-equipment-availability.md) | [TEST-F03-04](f-03-equipment-availability.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F03-04](f-03-equipment-availability.md) | [TEST-F03-01](f-03-equipment-availability.md), [TEST-F03-05](f-03-equipment-availability.md), [TEST-F03-06](f-03-equipment-availability.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F03-05](f-03-equipment-availability.md) | [TEST-F03-07](f-03-equipment-availability.md), [TEST-F03-08](f-03-equipment-availability.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F03-06](f-03-equipment-availability.md) | [TEST-F03-09](f-03-equipment-availability.md), [TEST-F03-10](f-03-equipment-availability.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F03-07](f-03-equipment-availability.md) | [TEST-F03-10](f-03-equipment-availability.md), [TEST-F03-11](f-03-equipment-availability.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
 
 ### F-04
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F04-01](f-04-borrowing-request.md) | [TEST-F04-01](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-02](f-04-borrowing-request.md) | [TEST-F04-02](f-04-borrowing-request.md), [TEST-F04-13](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-03](f-04-borrowing-request.md) | [TEST-F04-03](f-04-borrowing-request.md), [TEST-F04-04](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-04](f-04-borrowing-request.md) | [TEST-F04-05](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | EXECUTED locally — #12 transition coverage ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | EXECUTED locally — #12 transition coverage ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F04-07](f-04-borrowing-request.md) | [TEST-F04-08](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-08](f-04-borrowing-request.md) | [TEST-F04-09](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-09](f-04-borrowing-request.md) | [TEST-F04-10](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
-| [AC-F04-10](f-04-borrowing-request.md) | [TEST-F04-11](f-04-borrowing-request.md) | EXECUTED — request-only behavior ([F-04 evidence](tdd-evidence-f04.md)) |
+| [AC-F04-01](f-04-borrowing-request.md) | [TEST-F04-01](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-02](f-04-borrowing-request.md) | [TEST-F04-02](f-04-borrowing-request.md), [TEST-F04-13](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-03](f-04-borrowing-request.md) | [TEST-F04-03](f-04-borrowing-request.md), [TEST-F04-04](f-04-borrowing-request.md), [TEST-F04-12](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-04](f-04-borrowing-request.md) | [TEST-F04-05](f-04-borrowing-request.md), [TEST-F04-14](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-05](f-04-borrowing-request.md) | [TEST-F04-06](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-06](f-04-borrowing-request.md) | [TEST-F04-07](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-07](f-04-borrowing-request.md) | [TEST-F04-08](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-08](f-04-borrowing-request.md) | [TEST-F04-09](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-09](f-04-borrowing-request.md) | [TEST-F04-10](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F04-10](f-04-borrowing-request.md) | [TEST-F04-11](f-04-borrowing-request.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
 
 ### F-05
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F05-01](f-05-checkout-active-loan.md) | [TEST-F05-01](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-02](f-05-checkout-active-loan.md) | [TEST-F05-02](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-03](f-05-checkout-active-loan.md) | [TEST-F05-03](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-04](f-05-checkout-active-loan.md) | [TEST-F05-04](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-05](f-05-checkout-active-loan.md) | [TEST-F05-06](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-06](f-05-checkout-active-loan.md) | [TEST-F05-07](f-05-checkout-active-loan.md), [TEST-F05-08](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-07](f-05-checkout-active-loan.md) | [TEST-F05-09](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-08](f-05-checkout-active-loan.md) | [TEST-F05-10](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-09](f-05-checkout-active-loan.md) | [TEST-F05-11](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-10](f-05-checkout-active-loan.md) | [TEST-F05-12](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-11](f-05-checkout-active-loan.md) | [TEST-F05-13](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
-| [AC-F05-12](f-05-checkout-active-loan.md) | [TEST-F05-14](f-05-checkout-active-loan.md) | EXECUTED locally ([F-05 evidence](tdd-evidence-f05.md)); baseline/release pending |
+| [AC-F05-01](f-05-checkout-active-loan.md) | [TEST-F05-01](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-02](f-05-checkout-active-loan.md) | [TEST-F05-02](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-03](f-05-checkout-active-loan.md) | [TEST-F05-03](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-04](f-05-checkout-active-loan.md) | [TEST-F05-04](f-05-checkout-active-loan.md), [TEST-F05-05](f-05-checkout-active-loan.md), [TEST-F05-15](f-05-checkout-active-loan.md), [TEST-F05-16](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-05](f-05-checkout-active-loan.md) | [TEST-F05-06](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-06](f-05-checkout-active-loan.md) | [TEST-F05-07](f-05-checkout-active-loan.md), [TEST-F05-08](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-07](f-05-checkout-active-loan.md) | [TEST-F05-09](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-08](f-05-checkout-active-loan.md) | [TEST-F05-10](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-09](f-05-checkout-active-loan.md) | [TEST-F05-11](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-10](f-05-checkout-active-loan.md) | [TEST-F05-12](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-11](f-05-checkout-active-loan.md) | [TEST-F05-13](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F05-12](f-05-checkout-active-loan.md) | [TEST-F05-14](f-05-checkout-active-loan.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
 
 ### F-10
 
 | Contract AC | Planned STS cases | Execution status |
 |---|---|---|
-| [AC-F10-01](f-10-integration-verification.md) | [TEST-F10-01](f-10-integration-verification.md) | NOT RUN |
-| [AC-F10-02](f-10-integration-verification.md) | [TEST-F10-02](f-10-integration-verification.md) | NOT RUN |
-| [AC-F10-03](f-10-integration-verification.md) | [TEST-F10-03](f-10-integration-verification.md) | NOT RUN |
-| [AC-F10-04](f-10-integration-verification.md) | [TEST-F10-04](f-10-integration-verification.md), [TEST-F10-05](f-10-integration-verification.md) | NOT RUN |
-| [AC-F10-05](f-10-integration-verification.md) | [TEST-F10-06](f-10-integration-verification.md) | NOT RUN |
-| [AC-F10-06](f-10-integration-verification.md) | [TEST-F10-07](f-10-integration-verification.md), [TEST-F10-10](f-10-integration-verification.md) | NOT RUN |
-| [AC-F10-07](f-10-integration-verification.md) | [TEST-F10-08](f-10-integration-verification.md) | NOT RUN |
-| [AC-F10-08](f-10-integration-verification.md) | [TEST-F10-09](f-10-integration-verification.md), [TEST-F10-10](f-10-integration-verification.md) | NOT RUN |
+| [AC-F10-01](f-10-integration-verification.md) | [TEST-F10-01](f-10-integration-verification.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F10-02](f-10-integration-verification.md) | [TEST-F10-02](f-10-integration-verification.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F10-03](f-10-integration-verification.md) | [TEST-F10-03](f-10-integration-verification.md) | EXECUTED — actual candidate checks PASS ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F10-04](f-10-integration-verification.md) | [TEST-F10-04](f-10-integration-verification.md), [TEST-F10-05](f-10-integration-verification.md) | PARTIAL — automated checks executed; human/release portions pending ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F10-05](f-10-integration-verification.md) | [TEST-F10-06](f-10-integration-verification.md) | PARTIAL — automated checks executed; human/release portions pending ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F10-06](f-10-integration-verification.md) | [TEST-F10-07](f-10-integration-verification.md), [TEST-F10-10](f-10-integration-verification.md) | PARTIAL — automated checks executed; human/release portions pending ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F10-07](f-10-integration-verification.md) | [TEST-F10-08](f-10-integration-verification.md) | PARTIAL — automated checks executed; human/release portions pending ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
+| [AC-F10-08](f-10-integration-verification.md) | [TEST-F10-09](f-10-integration-verification.md), [TEST-F10-10](f-10-integration-verification.md) | PARTIAL — automated checks executed; human/release portions pending ([F-10 actual results](../../verification/sprint-1/run/ac-results.md)) |
 
 ## 3. SRS Requirements With Sprint 1 Allocation
 
@@ -217,3 +217,5 @@ F-04 update (2026-11-06): request-only actual execution is recorded above and in
 Revision 3 (2026-11-06): linked F-04 actual candidate results, preserving F-05-dependent partial AC/STS; added no new AC IDs or test-pass claims for other features.
 
 F-05 execution update (2026-11-07): all 16 STS designs have actual local coverage in [F-05 evidence](tdd-evidence-f05.md), with 115 server / 70 client / 51 browser cases passing. F-04 submitted-to-fulfilled and staff queue exclusion are now additionally exercised by `server/tests/loan.test.ts`; earlier request-only evidence is preserved. Loan-dependent F-03 cases run with the actual migration003 on a fresh DB; no historical run is relabeled. Shared-baseline approval, teammate ratification, integration and release remain pending.
+
+Revision5 (2026-11-07, Issue #13): current execution supersedes earlier NOT RUN/dependency-gated rows using actual integrated results. All57 AC and77 planned STS IDs are audited against contract definitions and linked to actual test names/results. Original per-feature historical outputs remain unchanged. See [Part F evidence](../../verification/sprint-1/README.md) for164 server/70 client/54 browser cases, timing, source fingerprints and pending human/release gates.
