@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "../lib/session";
@@ -17,12 +17,12 @@ function mount(path = "/requests") {
     <Route path="/login" element={<div>LOGIN_PAGE</div>} />
   </Routes></SessionProvider></MemoryRouter>);
 }
-function mockApi(options: { role?: string; post?: () => Promise<Response>; loans?: unknown[]; error?: number } = {}) {
+function mockApi(options: { role?: string; post?: () => Promise<Response>; loans?: unknown[]; error?: number; equipmentError?: number; username?: string } = {}) {
   let fulfilled = false;
   const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const path = String(input);
-    if (path === "/api/auth/me") return response(200, { data: { user: { id: "B-A", username: "B-A", role: options.role ?? "CUSTODIAN" } } });
-    if (path === "/api/equipment") return response(200, { data: [{ id: record.equipment_id, name: "Fixture" }] });
+    if (path === "/api/auth/me") return response(200, { data: { user: { id: "B-A", username: options.username ?? "B-A", role: options.role ?? "CUSTODIAN" } } });
+    if (path === "/api/equipment") return options.equipmentError ? response(options.equipmentError, { error: { code: "UNAVAILABLE" } }) : response(200, { data: [{ id: record.equipment_id, name: "Fixture" }] });
     if (path.endsWith("/checkout") && init?.method === "POST") {
       if (options.post) return options.post();
       fulfilled = true; return response(201, { data: loan });
@@ -43,6 +43,9 @@ describe("F-05 checkout and active-loan UI", () => {
     expect(await screen.findByText("Checkout completed.")).toBeInTheDocument();
     expect(screen.getByText("2027-01-04")).toBeInTheDocument();
     expect(await screen.findByText("No submitted requests.")).toBeInTheDocument();
+    const details = screen.getByText("Equipment", { exact: true }).closest("dl")!;
+    expect(within(details).getByText("Fixture")).toBeInTheDocument();
+    expect(within(details).getByText("Borrower details unavailable")).toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledWith(`/api/requests/${encodeURIComponent(record.id)}/checkout`, expect.objectContaining({ body: "{}", method: "POST" }));
   });
   it("prevents duplicate clicks and success before the response", async () => {
@@ -79,6 +82,33 @@ describe("F-05 checkout and active-loan UI", () => {
     expect(await screen.findByText("2027-01-04")).toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledWith(`/api/loans/${encodeURIComponent(loan.id)}`, expect.anything());
     expect(loanIdFromPathname(loanPath(loan.id))).toBe(loan.id);
+  });
+  it("shows catalog names and the authenticated borrower username rather than internal IDs", async () => {
+    mockApi({ role: "BORROWER", username: "Student Alice" }); mount(loanPath(loan.id));
+    await screen.findByText("2027-01-04");
+    const details = screen.getByText("Equipment", { exact: true }).closest("dl")!;
+    expect(within(details).getByText("Fixture")).toBeInTheDocument();
+    expect(within(details).getByText("Student Alice")).toBeInTheDocument();
+    expect(within(details).queryByText(record.equipment_id)).not.toBeInTheDocument();
+    expect(within(details).queryByText(loan.borrower_id)).not.toBeInTheDocument();
+  });
+  it("keeps readable loans when catalog enrichment is unavailable", async () => {
+    mockApi({ role: "BORROWER", equipmentError: 503 }); mount(loanPath(loan.id));
+    await screen.findByText("2027-01-04");
+    expect(screen.getByText("Equipment details unavailable")).toBeInTheDocument();
+    expect(screen.queryByText(record.equipment_id)).not.toBeInTheDocument();
+  });
+  it("expires the session when the catalog enrichment returns401", async () => {
+    mockApi({ role: "BORROWER", equipmentError: 401 }); mount(loanPath(loan.id));
+    expect(await screen.findByText("LOGIN_PAGE")).toBeInTheDocument();
+    expect(screen.queryByText("2027-01-04")).not.toBeInTheDocument();
+  });
+  it("refreshes the current loan detail instead of navigating back to the list", async () => {
+    const fetcher = mockApi({ role: "BORROWER" }); mount(loanPath(loan.id));
+    await screen.findByText("2027-01-04");
+    fireEvent.click(screen.getByRole("button", { name: "Refresh loans" }));
+    await waitFor(() => expect(fetcher.mock.calls.filter(([url]) => url === `/api/loans/${encodeURIComponent(loan.id)}`)).toHaveLength(2));
+    expect(fetcher.mock.calls.some(([url]) => url === "/api/loans")).toBe(false);
   });
   it("handles empty active loans and reload", async () => {
     const fetcher = mockApi({ role: "BORROWER", loans: [] }); mount("/loans");
