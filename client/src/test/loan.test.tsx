@@ -38,14 +38,16 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("F-05 checkout and active-loan UI", () => {
   it("shows committed loan and refreshes the submitted queue", async () => {
-    const fetcher = mockApi(); mount();
+    const fetcher = mockApi({ username: "Staff Casey" }); mount();
     fireEvent.click(await screen.findByRole("button", { name: "Check out" }));
     expect(await screen.findByText("Checkout completed.")).toBeInTheDocument();
     expect(screen.getByText("2027-01-04")).toBeInTheDocument();
     expect(await screen.findByText("No submitted requests.")).toBeInTheDocument();
     const details = screen.getByText("Equipment", { exact: true }).closest("dl")!;
     expect(within(details).getByText("Fixture")).toBeInTheDocument();
-    expect(within(details).getByText("Borrower details unavailable")).toBeInTheDocument();
+    expect(within(details).getByText(loan.borrower_id, { exact: true })).toBeInTheDocument();
+    expect(within(details).queryByText("Staff Casey")).not.toBeInTheDocument();
+    expect(within(details).queryByText("Borrower details unavailable")).not.toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledWith(`/api/requests/${encodeURIComponent(record.id)}/checkout`, expect.objectContaining({ body: "{}", method: "POST" }));
   });
   it("prevents duplicate clicks and success before the response", async () => {

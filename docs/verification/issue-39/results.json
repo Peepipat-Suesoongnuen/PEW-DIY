@@ -1,18 +1,10 @@
 {
   "issue": 39,
-  "head_commit": "ef58fae87e6a262a30df8b9d65480924add2d516",
-  "tested_commit": null,
-  "version_kind": "WORKING_TREE_CANDIDATE",
-  "source_dirty_files": [
-    "client/src/components/LoanDetails.tsx",
-    "client/src/pages/LoansPage.tsx",
-    "client/src/pages/RequestsPage.tsx",
-    "client/src/styles/tokens.css",
-    "client/src/test/loan.test.tsx",
-    "e2e/specs/ui-layout.spec.ts"
-  ],
+  "head_commit": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+  "tested_commit": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+  "version_kind": "COMMIT_FINGERPRINT_MATCHED_AFTER_RUN",
   "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
-  "scope": "Local working-tree UI verification; not clean-commit or release evidence",
+  "scope": "Historical local UI results; six changed-source fingerprints matched to published commit after execution. Not a clean-checkout execution claim or current remediation result.",
   "changed_source_sha256": {
     "client/src/components/LoanDetails.tsx": "fe79c84cf576082100b55fd01adfa885871dc88dd50374a7a649ae335cb8f0be",
     "client/src/pages/LoansPage.tsx": "e66dab6af6ac6466bdde1d2f9df599025118c3547620283f15b551083f8f084c",
@@ -220,5 +212,25 @@
         0.99
       ]
     }
-  ]
+  ],
+  "execution_provenance": {
+    "head_commit": "ef58fae87e6a262a30df8b9d65480924add2d516",
+    "tested_commit": null,
+    "version_kind": "WORKING_TREE_CANDIDATE",
+    "source_dirty_files": [
+      "client/src/components/LoanDetails.tsx",
+      "client/src/pages/LoansPage.tsx",
+      "client/src/pages/RequestsPage.tsx",
+      "client/src/styles/tokens.css",
+      "client/src/test/loan.test.tsx",
+      "e2e/specs/ui-layout.spec.ts"
+    ]
+  },
+  "commit_reconciliation": {
+    "date": "2026-11-08",
+    "method": "Compare all six recorded changed-source hashes against actual Git blobs, with CRLF normalized to LF",
+    "matched_commit": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+    "matched_files": 6,
+    "review": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/41#pullrequestreview-5813989510"
+  }
 }

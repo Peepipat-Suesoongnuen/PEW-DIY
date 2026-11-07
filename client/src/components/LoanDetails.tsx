@@ -4,7 +4,7 @@ import { DetailList } from "./DetailList";
 export function LoanDetails({ loan, borrowerName, equipmentName }: { loan: Loan; borrowerName?: string; equipmentName?: string }) {
   return <DetailList items={[
     { term: "Loan", value: loan.id },
-    { term: "Borrower", value: borrowerName ?? "Borrower details unavailable" },
+    { term: "Borrower", value: borrowerName ?? loan.borrower_id },
     { term: "Equipment", value: equipmentName ?? "Equipment details unavailable" },
     { term: "Quantity", value: loan.quantity_borrowed },
     { term: "Status", value: "Active" },
