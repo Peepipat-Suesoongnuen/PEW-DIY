@@ -1,11 +1,11 @@
 import type { Loan } from "../lib/api";
 import { DetailList } from "./DetailList";
 
-export function LoanDetails({ loan }: { loan: Loan }) {
+export function LoanDetails({ loan, borrowerName, equipmentName }: { loan: Loan; borrowerName?: string; equipmentName?: string }) {
   return <DetailList items={[
     { term: "Loan", value: loan.id },
-    { term: "Borrower", value: loan.borrower_id },
-    { term: "Equipment", value: loan.equipment_id },
+    { term: "Borrower", value: borrowerName ?? "Borrower details unavailable" },
+    { term: "Equipment", value: equipmentName ?? "Equipment details unavailable" },
     { term: "Quantity", value: loan.quantity_borrowed },
     { term: "Status", value: "Active" },
     { term: "Checked out", value: new Date(loan.checkout_at).toLocaleString("en-GB", { timeZone: "Asia/Bangkok" }) + " (Asia/Bangkok)" },

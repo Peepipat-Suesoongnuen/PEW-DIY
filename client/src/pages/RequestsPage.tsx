@@ -20,7 +20,7 @@ export function RequestsPage() {
   const onUnauthorized = useUnauthorizedRedirect();
   const [state, setState] = useState<State>({ owner: "", kind: "loading" });
   const [revision, setRevision] = useState(0);
-  const [created, setCreated] = useState<{ owner: string; loan: Loan }>();
+  const [created, setCreated] = useState<{ owner: string; loan: Loan; equipmentName: string }>();
   const title = id ? "Request details" : user?.role === "CUSTODIAN" ? "Submitted requests" : "My requests";
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function RequestsPage() {
   const showCreated = created?.owner === user?.id && user?.role === "CUSTODIAN" && (!id || created?.loan.request_id === id);
   return <section>
     <h1 className="mb-4 text-xl font-semibold">{title}</h1>
-    {showCreated ? <Card><Alert tone="success">Checkout completed.</Alert><LoanDetails loan={created!.loan} /></Card> : null}
+    {showCreated ? <Card><Alert tone="success">Checkout completed.</Alert><LoanDetails loan={created!.loan} equipmentName={created!.equipmentName} /></Card> : null}
     {id ? <Link to="/requests" className="mb-4 inline-block text-primary underline">Back to requests</Link> : null}
     {!id && location.state?.submitted && user?.role === "BORROWER" ? <Alert tone="success">Request submitted.</Alert> : null}
     {current.kind === "loading" ? <Loading label="Loading requests…" /> : null}
@@ -61,7 +61,7 @@ export function RequestsPage() {
           {user?.role === "CUSTODIAN" && record.status === "SUBMITTED" ? <CheckoutRequest requestId={record.id}
             onRefresh={() => { setCreated(undefined); setRevision((v) => v + 1); }}
             onSuccess={(loan) => {
-              setCreated({ owner: user.id, loan });
+              setCreated({ owner: user.id, loan, equipmentName: name });
               setState((previous) => ({ ...previous, records: previous.records?.filter((r) => r.id !== record.id) }));
               // Refresh queue AND catalog; detail becomes a committed-result view.
               if (!id) setRevision((v) => v + 1);
