@@ -1,7 +1,7 @@
 {
-  "started_at": "2026-11-06T20:33:57.551Z",
-  "head_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
-  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "started_at": "2026-11-07T12:47:56.184Z",
+  "head_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
   "version_kind": "CLEAN_SOURCE_COMMIT",
   "source_dirty_files": [],
   "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
@@ -9,10 +9,10 @@
   "steps": [
     {
       "label": "runner-failure-probe",
-      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-qoPN00 --config [temp]\\pewdiy-f10-runner-qoPN00\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-qoPN00\\result.json",
+      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-WU7nAF --config [temp]\\pewdiy-f10-runner-WU7nAF\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-WU7nAF\\result.json",
       "cwd": ".",
       "exit_code": 1,
-      "duration_ms": 629,
+      "duration_ms": 3040,
       "log": "runner-failure-probe.txt"
     },
     {
@@ -20,7 +20,7 @@
       "command": "node node_modules\\typescript\\bin\\tsc",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 237,
+      "duration_ms": 487,
       "log": "server-build.txt"
     },
     {
@@ -28,7 +28,7 @@
       "command": "node client\\node_modules\\typescript\\bin\\tsc --noEmit",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 345,
+      "duration_ms": 653,
       "log": "client-typecheck.txt"
     },
     {
@@ -36,7 +36,7 @@
       "command": "node client\\node_modules\\vite\\bin\\vite.js build",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 604,
+      "duration_ms": 6901,
       "log": "client-build.txt"
     },
     {
@@ -44,7 +44,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 341,
+      "duration_ms": 1057,
       "log": "server-migration.txt"
     },
     {
@@ -52,7 +52,7 @@
       "command": "node node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\server.json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 12931,
+      "duration_ms": 26204,
       "log": "server-tests.txt"
     },
     {
@@ -60,7 +60,7 @@
       "command": "node client\\node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\client.json",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 4515,
+      "duration_ms": 17178,
       "log": "client-tests.txt"
     },
     {
@@ -68,7 +68,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 440,
+      "duration_ms": 306,
       "log": "browser-migration.txt"
     },
     {
@@ -76,7 +76,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/seed.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 359,
+      "duration_ms": 354,
       "log": "browser-seed.txt"
     },
     {
@@ -84,7 +84,7 @@
       "command": "node node_modules\\@playwright\\test\\cli.js test --config e2e/playwright.config.ts --workers=3 --reporter=json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 23395,
+      "duration_ms": 22052,
       "log": "browser-tests.txt"
     }
   ],
@@ -1667,7 +1667,7 @@
   },
   "readiness": "NOT_RELEASED",
   "error": null,
-  "setup_tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "setup_tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
   "postgresql": "18.4",
   "runner_failure_probe": {
     "status": "PASS",
@@ -1689,7 +1689,7 @@
     "TEST-F10-06": {
       "status": "PASS",
       "artifact": "setup.json",
-      "detail": "Local fresh-project rehearsal 23746ms; peer repetition pending"
+      "detail": "Local fresh-project rehearsal 38044ms; peer repetition pending"
     },
     "TEST-F10-07": {
       "status": "PASS",
@@ -4230,7 +4230,7 @@
           "id": "TEST-F10-06",
           "matched": [
             {
-              "name": "TEST-F10-06: Local fresh-project rehearsal 23746ms; peer repetition pending",
+              "name": "TEST-F10-06: Local fresh-project rehearsal 38044ms; peer repetition pending",
               "file": "setup.json",
               "status": "PASS"
             }
@@ -4398,13 +4398,13 @@
     "e2e/tsconfig.json": "e8d9eec0e0e1aa4342a3e320fccac91ecbcc6495e097404e4399a666fc193c84",
     "package-lock.json": "2bc5080695e65cf43a2a1310039f0162a3595cbcaf47db7d63e98882176cfe3c",
     "package.json": "96f7aba7576d64155114111b1f1963425bb230555b6f011b9b7fa2fbb096f39c",
-    "scripts/audit-sprint1-evidence.mjs": "41a5ccbfc45aac4b14cb0429c19e00360971f5906dc35eb1c2267f6545302859",
-    "scripts/evidence-utils.mjs": "377e98859baf42663a3e1c775842f60c728d521b4b0f04ef8cbaa018658cf0b5",
+    "scripts/audit-sprint1-evidence.mjs": "7eac1121da6508a76d510169aadd7154cdd918b52931a5b64c6d4f3d0fe4d87b",
+    "scripts/evidence-utils.mjs": "050f1e0def803547ea095c9ee72ea201b4f7970953f9e47f7010ba1059f7a2b4",
     "scripts/migrate-test.mjs": "b9f790f456b2532ee465eb4a44d8e6a66a84101e8095e32061f7467e64a43669",
     "scripts/rehearse-setup.mjs": "d4a45bf16778ab273894e1fc66bb5a9eab7ab30b6a64f17e5406de374e725b69",
     "scripts/sprint1-ac-map.json": "dd4eb2fe2e35111aac43bb0d90bf342ca5f6783ba0022ac82367b55dbb35aebc",
-    "scripts/tests/evidence.test.mjs": "98b11f980c7a62236e81d38e0438070c238e72ad2b8819269afbf5b7b6852d94",
-    "scripts/verify-sprint1.mjs": "a13a81a7178bca624c088b9ec33252c2c7eff35f04ec424c8e8f5671eec7f461",
+    "scripts/tests/evidence.test.mjs": "5d2c3713229e66529435f95d8bac4639221b9599b15c7b7742cb463348317eb9",
+    "scripts/verify-sprint1.mjs": "a37e1cbe248d33ea831a3f13cb06d58a875015cacd4a777f4fe6bf5ee98f6f8a",
     "server/src/config/config.ts": "bebb2c6b58bfc284078885065293bbedecc907e8b1701cad27362ad79507774a",
     "server/src/db/migrate.ts": "ffd0ac0325cea1ee7be6f1b78b6f851612d770360e70c60720e971f969c8d73a",
     "server/src/db/migrations.ts": "2885ac9df809eb7fb0739c87bf6de74bef75a2fbbed6f1d2a2e496c6d24e1b8f",
@@ -4441,5 +4441,5 @@
     "tsconfig.json": "ae9d13ce32643d27624a4dbe651e48d6cbcaf769701a16cc231772f03d7138c3",
     "vitest.config.ts": "d1963ec8702244c73463fd046d527b2603f419c647bbfc99c389d3fc8062660a"
   },
-  "completed_at": "2026-11-06T20:34:44.976Z"
+  "completed_at": "2026-11-07T12:49:17.903Z"
 }

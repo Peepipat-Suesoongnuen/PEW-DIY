@@ -1,7 +1,7 @@
 {
   "workers": [
-    24528,
-    12680
+    2248,
+    5688
   ],
   "database": "PostgreSQL 18.4",
   "distinctRequestRaces": 50,
@@ -213,5 +213,5 @@
     ]
   ],
   "invariant": "one loan, held=1, available=0 in every race",
-  "timestamp": "2026-11-06T20:34:06.173Z"
+  "timestamp": "2026-11-07T12:48:16.476Z"
 }

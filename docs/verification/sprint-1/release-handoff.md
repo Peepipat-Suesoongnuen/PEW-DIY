@@ -10,37 +10,7 @@ Submitted PR #38 title: `test(D1-06.6): Verify Sprint 1 integration and prepare 
 
 Base: **sprint/1-staging**. Head: **feature/13-sprint-1-integration-verification**. Reviewer: **Peepipat-Suesoongnuen**, independent from author L0u1sss.
 
-PR #38 body template (update validation/provenance from the latest clean-source run):
-
-```markdown
-## Summary
-
-Adds integrated Sprint1 verification and a Part F evidence pack for F-01–F-05.
-The runner builds and tests real UI/API/PostgreSQL behavior in fresh isolated schemas, records exact counts/source fingerprints, and resolves every contract AC to planned STS IDs and actual executed cases.
-
-## Changes
-
-- Add real production-HTTP protected-route/security/restart/seed checks and complete browser domain journeys.
-- Add fail-closed verification and evidence audits, explicit test-DB migration, and timed fresh-source setup rehearsal.
-- Record screenshots, two actual test excerpts, historical TDD provenance, reviewed workflow chains, both-student contributions and AI-use disclosure.
-- Update README and F-10/verification documentation; report the actual database version in race evidence.
-
-## Validation
-
-- Server:164 passed /0 failed /0 skipped.
-- Client:70 passed.
-- Browser:54 passed across desktop/tablet/mobile, zero flaky cases.
-- Build/typecheck:PASS.
-- 49/49 application AC mapped to executed passing checks;57 total contract result rows with human/release criteria explicitly partial.
-- Fresh-project setup rehearsal: latest actual duration is in run/setup.json; installed tools and potentially warm host caches disclosed, peer repetition pending.
-
-Local Node24.15.0/PostgreSQL18.4 results are separate from earlier reviewer-reported PostgreSQL17 results. See docs/verification/sprint-1/README.md and run/verification.json for tested source/version and raw outputs. The original source was submitted as `2b76abb`; latest source SHA, dirty status and fingerprints are recorded by the runner. Commit remediation source and rerun before claiming clean-commit verification.
-
-## Remaining gates
-
-Refs #13 — keep the Issue open until reviewed integration and release are complete.
-A-12 team ratification, other-student README repetition, human disclosure/TDD checks and final board evidence remain pending. This PR does not create a main release, merge itself, tag a release or claim the full submission PDF is complete.
-```
+PR description updates are supplied in the user chat, as requested, rather than maintained as repository draft files. Replace the whole PR description with the supplied text so obsolete appended validation/version claims do not remain.
 
 PR #38 is already open and the latest observed published head is0316500, containing the earlier authorized local remediation commits. Prior agent authorization excluded push; this does not imply the commits remain unpublished after later repository activity. This correction round does not itself update GitHub. AGENT.md §11.1 requires authorization for further commits/pushes, and §12.3 requires the human Reviewer to merge. There is no self-approval or direct feature merge/push to main.
 

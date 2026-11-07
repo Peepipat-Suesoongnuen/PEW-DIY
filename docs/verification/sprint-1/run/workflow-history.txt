@@ -1,3 +1,9 @@
+8676957 2026-11-07T19:46:29+07:00
+fix(F-10): remove candidate mode and reconcile published review evidence (Refs #13)
+
+0316500 2026-11-07T03:37:24+07:00
+docs(F-10): regenerate evidence on verified source 8fb84f4
+
 8fb84f4 2026-11-07T03:33:07+07:00
 fix(F-10): bind setup provenance and audit complete source manifests (Refs #13)
 
@@ -15,9 +21,3 @@ Merge pull request #37 from Peepipat-Suesoongnuen/feature/12-checkout-active-loa
 
 70e7b5e 2026-11-07T01:01:36+07:00
 feat(F-05): implement atomic checkout and active loans (Refs #12)
-
-de63590 2026-11-07T00:23:14+07:00
-Merge pull request #36 from Peepipat-Suesoongnuen/feature/11-borrowing-request
-
-a080fa0 2026-11-07T00:08:13+07:00
-fix

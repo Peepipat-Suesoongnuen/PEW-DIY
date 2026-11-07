@@ -1,19 +1,20 @@
-﻿✔ canonical source hashes tolerate CRLF checkout conversion but detect content changes (1.2726ms)
-✔ portable artifacts remove mixed-slash workspace, home, cache and temp paths without corrupting JSON or web URLs (1.5452ms)
-✔ candidate evidence cannot silently pass committed-source audit (37.218ms)
-✔ evidence-only descendant HEAD is accepted only with matching source and tested Git blob (7847.6295ms)
-✔ dirty-source state never labels a working-tree candidate as a clean commit (2602.5733ms)
-✔ setup must be clean, successful and from exactly the verification source commit (0.6069ms)
-✔ edited HTML, stylesheet, asset and build configs are dirty source (15864.5114ms)
-✔ deleted tracked source is reported dirty without ENOENT crash (3656.1534ms)
-✔ audit rejects omitted fingerprint keys, modified HTML and forged hashes (22994.2438ms)
-✔ shallow history fails with a full-clone prerequisite message (611.9384ms)
-✔ binary assets retain byte-exact fingerprints (0.4718ms)
-ℹ tests 11
+﻿✔ canonical source hashes tolerate CRLF checkout conversion but detect content changes (1.2701ms)
+✔ portable artifacts remove mixed-slash workspace, home, cache and temp paths without corrupting JSON or web URLs (1.5591ms)
+✔ candidate evidence cannot silently pass committed-source audit (27.0081ms)
+✔ evidence-only descendant HEAD is accepted only with matching source and tested Git blob (6952.7799ms)
+✔ dirty-source state never labels a working-tree candidate as a clean commit (2762.9533ms)
+✔ setup must be clean, successful and from exactly the verification source commit (0.6676ms)
+✔ edited HTML, stylesheet, asset and build configs are dirty source (15954.2299ms)
+✔ deleted tracked source is reported dirty without ENOENT crash (3709.9896ms)
+✔ audit rejects omitted fingerprint keys, modified HTML and forged hashes (16992.3801ms)
+✔ shallow history fails with a full-clone prerequisite message (379.8091ms)
+✔ binary assets retain byte-exact fingerprints (0.2283ms)
+✔ removed working-tree option is rejected explicitly by verification and audit before execution (3386.0499ms)
+ℹ tests 12
 ℹ suites 0
-ℹ pass 11
+ℹ pass 12
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 53714.0537
+ℹ duration_ms 50246.4323

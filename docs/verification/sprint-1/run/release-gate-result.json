@@ -1,7 +1,7 @@
 {
-  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
   "actual_exit_code": 2,
   "expected_exit_code": 2,
   "status": "NOT_RELEASED",
-  "meaning": "Strict release audit first passed complete source and exact setup commit checks; absent actual main release/human evidence correctly blocks release"
+  "meaning": "Strict release audit passed complete source and exact setup commit checks; missing actual main release and human evidence correctly block release"
 }
