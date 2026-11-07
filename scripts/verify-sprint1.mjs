@@ -71,7 +71,8 @@ function suiteCases(result) {
   return result.testResults.flatMap((file) => file.assertionResults.map((t) => ({ file: relative(path.resolve(file.name)), name: t.fullName, status: t.status })));
 }
 try {
-  if (!report.tested_commit && !process.argv.includes("--allow-working-tree")) throw new Error("Source differs from HEAD; commit source before verification, or explicitly use --allow-working-tree for a non-commit candidate");
+  if (process.argv.length > 2) throw new Error(`Unsupported option: ${process.argv[2]}; verify:sprint1 requires clean committed source and matching setup evidence`);
+  if (!report.tested_commit) throw new Error("Source differs from HEAD; commit source, then run rehearse:sprint1 before verification");
   assertFullHistory(root);
   // Fail closed before opening a DB connection or starting any suite.
   let setup;

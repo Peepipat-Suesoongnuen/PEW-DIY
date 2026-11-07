@@ -1,27 +1,43 @@
-# Proposed PR38 description (ready to copy to the existing PR)
+## Summary
 
-Refs #13. This PR verifies the Sprint1 authentication, catalog/availability, borrowing request and checkout/active-loan increment and prepares Part F evidence. It does not constitute a release from sprint/1-staging to main; Issue13 remains open for human/release gates.
+Verify the Sprint1 authentication, catalog/availability, borrowing request and checkout/active-loan increment (F01-F05) and prepare Part F evidence. Refs #13. This integration/evidence PR targets sprint/1-staging; it is not a Sprint1 release to main and does not close Issue13.
 
 ## Changes
 
-- Exercise real UI/API/PostgreSQL journeys, access control, restart durability and checkout races; map49 application AC and57 contract AC to executed checks or explicit pending human/release evidence.
-- Bind setup evidence to the exact clean verification source commit before any suite starts; reject stale/candidate setup records.
-- Use a shared complete product/test/tooling manifest for the dirty-source guard, fingerprints and audit, including HTML/CSS/config/assets and deleted files; validate the exact fingerprint key set and Git blobs.
-- Keep NOT_RELEASED pending rather than matched/pass, document full-history prerequisites, sanitize portable evidence, and separate local execution from reviewer-reported results.
+- Exercise real UI/API/PostgreSQL journeys, authorization, restart durability and checkout races; map49 application AC and57 contract AC with77 planned STS IDs.
+- Require successful clean setup evidence from exactly the verified source commit before any suite/DB connection.
+- Validate complete product/test/tooling fingerprint key sets against tested Git blobs and current files, including HTML/CSS/config/assets and deleted tracked files.
+- Remove working-tree candidate mode. Verification accepts no CLI options; audit accepts only --require-release. Unknown options fail explicitly; no override bypasses clean-source provenance.
+- Keep NOT_RELEASED pending, disclose full-history prerequisites, separate local/reviewer measurements, and retain authentic scoped CLI RED/GREEN logs.
 
 ## Version and validation traceability
 
-| Round | Source | Evidence/reviewed head | Results |
+| Round | Tested source | Evidence / reviewed head | Local measurement |
 |---|---|---|---|
-| Original submission | 2b76abb | 2b76abb | Historical local setup61.812s; original reviewer PG17 setup11.957s |
-| First remediation | 8bff092 | 43bcdfe | Local PG18:164 server /70 client /54 E2E,5 tooling; setup22.417s |
-| Independent re-review | 43bcdfe | 43bcdfe | Reviewer Node24.19/PG17.11:164/70/54,5 tooling; normal audit0, release-required2 |
-| Latest remediation | 8fb84f4c0803b12cbdd65275e4361a0aaeb88a23 | Evidence-only descendant containing this pack (see Git history) | Local Node24.15/PG18.4:164 server/70 client/54 E2E,11 tooling; setup23.746s; build/typecheck PASS; normal audit0, release-required2 NOT_RELEASED |
+| Original submission |2b76abb |2b76abb | Historical setup61.812s |
+| First remediation |8bff092 |43bcdfe |164 server/70 client/54 browser,5 tooling; setup22.417s |
+| Second remediation |8fb84f4 |0316500 |164 server/70 client/54 browser,11 tooling; setup23.746s |
+| Current review corrections | Pending clean source commit | Pending regenerated evidence | Prior rows are historical and are not current execution |
 
-The first three rows describe separate historical measurements. Three actual entrypoint probes reject stale/candidate/missing-commit setup with exit1 and zero started suites. All49 application AC pass; contract mapping remains52 PASS/5 PARTIAL. Latest machine-readable results belong in run/verification.json and run/setup.json and must name the same source commit. A source-preserving evidence descendant may retain that tested source SHA.
+Historical local full-suite results use Node24.15.0/PostgreSQL18.4; host caches may be warm and installed toolchain prerequisites are excluded from rehearsal timing. The original reviewer setup11.957s on2b76abb and PG17 results on43bcdfe are independent measurements. The latest independent review on0316500 reports164/70/54,41 audit checks and8 pending gates, confirms no remaining P0/P1/P2, and requests these five documentation/CLI corrections; its toolchain versions were not specified.
+
+## Validation and reproduction
+
+Use full Git history, the README toolchain, a clean source commit and a dedicated disposable TEST_DATABASE_URL. The test DB role needs CREATE DATABASE for rehearsal and CREATE SCHEMA for isolated suite schemas. Run in this order on the same clean source commit:
+
+```powershell
+npm run rehearse:sprint1
+npm run verify:sprint1
+npm run audit:sprint1
+npm run audit:sprint1 -- --require-release
+```
+
+The runner migrates its new schemas before test discovery. A manual `migrate:test` step is not required for this complete runner. The final strict audit is expected to exit2 NOT_RELEASED until an actual reviewed main release and human evidence are supplied; this is not a passing release check. Unknown/removed options are rejected with exit1.
+
+Machine-readable setup/verification records must name the same source commit. The final evidence-only descendant retains that tested source SHA. See docs/verification/sprint-1/README.md for counts, timings, screenshots, per-AC mapping and evidence identity. All49 application AC passed in the second remediation; contract coverage remains52 PASS/5 PARTIAL rather than treating human/release gates as passed.
+
+The narrated historical tooling RED5-pass/5-fail run has no retained raw artifact and is unverified. New tooling-option-red.txt and tooling-option-green.txt retain the actual same-test0/1 then1/0 CLI regression observations; they do not establish the missing historical run.
 
 ## Remaining gates
 
-A-12 shared-team ratification artifact, teammate README repetition, contribution/AI disclosure and RED authenticity sign-off, final board evidence, reviewed main release and final PDF remain pending. Application AC passing does not close these gates; five contract rows remain PARTIAL. CI and branch protection are known gaps outside this remediation scope. Local checks are not GitHub CI results.
-
-This text is prepared locally; no GitHub PR edit is performed by the remediation task.
+A-12 shared-team ratification, teammate README repetition, historical RED authenticity/contribution/AI disclosure sign-off, final board evidence, independent re-review/integration, a separate reviewed staging-to-main release with regression on the actual release SHA, and final Parts A-F PDF remain pending. CI and branch protection are known gaps outside this correction scope. All test/audit results here are local verification, not GitHub CI checks. The human reviewer must independently re-review before merging.

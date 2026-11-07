@@ -42,7 +42,7 @@ Refs #13 — keep the Issue open until reviewed integration and release are comp
 A-12 team ratification, other-student README repetition, human disclosure/TDD checks and final board evidence remain pending. This PR does not create a main release, merge itself, tag a release or claim the full submission PDF is complete.
 ```
 
-The user already committed/pushed the original work and opened PR #38. Local remediation does not itself update GitHub. AGENT.md §11.1 requires authorization for further commits/pushes, and §12.3 requires the human Reviewer to merge. There is no self-approval or direct feature merge/push to main.
+PR #38 is already open and the latest observed published head is0316500, containing the earlier authorized local remediation commits. Prior agent authorization excluded push; this does not imply the commits remain unpublished after later repository activity. This correction round does not itself update GitHub. AGENT.md §11.1 requires authorization for further commits/pushes, and §12.3 requires the human Reviewer to merge. There is no self-approval or direct feature merge/push to main.
 
 ## Human gates and subsequent release sequence
 

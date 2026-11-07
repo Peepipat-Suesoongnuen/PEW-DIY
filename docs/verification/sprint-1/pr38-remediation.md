@@ -1,34 +1,38 @@
 # PR38 review remediation
 
-Review target: `2b76abbf7be1d6384ee4ae2dffa1808f71aeda82`; [review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5805879906). The previous agent authorization covered two local commits only and excluded push and GitHub writes. Actual repository state is separate: GitHub PR38 now has reviewed head `43bcdfe`, so the first remediation was subsequently published. This new local remediation does not itself authorize any further push or remote PR edit.
+Latest [independent review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5807698601): reviewed head `0316500e9b6ca93cf477b83f04d986adaf7a67ed`, REQUEST CHANGES. The reviewer confirms stale-setup and complete-fingerprint P2 fixes, reports no outstanding P0/P1/P2, and reproduces164 server/70 client/54 browser tests plus41 audit checks with8 pending gates. The five remaining corrections are addressed below.
 
-| Finding | Remediation | Verification |
-|---|---|---|
-| P2-1 source/version provenance | Commit remediation source first; default runner rejects dirty source. Clean runs record the actual source SHA. Audit validates canonical LF-normalized fingerprints against both tested Git blobs and current files, accepting a later evidence-only descendant commit | Current run/verification.json and evidence-audit.json record actual state. Candidate mode is explicit and cannot satisfy strict release provenance |
-| P2-2 stale pre-commit prose | Record the actual original commit `2b76abb` and existing PR38; distinguish historical first-run evidence from current source/evidence commits | Pack README, test excerpts, workflow/contribution declaration, F10 contract and release handoff updated |
-| P2-3 personal absolute paths | Shared sanitizer handles structured JSON, logs, commands, root/home/temp paths and trims trailing blank lines; history images use Git SHAs/dates/subjects and public account attribution instead of local display names | Artifact path scan plus portable-path regression test; no credential/private path included |
-| P2-4 semantic process mapping | AC-F10-04/05/06/07/08 point to suite/failure probe/setup/TDD/workflow/release/disclosure checks TEST-F10-04..10; E2E journeys remain mapped only to behavioral AC | Generated57-row result table lists process artifacts and keeps human/release portions PARTIAL; duplicate viewport labels removed |
+## Authorization versus observed repository state
 
-The complete server/client/browser regression remains164/70/54. Native tooling regression tests cover canonical hashes, mixed-slash path sanitization, dirty candidate rejection and evidence-only descendant commits. Exact current results, versions, commands and source SHA are in run/verification.json; no uncommitted state is labeled CLEAN_SOURCE_COMMIT.
+Previous agent authorizations allowed two local commits per round and excluded push/remote PR edits. Those authorizations describe the agent's action scope; they do not describe all later human/repository activity. GitHub now exposes both remediation pairs, with PR38 head `0316500` as observed7 November2026. Therefore the remediation is published on PR38. No assertion that those commits remain unpushed is made. This new local correction request does not authorize a further push or remote PR edit.
 
-The PR38 reviewer separately reports164/70/54 on Node24.19.0/PostgreSQL17.11, setup11.957s (warm cache). Local reruns use Node24.15.0/PostgreSQL18.4. Reviewer results are attributed in pr38-reviewer-results.json and not presented as local PG17 execution. CI/branch protection remain outside this bounded F10 remediation. Issue13 remains open for human gates and reviewed main release.
+| Round | Tested source | Evidence / published head | Local result |
+|---|---|---|---|
+| Original submission | `2b76abb` | `2b76abb` | Historical setup61.812s |
+| First remediation | `8bff092` | `43bcdfe` |164/70/54;5 tooling; setup22.417s |
+| Second remediation | `8fb84f4` | `0316500` |164/70/54;11 tooling; setup23.746s |
+| Current corrections | Pending fresh source commit | Pending regenerated evidence | Previous results above are historical; do not relabel them as this round |
 
-Release audit behavior: invalid/candidate source exits1; committed matching source with absent main release/human approvals exits2 NOT_RELEASED. An evidence-only commit must retain the tested source SHA, not rewrite it to pretend the evidence commit tested itself.
+Local full-suite measurements above use Node24.15.0/PostgreSQL18.4. Reviewer PG17 reproductions belong to the earlier reviews/heads and are separately attributed in pr38-reviewer-results.json and pr38-reviewer-rerun.json. The latest review of0316500 does not specify toolchain versions.
 
-## Latest independent re-review (review 5806364064)
+## Latest requested corrections
 
-Reviewed head: `43bcdfe`; [review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5806364064). The reviewer confirms the previous four P2 findings are fixed. This round addresses:
-
-| Finding | Change |
+| Request | Correction |
 |---|---|
-| P2-1 stale setup evidence | Require CLEAN_SOURCE_COMMIT and exact setup/verification tested_commit equality, successful rehearsal and valid duration before any suite/DB connection; independently enforce the same setup relationship in audit |
-| P2-2 omitted product files | Share a complete manifest across dirty-source guard, fingerprints and audit; include HTML/CSS/config/assets and root configuration; audit exact key sets, tested Git blobs and current files |
-| P3-1/2/3 traceability | Separate original2b76abb, first source8bff092 and published evidence43bcdfe; distinguish authorization from actual GitHub state; prepare updated PR text locally |
-| P3-4 CI/protection | Record as known gap; no repository setting changes |
-| P3-5 missing files | ENOENT produces a dirty source entry, including staged/unstaged deletions |
-| P3-6 historical SHAs | Explicit full-history prerequisite with actionable shallow-clone failure |
-| P3-7 release status | NOT_RELEASED is pending and absent from matched/pass checks; affected AC stays PARTIAL |
+|1. PR body and command order | Prepare pr38-description.md as a complete replacement body, with consistent SHA/result rows and `rehearse:sprint1 -> verify:sprint1 -> audit:sprint1`. The obsolete appended Validation/Evidence prose must be removed, not left below the replacement |
+|2. Publication wording | Separate prior local-only authorization from observed published PR head0316500; no global claim that no push occurred |
+|3. README commit chain | Explicitly list original2b76abb, source8bff092/evidence43bcdfe, source8fb84f4/evidence0316500, and the current round separately |
+|4. Unusable candidate option | Remove candidate bypass from verification, audit and source assertion; verification accepts no options, audit only --require-release. Unsupported options fail explicitly before suites/checks; clean committed source and matching setup remain mandatory |
+|5. Tooling RED evidence | No retained artifact verifies the previous5-pass/5-fail tooling RED narrative. Mark it unverified; retain a new actual RED/GREEN pair for the CLI option regression without claiming it proves the earlier run |
 
-New regression tests reproduce omitted HTML/config/CSS changes, new assets, deleted files, incomplete hash maps and mismatched/candidate setup. Binary asset hashes are byte-exact. The initial RED run had5 passed/5 failed, including the actual false-clean HTML/deletion cases. The user authorized two additional local commits for this round (source/docs, then regenerated evidence), with no push or GitHub write. Full verification completed on clean source `8fb84f4c0803b12cbdd65275e4361a0aaeb88a23`:164 server/70 client/54 browser,11 native tooling tests, builds/typecheck PASS; setup23.746s. Normal audit exit0 (41 checks), strict release exit2 NOT_RELEASED. Three actual verifier entrypoint probes reject invalid setup before suites. Original source2b76abb and first remediation8bff092/evidence43bcdfe remain historical records, not this round's results.
+## Retained CLI RED/GREEN evidence
 
-Additional entrypoint verification: two audit probes reject an omitted HTML fingerprint and stale setup commit with exit1. A real HTML edit probe makes verification report WORKING_TREE_CANDIDATE, tested_commit=null and exit1 before any step; the file was restored byte-for-byte. Evidence JSON, private absolute path scan, relative Markdown links and whitespace checks passed. See run/audit-rejection-probes.json and run/source-guard-probe.json.
+The regression test `removed working-tree option is rejected explicitly by verification and audit before execution` is in scripts/tests/evidence.test.mjs. Before the fix it failed because verification handled the obsolete flag and continued to setup evidence validation rather than rejecting the option. The [RED output](tooling-option-red.txt) records0 passed/1 failed. After removing the bypass, the same test checks both entrypoints reject the option with exit1, zero steps/suites/audit checks; the [GREEN output](tooling-option-green.txt) records1 passed/0 failed. These two targeted observations ran on Node24.14.0. They are working-tree observations with logs, not invented historical commits. The full tooling suite is rerun separately on the clean source commit.
+
+The earlier tooling5-pass/5-fail RED report has no retained raw artifact; its exact historical counts cannot be independently verified from the pack. Existing F01/F05 TDD evidence remains separately attributed and requires human authenticity assessment. No absent artifact is marked VERIFIED.
+
+## Previously fixed review findings
+
+Earlier source/evidence provenance, portable private-path sanitization, process AC mapping, stale setup rejection, exact product fingerprint keys, HTML/CSS/config/assets coverage, missing-file handling and full-history prerequisites remain in place. NOT_RELEASED is a pending check with no matched/pass entry. Prior real entrypoint probes are retained in run/setup-preflight-probes.json, run/audit-rejection-probes.json and run/source-guard-probe.json with their original source attribution; they must not be relabeled as current execution.
+
+Normal audit should exit0 only after source/setup validation; strict release audit must still exit2 NOT_RELEASED while actual main release/human evidence is missing. Issue13 remains open. GitHub CI and branch protection are known gaps outside this bounded correction.

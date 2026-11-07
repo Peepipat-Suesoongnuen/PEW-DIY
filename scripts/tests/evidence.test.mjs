@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { mkdtempSync, readFileSync, writeFileSync, rmSync, unlinkSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, unlinkSync } from "node:fs";
 import os from "node:os";
 import * as evidence from "../evidence-utils.mjs";
 import { canonicalHash, createSanitizer, sanitizeData, digestFile, assertSourceVersion, sourceState } from "../evidence-utils.mjs";
@@ -98,4 +98,23 @@ test("shallow history fails with a full-clone prerequisite message", (t) => {
 });
 test("binary assets retain byte-exact fingerprints", () => {
   assert.notEqual(evidence.hashSource("client/src/asset.png", Buffer.from([13, 10])), evidence.hashSource("client/src/asset.png", Buffer.from([10])));
+});
+test("removed working-tree option is rejected explicitly by verification and audit before execution", (t) => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "pewdiy-option-test-"));
+  t.after(() => {
+    if (!dir.startsWith(path.resolve(os.tmpdir()) + path.sep) || !path.basename(dir).startsWith("pewdiy-option-test-")) throw new Error("Unsafe test cleanup");
+    rmSync(dir, { recursive: true, force: true });
+  });
+  for (const [script, artifact] of [["verify-sprint1.mjs", "verification.json"], ["audit-sprint1-evidence.mjs", "evidence-audit.json"]]) {
+    const out = path.join(dir, script); mkdirSync(out);
+    const result = spawnSync(process.execPath, [path.join(root, "scripts", script), "--allow-working-tree"], {
+      cwd: root, env: { ...process.env, VERIFICATION_OUTPUT_DIR: out }, encoding: "utf8", windowsHide: true,
+    });
+    assert.equal(result.status, 1, script);
+    const report = JSON.parse(readFileSync(path.join(out, artifact), "utf8"));
+    assert.match(report.error, /Unsupported option: --allow-working-tree/);
+    if (report.steps) assert.equal(report.steps.length, 0);
+    if (report.suites) assert.equal(Object.keys(report.suites).length, 0);
+    if (report.checks) assert.equal(report.checks.length, 0);
+  }
 });

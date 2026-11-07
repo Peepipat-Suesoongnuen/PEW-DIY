@@ -91,9 +91,9 @@ export function sourceState(root) {
     version_kind: dirty.length ? "WORKING_TREE_CANDIDATE" : "CLEAN_SOURCE_COMMIT",
     source_dirty_files: dirty.sort(), fingerprint_format: "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest" };
 }
-export function assertSourceVersion(run, root, allowCandidate = false) {
+export function assertSourceVersion(run, root) {
   const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
-  if (!run.tested_commit && !allowCandidate) throw new Error("Verification source is an uncommitted candidate; commit source and rerun verify:sprint1");
+  if (!run.tested_commit) throw new Error("Verification source is an uncommitted candidate; commit source and rerun rehearse:sprint1 then verify:sprint1");
   const expected = sourceFiles(root, run.tested_commit || undefined);
   const actual = Object.keys(run.source_sha256 ?? {}).sort();
   if (JSON.stringify(expected) !== JSON.stringify(actual) || JSON.stringify(sourceFiles(root)) !== JSON.stringify(actual)) {

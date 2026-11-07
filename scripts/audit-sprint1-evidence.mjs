@@ -15,10 +15,11 @@ const audit = { audited_at: new Date().toISOString(), audited_head: git("rev-par
   audit_source_sha256: digest(fileURLToPath(import.meta.url)), status: "NOT_RUN" };
 function check(label, condition) { audit.checks.push({ label, status: condition ? "PASS" : "FAIL" }); if (!condition) throw new Error(label); }
 try {
+  const unsupported = process.argv.slice(2).find((arg) => arg !== "--require-release");
+  if (unsupported) throw new Error(`Unsupported option: ${unsupported}; audit:sprint1 accepts only --require-release and requires committed source`);
   assertFullHistory(root);
   const run = await json(path.join(out, "verification.json"));
-  const candidateAllowed = process.argv.includes("--allow-working-tree") && !process.argv.includes("--require-release");
-  assertSourceVersion(run, root, candidateAllowed);
+  assertSourceVersion(run, root);
   audit.tested_commit = run.tested_commit;
   audit.version_kind = run.version_kind;
   check("Full runner succeeded on the recorded source version", run.status === "AUTOMATED_CHECKS_PASS");
@@ -80,7 +81,7 @@ try {
     await mkdir(path.join(out, "screenshots"), { recursive: true });
     await page.screenshot({ path: path.join(out, "screenshots/workflow-history.png"), fullPage: true });
   } finally { await browser.close(); }
-  audit.status = run.tested_commit ? "AUTOMATED_EVIDENCE_PASS_WITH_HUMAN_GATES" : "CANDIDATE_CHECKS_PASS_COMMIT_VERIFICATION_PENDING";
+  audit.status = "AUTOMATED_EVIDENCE_PASS_WITH_HUMAN_GATES";
 } catch (error) { audit.status = error.message.startsWith("Release gate:") ? "NOT_RELEASED" : "FAIL"; audit.error = error.message; process.exitCode = audit.status === "NOT_RELEASED" ? 2 : 1; }
 await writeEvidence(path.join(out, process.argv.includes("--require-release") ? "release-audit.json" : "evidence-audit.json"), audit, scrub);
 await sanitizeArtifacts(out, scrub);
