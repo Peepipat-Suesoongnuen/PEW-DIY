@@ -1,6 +1,6 @@
 # Issue #13 review and release handoff
 
-Local work is on `feature/13-sprint-1-integration-verification`, based on staging `5b064ea`. Actual local evidence is in [verification.json](run/verification.json), [AC results](run/ac-results.md) and [setup rehearsal](run/setup.json). Passing local tests do not identify a released main commit.
+Local work is on `feature/13-sprint-1-integration-verification`, based on staging `5b064ea`. Actual local evidence is in [verification.json](run/verification.json), [AC results](run/ac-results.md) and [setup rehearsal](run/setup.json). Latest observed PR head / evidence commit: `dad4cd8139034237c29f086a93c03a3305abf0e6`; tested source: `8676957c3dc40511508bfefb772576c6a4958e84`. Passing local tests do not identify a released main commit.
 
 ## Submitted feature PR and remediation
 
@@ -12,7 +12,9 @@ Base: **sprint/1-staging**. Head: **feature/13-sprint-1-integration-verification
 
 PR description updates are supplied in the user chat, as requested, rather than maintained as repository draft files. Replace the whole PR description with the supplied text so obsolete appended validation/version claims do not remain.
 
-PR #38 is already open and the latest observed published head is0316500, containing the earlier authorized local remediation commits. Prior agent authorization excluded push; this does not imply the commits remain unpublished after later repository activity. This correction round does not itself update GitHub. AGENT.md §11.1 requires authorization for further commits/pushes, and §12.3 requires the human Reviewer to merge. There is no self-approval or direct feature merge/push to main.
+PR #38 is already open and the latest observed published head / evidence commit is `dad4cd8`, preserving tested source `8676957`, containing the earlier authorized local remediation commits. Prior agent authorization excluded push; this does not imply the commits remain unpublished after later repository activity. This correction round does not itself update GitHub. AGENT.md §11.1 requires authorization for further commits/pushes, and §12.3 requires the human Reviewer to merge. There is no self-approval or direct feature merge/push to main.
+
+The [latest independent review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5812473875) assessed `dad4cd8` and leaves only PR-description cleanup and latest-head documentation. Original submission `2b76abb` and earlier evidence heads `43bcdfe` / `0316500` are historical, not the current PR head. Current documentation-only edits preserve the tested source and existing run evidence.
 
 ## Human gates and subsequent release sequence
 
