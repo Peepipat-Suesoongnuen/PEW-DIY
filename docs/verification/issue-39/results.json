@@ -1,0 +1,236 @@
+{
+  "issue": 39,
+  "head_commit": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+  "tested_commit": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+  "version_kind": "COMMIT_FINGERPRINT_MATCHED_AFTER_RUN",
+  "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
+  "scope": "Historical local UI results; six changed-source fingerprints matched to published commit after execution. Not a clean-checkout execution claim or current remediation result.",
+  "changed_source_sha256": {
+    "client/src/components/LoanDetails.tsx": "fe79c84cf576082100b55fd01adfa885871dc88dd50374a7a649ae335cb8f0be",
+    "client/src/pages/LoansPage.tsx": "e66dab6af6ac6466bdde1d2f9df599025118c3547620283f15b551083f8f084c",
+    "client/src/pages/RequestsPage.tsx": "8d731fd0806257be385110b64bef71a226cdfe552bf8c222ebd5ccddf603031a",
+    "client/src/styles/tokens.css": "43aa3933c4e79ef704767de1f854edc75d516fef293db885acf437445d463d3e",
+    "client/src/test/loan.test.tsx": "ef579ee667bcbfc0aeaec65d76082b222a122c7454b6b11241d62021b783e29b",
+    "e2e/specs/ui-layout.spec.ts": "b360e9962e43f687c7d825c821b66b135338abfaa12cf6c8a29139f3658f07a6"
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "postgresql": "18.4"
+  },
+  "client": {
+    "passed": 74,
+    "failed": 0,
+    "skipped": 0
+  },
+  "full_browser": {
+    "startTime": "2026-11-07T15:57:42.710Z",
+    "duration": 24791.84,
+    "expected": 57,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "latest_targeted_browser": {
+    "startTime": "2026-11-07T15:59:28.705Z",
+    "duration": 3946.312,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "measurement_note": "Synthetic route identifiers normalized to :id; targeted rerun adds screenshots to the already-passing full-suite regression",
+  "measurements": [
+    {
+      "width": 1280,
+      "positions": [
+        {
+          "path": "/catalog",
+          "navX": 48.5,
+          "mainX": 32.5,
+          "scrolls": false
+        },
+        {
+          "path": "/loans",
+          "navX": 48.5,
+          "mainX": 32.5,
+          "scrolls": true
+        },
+        {
+          "path": "/loans/:id",
+          "navX": 48.5,
+          "mainX": 32.5,
+          "scrolls": false
+        },
+        {
+          "path": "/requests",
+          "navX": 48.5,
+          "mainX": 32.5,
+          "scrolls": true
+        },
+        {
+          "path": "/items/:id",
+          "navX": 48.5,
+          "mainX": 32.5,
+          "scrolls": false
+        }
+      ],
+      "actionGap": 16,
+      "refreshClickFractions": [
+        0.01,
+        0.1,
+        0.5,
+        0.9,
+        0.99
+      ]
+    },
+    {
+      "width": 1024,
+      "positions": [
+        {
+          "path": "/catalog",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        },
+        {
+          "path": "/loans",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": true
+        },
+        {
+          "path": "/loans/:id",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        },
+        {
+          "path": "/requests",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": true
+        },
+        {
+          "path": "/items/:id",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        }
+      ],
+      "actionGap": 16,
+      "refreshClickFractions": [
+        0.01,
+        0.1,
+        0.5,
+        0.9,
+        0.99
+      ]
+    },
+    {
+      "width": 768,
+      "positions": [
+        {
+          "path": "/catalog",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        },
+        {
+          "path": "/loans",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": true
+        },
+        {
+          "path": "/loans/:id",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        },
+        {
+          "path": "/requests",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": true
+        },
+        {
+          "path": "/items/:id",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        }
+      ],
+      "actionGap": 16,
+      "refreshClickFractions": [
+        0.01,
+        0.1,
+        0.5,
+        0.9,
+        0.99
+      ]
+    },
+    {
+      "width": 390,
+      "positions": [
+        {
+          "path": "/catalog",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        },
+        {
+          "path": "/loans",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": true
+        },
+        {
+          "path": "/loans/:id",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        },
+        {
+          "path": "/requests",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": true
+        },
+        {
+          "path": "/items/:id",
+          "navX": 16,
+          "mainX": 0,
+          "scrolls": false
+        }
+      ],
+      "actionGap": 16,
+      "refreshClickFractions": [
+        0.01,
+        0.1,
+        0.5,
+        0.9,
+        0.99
+      ]
+    }
+  ],
+  "execution_provenance": {
+    "head_commit": "ef58fae87e6a262a30df8b9d65480924add2d516",
+    "tested_commit": null,
+    "version_kind": "WORKING_TREE_CANDIDATE",
+    "source_dirty_files": [
+      "client/src/components/LoanDetails.tsx",
+      "client/src/pages/LoansPage.tsx",
+      "client/src/pages/RequestsPage.tsx",
+      "client/src/styles/tokens.css",
+      "client/src/test/loan.test.tsx",
+      "e2e/specs/ui-layout.spec.ts"
+    ]
+  },
+  "commit_reconciliation": {
+    "date": "2026-11-08",
+    "method": "Compare all six recorded changed-source hashes against actual Git blobs, with CRLF normalized to LF",
+    "matched_commit": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+    "matched_files": 6,
+    "review": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/41#pullrequestreview-5813989510"
+  }
+}

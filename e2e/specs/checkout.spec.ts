@@ -69,6 +69,9 @@ for (const mode of ["hold", "fail", "normal"] as const) {
           expect((await pool.query("SELECT * FROM loans WHERE request_id=$1", [requestId])).rowCount).toBe(0);
         } finally { proc.send("release"); }
         await expect(cPage.getByText("Checkout completed.")).toBeVisible();
+        const committed = cPage.getByRole("main").locator("dl");
+        await expect(committed.getByText(accounts[0]!.username, { exact: true })).toBeVisible();
+        await expect(committed.getByText(accounts[2]!.username, { exact: true })).toHaveCount(0);
         const stored = (await pool.query("SELECT *,due_on::text AS due_date FROM loans WHERE request_id=$1", [requestId])).rows[0];
         await expect(cPage.getByText(stored.due_date, { exact: true })).toBeVisible();
         expect(stored.quantity_borrowed).toBe(2);
