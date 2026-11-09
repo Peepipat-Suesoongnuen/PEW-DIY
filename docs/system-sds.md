@@ -325,6 +325,8 @@ Use ignored local configuration and a future tracked `.env.example` with placeho
 
 **Confirmed course boundary:** Part C needs a feasible design now; Docker, mandatory CI and real GCP setup are later work. No Dockerfile, CI workflow, GCP resource or actual deployment is delivered by this issue.
 
+**Subsequent CI implementation:** `.github/workflows/ci.yml` now defines build/type checks and tooling, server/API, client and three-viewport Chromium regression checks using Node24.15.0 and disposable PostgreSQL17. `npm run test:ci` records sanitized results outside the assessed Sprint1 evidence directory. See README Continuous integration for reproduction and required-check setup. This establishes PR CI configuration; the first hosted run, repository required-check enforcement, Docker packaging and GCP deployment remain separate verification/administration steps. It does not bypass the existing F-10 clean-source rehearsal/audit or human release gates.
+
 | Component | Proposed plan and rationale | Open decision |
 |---|---|---|
 | Application packaging | One reproducible application image can serve UI/API for the modular monolith; configure at runtime and bind the platform HTTP port | Selected stack determines build/start procedure |
