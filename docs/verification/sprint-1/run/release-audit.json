@@ -1,6 +1,6 @@
 {
-  "audited_at": "2026-11-07T12:49:44.117Z",
-  "audited_head": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "audited_at": "2026-11-09T17:02:52.660Z",
+  "audited_head": "d291873c10c2021d4eb5ebe733aa68012f813678",
   "checks": [
     {
       "label": "Full runner succeeded on the recorded source version",
@@ -173,13 +173,12 @@
     "tdd_authenticity_review",
     "contribution_disclosure",
     "final_board",
-    "feature13_review_integration",
     "release_peer_review",
     "Actual main release commit and release-version rerun"
   ],
   "audit_source_sha256": "7eac1121da6508a76d510169aadd7154cdd918b52931a5b64c6d4f3d0fe4d87b",
   "status": "NOT_RELEASED",
-  "tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "tested_commit": "d291873c10c2021d4eb5ebe733aa68012f813678",
   "version_kind": "CLEAN_SOURCE_COMMIT",
   "main_remote": "7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c",
   "release_commit": null,

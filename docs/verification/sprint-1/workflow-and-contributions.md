@@ -14,14 +14,14 @@ Full SHA/ref/review metadata is retained in [workflow.json](workflow.json). The 
 
 ![Actual Git history rendered from recorded git log output](run/screenshots/workflow-history.png)
 
-The image renders [actual local Git output](run/workflow-history.txt); it is explicitly not a fabricated GitHub UI. Final GitHub board state and release PR screenshot remain pending. No staging→main release chain is claimed: the observed main ref is `7bf6c8d`, not the staged increment.
+The image renders [actual local Git output](run/workflow-history.txt); it is explicitly not a fabricated GitHub UI. Final GitHub board state and release PR screenshot remain pending. [Release PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) is open from staging candidate `d291873` into main `7bf6c8d`; no completed staging-to-main release chain is claimed.
 
 ## Contribution table — observed artifacts
 
 | Student/account | Observed contribution | Evidence and limits |
 |---|---|---|
-| L0u1sss (user) | Auth/RBAC peer review and merge; F-04 request implementation/docs remediation; F-05 checkout/loans implementation; user decisions on quantity and timezone; supervision/request of F-10 local verification work | PR #22 review; authored commits/PRs #36/#37; explicit work-session instructions. F-10 was committed/pushed as `2b76abb` and submitted by L0u1sss in PR #38; it remains under review and is not integrated |
-| Peepipat-Suesoongnuen (teammate) | Auth/RBAC implementation/security corrections; substantive F-04/F-05 peer review, independent PG17 verification reports, reviewer integration of PR #36/#37 | PR #22 authorship and final review discussions on #36/#37; Git merge authorship. Reviewer test results are attributed reports, distinct from local PG18 runs |
+| L0u1sss (user) | Auth/RBAC peer review and merge; F-04 request implementation/docs remediation; F-05 checkout/loans implementation; user decisions on quantity and timezone; supervision/request of F-10 local verification work | PR #22 review; authored commits/PRs #36/#37; explicit work-session instructions. F-10 was submitted in PR #38 and is integrated at `ef58fae`; L0u1sss authored open release PR #42 |
+| Peepipat-Suesoongnuen (teammate) | Auth/RBAC implementation/security corrections; substantive F-04/F-05/F-10 peer review, independent verification reports and feature integration; PR #42 release-candidate review | PR #22 authorship; final reviews on #36/#37/#38 and PR #42 review5829522619; PR #38 merge metadata. Reviewer test results are attributed reports, distinct from local PG18 runs |
 
 This table records repository/session evidence, not a claim that either person manually wrote every generated line or performed every local command. Pair-work duration, off-repository activities and equal contribution percentages were not supplied. Both students must confirm they understand the design/tests/released behavior and approve the final attribution before submission.
 

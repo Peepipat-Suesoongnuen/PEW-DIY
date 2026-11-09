@@ -1,7 +1,7 @@
 {
-  "started_at": "2026-11-07T12:47:56.184Z",
-  "head_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
-  "tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "started_at": "2026-11-09T16:59:27.752Z",
+  "head_commit": "d291873c10c2021d4eb5ebe733aa68012f813678",
+  "tested_commit": "d291873c10c2021d4eb5ebe733aa68012f813678",
   "version_kind": "CLEAN_SOURCE_COMMIT",
   "source_dirty_files": [],
   "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
@@ -9,10 +9,10 @@
   "steps": [
     {
       "label": "runner-failure-probe",
-      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-WU7nAF --config [temp]\\pewdiy-f10-runner-WU7nAF\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-WU7nAF\\result.json",
+      "command": "node node_modules\\vitest\\vitest.mjs run --root [temp]\\pewdiy-f10-runner-PAn6vn --config [temp]\\pewdiy-f10-runner-PAn6vn\\vitest.config.mjs --reporter=json --outputFile=[temp]\\pewdiy-f10-runner-PAn6vn\\result.json",
       "cwd": ".",
       "exit_code": 1,
-      "duration_ms": 3040,
+      "duration_ms": 2806,
       "log": "runner-failure-probe.txt"
     },
     {
@@ -20,7 +20,7 @@
       "command": "node node_modules\\typescript\\bin\\tsc",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 487,
+      "duration_ms": 449,
       "log": "server-build.txt"
     },
     {
@@ -28,7 +28,7 @@
       "command": "node client\\node_modules\\typescript\\bin\\tsc --noEmit",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 653,
+      "duration_ms": 630,
       "log": "client-typecheck.txt"
     },
     {
@@ -36,7 +36,7 @@
       "command": "node client\\node_modules\\vite\\bin\\vite.js build",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 6901,
+      "duration_ms": 5925,
       "log": "client-build.txt"
     },
     {
@@ -44,7 +44,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 1057,
+      "duration_ms": 912,
       "log": "server-migration.txt"
     },
     {
@@ -52,7 +52,7 @@
       "command": "node node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\server.json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 26204,
+      "duration_ms": 24686,
       "log": "server-tests.txt"
     },
     {
@@ -60,7 +60,7 @@
       "command": "node client\\node_modules\\vitest\\vitest.mjs run --reporter=json --outputFile=docs\\verification\\sprint-1\\run\\client.json",
       "cwd": "client",
       "exit_code": 0,
-      "duration_ms": 17178,
+      "duration_ms": 16739,
       "log": "client-tests.txt"
     },
     {
@@ -68,7 +68,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/migrate.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 306,
+      "duration_ms": 311,
       "log": "browser-migration.txt"
     },
     {
@@ -76,7 +76,7 @@
       "command": "node node_modules\\tsx\\dist\\cli.mjs server/src/db/seed.ts",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 354,
+      "duration_ms": 360,
       "log": "browser-seed.txt"
     },
     {
@@ -84,7 +84,7 @@
       "command": "node node_modules\\@playwright\\test\\cli.js test --config e2e/playwright.config.ts --workers=3 --reporter=json",
       "cwd": ".",
       "exit_code": 0,
-      "duration_ms": 22052,
+      "duration_ms": 23844,
       "log": "browser-tests.txt"
     }
   ],
@@ -917,7 +917,7 @@
       ]
     },
     "client": {
-      "passed": 70,
+      "passed": 74,
       "failed": 0,
       "skipped": 0,
       "cases": [
@@ -1213,6 +1213,26 @@
         },
         {
           "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI shows catalog names and the authenticated borrower username rather than internal IDs",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI keeps readable loans when catalog enrichment is unavailable",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI expires the session when the catalog enrichment returns401",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
+          "name": "F-05 checkout and active-loan UI refreshes the current loan detail instead of navigating back to the list",
+          "status": "passed"
+        },
+        {
+          "file": "client/src/test/loan.test.tsx",
           "name": "F-05 checkout and active-loan UI handles empty active loans and reload",
           "status": "passed"
         },
@@ -1274,7 +1294,7 @@
       ]
     },
     "browser": {
-      "passed": 54,
+      "passed": 57,
       "failed": 0,
       "skipped": 0,
       "flaky": 0,
@@ -1553,6 +1573,27 @@
           "attempts": 1
         },
         {
+          "file": "e2e/ui-layout.spec.ts",
+          "name": "Issue39: stable navigation, separated loan actions, edge clicks and readable names",
+          "project": "desktop-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-layout.spec.ts",
+          "name": "Issue39: stable navigation, separated loan actions, edge clicks and readable names",
+          "project": "tablet-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "file": "e2e/ui-layout.spec.ts",
+          "name": "Issue39: stable navigation, separated loan actions, edge clicks and readable names",
+          "project": "mobile-chromium",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
           "file": "e2e/ui-states.spec.ts",
           "name": "loading state is shown while the catalog request is in flight",
           "project": "desktop-chromium",
@@ -1667,7 +1708,7 @@
   },
   "readiness": "NOT_RELEASED",
   "error": null,
-  "setup_tested_commit": "8676957c3dc40511508bfefb772576c6a4958e84",
+  "setup_tested_commit": "d291873c10c2021d4eb5ebe733aa68012f813678",
   "postgresql": "18.4",
   "runner_failure_probe": {
     "status": "PASS",
@@ -1689,7 +1730,7 @@
     "TEST-F10-06": {
       "status": "PASS",
       "artifact": "setup.json",
-      "detail": "Local fresh-project rehearsal 38044ms; peer repetition pending"
+      "detail": "Local fresh-project rehearsal 34282ms; peer repetition pending"
     },
     "TEST-F10-07": {
       "status": "PASS",
@@ -4230,7 +4271,7 @@
           "id": "TEST-F10-06",
           "matched": [
             {
-              "name": "TEST-F10-06: Local fresh-project rehearsal 38044ms; peer repetition pending",
+              "name": "TEST-F10-06: Local fresh-project rehearsal 34282ms; peer repetition pending",
               "file": "setup.json",
               "status": "PASS"
             }
@@ -4339,7 +4380,7 @@
   "status": "AUTOMATED_CHECKS_PASS",
   "source_sha256": {
     ".env.example": "e2ebe350092cc2a182c735beefa463d6690ae317d3bd57b748a4a3d4af282f44",
-    ".gitignore": "380a0f1e4ced5a9fdacfa7ecbe08a51d0e241ceabd620418c6b8fc1d3dd3c129",
+    ".gitignore": "f634017d9e42a3b26d9b0bc4435b29c4270a1fc22c974bac63895e6744b38dfe",
     "client/catalog.html": "32879a2a50e5f74246ce69b7d51bba4c13cf66f4ff032affa9f89299d6f6fffd",
     "client/index.html": "021ff7c5e822cb1c46a4da3a0911e90e6e3fea60ce1479d24628e67867817749",
     "client/item.html": "15550a5c82e5bc354caec5488cd1f44b1226c014339e40b30b7ec7f0e3e63984",
@@ -4359,7 +4400,7 @@
     "client/src/components/Field.tsx": "832f52b9f85fca7baaeb13c211a426fb0f36d58e89e00be8e292d35d5e7068a0",
     "client/src/components/ItemCard.tsx": "a9c31cadbdbe4d12fcdd29e667825bfba282e4974f1979b949bdb95fa3a0fd0e",
     "client/src/components/Loading.tsx": "1ed39907029e2f63cb9fa400671b5ac6372de01f8c0f76f21cfec95809775900",
-    "client/src/components/LoanDetails.tsx": "cb6c629e13c302aa2a187fbe668502a7dfecf0bf5689790bbbc5eacbb7952907",
+    "client/src/components/LoanDetails.tsx": "900ab5aed1b4cd541b6555c018e5cd26cd0c92fd402a0a25bce5344026212ce5",
     "client/src/components/RequestToBorrow.tsx": "237204ecd9b1796f60c3b2b1815f371946bdc4276fdfd757ed80b66096e8a322",
     "client/src/components/Table.tsx": "e14ad21fe6c382b800b53ebbb3281a5548ab1944b304564411a30757df667b8e",
     "client/src/lib/api.ts": "62146e989a1cd8b7d9616261cb9896f150ad58031d73fcb092d5ca0adca45866",
@@ -4368,17 +4409,17 @@
     "client/src/main.tsx": "7beaf76641f65715008e940b24b541720dbf47e0d8a5a156e0a1037aba0912c8",
     "client/src/pages/CatalogPage.tsx": "122bb78db1a71d0a11a4a0393a2fdaaeebcbb585b8c5975d1be539bca7c217ed",
     "client/src/pages/ItemDetailPage.tsx": "fa95298fac5d515aae71597b772b601a4e4df0cc23062d817dcccc71487f42a9",
-    "client/src/pages/LoansPage.tsx": "55a99cfcd2b408ff0fcaaeb4472f224479ed1141fe97bacf15d0490a201d8ebc",
+    "client/src/pages/LoansPage.tsx": "e66dab6af6ac6466bdde1d2f9df599025118c3547620283f15b551083f8f084c",
     "client/src/pages/LoginPage.tsx": "1f4fc748c80093a9f627c1ef4accef78882fb1408153c47bd20d833268f93008",
-    "client/src/pages/RequestsPage.tsx": "719269a3e6fe4314994b08fb867b81a420d494d3c38ce35dc94cef847409cff9",
-    "client/src/styles/tokens.css": "fc46390143901fa955dc3355657b91dd67a23b7a4742d76a04d53dcedb801930",
+    "client/src/pages/RequestsPage.tsx": "8d731fd0806257be385110b64bef71a226cdfe552bf8c222ebd5ccddf603031a",
+    "client/src/styles/tokens.css": "43aa3933c4e79ef704767de1f854edc75d516fef293db885acf437445d463d3e",
     "client/src/test/account-menu.test.tsx": "5fc1a7c7db464cad2f3f65ecb872ba79791a40eb2211871ab8c3e06898d88c9e",
     "client/src/test/api.test.ts": "887777e08eb37143b94d53f4167bab48433533c3b9e9b2f295889e97c37a58f8",
     "client/src/test/borrowing-request.test.tsx": "d6f73d902cdc15fc01f012fa064c5f5a6044d42463b403876273f84c44038f64",
     "client/src/test/catalog-page.test.tsx": "e8048d32497abe0cbd26911369a540511715b7e577f5c680a438dd64cff27300",
     "client/src/test/components.test.tsx": "5dcab7b2270b9039facbd0c9e35dd4d6996fd5d94dbe20466d4d8fb705c53c28",
     "client/src/test/item-detail-page.test.tsx": "92e8d3f305669d2d78f535397c88f0210781b3b67321ade7a6540fe94db25df6",
-    "client/src/test/loan.test.tsx": "3b5a7d0634515d23f43758da4018a6e6a8c3bcf9707294a4fe67cf954a2167db",
+    "client/src/test/loan.test.tsx": "eb22a87b54864d67d2a977cb49795f651ae3ad242a9d9592d59acec470e9426e",
     "client/src/test/login-page.test.tsx": "1b3a620a95c66d0f5c22cfba63eb8f1a1ceecfb870fad71c14706d80945f94f7",
     "client/src/test/setup.ts": "50e6c4c172d1725b83c9689d0999bcd37095ab41f6e2212ad9467d5525e3c272",
     "client/tsconfig.json": "d3eb07dcdb9aa20f700280724dc322d12cdac236e2edcdfad5e938c75d73c6ff",
@@ -4388,17 +4429,19 @@
     "e2e/pages/fixtures.ts": "ab3bacd32f713c59af9ce6e4cd6ccc6c2ba9385784bb2da70efa028b9017f6fd",
     "e2e/pages/item.page.ts": "363328b6dd3c0a0891f0038072b66e7b8275d0bdf592c86dbfb41d90f94802cb",
     "e2e/pages/login.page.ts": "84aaada78aeb2b23a626aa888df9ed6869f3802de918f26801fb60e5bfe22df0",
-    "e2e/playwright.config.ts": "54d514aa09c0d5654ab9e9e685c0792848e3ef23ece7d3feb22aa2cfbef24792",
+    "e2e/playwright.config.ts": "27b8a12f11523789fba3f164929606fca953fa060c65dc2a1253753bf2347f93",
     "e2e/specs/auth-journey.spec.ts": "ed7a2c08d605396aba7ca092e3534864f5708498133fb2fa74a34b740d3b1581",
     "e2e/specs/borrowing-request.spec.ts": "04ab35a47f2d2641659ee674aac888c8b1de0635de7a0dcfd209b25bb0e2ff19",
     "e2e/specs/catalog-journey.spec.ts": "c047d9920239f091056eb051afe994b7bd41289184c1212efc7627fc995f3a21",
-    "e2e/specs/checkout.spec.ts": "de9500544c5c1c6fc8d82e3b8ecca825ed8239a623fe5c28a6c91ad5458670c2",
+    "e2e/specs/checkout.spec.ts": "44a03510ec0347a1f2ddb09596fa50f6e4f9d1a70e583783a93617c55e701ee7",
     "e2e/specs/sprint1-integration.spec.ts": "b6e5e1d1c3ed8c3678917ed4bbc5cab46b5e7da3f71fae770e826bf1f1c07ca6",
+    "e2e/specs/ui-layout.spec.ts": "b360e9962e43f687c7d825c821b66b135338abfaa12cf6c8a29139f3658f07a6",
     "e2e/specs/ui-states.spec.ts": "bcae89908e029fb61098bf37c37fff24b9f9b2d93ce11bdcf0d0a540bc263fb5",
     "e2e/tsconfig.json": "e8d9eec0e0e1aa4342a3e320fccac91ecbcc6495e097404e4399a666fc193c84",
     "package-lock.json": "2bc5080695e65cf43a2a1310039f0162a3595cbcaf47db7d63e98882176cfe3c",
-    "package.json": "96f7aba7576d64155114111b1f1963425bb230555b6f011b9b7fa2fbb096f39c",
+    "package.json": "951bbee5e85f652549a403e9d40f93c09fc2c7716c6fd9c7b3cf754414240151",
     "scripts/audit-sprint1-evidence.mjs": "7eac1121da6508a76d510169aadd7154cdd918b52931a5b64c6d4f3d0fe4d87b",
+    "scripts/ci.mjs": "a9b173c6cbf047d90b84dad73ca94dfa633c1e34305ac0c3a79ca4e372edb68b",
     "scripts/evidence-utils.mjs": "050f1e0def803547ea095c9ee72ea201b4f7970953f9e47f7010ba1059f7a2b4",
     "scripts/migrate-test.mjs": "b9f790f456b2532ee465eb4a44d8e6a66a84101e8095e32061f7467e64a43669",
     "scripts/rehearse-setup.mjs": "d4a45bf16778ab273894e1fc66bb5a9eab7ab30b6a64f17e5406de374e725b69",
@@ -4441,5 +4484,5 @@
     "tsconfig.json": "ae9d13ce32643d27624a4dbe651e48d6cbcaf769701a16cc231772f03d7138c3",
     "vitest.config.ts": "d1963ec8702244c73463fd046d527b2603f419c647bbfc99c389d3fc8062660a"
   },
-  "completed_at": "2026-11-07T12:49:17.903Z"
+  "completed_at": "2026-11-09T17:00:47.757Z"
 }

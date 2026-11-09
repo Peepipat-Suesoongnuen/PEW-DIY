@@ -1,10 +1,10 @@
 {
   "test": "TEST-F10-01/02",
   "project": "desktop-chromium",
-  "item": "f10-browser-6911df90-03ab-47f7-a673-9bf8aab03c26",
-  "requestId": "3f425c5b-dd82-418d-850f-63fb7e8f54ff",
-  "loanId": "c5679049-5445-4f7e-96e2-5704796450e1",
-  "due_on": "2026-11-14",
+  "item": "f10-browser-c3291368-4d3c-4b50-b16e-961cce03324f",
+  "requestId": "442054e7-7037-46d1-902a-e7fc84755133",
+  "loanId": "fe0121ac-1f23-4dc1-9028-95f51e297f3e",
+  "due_on": "2026-11-17",
   "requestStatus": "CHECKED_OUT",
   "quantity_available": 0,
   "outcomes": {
