@@ -14,6 +14,9 @@ const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
 
 export default defineConfig({
   testDir: "./specs",
+  forbidOnly: !!process.env.CI,
+  workers: process.env.CI ? 2 : undefined,
+  globalTimeout: process.env.CI ? 10 * 60_000 : undefined,
   retries: 1,
   reporter: [["list"]],
   use: {
@@ -25,7 +28,7 @@ export default defineConfig({
     // that legacy .html pages keep being served (ARCH-01 §12.1 coexistence).
     url: `${baseURL}/login.html`,
     cwd: "..",
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },
   projects: [

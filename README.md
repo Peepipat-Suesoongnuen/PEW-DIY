@@ -87,6 +87,22 @@ npm run rehearse:sprint1
 
 Environment loading: app/scripts load optional `.env`; exported process variables take precedence. Missing required product configuration fails closed. Never include `.env`, password values, session cookies or private data in evidence.
 
+## Continuous integration
+
+[GitHub Actions CI](.github/workflows/ci.yml) runs on PRs into `main` or `sprint/**`, pushes to those branches and `ci/**`, `feature/**`, `fix/**`, and manual dispatch. It installs both lockfiles with `npm ci`, uses Node24.15.0 and a disposable PostgreSQL17 service, checks server/client/E2E TypeScript, builds both applications, and runs verification-tooling, server/API, client and Chromium E2E tests at desktop/tablet/mobile sizes. Empty, skipped, failing or flaky product suites fail the check; focused E2E tests are rejected. Reports are retained as sanitized workflow artifacts for14 days, without database contents, seed passwords or browser traces.
+
+To run the same checks locally with installed dependencies/Chromium and Node24.15+:
+
+```powershell
+# Dedicated disposable DB only; the role needs CREATE SCHEMA privilege.
+$env:CI_TEST_DATABASE_URL = 'postgresql://<test-role>@127.0.0.1:5432/<disposable-test-db>'
+npm run test:ci
+```
+
+The runner creates separate server/browser schemas, migrates before server test discovery, generates private synthetic seed passwords and drops only its own schemas afterward. Reports in ignored `ci-results/` identify HEAD, dirty-source state, source fingerprints, workflow fingerprint, environment and actual outcomes. The runner never falls back to `.env` database configuration. A local working-tree run is labelled as such; it is not a GitHub Actions result.
+
+For the normal release path in group specification §5.3, a repository administrator must require **Build and regression tests** on `main` and sprint staging via branch protection/rulesets after its first successful run, alongside independent teammate review. This change does not configure repository settings. CI checks the PR merge result by default and cannot replace teammate approval, the F-10 setup/evidence audit or a release decision. Existing `rehearse:sprint1 -> verify:sprint1 -> audit:sprint1` clean-source gates remain in place. Docker image delivery and accepted-release deployment from `main` are separate Lab5 work; this workflow establishes CI only.
+
 ## Sprint 1 verification and handoff
 
 F-01 through F-05 are merged into sprint staging. [Part F evidence](docs/verification/sprint-1/README.md) contains scenarios, screenshots, actual AC/test results, TDD references, sampled workflow/review history, contributions/AI-use disclosure and known gaps. A verified local staging candidate is distinct from a reviewed main release. Human review, A-12 shared-team ratification, independent README repetition and the reviewed release remain explicit gates.
