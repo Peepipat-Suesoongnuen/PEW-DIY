@@ -18,6 +18,22 @@ The `8676957` source / `dad4cd8` evidence pair is historical:164 server/70 clien
 
 ## Human gates and subsequent release sequence
 
+### Latest re-review and seven pending gates
+
+The [latest PR #42 re-review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42#pullrequestreview-5829944815) assesses evidence head `7bdeba2`, confirms164/74/57 tests,49/49 application AC,41 audit checks and104/104 matching source files, and retains `CHANGES_REQUESTED`. Technical confirmation is not formal release approval. The Sprint1 contract README is corrected in this local documentation round; the complete replacement PR body is supplied in chat. No product source or existing run attribution is changed.
+
+| Pending gate | Responsible confirmation / required artifact | Timing |
+|---|---|---|
+| `a12_ratification` | Both students confirm multi-unit up to available stock, no extra per-person cap and full return per loan; retain teammate message/review URL | Before release approval |
+| `readme_peer_reproduction` | Other student follows README from declared prerequisites and records version, commands, actual duration and exceptions | Before release approval |
+| `tdd_authenticity_review` | Teammate reviews retained domain/security RED/GREEN output, source/history and regression assertions; explicit confirmation URL | Before release approval |
+| `contribution_disclosure` | Both students confirm contribution table and AI-use disclosure; names/student IDs supplied through the appropriate submission channel | Before release approval |
+| `final_board` | Human captures actual board/version/status and checks it agrees with Issues and PRs; no inferred or fabricated board state | Before release approval; refresh for final handoff if statuses change |
+| `release_peer_review` | Independent teammate re-reviews the latest published PR #42 revision and records formal approval once required pre-release evidence/checks pass | After publishing corrections, before human reviewer merges |
+| Actual main release commit and release-version rerun | Record actual main SHA/tag after human merge; rerun rehearsal/verification on that exact SHA and strict audit with `RELEASE_REF` | After merge, before declaring release complete |
+
+Do not require post-merge evidence to exist before a merge is possible: the final gate is deliberately post-release verification, while the pre-release gates must be resolved first. Do not mark any gate VERIFIED merely because the technical review reports passing suites. Current `workflow.json` statuses remain authoritative until real human artifacts are supplied. If this documentation round creates a new head, request review and check CI on that new revision rather than treating `7bdeba2` as a future head.
+
 1. Attach the actual teammate message/link ratifying A-12. Account identity alone is insufficient. Confirm contribution/AI disclosure, historical RED provenance and both students' final names/IDs for the cover. Record real evidence in `workflow.json` human_checks; do not change a status to VERIFIED without its artifact.
 2. Have the teammate repeat the README setup from the declared prerequisites, record actual duration/exceptions, and capture final live board status. The connected GitHub tools did not expose Project reads, so no final board status was inferred.
 3. Current candidate `d291873` is clean committed source. Run `rehearse:sprint1 -> verify:sprint1 -> audit:sprint1` in that order; publish the regenerated evidence and documentation after commit/push authorization. An evidence-only descendant commit is accepted only if every canonical source hash still equals both the tested Git blob and the current file. Do not manufacture historical RED commits. A new source change requires a new rehearsal and complete verification.
