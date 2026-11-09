@@ -1,0 +1,30 @@
+✖ removed working-tree option is rejected explicitly by verification and audit before execution (3437.3263ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3513.0406
+
+✖ failing tests:
+
+test at scripts\tests\evidence.test.mjs:102:1
+✖ removed working-tree option is rejected explicitly by verification and audit before execution (3437.3263ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Unsupported option: --allow-working-tree/. Input:
+
+  'Setup evidence is missing or invalid; run rehearse:sprint1 before verify:sprint1 on this clean source commit'
+
+      at TestContext.<anonymous> (repo:/scripts/tests/evidence.test.mjs:115:12)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.start (node:internal/test_runner/test:1015:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Setup evidence is missing or invalid; run rehearse:sprint1 before verify:sprint1 on this clean source commit',
+    expected: /Unsupported option: --allow-working-tree/,
+    operator: 'match',
+    diff: 'simple'
+  }

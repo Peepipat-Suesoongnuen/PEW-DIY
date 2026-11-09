@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PEW-DIY — Item Detail</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    dl { margin: 1rem 0; }
+    dt { font-weight: bold; }
+    dd { margin: 0 0 0.5rem 0; }
+    .state { margin: 1rem 0; padding: 1rem; border: 1px solid #ddd; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Equipment Detail</h1>
+  <p><a href="/catalog.html">← Back to catalog</a></p>
+
+  <div id="loading" class="state hidden">Loading item…</div>
+  <div id="missing" class="state hidden">The item could not be found. <a href="/catalog.html">Return to catalog</a></div>
+  <div id="error" class="state hidden"></div>
+
+  <dl id="detail" class="hidden">
+    <dt>ID</dt><dd id="f-id"></dd>
+    <dt>Name</dt><dd id="f-name"></dd>
+    <dt>Description</dt><dd id="f-description"></dd>
+    <dt>Category</dt><dd id="f-category"></dd>
+    <dt>Total quantity</dt><dd id="f-total"></dd>
+    <dt>Available</dt><dd id="f-available"></dd>
+    <dt>Availability</dt><dd id="f-availability"></dd>
+  </dl>
+
+  <script>
+    const show = (id) => document.getElementById(id).classList.remove("hidden");
+    const hide = (id) => document.getElementById(id).classList.add("hidden");
+
+    function redirectToLogin() {
+      window.location.href = "/login.html";
+    }
+
+    async function load() {
+      const id = new URLSearchParams(window.location.search).get("id") || "";
+      if (!id) {
+        show("missing");
+        return;
+      }
+      show("loading");
+      try {
+        const res = await fetch("/api/equipment/" + encodeURIComponent(id), { credentials: "same-origin" });
+        if (res.status === 401) {
+          hide("loading");
+          redirectToLogin();
+          return;
+        }
+        if (res.status === 404) {
+          hide("loading");
+          show("missing");
+          return;
+        }
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const body = await res.json();
+        const item = body.data;
+        document.getElementById("f-id").textContent = item.id;
+        document.getElementById("f-name").textContent = item.name;
+        document.getElementById("f-description").textContent = item.description;
+        document.getElementById("f-category").textContent = item.category;
+        document.getElementById("f-total").textContent = item.quantity_total;
+        document.getElementById("f-available").textContent = item.quantity_available;
+        document.getElementById("f-availability").textContent = item.availability;
+        hide("loading");
+        show("detail");
+      } catch (err) {
+        hide("loading");
+        const box = document.getElementById("error");
+        box.textContent = "The item could not be loaded. Please try again. (no server details shown)";
+        show("error");
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

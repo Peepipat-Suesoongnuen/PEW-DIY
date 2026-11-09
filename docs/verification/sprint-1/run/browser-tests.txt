@@ -1,0 +1,103 @@
+[WebServer] (node:18020) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[WebServer] (node:18704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 57 tests using 3 workers
+
+(node:17484) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:24308) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:22672) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/57] [desktop-chromium] › e2e\specs\auth-journey.spec.ts:11:7 › auth journey › login as Borrower lands on the catalog; sign out returns to Login
+[2/57] [desktop-chromium] › e2e\specs\borrowing-request.spec.ts:6:7 › F-04 persisted borrowing requests › multi-unit submit, reload, own detail, cross-owner denial and Custodian queue
+[3/57] [desktop-chromium] › e2e\specs\catalog-journey.spec.ts:13:7 › catalog journey › list → detail → back keeps the same persisted item (Borrower)
+[4/57] [desktop-chromium] › e2e\specs\auth-journey.spec.ts:28:7 › auth journey › invalid login shows one generic message and never reveals account existence
+[5/57] [desktop-chromium] › e2e\specs\catalog-journey.spec.ts:30:7 › catalog journey › Custodian sees the same catalog data without a Borrower request action
+[6/57] [desktop-chromium] › e2e\specs\catalog-journey.spec.ts:47:7 › catalog journey › responsive surfaces match the viewport (AC-7 matrix)
+[7/57] [desktop-chromium] › e2e\specs\auth-journey.spec.ts:46:7 › auth journey › a 401 during browsing clears stale state and returns to Login with a notice
+[8/57] [desktop-chromium] › e2e\specs\catalog-journey.spec.ts:59:7 › catalog journey › a missing item shows the missing state with a way back
+[9/57] [desktop-chromium] › e2e\specs\borrowing-request.spec.ts:54:7 › F-04 persisted borrowing requests › unavailable item has no submit form and rejects direct API requests
+[10/57] [desktop-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)
+[11/57] [desktop-chromium] › e2e\specs\sprint1-integration.spec.ts:10:5 › TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout
+[12/57] [desktop-chromium] › e2e\specs\ui-layout.spec.ts:10:5 › Issue39: stable navigation, separated loan actions, edge clicks and readable names
+[13/57] [desktop-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)
+[14/57] [desktop-chromium] › e2e\specs\ui-states.spec.ts:11:7 › shared UI states (f-02 §3 / ui-spec §0.3) › loading state is shown while the catalog request is in flight
+(node:4528) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[15/57] [tablet-chromium] › e2e\specs\auth-journey.spec.ts:11:7 › auth journey › login as Borrower lands on the catalog; sign out returns to Login
+[16/57] [tablet-chromium] › e2e\specs\auth-journey.spec.ts:28:7 › auth journey › invalid login shows one generic message and never reveals account existence
+[17/57] [desktop-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)
+[18/57] [tablet-chromium] › e2e\specs\auth-journey.spec.ts:46:7 › auth journey › a 401 during browsing clears stale state and returns to Login with a notice
+[19/57] [desktop-chromium] › e2e\specs\ui-states.spec.ts:28:7 › shared UI states (f-02 §3 / ui-spec §0.3) › empty catalog renders a dedicated empty state, not an error
+[20/57] [tablet-chromium] › e2e\specs\borrowing-request.spec.ts:6:7 › F-04 persisted borrowing requests › multi-unit submit, reload, own detail, cross-owner denial and Custodian queue
+[21/57] [desktop-chromium] › e2e\specs\ui-states.spec.ts:45:7 › shared UI states (f-02 §3 / ui-spec §0.3) › server failure shows a generic retry message with requestId — never false-empty
+[22/57] [desktop-chromium] › e2e\specs\ui-states.spec.ts:65:7 › shared UI states (f-02 §3 / ui-spec §0.3) › 401 during browsing returns to Login with the expired-session notice
+[23/57] [desktop-chromium] › e2e\specs\ui-states.spec.ts:82:7 › shared UI states (f-02 §3 / ui-spec §0.3) › serving contract: app shell at / and /api unknown routes stay JSON (AC-1)
+[24/57] [tablet-chromium] › e2e\specs\borrowing-request.spec.ts:54:7 › F-04 persisted borrowing requests › unavailable item has no submit form and rejects direct API requests
+(node:9020) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[25/57] [tablet-chromium] › e2e\specs\catalog-journey.spec.ts:13:7 › catalog journey › list → detail → back keeps the same persisted item (Borrower)
+[26/57] [tablet-chromium] › e2e\specs\sprint1-integration.spec.ts:10:5 › TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout
+(node:12128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[27/57] [tablet-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)
+[28/57] [tablet-chromium] › e2e\specs\catalog-journey.spec.ts:30:7 › catalog journey › Custodian sees the same catalog data without a Borrower request action
+[29/57] [tablet-chromium] › e2e\specs\catalog-journey.spec.ts:47:7 › catalog journey › responsive surfaces match the viewport (AC-7 matrix)
+[30/57] [tablet-chromium] › e2e\specs\catalog-journey.spec.ts:59:7 › catalog journey › a missing item shows the missing state with a way back
+[31/57] [tablet-chromium] › e2e\specs\ui-layout.spec.ts:10:5 › Issue39: stable navigation, separated loan actions, edge clicks and readable names
+[32/57] [tablet-chromium] › e2e\specs\ui-states.spec.ts:11:7 › shared UI states (f-02 §3 / ui-spec §0.3) › loading state is shown while the catalog request is in flight
+[33/57] [tablet-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)
+(node:10972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[34/57] [mobile-chromium] › e2e\specs\auth-journey.spec.ts:11:7 › auth journey › login as Borrower lands on the catalog; sign out returns to Login
+[35/57] [tablet-chromium] › e2e\specs\ui-states.spec.ts:28:7 › shared UI states (f-02 §3 / ui-spec §0.3) › empty catalog renders a dedicated empty state, not an error
+[36/57] [tablet-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)
+[37/57] [tablet-chromium] › e2e\specs\ui-states.spec.ts:45:7 › shared UI states (f-02 §3 / ui-spec §0.3) › server failure shows a generic retry message with requestId — never false-empty
+[38/57] [mobile-chromium] › e2e\specs\auth-journey.spec.ts:28:7 › auth journey › invalid login shows one generic message and never reveals account existence
+[39/57] [tablet-chromium] › e2e\specs\ui-states.spec.ts:65:7 › shared UI states (f-02 §3 / ui-spec §0.3) › 401 during browsing returns to Login with the expired-session notice
+[40/57] [mobile-chromium] › e2e\specs\auth-journey.spec.ts:46:7 › auth journey › a 401 during browsing clears stale state and returns to Login with a notice
+[41/57] [tablet-chromium] › e2e\specs\ui-states.spec.ts:82:7 › shared UI states (f-02 §3 / ui-spec §0.3) › serving contract: app shell at / and /api unknown routes stay JSON (AC-1)
+[42/57] [mobile-chromium] › e2e\specs\catalog-journey.spec.ts:13:7 › catalog journey › list → detail → back keeps the same persisted item (Borrower)
+[43/57] [mobile-chromium] › e2e\specs\catalog-journey.spec.ts:30:7 › catalog journey › Custodian sees the same catalog data without a Borrower request action
+(node:12724) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[44/57] [mobile-chromium] › e2e\specs\borrowing-request.spec.ts:6:7 › F-04 persisted borrowing requests › multi-unit submit, reload, own detail, cross-owner denial and Custodian queue
+[45/57] [mobile-chromium] › e2e\specs\catalog-journey.spec.ts:47:7 › catalog journey › responsive surfaces match the viewport (AC-7 matrix)
+[46/57] [mobile-chromium] › e2e\specs\catalog-journey.spec.ts:59:7 › catalog journey › a missing item shows the missing state with a way back
+(node:17256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[47/57] [mobile-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 hold: real checkout, active loans and safe rejection (TEST-F05-12)
+[48/57] [mobile-chromium] › e2e\specs\sprint1-integration.spec.ts:10:5 › TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership and logout
+[49/57] [mobile-chromium] › e2e\specs\borrowing-request.spec.ts:54:7 › F-04 persisted borrowing requests › unavailable item has no submit form and rejects direct API requests
+[50/57] [mobile-chromium] › e2e\specs\ui-layout.spec.ts:10:5 › Issue39: stable navigation, separated loan actions, edge clicks and readable names
+[51/57] [mobile-chromium] › e2e\specs\ui-states.spec.ts:11:7 › shared UI states (f-02 §3 / ui-spec §0.3) › loading state is shown while the catalog request is in flight
+[52/57] [mobile-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 fail: real checkout, active loans and safe rejection (TEST-F05-12)
+[53/57] [mobile-chromium] › e2e\specs\checkout.spec.ts:13:7 › F-05 normal: real checkout, active loans and safe rejection (TEST-F05-12)
+[54/57] [mobile-chromium] › e2e\specs\ui-states.spec.ts:28:7 › shared UI states (f-02 §3 / ui-spec §0.3) › empty catalog renders a dedicated empty state, not an error
+[55/57] [mobile-chromium] › e2e\specs\ui-states.spec.ts:45:7 › shared UI states (f-02 §3 / ui-spec §0.3) › server failure shows a generic retry message with requestId — never false-empty
+[56/57] [mobile-chromium] › e2e\specs\ui-states.spec.ts:65:7 › shared UI states (f-02 §3 / ui-spec §0.3) › 401 during browsing returns to Login with the expired-session notice
+[57/57] [mobile-chromium] › e2e\specs\ui-states.spec.ts:82:7 › shared UI states (f-02 §3 / ui-spec §0.3) › serving contract: app shell at / and /api unknown routes stay JSON (AC-1)
+  57 passed (22.0s)

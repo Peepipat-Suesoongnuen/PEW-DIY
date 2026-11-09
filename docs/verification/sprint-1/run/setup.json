@@ -1,0 +1,60 @@
+{
+  "head_commit": "d291873c10c2021d4eb5ebe733aa68012f813678",
+  "tested_commit": "d291873c10c2021d4eb5ebe733aa68012f813678",
+  "version_kind": "CLEAN_SOURCE_COMMIT",
+  "source_dirty_files": [],
+  "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
+  "node": "v24.15.0",
+  "status": "LOCAL_REHEARSAL_PASS",
+  "steps": [
+    {
+      "label": "root-ci",
+      "exit_code": 0,
+      "duration_ms": 11634
+    },
+    {
+      "label": "client-ci",
+      "exit_code": 0,
+      "duration_ms": 7657
+    },
+    {
+      "label": "chromium",
+      "exit_code": 0,
+      "duration_ms": 897
+    },
+    {
+      "label": "migrate",
+      "exit_code": 0,
+      "duration_ms": 1399
+    },
+    {
+      "label": "seed",
+      "exit_code": 0,
+      "duration_ms": 596
+    },
+    {
+      "label": "build",
+      "exit_code": 0,
+      "duration_ms": 463
+    },
+    {
+      "label": "build-client",
+      "exit_code": 0,
+      "duration_ms": 7369
+    }
+  ],
+  "starting_conditions": "Windows/Node/npm/PostgreSQL/tar installed; new source directory and application DBs; host package/browser caches may be warm",
+  "other_student_reproduction": "PENDING",
+  "started_at": "2026-11-09T16:57:11.024Z",
+  "postgresql": "18.4",
+  "duration_ms": 34282,
+  "target_ms": 900000,
+  "target_met": true,
+  "checks": {
+    "login": 200,
+    "catalog": 200,
+    "seeded_items": 3,
+    "built_react_shell": true
+  },
+  "completed_at": "2026-11-09T16:57:47.726Z"
+}

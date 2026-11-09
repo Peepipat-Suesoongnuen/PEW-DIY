@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist",
+    "rootDir": "server/src",
+    "resolveJsonModule": true
+  },
+  "include": ["server/src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "server/tests", "client"]
+}

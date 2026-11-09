@@ -1,0 +1,83 @@
+# F-04 — Borrowing Request Contract
+
+> **Revision:** 5 — 2026-11-07 | **Contract approval:** shared-baseline ratification pending | **Implementation:** PR #36 merged; F-05 transitions implemented locally in #12 | **Tests:** request-only historical results plus fresh F-05-dependent execution in [F-05 evidence](tdd-evidence-f05.md)
+>
+> Implementation Issue: [#11 / D1-06.4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/11); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). The OQ-02 choice is recorded in user decision A-12; PR #36 is merged; shared-team ratification before baseline closure remains pending per its final review (2026-11-06): multi-unit up to current availability, no additional per-borrower cap, full return per loan. Stack/auth are already selected in SDS rev 3; fresh F-05 fulfillment verification is linked above; independent review of #12 and shared-baseline acceptance remain pending.
+
+## 1. Identity, Requirements and Dependencies
+
+F-04 implements FR-11/FR-12/FR-13 and enforces BR-01/BR-05 with F-01; request durability participates in BR-11/NFR-04 and F-10 verification. The feature consumes F-01 identity/authorization, F-02 catalog and F-03 current availability. F-05 fulfills its submitted requests. Requirements are defined in [SRS](../../srs.md), responsibility/sprint allocation in [Part B](../../features.md) and [Part D](../plan.md); this feature does not add return, approval, cancellation or reservation capabilities.
+
+PR #17 discussion records agreement that only a Borrower creates a request in current scope. This is the team's chosen operation scope, not a claim that the SRS explicitly prohibits staff borrowing forever. A future expansion follows baseline change with ownership/permission tests.
+
+## 2. Feature Design and Workflow
+
+Borrower selects an available item → enters an approved quantity → submits → API derives borrower from authenticated principal → verifies equipment, quantity policy and current availability in a DB transaction → inserts a request → returns the committed record. UI opens My Requests and supports reload/persisted retrieval. Submitted requests are directly eligible for Custodian checkout; there is no approve/reject transition.
+
+**Proposed representation:** request `status` is `SUBMITTED` without a linked loan and `CHECKED_OUT` when F-05 creates its unique linked loan. **Confirmed (Direction A, 2026-11-06; SRS BR-12): the request itself does not decrement availability or reserve stock** — including any pending request under the Sprint 2 approval workflow (which is deferred to the Sprint 2 contracts). More than one Borrower can request an available single-unit item before checkout; F-05 resolves competition using current stock. One request targets one equipment type; A-12 permits multiple units up to current availability and imposes no additional per-borrower cap; each later loan is returned in full. Successful submission never guarantees future stock.
+
+BR-01/A-12 reject unavailable equipment or a requested quantity exceeding current available stock, with no stored request. Validate positive integer quantity; PostgreSQL INTEGER representation is bounded to 2,147,483,647, a storage bound rather than a per-user policy cap. Use the Equipment-first transaction/lock and post-lock stock read proposed in SDS §3.3 so a concurrent checkout cannot invalidate the availability check before request insertion. Roll back on insert/DB failure. Do not derive authoritative owner/stock from UI state.
+
+## 3. UI, API and Data Specification
+
+UI: catalog/detail request control is Borrower-only; show availability, approved quantity bounds, loading/validation/error/empty states. Preserve safe inputs after failure, prevent repeated submits while pending, and re-fetch stock after conflict. My Requests shows only own records in both states; Custodian submitted queue supports selecting a request for checkout. A missing queued item after uncertain checkout requires reconciliation, not an invented approval/history page.
+
+Apply [shared conventions](shared-conventions.md) for envelope, guards, error codes and all record-scope details:
+
+| Method/path | Request and outcome |
+|---|---|
+| `POST /api/requests` | B only; exact body `{ "equipment_id": "<opaque-id>", "quantity_requested": 1 }`; 201 `data` with the committed request fields below |
+| `GET /api/requests` | B receives own requests; C receives submitted queue only; 200 `data` array, including empty `[]` |
+| `GET /api/requests/{requestId}` | B own / C submitted request; 200 `data` request; cross-owner B or existing checked-out request requested by C →403 |
+
+Request fields: `id`, `borrower_id`, `equipment_id`, `quantity_requested`, `created_at`, `status`. Quantity 1 is illustrative; any positive integer up to current stock is allowed under A-12. Repeated requests do not reserve stock or create an additional per-borrower cap. Unknown resource →404 `NOT_FOUND`; missing auth →401; disallowed role/owner →403; invalid/extra fields →400; unavailable equipment →409 `INSUFFICIENT_AVAILABILITY`; DB failure →safe 500/503. Reject injected `borrower_id`, `status`, `created_at`, loan or approval fields. No API accepts an owner filter to widen a Borrower's list.
+
+**Data/migrations:** add BorrowingRequest with PK, User/Equipment FKs, positive integer `quantity_requested`, creation timestamp and owner/item lookup indexes. Enforce User role in service; a FK alone does not establish Borrower eligibility. Preserve referenced users/equipment/history, with no cascade-delete of requests. Derive state from the Loan relation introduced by F-05; do not introduce a second approval/status source. No User/Equipment schema changes beyond consuming their existing keys are needed; auth transport schema belongs to F-01. Migration 002 in `server/src/db/migrations.ts` creates `borrowing_requests` with TEXT keys, INTEGER quantity, TIMESTAMPTZ creation time and owner/item indexes; `npm run migrate` applies it. Quantity validation follows A-12. Loan DDL is deliberately absent until Issue #12; the service derives CHECKED_OUT when that actual relation exists and otherwise reports SUBMITTED. No fake Loan schema is installed to claim fulfilled-state coverage.
+
+## 4. Acceptance Criteria
+
+| ID | Observable outcome | Current evidence status |
+|---|---|---|
+| AC-F04-01 | Eligible B-A submitting quantity 1 for available E-ONE receives 201 with server-owned fields; a fresh API/DB read returns the same persisted request. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+| AC-F04-02 | Requesting unavailable E-ZERO returns 409 and creates no request or loan; stock is unchanged. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+| AC-F04-03 | Malformed/invalid quantities, missing/unknown fields and forged server-owned fields return safe 400 with zero domain writes; unknown equipment returns 404. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+| AC-F04-04 | B-A's list/detail contains only B-A records; B-B's existing request ID is denied with 403 and no private content. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+| AC-F04-05 | C-A can read the submitted queue/details and proceed directly to checkout, but cannot create a request; no approval operation/state is required. | EXECUTED locally — fulfilled-state and non-reservation transitions verified in #12 ([new evidence](tdd-evidence-f05.md)); historical request-only results preserved |
+| AC-F04-06 | Persisting requests alone leaves available quantity unchanged; only a committed F-05 checkout produces `CHECKED_OUT` and a stock effect. | EXECUTED locally — fulfilled-state and non-reservation transitions verified in #12 ([new evidence](tdd-evidence-f05.md)); historical request-only results preserved |
+| AC-F04-07 | Requests and their ownership/item/quantity/state read back identically after app restart with the same DB and no reseed. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+| AC-F04-08 | Borrower UI completes submit → own-request display → reload; loading, validation, empty and conflict feedback match API outcomes without showing success for a rejected write. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+| AC-F04-09 | Under the user-confirmed candidate A-12, positive multi-unit requests up to available stock succeed; over-stock requests fail, while repeated requests incur no additional per-borrower cap and do not reserve units. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+| AC-F04-10 | Anonymous protected request routes return 401 without private data or domain writes; C-A's request-creation attempt returns 403 independently of hidden UI controls. | EXECUTED — request-only scope, see evidence ([evidence](tdd-evidence-f04.md)) |
+
+## 5. Software Test Specification
+
+Use independent [fixtures](fixtures.md) and real PostgreSQL. Rev 1 planned rows are retained; the execution column below is the current status and links actual working-tree evidence. Parameterized test counts are reported separately from STS row counts.
+
+| Test ID | Linked AC | Level | Preconditions / input | Action | Expected result | Current execution status |
+|---|---|---|---|---|---|---|
+| TEST-F04-01 | AC-F04-01 | API/DB integration | Base fixture; B-A; E-ONE available1; qty1 permitted | POST request, then fresh GET/detail and DB read | 201, generated nonempty opaque ID/server owner/time; exactly one durable request with matching fields | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-02 | AC-F04-02 | API/DB integration | Base fixture; B-A; E-ZERO available0 | POST qty1; compare before/after counts | 409 INSUFFICIENT_AVAILABILITY; zero request/loan/stock mutations | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-03 | AC-F04-03 | Unit + API/DB integration | B-A; valid item; each of missing/0/-1/1.5/null/true/string quantity, missing equipment and extra fields | Parameterize validation and direct POST | Safe 400 per invalid case; no writes; no internal details | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-04 | AC-F04-03 | API/DB integration | B-A; valid-looking unknown Equipment ID; separately valid item plus forged borrower/status/time | POST each body | Unknown item404; injection400; no ownership changes or request insertion | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-05 | AC-F04-04 | API/DB integration | R-ONE-A owned B-A; R-ONE-B owned B-B | B-A lists, reads own, then reads B-B's known ID | List contains only A; own200; other's403 without its contents | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-06 | AC-F04-05 | API/DB integration | C-A; submitted A/B requests; one subsequently fulfilled by F-05 | List queue/read submitted; read fulfilled; POST new request as C-A | Submitted visible; fulfilled excluded/detail403; create403; no approval state/path | EXECUTED locally — fulfilled-state and non-reservation transitions verified in #12 ([new evidence](tdd-evidence-f05.md)); historical request-only results preserved |
+| TEST-F04-07 | AC-F04-06 | API/DB integration | E-ONE available1; eligible B-A/B-B | Create R-ONE-A/B before checkout; check availability; checkout A as C-A | Before checkout still1/no loans; after commit0; A CHECKED_OUT and B SUBMITTED | EXECUTED locally — fulfilled-state and non-reservation transitions verified in #12 ([new evidence](tdd-evidence-f05.md)); historical request-only results preserved |
+| TEST-F04-08 | AC-F04-07 | API/DB integration | Persist R-ONE-A/B, record IDs/fields; same DB retained | Stop/start app only; authenticate again and read requests/DB | All recorded fields/ownership/state identical, no reset/reseed | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-09 | AC-F04-08 | UI/E2E | Fresh real app/DB; B-A login; E-ONE; controlled delayed response; separate empty/stock-conflict cases | Attempt missing/zero/fractional quantity and inspect field feedback with no write; then submit valid qty1, observe pending state, view own request and reload; separately exercise empty list and stock-conflict response | Invalid form has clear feedback and no request; valid committed own record survives reload; pending controls and distinct empty/conflict/error states work; rejected writes never show success | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-10 | AC-F04-09 | Unit + API/DB integration | **User-confirmed A-12; ratification pending**: E-MANY stock3; multiple requests allowed; full-return policy recorded | Test quantities1/3 accepted,4 rejected for stock3; repeated quantity3 requests accepted without decrementing stock | Match recorded decision; no invented maximum or inferred unlimited policy; unresolved gates cannot silently pass | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-11 | AC-F04-10 | API/DB integration | No credential; valid syntax/IDs/bodies for all three request routes | Call POST/list/detail directly; separately C-A POST | Anonymous401; C-A403; no private data or writes | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-12 | AC-F04-01, AC-F04-03 | API/DB integration | B-A valid submission; force DB insert failure after availability check using test-only hook | POST then inspect DB through fresh connection | Safe500/503; no partial request or loan, availability unchanged | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-13 | AC-F04-02 | Unit, retained regression | Domain validator given available0 then1; qty1 | Write BR-01 rejection assertion before implementation; run RED then GREEN | Correct rule rejects0/allows1; authentic command/SHA evidence, not a setup failure | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+| TEST-F04-14 | AC-F04-03, AC-F04-04 | API/DB integration | B-A; valid-looking absent request ID; own and foreign fixtures separately | GET absent/own/foreign IDs | Absent404, own200, foreign403; safe response contains no other record metadata | EXECUTED — actual files, commands and results in evidence ([evidence](tdd-evidence-f04.md)) |
+
+## 6. Feature DoD and Revision
+
+Satisfy [Product DoD](product-dod.md), all feature AC and actual mapped verification; retain rejection/ownership TDD evidence and link Issue #11 to contract revision, tested SHA and other-student-reviewed PR. A-12 records the user choice; shared-team ratification evidence for baseline closure is pending PR #36. Stack/auth are selected. Record peer review and re-test F-05-dependent portions after real Loan migrations/checkout land. No product-ready, test-pass or peer-approval claim follows from drafting this contract.
+
+| Rev | Change | Basis |
+|---|---|---|
+| 1 — 2026-11-05 | Initial F-04 proposed workflow/UI/API/data/AC/STS contract | Issue #5/#11; SRS rev 2; SDS rev 2; PR #17 role discussion; plan rev 3 |
+| 2 — 2026-11-06 | Documentation alignment (Issue #10 PR): Direction A recorded as confirmed (non-reservation + Direct Checkout, SRS BR-12/A-11 — Sprint 2 approval workflow is deferred to the Sprint 2 contracts and its pending requests do not reserve units); status header split into Contract approval / Implementation / Test status | Team decision Direction A (2026-11-06); SDS rev 3 (stack/auth decisions) |
+| 3 — 2026-11-06 | Implemented request-only UI/API/migration; recorded confirmed multi-unit/no-extra-cap/full-return A-12; added per-row AC/STS actual evidence and retained F-05-dependent gaps | User decision in this work session; source baseline 4e4e62c; [local evidence](tdd-evidence-f04.md) |
+| 4 — 2026-11-06 | Repaired malformed ASCII status separators and distinguished user confirmation from pending team ratification; request behavior and per-row execution status unchanged | PR #36 review; fresh submitted-source server rerun in linked evidence |
+| 5 — 2026-11-07 | Recorded actual #12 execution of previously partial TEST-F04-06/07; kept historical request-only results intact and corrected the stale not-implemented header | PR #36 merged; [F-05 execution evidence](tdd-evidence-f05.md) |

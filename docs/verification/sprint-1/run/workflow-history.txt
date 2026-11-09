@@ -1,0 +1,23 @@
+d291873 2026-11-09T23:26:58+07:00
+Merge pull request #43 from Peepipat-Suesoongnuen/ci/setup-github-actions
+
+4d777f5 2026-11-09T23:04:00+07:00
+ci: add GitHub Actions build and regression checks
+
+4f3e750 2026-11-08T01:32:38+07:00
+Merge pull request #41 from Peepipat-Suesoongnuen/fix/39-ui-layout-and-loan-details
+
+94f9e01 2026-11-08T00:50:08+07:00
+fix(ui): preserve borrower reference in checkout confirmation (Refs #39)
+
+2b0df2d 2026-11-07T23:38:41+07:00
+fix(ui): stabilize page layout and improve loan details (Refs #39)
+
+ef58fae 2026-11-07T21:16:06+07:00
+Merge pull request #38 from Peepipat-Suesoongnuen/feature/13-sprint-1-integration-verification
+
+37e11d2 2026-11-07T20:59:28+07:00
+fix
+
+dad4cd8 2026-11-07T19:50:37+07:00
+docs(F-10): refresh 8676957 evidence and remove PR-specific drafts

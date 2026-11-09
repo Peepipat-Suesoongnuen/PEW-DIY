@@ -1,0 +1,57 @@
+{
+  "name": "pew-diy",
+  "version": "1.0.0",
+  "description": "**D.I.Y. Room Equipment Borrowing System**",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:ci": "node scripts/ci.mjs",
+    "test:watch": "vitest",
+    "test:client": "npm --prefix client test",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "build": "tsc",
+    "build:client": "npm --prefix client run build",
+    "dev": "tsx server/src/index.ts",
+    "migrate": "tsx server/src/db/migrate.ts",
+    "migrate:test": "node --import tsx scripts/migrate-test.mjs",
+    "verify:sprint1": "node scripts/verify-sprint1.mjs",
+    "audit:sprint1": "node scripts/audit-sprint1-evidence.mjs",
+    "rehearse:sprint1": "node scripts/rehearse-setup.mjs",
+    "seed": "tsx server/src/db/seed.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Peepipat-Suesoongnuen/PEW-DIY.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues"
+  },
+  "homepage": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY#readme",
+  "dependencies": {
+    "@node-rs/argon2": "^2.2.2",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.2.1",
+    "jsdom": "^31.0.0",
+    "light-my-request": "^6.8.0",
+    "supertest": "^7.3.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

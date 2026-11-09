@@ -1,0 +1,2289 @@
+{
+  "numTotalTestSuites": 49,
+  "numPassedTestSuites": 49,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 164,
+  "numPassedTests": 164,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1794243581562,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "POST /api/auth/login (TEST-F01-01/02/03)"
+          ],
+          "fullName": "POST /api/auth/login (TEST-F01-01/02/03) returns 200 with data.user and sets a session cookie (TEST-F01-01)",
+          "status": "passed",
+          "title": "returns 200 with data.user and sets a session cookie (TEST-F01-01)",
+          "duration": 65.12640000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "POST /api/auth/login (TEST-F01-01/02/03)"
+          ],
+          "fullName": "POST /api/auth/login (TEST-F01-01/02/03) returns 401 INVALID_CREDENTIALS for unknown user and wrong password identically (TEST-F01-02)",
+          "status": "passed",
+          "title": "returns 401 INVALID_CREDENTIALS for unknown user and wrong password identically (TEST-F01-02)",
+          "duration": 63.66469999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "POST /api/auth/login (TEST-F01-01/02/03)"
+          ],
+          "fullName": "POST /api/auth/login (TEST-F01-01/02/03) returns 400 VALIDATION_ERROR for malformed or extra-field payloads (TEST-F01-03)",
+          "status": "passed",
+          "title": "returns 400 VALIDATION_ERROR for malformed or extra-field payloads (TEST-F01-03)",
+          "duration": 24.76429999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "GET /api/auth/me (TEST-F01-04/05)"
+          ],
+          "fullName": "GET /api/auth/me (TEST-F01-04/05) returns 200 with user identity when authenticated (TEST-F01-04)",
+          "status": "passed",
+          "title": "returns 200 with user identity when authenticated (TEST-F01-04)",
+          "duration": 30.896000000000072,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "GET /api/auth/me (TEST-F01-04/05)"
+          ],
+          "fullName": "GET /api/auth/me (TEST-F01-04/05) returns 401 UNAUTHENTICATED without a session (TEST-F01-05)",
+          "status": "passed",
+          "title": "returns 401 UNAUTHENTICATED without a session (TEST-F01-05)",
+          "duration": 3.0008000000000266,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "POST /api/auth/logout (TEST-F01-06/07)"
+          ],
+          "fullName": "POST /api/auth/logout (TEST-F01-06/07) returns 204, clears cookie, and denies replay (TEST-F01-07)",
+          "status": "passed",
+          "title": "returns 204, clears cookie, and denies replay (TEST-F01-07)",
+          "duration": 33.852300000000014,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "POST /api/auth/logout (TEST-F01-06/07)"
+          ],
+          "fullName": "POST /api/auth/logout (TEST-F01-06/07) returns 401 for logout without authentication (TEST-F01-05)",
+          "status": "passed",
+          "title": "returns 401 for logout without authentication (TEST-F01-05)",
+          "duration": 2.459600000000023,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Regression — safe error envelopes (TEST-F01-03/06/14)"
+          ],
+          "fullName": "Regression — safe error envelopes (TEST-F01-03/06/14) malformed JSON body returns 400 JSON envelope, never HTML (TEST-F01-03)",
+          "status": "passed",
+          "title": "malformed JSON body returns 400 JSON envelope, never HTML (TEST-F01-03)",
+          "duration": 3.749500000000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Regression — safe error envelopes (TEST-F01-03/06/14)"
+          ],
+          "fullName": "Regression — safe error envelopes (TEST-F01-03/06/14) object-typed session cookie is denied with 401 JSON, not 500 HTML (TEST-F01-06)",
+          "status": "passed",
+          "title": "object-typed session cookie is denied with 401 JSON, not 500 HTML (TEST-F01-06)",
+          "duration": 2.098199999999906,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Regression — safe error envelopes (TEST-F01-03/06/14)"
+          ],
+          "fullName": "Regression — safe error envelopes (TEST-F01-03/06/14) auth storage failure returns safe 500/503 JSON without internal details (TEST-F01-14)",
+          "status": "passed",
+          "title": "auth storage failure returns safe 500/503 JSON without internal details (TEST-F01-14)",
+          "duration": 3.5605999999999085,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Regression — anti-CSRF origin enforcement (TEST-F01-15)"
+          ],
+          "fullName": "Regression — anti-CSRF origin enforcement (TEST-F01-15) cross-origin logout is denied 403 and does NOT revoke the session (forced-logout defense)",
+          "status": "passed",
+          "title": "cross-origin logout is denied 403 and does NOT revoke the session (forced-logout defense)",
+          "duration": 34.53890000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Regression — anti-CSRF origin enforcement (TEST-F01-15)"
+          ],
+          "fullName": "Regression — anti-CSRF origin enforcement (TEST-F01-15) same-origin state-changing request is allowed",
+          "status": "passed",
+          "title": "same-origin state-changing request is allowed",
+          "duration": 28.840299999999957,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Regression — missing anti-CSRF evidence (TEST-F01-15, review round 2)"
+          ],
+          "fullName": "Regression — missing anti-CSRF evidence (TEST-F01-15, review round 2) logout with neither Origin nor Referer is denied 403 and does NOT revoke the session",
+          "status": "passed",
+          "title": "logout with neither Origin nor Referer is denied 403 and does NOT revoke the session",
+          "duration": 30.169099999999958,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243590266,
+      "endTime": 1794243590594.1692,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/auth-routes.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02)"
+          ],
+          "fullName": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) logs in a seeded Borrower and returns a fresh session with correct identity (TEST-F01-01)",
+          "status": "passed",
+          "title": "logs in a seeded Borrower and returns a fresh session with correct identity (TEST-F01-01)",
+          "duration": 37.82839999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02)"
+          ],
+          "fullName": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) returns identical INVALID_CREDENTIALS for unknown user and wrong password (AC-F01-02, TEST-F01-02)",
+          "status": "passed",
+          "title": "returns identical INVALID_CREDENTIALS for unknown user and wrong password (AC-F01-02, TEST-F01-02)",
+          "duration": 58.01169999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02)"
+          ],
+          "fullName": "AuthService.login (AC-F01-01, AC-F01-02, TEST-F01-01/02) rejects malformed payloads and extra identity/role/expiry fields with VALIDATION_ERROR (AC-F01-03, TEST-F01-03)",
+          "status": "passed",
+          "title": "rejects malformed payloads and extra identity/role/expiry fields with VALIDATION_ERROR (AC-F01-03, TEST-F01-03)",
+          "duration": 13.716999999999985,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AuthService.currentUser (AC-F01-04, TEST-F01-04)"
+          ],
+          "fullName": "AuthService.currentUser (AC-F01-04, TEST-F01-04) derives identity from the session, not client-supplied claims",
+          "status": "passed",
+          "title": "derives identity from the session, not client-supplied claims",
+          "duration": 32.61219999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AuthService.logout (AC-F01-06, TEST-F01-07)"
+          ],
+          "fullName": "AuthService.logout (AC-F01-06, TEST-F01-07) revokes server-side and denies replay (TEST-F01-07)",
+          "status": "passed",
+          "title": "revokes server-side and denies replay (TEST-F01-07)",
+          "duration": 25.853200000000015,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AuthService.logout (AC-F01-06, TEST-F01-07)"
+          ],
+          "fullName": "AuthService.logout (AC-F01-06, TEST-F01-07) revocation survives application restart (TEST-F01-16)",
+          "status": "passed",
+          "title": "revocation survives application restart (TEST-F01-16)",
+          "duration": 33.69440000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AuthService secrets hygiene (AC-F01-10, TEST-F01-12)"
+          ],
+          "fullName": "AuthService secrets hygiene (AC-F01-10, TEST-F01-12) login result and stored rows never expose password or hash",
+          "status": "passed",
+          "title": "login result and stored rows never expose password or hash",
+          "duration": 31.192099999999982,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243604777,
+      "endTime": 1794243605011.1921,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/auth.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "PROTECTED_ROUTES registry (TEST-F01-05 route-parameterized)"
+          ],
+          "fullName": "PROTECTED_ROUTES registry (TEST-F01-05 route-parameterized) lists every protected route with at least one allowed role",
+          "status": "passed",
+          "title": "lists every protected route with at least one allowed role",
+          "duration": 2.9236999999999966,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "PROTECTED_ROUTES registry (TEST-F01-05 route-parameterized)"
+          ],
+          "fullName": "PROTECTED_ROUTES registry (TEST-F01-05 route-parameterized) marks /api/auth/me and /api/auth/logout as accessible to both roles",
+          "status": "passed",
+          "title": "marks /api/auth/me and /api/auth/logout as accessible to both roles",
+          "duration": 0.7735999999999876,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "requireAuth deny-by-default (AC-F01-05)"
+          ],
+          "fullName": "requireAuth deny-by-default (AC-F01-05) returns 401 UNAUTHENTICATED without a session and does not call next()",
+          "status": "passed",
+          "title": "returns 401 UNAUTHENTICATED without a session and does not call next()",
+          "duration": 0.4531000000000063,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "requireAuth deny-by-default (AC-F01-05)"
+          ],
+          "fullName": "requireAuth deny-by-default (AC-F01-05) returns 401 for an invalid/tampered session id (fail-closed, no DB call)",
+          "status": "passed",
+          "title": "returns 401 for an invalid/tampered session id (fail-closed, no DB call)",
+          "duration": 0.1799000000000035,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "requireRole enforcement (AC-F01-08, BR-04/BR-06)"
+          ],
+          "fullName": "requireRole enforcement (AC-F01-08, BR-04/BR-06) returns 403 FORBIDDEN for wrong role and passes correct role",
+          "status": "passed",
+          "title": "returns 403 FORBIDDEN for wrong role and passes correct role",
+          "duration": 0.3628999999999962,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "requireRole enforcement (AC-F01-08, BR-04/BR-06)"
+          ],
+          "fullName": "requireRole enforcement (AC-F01-08, BR-04/BR-06) returns 401 (not 403) when unauthenticated (deny-by-default)",
+          "status": "passed",
+          "title": "returns 401 (not 403) when unauthenticated (deny-by-default)",
+          "duration": 0.1490000000000009,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "verifyOwnership record-scope guard (AC-F01-09, BR-05)"
+          ],
+          "fullName": "verifyOwnership record-scope guard (AC-F01-09, BR-05) grants access to the owner and denies another borrower (403 semantics)",
+          "status": "passed",
+          "title": "grants access to the owner and denies another borrower (403 semantics)",
+          "duration": 0.20649999999997704,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "verifyOwnership record-scope guard (AC-F01-09, BR-05)"
+          ],
+          "fullName": "verifyOwnership record-scope guard (AC-F01-09, BR-05) denies ownership check without authentication",
+          "status": "passed",
+          "title": "denies ownership check without authentication",
+          "duration": 0.1343999999999994,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243605760,
+      "endTime": 1794243605765.3628,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/authz.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "Availability derivation (TEST-F03-01 / TEST-F03-05)"
+          ],
+          "fullName": "Availability derivation (TEST-F03-01 / TEST-F03-05) computes total minus held with exact zero/positive boundaries (TEST-F03-01)",
+          "status": "passed",
+          "title": "computes total minus held with exact zero/positive boundaries (TEST-F03-01)",
+          "duration": 7.448399999999992,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Availability derivation (TEST-F03-01 / TEST-F03-05)"
+          ],
+          "fullName": "Availability derivation (TEST-F03-01 / TEST-F03-05) rejects invalid aggregate inputs explicitly — never clamps (TEST-F03-05)",
+          "status": "passed",
+          "title": "rejects invalid aggregate inputs explicitly — never clamps (TEST-F03-05)",
+          "duration": 3.9923,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Derived availability over persisted stock (TEST-F03-03, clean fixtures)"
+          ],
+          "fullName": "Derived availability over persisted stock (TEST-F03-03, clean fixtures) shows correct values for clean fixtures as both roles, list and detail agreeing (TEST-F03-03)",
+          "status": "passed",
+          "title": "shows correct values for clean fixtures as both roles, list and detail agreeing (TEST-F03-03)",
+          "duration": 82.25649999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Invalid aggregate state is a safe internal error (TEST-F03-06)"
+          ],
+          "fullName": "Invalid aggregate state is a safe internal error (TEST-F03-06) returns 500 INTERNAL_ERROR with requestId and leaks no quantity/stack/loan data",
+          "status": "passed",
+          "title": "returns 500 INTERNAL_ERROR with requestId and leaks no quantity/stack/loan data",
+          "duration": 27.726099999999974,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03)"
+          ],
+          "fullName": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) aggregates all active loans for the item without exposing loan/borrower details (TEST-F03-02)",
+          "status": "passed",
+          "title": "aggregates all active loans for the item without exposing loan/borrower details (TEST-F03-02)",
+          "duration": 25.39670000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03)"
+          ],
+          "fullName": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) a submitted request alone leaves availability unchanged (non-reservation; AC-F03-03 first half)",
+          "status": "passed",
+          "title": "a submitted request alone leaves availability unchanged (non-reservation; AC-F03-03 first half)",
+          "duration": 20.686500000000024,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03)"
+          ],
+          "fullName": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) a committed quantity-one loan flips E-ONE from 1/AVAILABLE to 0/UNAVAILABLE on fresh reads (AC-F03-03 second half, fixture-level)",
+          "status": "passed",
+          "title": "a committed quantity-one loan flips E-ONE from 1/AVAILABLE to 0/UNAVAILABLE on fresh reads (AC-F03-03 second half, fixture-level)",
+          "duration": 27.302900000000022,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03)"
+          ],
+          "fullName": "Real-DB held-unit aggregation — dependency-gated on #11/#12 schema (TEST-F03-02 / AC-F03-03) a fully returned loan contributes zero held units (edge; D1-03 §3.3)",
+          "status": "passed",
+          "title": "a fully returned loan contributes zero held units (edge; D1-03 §3.3)",
+          "duration": 23.500999999999976,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Non-negative data-layer constraints — dependency-gated on #11/#12 schema (AC-06.3-03)"
+          ],
+          "fullName": "Non-negative data-layer constraints — dependency-gated on #11/#12 schema (AC-06.3-03) rejects non-positive loan and request quantities at the database boundary",
+          "status": "passed",
+          "title": "rejects non-positive loan and request quantities at the database boundary",
+          "duration": 71.17669999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243591029,
+      "endTime": 1794243591319.1768,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/availability.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "BR-01 request availability (TEST-F04-13)"
+          ],
+          "fullName": "BR-01 request availability (TEST-F04-13) rejects unavailable equipment before persisting a request",
+          "status": "passed",
+          "title": "rejects unavailable equipment before persisting a request",
+          "duration": 1.9394999999999953,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "BR-01 request availability (TEST-F04-13)"
+          ],
+          "fullName": "BR-01 request availability (TEST-F04-13) accepts an available item without reserving its units",
+          "status": "passed",
+          "title": "accepts an available item without reserving its units",
+          "duration": 0.2254999999999967,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243605895,
+      "endTime": 1794243605897.2256,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/borrowing-request-unit.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL persists server-owned request fields, opaque item ID and fresh retrieval (TEST-F04-01)",
+          "status": "passed",
+          "title": "persists server-owned request fields, opaque item ID and fresh retrieval (TEST-F04-01)",
+          "duration": 20.0865,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects unavailable equipment without persistence (TEST-F04-02)",
+          "status": "passed",
+          "title": "rejects unavailable equipment without persistence (TEST-F04-02)",
+          "duration": 5.6404,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity undefined (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity undefined (TEST-F04-03)",
+          "duration": 4.518300000000011,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity 0 (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity 0 (TEST-F04-03)",
+          "duration": 4.0400000000000205,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity -1 (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity -1 (TEST-F04-03)",
+          "duration": 4.422499999999957,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity 1.5 (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity 1.5 (TEST-F04-03)",
+          "duration": 4.573800000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity null (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity null (TEST-F04-03)",
+          "duration": 3.9811000000000263,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity true (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity true (TEST-F04-03)",
+          "duration": 3.876700000000028,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity 1 (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity 1 (TEST-F04-03)",
+          "duration": 3.6784000000000106,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects invalid quantity 2147483648 (TEST-F04-03)",
+          "status": "passed",
+          "title": "rejects invalid quantity 2147483648 (TEST-F04-03)",
+          "duration": 4.110200000000077,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects injected borrower_id (TEST-F04-04)",
+          "status": "passed",
+          "title": "rejects injected borrower_id (TEST-F04-04)",
+          "duration": 3.499400000000037,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects injected status (TEST-F04-04)",
+          "status": "passed",
+          "title": "rejects injected status (TEST-F04-04)",
+          "duration": 3.0131000000000085,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects injected created_at (TEST-F04-04)",
+          "status": "passed",
+          "title": "rejects injected created_at (TEST-F04-04)",
+          "duration": 3.2667000000000144,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects injected id (TEST-F04-04)",
+          "status": "passed",
+          "title": "rejects injected id (TEST-F04-04)",
+          "duration": 2.965400000000045,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects injected loan_id (TEST-F04-04)",
+          "status": "passed",
+          "title": "rejects injected loan_id (TEST-F04-04)",
+          "duration": 3.1335000000000264,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rejects absent equipment and malformed body (TEST-F04-03/04)",
+          "status": "passed",
+          "title": "rejects absent equipment and malformed body (TEST-F04-03/04)",
+          "duration": 14.773199999999974,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL filters lists and forbids another borrower's detail (TEST-F04-05/14)",
+          "status": "passed",
+          "title": "filters lists and forbids another borrower's detail (TEST-F04-05/14)",
+          "duration": 17.509500000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL allows the submitted queue, denies Custodian creation before input validation (TEST-F04-06)",
+          "status": "passed",
+          "title": "allows the submitted queue, denies Custodian creation before input validation (TEST-F04-06)",
+          "duration": 12.385499999999979,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL does not reserve units for repeated or competing requests (TEST-F04-07 request half; BR-12)",
+          "status": "passed",
+          "title": "does not reserve units for repeated or competing requests (TEST-F04-07 request half; BR-12)",
+          "duration": 13.231899999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL enforces approved multi-unit bounds with no additional per-user cap (TEST-F04-10)",
+          "status": "passed",
+          "title": "enforces approved multi-unit bounds with no additional per-user cap (TEST-F04-10)",
+          "duration": 10.82650000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL denies all anonymous routes and hostile-origin submissions (TEST-F04-11)",
+          "status": "passed",
+          "title": "denies all anonymous routes and hostile-origin submissions (TEST-F04-11)",
+          "duration": 14.89179999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL rolls back an inserted request on failure and permits a clean retry (TEST-F04-12)",
+          "status": "passed",
+          "title": "rolls back an inserted request on failure and permits a clean retry (TEST-F04-12)",
+          "duration": 9.620999999999981,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL denies invalid and logged-out credentials on every new request route",
+          "status": "passed",
+          "title": "denies invalid and logged-out credentials on every new request route",
+          "duration": 41.254800000000046,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 real API/PostgreSQL"
+          ],
+          "fullName": "F-04 real API/PostgreSQL repeated migrations preserve requests and foreign keys protect their history",
+          "status": "passed",
+          "title": "repeated migrations preserve requests and foreign keys protect their history",
+          "duration": 11.012099999999919,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243604360,
+      "endTime": 1794243604581.0122,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/borrowing-request.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "catalog.html rendering safety (P1 XSS regression)"
+          ],
+          "fullName": "catalog.html rendering safety (P1 XSS regression) renders HTML-bearing item fields as text — no element creation, no script execution",
+          "status": "passed",
+          "title": "renders HTML-bearing item fields as text — no element creation, no script execution",
+          "duration": 141.8191999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "catalog.html logout failure handling (P2 regression)"
+          ],
+          "fullName": "catalog.html logout failure handling (P2 regression) failed logout (503) shows a safe failure with retry — no redirect, session page stays",
+          "status": "passed",
+          "title": "failed logout (503) shows a safe failure with retry — no redirect, session page stays",
+          "duration": 91.56560000000172,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "catalog.html logout failure handling (P2 regression)"
+          ],
+          "fullName": "catalog.html logout failure handling (P2 regression) network-error logout also reports failure without redirect (uncertain outcome)",
+          "status": "passed",
+          "title": "network-error logout also reports failure without redirect (uncertain outcome)",
+          "duration": 77.93650000000162,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "catalog.html logout failure handling (P2 regression)"
+          ],
+          "fullName": "catalog.html logout failure handling (P2 regression) confirmed logout (204) redirects to login",
+          "status": "passed",
+          "title": "confirmed logout (204) redirects to login",
+          "duration": 76.64099999999962,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243603498,
+      "endTime": 1794243603885.641,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/catalog-ui.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03)"
+          ],
+          "fullName": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) lists seeded items for both roles with correct fields and no private data (TEST-F02-01)",
+          "status": "passed",
+          "title": "lists seeded items for both roles with correct fields and no private data (TEST-F02-01)",
+          "duration": 77.88130000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03)"
+          ],
+          "fullName": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) E-ONE detail matches its list entry for both roles (TEST-F02-02)",
+          "status": "passed",
+          "title": "E-ONE detail matches its list entry for both roles (TEST-F02-02)",
+          "duration": 25.031800000000032,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03)"
+          ],
+          "fullName": "GET /api/equipment and /api/equipment/{id} (TEST-F02-01/02/03) empty catalog returns data=[] and unknown id returns safe 404 (TEST-F02-03)",
+          "status": "passed",
+          "title": "empty catalog returns data=[] and unknown id returns safe 404 (TEST-F02-03)",
+          "duration": 30.4726,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Authentication on catalog routes (TEST-F02-04)"
+          ],
+          "fullName": "Authentication on catalog routes (TEST-F02-04) rejects absent/invalid/logged-out credentials with 401 and no catalog data",
+          "status": "passed",
+          "title": "rejects absent/invalid/logged-out credentials with 401 and no catalog data",
+          "duration": 26.267800000000022,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Seed idempotency and validation (TEST-F02-05/06)"
+          ],
+          "fullName": "Seed idempotency and validation (TEST-F02-05/06) re-seeding produces no duplicates and preserves totals and identity rows (TEST-F02-05 catalog/identity portion)",
+          "status": "passed",
+          "title": "re-seeding produces no duplicates and preserves totals and identity rows (TEST-F02-05 catalog/identity portion)",
+          "duration": 3.423000000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Seed idempotency and validation (TEST-F02-05/06)"
+          ],
+          "fullName": "Seed idempotency and validation (TEST-F02-05/06) rejects negative total and fractional quantity at the typed boundary; zero total is valid (TEST-F02-06)",
+          "status": "passed",
+          "title": "rejects negative total and fractional quantity at the typed boundary; zero total is valid (TEST-F02-06)",
+          "duration": 22.0548,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Availability derivation and UI serving (TEST-F02-07/08 backend portion)"
+          ],
+          "fullName": "Availability derivation and UI serving (TEST-F02-07/08 backend portion) availability label derives from total minus held (no loans held yet → available=total)",
+          "status": "passed",
+          "title": "availability label derives from total minus held (no loans held yet → available=total)",
+          "duration": 25.187200000000075,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Availability derivation and UI serving (TEST-F02-07/08 backend portion)"
+          ],
+          "fullName": "Availability derivation and UI serving (TEST-F02-07/08 backend portion) catalog and item UI pages are served (UI journey harness; browser E2E deferred with TEST-F01-13)",
+          "status": "passed",
+          "title": "catalog and item UI pages are served (UI journey harness; browser E2E deferred with TEST-F01-13)",
+          "duration": 8.847999999999956,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Availability derivation and UI serving (TEST-F02-07/08 backend portion)"
+          ],
+          "fullName": "Availability derivation and UI serving (TEST-F02-07/08 backend portion) UI-to-API-to-DB journey: login page -> login API -> catalog page -> catalog API -> item page -> detail API (Borrower flow)",
+          "status": "passed",
+          "title": "UI-to-API-to-DB journey: login page -> login API -> catalog page -> catalog API -> item page -> detail API (Borrower flow)",
+          "duration": 28.086799999999926,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Safe failure and restart persistence (TEST-F02-09/10)"
+          ],
+          "fullName": "Safe failure and restart persistence (TEST-F02-09/10) catalog DB failure yields safe 503 for list/detail and recovery returns real data (TEST-F02-09)",
+          "status": "passed",
+          "title": "catalog DB failure yields safe 503 for list/detail and recovery returns real data (TEST-F02-09)",
+          "duration": 27.339900000000057,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Safe failure and restart persistence (TEST-F02-09/10)"
+          ],
+          "fullName": "Safe failure and restart persistence (TEST-F02-09/10) catalog survives a new application instance on the same DB (TEST-F02-10 instance-level portion)",
+          "status": "passed",
+          "title": "catalog survives a new application instance on the same DB (TEST-F02-10 instance-level portion)",
+          "duration": 20.468899999999962,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243589612,
+      "endTime": 1794243589907.469,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/catalog.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) rejects an unavailable exclusive unit",
+          "status": "passed",
+          "title": "rejects an unavailable exclusive unit",
+          "duration": 2.1636000000000024,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) allows the available exclusive unit",
+          "status": "passed",
+          "title": "allows the available exclusive unit",
+          "duration": 0.2569000000000017,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 1/2/1",
+          "status": "passed",
+          "title": "rejects corrupt quantities 1/2/1",
+          "duration": 0.23029999999999973,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities -1/0/1",
+          "status": "passed",
+          "title": "rejects corrupt quantities -1/0/1",
+          "duration": 0.17980000000000018,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 3/-1/1",
+          "status": "passed",
+          "title": "rejects corrupt quantities 3/-1/1",
+          "duration": 0.17189999999999372,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 3/0/0",
+          "status": "passed",
+          "title": "rejects corrupt quantities 3/0/0",
+          "duration": 0.158299999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) rejects corrupt quantities 3/0/1.5",
+          "status": "passed",
+          "title": "rejects corrupt quantities 3/0/1.5",
+          "duration": 0.15370000000000061,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-11-06T16:59:59Z (TEST-F05-07)",
+          "status": "passed",
+          "title": "adds seven business calendar days for 2026-11-06T16:59:59Z (TEST-F05-07)",
+          "duration": 17.82679999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-11-06T17:00:00Z (TEST-F05-07)",
+          "status": "passed",
+          "title": "adds seven business calendar days for 2026-11-06T17:00:00Z (TEST-F05-07)",
+          "duration": 0.28130000000001587,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2026-12-27T17:00:00Z (TEST-F05-07)",
+          "status": "passed",
+          "title": "adds seven business calendar days for 2026-12-27T17:00:00Z (TEST-F05-07)",
+          "duration": 0.34440000000000737,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) adds seven business calendar days for 2028-02-22T17:00:00Z (TEST-F05-07)",
+          "status": "passed",
+          "title": "adds seven business calendar days for 2028-02-22T17:00:00Z (TEST-F05-07)",
+          "duration": 0.23190000000002442,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout invariant (TEST-F05-15)"
+          ],
+          "fullName": "F-05 checkout invariant (TEST-F05-15) uses an explicit zone across DST rather than 168 hours",
+          "status": "passed",
+          "title": "uses an explicit zone across DST rather than 168 hours",
+          "duration": 0.4473000000000127,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243605598,
+      "endTime": 1794243605620.4473,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/loan-unit.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API completes the previously deferred request/queue transitions (TEST-F04-06/07)",
+          "status": "passed",
+          "title": "completes the previously deferred request/queue transitions (TEST-F04-06/07)",
+          "duration": 200.79710000000023,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API commits correct server fields and due date; fresh request/queue/loan/stock reads (TEST-F05-01/08)",
+          "status": "passed",
+          "title": "commits correct server fields and due date; fresh request/queue/loan/stock reads (TEST-F05-01/08)",
+          "duration": 21.234399999999823,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API rejects unavailable and repeated requests without mutation (TEST-F05-02/03)",
+          "status": "passed",
+          "title": "rejects unavailable and repeated requests without mutation (TEST-F05-02/03)",
+          "duration": 15.830099999999675,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API rolls back failure after INSERT, forbids dirty availability reads, then retries (TEST-F05-06 / F03-10)",
+          "status": "passed",
+          "title": "rolls back failure after INSERT, forbids dirty availability reads, then retries (TEST-F05-06 / F03-10)",
+          "duration": 17.50799999999981,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API enforces authentication, role, ownership and trusted origin (TEST-F05-09/10)",
+          "status": "passed",
+          "title": "enforces authentication, role, ownership and trusted origin (TEST-F05-09/10)",
+          "duration": 38.57179999999971,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API rejects injected fields, non-object bodies and malformed IDs (TEST-F05-13)",
+          "status": "passed",
+          "title": "rejects injected fields, non-object bodies and malformed IDs (TEST-F05-13)",
+          "duration": 31.696800000000167,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API fulfills multiple units with no extra borrower cap and checks stock again (TEST-F05-14/16)",
+          "status": "passed",
+          "title": "fulfills multiple units with no extra borrower cap and checks stock again (TEST-F05-14/16)",
+          "duration": 33.30179999999973,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API fails closed when business timezone has not been configured",
+          "status": "passed",
+          "title": "fails closed when business timezone has not been configured",
+          "duration": 5.510600000000068,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API backs the relation with FK, unique and positive-quantity constraints",
+          "status": "passed",
+          "title": "backs the relation with FK, unique and positive-quantity constraints",
+          "duration": 47.090999999999894,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API restricts Borrower reads to active records, with no return endpoint",
+          "status": "passed",
+          "title": "restricts Borrower reads to active records, with no return endpoint",
+          "duration": 38.14080000000013,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API persists API-created loan across two actual app processes (TEST-F05-11)",
+          "status": "passed",
+          "title": "persists API-created loan across two actual app processes (TEST-F05-11)",
+          "duration": 942.5016,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 real PostgreSQL/API"
+          ],
+          "fullName": "F-05 real PostgreSQL/API serializes N=50 independent two-worker races and a same-request race (TEST-F05-04/05)",
+          "status": "passed",
+          "title": "serializes N=50 independent two-worker races and a same-request race (TEST-F05-04/05)",
+          "duration": 743.1560000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243583910,
+      "endTime": 1794243586045.156,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/loan.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "password hashing service (BR-10, NFR-03)"
+          ],
+          "fullName": "password hashing service (BR-10, NFR-03) produces a salted argon2 hash that is not the plaintext and differs for equal inputs",
+          "status": "passed",
+          "title": "produces a salted argon2 hash that is not the plaintext and differs for equal inputs",
+          "duration": 30.54780000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "password hashing service (BR-10, NFR-03)"
+          ],
+          "fullName": "password hashing service (BR-10, NFR-03) verifies the correct password and rejects wrong ones (library comparison only)",
+          "status": "passed",
+          "title": "verifies the correct password and rejects wrong ones (library comparison only)",
+          "duration": 50.79499999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "password hashing service (BR-10, NFR-03)"
+          ],
+          "fullName": "password hashing service (BR-10, NFR-03) fails closed on a corrupted/invalid stored hash instead of authenticating",
+          "status": "passed",
+          "title": "fails closed on a corrupted/invalid stored hash instead of authenticating",
+          "duration": 0.3393000000000086,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "password hashing service (BR-10, NFR-03)"
+          ],
+          "fullName": "password hashing service (BR-10, NFR-03) dummy hash used for timing equalization is a hash but never matches user input",
+          "status": "passed",
+          "title": "dummy hash used for timing equalization is a hash but never matches user input",
+          "duration": 22.376499999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243605145,
+      "endTime": 1794243605249.3765,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/password.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "Application process restart against the same durable DB (AC-06.2-03)"
+          ],
+          "fullName": "Application process restart against the same durable DB (AC-06.2-03) catalog and session survive a full process stop/start (TEST-F02-10 process-restart evidence)",
+          "status": "passed",
+          "title": "catalog and session survive a full process stop/start (TEST-F02-10 process-restart evidence)",
+          "duration": 931.1455000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Derived availability survives process restart (TEST-F03-09 / AC-06.3-05)"
+          ],
+          "fullName": "Derived availability survives process restart (TEST-F03-09 / AC-06.3-05) keeps the same derived quantity/label after a hard restart on the same store",
+          "status": "passed",
+          "title": "keeps the same derived quantity/label after a hard restart on the same store",
+          "duration": 49.34809999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243588254,
+      "endTime": 1794243589234.3481,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/restart-e2e.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "SessionStore (D2: server session, durable revocation)"
+          ],
+          "fullName": "SessionStore (D2: server session, durable revocation) creates a session whose raw id resolves to the correct user (TEST-F01-01 support)",
+          "status": "passed",
+          "title": "creates a session whose raw id resolves to the correct user (TEST-F01-01 support)",
+          "duration": 10.4315,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "SessionStore (D2: server session, durable revocation)"
+          ],
+          "fullName": "SessionStore (D2: server session, durable revocation) does not store the raw session id anywhere (digest-only persistence)",
+          "status": "passed",
+          "title": "does not store the raw session id anywhere (digest-only persistence)",
+          "duration": 5.210100000000011,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "SessionStore (D2: server session, durable revocation)"
+          ],
+          "fullName": "SessionStore (D2: server session, durable revocation) rejects unknown, empty and tampered session ids (TEST-F01-05/06 support)",
+          "status": "passed",
+          "title": "rejects unknown, empty and tampered session ids (TEST-F01-05/06 support)",
+          "duration": 1.9860999999999933,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "SessionStore (D2: server session, durable revocation)"
+          ],
+          "fullName": "SessionStore (D2: server session, durable revocation) revocation denies replay immediately and survives application restart (TEST-F01-07, TEST-F01-16)",
+          "status": "passed",
+          "title": "revocation denies replay immediately and survives application restart (TEST-F01-07, TEST-F01-16)",
+          "duration": 3.452600000000018,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "SessionStore (D2: server session, durable revocation)"
+          ],
+          "fullName": "SessionStore (D2: server session, durable revocation) enforces idle expiry at the boundary using the injectable clock (TEST-F01-08)",
+          "status": "passed",
+          "title": "enforces idle expiry at the boundary using the injectable clock (TEST-F01-08)",
+          "duration": 7.288799999999981,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "SessionStore (D2: server session, durable revocation)"
+          ],
+          "fullName": "SessionStore (D2: server session, durable revocation) enforces the absolute cap even with continuous activity (TEST-F01-08)",
+          "status": "passed",
+          "title": "enforces the absolute cap even with continuous activity (TEST-F01-08)",
+          "duration": 3.9003000000000156,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "SessionStore (D2: server session, durable revocation)"
+          ],
+          "fullName": "SessionStore (D2: server session, durable revocation) sliding idle extension never exceeds the absolute cap",
+          "status": "passed",
+          "title": "sliding idle extension never exceeds the absolute cap",
+          "duration": 2.2524999999999977,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243605432,
+      "endTime": 1794243605466.2524,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/session.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB keeps the HTTP probe inventory complete against the protected role matrix",
+          "status": "passed",
+          "title": "keeps the HTTP probe inventory complete against the protected role matrix",
+          "duration": 1.6463999999999714,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB configured HTTPS cookies have Secure/HttpOnly/SameSite attributes (TEST-F01-15)",
+          "status": "passed",
+          "title": "configured HTTPS cookies have Secure/HttpOnly/SameSite attributes (TEST-F01-15)",
+          "duration": 63.3356,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB actual seed reruns preserve existing requests, loans, stock and identities (TEST-F02-05 complete)",
+          "status": "passed",
+          "title": "actual seed reruns preserve existing requests, loans, stock and identities (TEST-F02-05 complete)",
+          "duration": 529.3268999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 2.465199999999868,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 2.166500000000042,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.6929000000000087,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.955900000000156,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.8152000000000044,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.6118000000001302,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.5221000000001368,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.7444000000000415,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.3957000000000335,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB anonymous GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "anonymous GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.345199999999977,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.804600000000164,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 2.3338999999998578,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.6748000000000047,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.5615000000000236,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.8841999999999643,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.9272000000000844,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.753400000000056,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.81679999999983,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 2.266600000000153,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB invalid GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "invalid GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.7739999999998872,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.7613000000001193,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.8075000000001182,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.5635999999999513,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 2.082499999999982,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.9182000000000698,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.627999999999929,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.649599999999964,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.7538999999999305,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.5572000000001935,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB expired GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "expired GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.648300000000063,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked GET /api/auth/me denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.669499999999971,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked POST /api/requests/fixture-r-one/checkout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 2.1993999999999687,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked GET /api/loans denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.740099999999984,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked GET /api/loans/fixture-loan denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.6320000000000618,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked POST /api/auth/logout denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.7781999999999698,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked GET /api/equipment denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.7388999999998305,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked GET /api/equipment/fixture-e-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.6339000000000397,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked POST /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.8865999999998166,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked GET /api/requests denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.6812999999999647,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB revoked GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "status": "passed",
+          "title": "revoked GET /api/requests/fixture-r-one denies without domain writes (TEST-F10-02 / TEST-F01-05/06/08)",
+          "duration": 1.598299999999881,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests is forbidden by server (TEST-F10-02)",
+          "status": "passed",
+          "title": "wrong role POST /api/requests is forbidden by server (TEST-F10-02)",
+          "duration": 2.2420999999999367,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB wrong role POST /api/requests/{requestId}/checkout is forbidden by server (TEST-F10-02)",
+          "status": "passed",
+          "title": "wrong role POST /api/requests/{requestId}/checkout is forbidden by server (TEST-F10-02)",
+          "duration": 2.2576000000001386,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans is forbidden by server (TEST-F10-02)",
+          "status": "passed",
+          "title": "wrong role GET /api/loans is forbidden by server (TEST-F10-02)",
+          "duration": 1.9143999999998869,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB wrong role GET /api/loans/{loanId} is forbidden by server (TEST-F10-02)",
+          "status": "passed",
+          "title": "wrong role GET /api/loans/{loanId} is forbidden by server (TEST-F10-02)",
+          "duration": 1.9507000000000971,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB owner query tampering cannot widen request/loan scope (TEST-F10-02 / TEST-F01-10)",
+          "status": "passed",
+          "title": "owner query tampering cannot widen request/loan scope (TEST-F10-02 / TEST-F01-10)",
+          "duration": 7.817400000000134,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F10 complete protected-route inventory on production HTTP/real DB"
+          ],
+          "fullName": "F10 complete protected-route inventory on production HTTP/real DB restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+          "status": "passed",
+          "title": "restart preserves all domain fields, stock and revocation; reauthentication retrieves own data (TEST-F10-03 / TEST-F01-16)",
+          "duration": 430.1376,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243586884,
+      "endTime": 1794243587996.1377,
+      "status": "passed",
+      "message": "",
+      "name": "server/tests/sprint1-integration.test.ts"
+    }
+  ]
+}

@@ -1,0 +1,1065 @@
+{
+  "numTotalTestSuites": 24,
+  "numPassedTestSuites": 24,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 74,
+  "numPassedTests": 74,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1794243607172,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "AccountMenu (ui-spec §2.2 + shared logout behavior §4)"
+          ],
+          "fullName": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) shows current username and role",
+          "status": "passed",
+          "title": "shows current username and role",
+          "duration": 108.35790000000088,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AccountMenu (ui-spec §2.2 + shared logout behavior §4)"
+          ],
+          "fullName": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) signs out and returns to Login on confirmed success",
+          "status": "passed",
+          "title": "signs out and returns to Login on confirmed success",
+          "duration": 100.98379999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AccountMenu (ui-spec §2.2 + shared logout behavior §4)"
+          ],
+          "fullName": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) keeps the session page with a safe retry message on logout failure — no redirect",
+          "status": "passed",
+          "title": "keeps the session page with a safe retry message on logout failure — no redirect",
+          "duration": 129.9413999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AccountMenu (ui-spec §2.2 + shared logout behavior §4)"
+          ],
+          "fullName": "AccountMenu (ui-spec §2.2 + shared logout behavior §4) clears stale identity and returns to Login on a 401 logout (session already invalid)",
+          "status": "passed",
+          "title": "clears stale identity and returns to Login on a 401 logout (session already invalid)",
+          "duration": 99.91220000000067,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243620180,
+      "endTime": 1794243620618.912,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/account-menu.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "api client (safe error mapping — shared-conventions)"
+          ],
+          "fullName": "api client (safe error mapping — shared-conventions) maps the JSON error envelope to ApiError with code and requestId",
+          "status": "passed",
+          "title": "maps the JSON error envelope to ApiError with code and requestId",
+          "duration": 5.531499999999141,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "api client (safe error mapping — shared-conventions)"
+          ],
+          "fullName": "api client (safe error mapping — shared-conventions) never surfaces raw non-JSON error bodies (proxy error pages)",
+          "status": "passed",
+          "title": "never surfaces raw non-JSON error bodies (proxy error pages)",
+          "duration": 0.7803999999996449,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "api client (safe error mapping — shared-conventions)"
+          ],
+          "fullName": "api client (safe error mapping — shared-conventions) maps network failures to a safe NETWORK_ERROR (uncertain outcome)",
+          "status": "passed",
+          "title": "maps network failures to a safe NETWORK_ERROR (uncertain outcome)",
+          "duration": 0.45930000000043947,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "api client (safe error mapping — shared-conventions)"
+          ],
+          "fullName": "api client (safe error mapping — shared-conventions) returns the data envelope for successful reads",
+          "status": "passed",
+          "title": "returns the data envelope for successful reads",
+          "duration": 0.5473999999994703,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "api client (safe error mapping — shared-conventions)"
+          ],
+          "fullName": "api client (safe error mapping — shared-conventions) encodes opaque ids with URL-significant characters in the detail URL (PR #34 P2-2)",
+          "status": "passed",
+          "title": "encodes opaque ids with URL-significant characters in the detail URL (PR #34 P2-2)",
+          "duration": 0.42519999999967695,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243618853,
+      "endTime": 1794243618861.4253,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/api.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) submits an opaque item ID and redirects to persisted own request display",
+          "status": "passed",
+          "title": "submits an opaque item ID and redirects to persisted own request display",
+          "duration": 191.90749999999935,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) rejects invalid quantity  without an API mutation",
+          "status": "passed",
+          "title": "rejects invalid quantity  without an API mutation",
+          "duration": 31.114799999999377,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) rejects invalid quantity 0 without an API mutation",
+          "status": "passed",
+          "title": "rejects invalid quantity 0 without an API mutation",
+          "duration": 30.995499999999083,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) rejects invalid quantity -1 without an API mutation",
+          "status": "passed",
+          "title": "rejects invalid quantity -1 without an API mutation",
+          "duration": 31.6229000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) rejects invalid quantity 1.5 without an API mutation",
+          "status": "passed",
+          "title": "rejects invalid quantity 1.5 without an API mutation",
+          "duration": 29.929900000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) rejects invalid quantity 4 without an API mutation",
+          "status": "passed",
+          "title": "rejects invalid quantity 4 without an API mutation",
+          "duration": 30.96939999999995,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) disables duplicate submission and shows no success before the server commits",
+          "status": "passed",
+          "title": "disables duplicate submission and shows no success before the server commits",
+          "duration": 26.148199999999633,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) preserves input and refreshes authoritative stock after a conflict",
+          "status": "passed",
+          "title": "preserves input and refreshes authoritative stock after a conflict",
+          "duration": 54.79310000000078,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) redirects to login after protected submission returns 401",
+          "status": "passed",
+          "title": "redirects to login after protected submission returns 401",
+          "duration": 28.59569999999985,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) keeps safe input and never shows success or raw diagnostics after a service failure",
+          "status": "passed",
+          "title": "keeps safe input and never shows success or raw diagnostics after a service failure",
+          "duration": 33.20530000000144,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) disables retry when stock cannot be refreshed after conflict",
+          "status": "passed",
+          "title": "disables retry when stock cannot be refreshed after conflict",
+          "duration": 30.869199999999182,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) hides borrowing controls from Custodians and unavailable items",
+          "status": "passed",
+          "title": "hides borrowing controls from Custodians and unavailable items",
+          "duration": 14.179199999998673,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) shows empty own/queue states and safe detail denial",
+          "status": "passed",
+          "title": "shows empty own/queue states and safe detail denial",
+          "duration": 45.89579999999842,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-04 request UI (TEST-F04-09)"
+          ],
+          "fullName": "F-04 request UI (TEST-F04-09) decodes each request ID exactly once at the route boundary",
+          "status": "passed",
+          "title": "decodes each request ID exactly once at the route boundary",
+          "duration": 0.3330000000005384,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243619170,
+      "endTime": 1794243619751.333,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/borrowing-request.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "CatalogPage (ui-spec §2 / f-02 §3 states)"
+          ],
+          "fullName": "CatalogPage (ui-spec §2 / f-02 §3 states) loads and renders item fields with availability badges",
+          "status": "passed",
+          "title": "loads and renders item fields with availability badges",
+          "duration": 120.74989999999889,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "CatalogPage (ui-spec §2 / f-02 §3 states)"
+          ],
+          "fullName": "CatalogPage (ui-spec §2 / f-02 §3 states) renders a dedicated empty state for an empty catalog (not an error)",
+          "status": "passed",
+          "title": "renders a dedicated empty state for an empty catalog (not an error)",
+          "duration": 6.469499999999243,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "CatalogPage (ui-spec §2 / f-02 §3 states)"
+          ],
+          "fullName": "CatalogPage (ui-spec §2 / f-02 §3 states) shows a generic retry message with requestId on server failure — never a false-empty",
+          "status": "passed",
+          "title": "shows a generic retry message with requestId on server failure — never a false-empty",
+          "duration": 9.872800000001007,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "CatalogPage (ui-spec §2 / f-02 §3 states)"
+          ],
+          "fullName": "CatalogPage (ui-spec §2 / f-02 §3 states) encodes opaque ids with URL-significant characters and round-trips them to the detail route (PR #34 P2-2)",
+          "status": "passed",
+          "title": "encodes opaque ids with URL-significant characters and round-trips them to the detail route (PR #34 P2-2)",
+          "duration": 91.98270000000048,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "CatalogPage (ui-spec §2 / f-02 §3 states)"
+          ],
+          "fullName": "CatalogPage (ui-spec §2 / f-02 §3 states) keeps the distinct opaque ids `fixture/opaque` and `fixture%2Fopaque` separate across the full round-trip (PR #34 review round 2)",
+          "status": "passed",
+          "title": "keeps the distinct opaque ids `fixture/opaque` and `fixture%2Fopaque` separate across the full round-trip (PR #34 review round 2)",
+          "duration": 205.60759999999937,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "CatalogPage (ui-spec §2 / f-02 §3 states)"
+          ],
+          "fullName": "CatalogPage (ui-spec §2 / f-02 §3 states) never renders unreceived quantities as zero while loading or after failure (TEST-F03-08)",
+          "status": "passed",
+          "title": "never renders unreceived quantities as zero while loading or after failure (TEST-F03-08)",
+          "duration": 13.360599999999977,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "CatalogPage (ui-spec §2 / f-02 §3 states)"
+          ],
+          "fullName": "CatalogPage (ui-spec §2 / f-02 §3 states) clears stale state and returns to Login on 401",
+          "status": "passed",
+          "title": "clears stale state and returns to Login on 401",
+          "duration": 14.273700000001554,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243620367,
+      "endTime": 1794243620829.2737,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/catalog-page.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "Button"
+          ],
+          "fullName": "Button renders a primary action and handles clicks",
+          "status": "passed",
+          "title": "renders a primary action and handles clicks",
+          "duration": 122.98520000000099,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Button"
+          ],
+          "fullName": "Button loading disables the button and marks it busy (no duplicate submits)",
+          "status": "passed",
+          "title": "loading disables the button and marks it busy (no duplicate submits)",
+          "duration": 60.00410000000011,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Field (Input/Label/FieldError)"
+          ],
+          "fullName": "Field (Input/Label/FieldError) links label and input, and links the error via aria-describedby",
+          "status": "passed",
+          "title": "links label and input, and links the error via aria-describedby",
+          "duration": 11.998199999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Field (Input/Label/FieldError)"
+          ],
+          "fullName": "Field (Input/Label/FieldError) renders without an error and without aria-invalid",
+          "status": "passed",
+          "title": "renders without an error and without aria-invalid",
+          "duration": 3.0892000000003463,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AvailabilityBadge (handoff component for #10)"
+          ],
+          "fullName": "AvailabilityBadge (handoff component for #10) renders text + color semantics for AVAILABLE (never color alone)",
+          "status": "passed",
+          "title": "renders text + color semantics for AVAILABLE (never color alone)",
+          "duration": 3.946800000001531,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "AvailabilityBadge (handoff component for #10)"
+          ],
+          "fullName": "AvailabilityBadge (handoff component for #10) renders UNAVAILABLE text for unavailable items",
+          "status": "passed",
+          "title": "renders UNAVAILABLE text for unavailable items",
+          "duration": 1.3625000000010914,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "QuantityDisplay (handoff component for #10)"
+          ],
+          "fullName": "QuantityDisplay (handoff component for #10) shows available-of-total Quantity Tracking wording with bold available",
+          "status": "passed",
+          "title": "shows available-of-total Quantity Tracking wording with bold available",
+          "duration": 2.4254000000000815,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Alert"
+          ],
+          "fullName": "Alert failure alert exposes role=alert",
+          "status": "passed",
+          "title": "failure alert exposes role=alert",
+          "duration": 2.4956999999994878,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Alert"
+          ],
+          "fullName": "Alert confirmation exposes role=status and shows requestId as muted text",
+          "status": "passed",
+          "title": "confirmation exposes role=status and shows requestId as muted text",
+          "duration": 2.4915000000000873,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "EmptyState"
+          ],
+          "fullName": "EmptyState shows a dedicated empty message distinct from errors",
+          "status": "passed",
+          "title": "shows a dedicated empty message distinct from errors",
+          "duration": 1.4552999999996246,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Loading"
+          ],
+          "fullName": "Loading announces loading via role=status",
+          "status": "passed",
+          "title": "announces loading via role=status",
+          "duration": 2.563899999999194,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Card / DetailList / Table"
+          ],
+          "fullName": "Card / DetailList / Table Card renders its title",
+          "status": "passed",
+          "title": "Card renders its title",
+          "duration": 3.9183999999986554,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Card / DetailList / Table"
+          ],
+          "fullName": "Card / DetailList / Table DetailList uses dl/dt/dd semantics",
+          "status": "passed",
+          "title": "DetailList uses dl/dt/dd semantics",
+          "duration": 3.763299999998708,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "Card / DetailList / Table"
+          ],
+          "fullName": "Card / DetailList / Table Table header cells use th scope=col",
+          "status": "passed",
+          "title": "Table header cells use th scope=col",
+          "duration": 4.204600000000937,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "ItemCard (mobile list)"
+          ],
+          "fullName": "ItemCard (mobile list) is a whole-card link with accessible name and key fields",
+          "status": "passed",
+          "title": "is a whole-card link with accessible name and key fields",
+          "duration": 8.187399999998888,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "ItemCard (mobile list)"
+          ],
+          "fullName": "ItemCard (mobile list) encodes opaque ids with URL-significant characters in the detail link (PR #34 P2-2)",
+          "status": "passed",
+          "title": "encodes opaque ids with URL-significant characters in the detail link (PR #34 P2-2)",
+          "duration": 2.5169000000005326,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243620226,
+      "endTime": 1794243620464.5168,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/components.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "ItemDetailPage (ui-spec §3, minus F-04 request panel)"
+          ],
+          "fullName": "ItemDetailPage (ui-spec §3, minus F-04 request panel) renders item information with badge and Quantity Tracking display",
+          "status": "passed",
+          "title": "renders item information with badge and Quantity Tracking display",
+          "duration": 101.36650000000009,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "ItemDetailPage (ui-spec §3, minus F-04 request panel)"
+          ],
+          "fullName": "ItemDetailPage (ui-spec §3, minus F-04 request panel) shows a missing-item state with a back link on 404",
+          "status": "passed",
+          "title": "shows a missing-item state with a back link on 404",
+          "duration": 17.511999999998807,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "ItemDetailPage (ui-spec §3, minus F-04 request panel)"
+          ],
+          "fullName": "ItemDetailPage (ui-spec §3, minus F-04 request panel) renders an empty description as muted 'No description'",
+          "status": "passed",
+          "title": "renders an empty description as muted 'No description'",
+          "duration": 14.006100000000515,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "ItemDetailPage (ui-spec §3, minus F-04 request panel)"
+          ],
+          "fullName": "ItemDetailPage (ui-spec §3, minus F-04 request panel) returns to Login on 401",
+          "status": "passed",
+          "title": "returns to Login on 401",
+          "duration": 16.059799999999086,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243619167,
+      "endTime": 1794243619316.0598,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/item-detail-page.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI shows committed loan and refreshes the submitted queue",
+          "status": "passed",
+          "title": "shows committed loan and refreshes the submitted queue",
+          "duration": 188.0637000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI prevents duplicate clicks and success before the response",
+          "status": "passed",
+          "title": "prevents duplicate clicks and success before the response",
+          "duration": 39.88750000000073,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI reconciles failure 409 without blind retry or false success",
+          "status": "passed",
+          "title": "reconciles failure 409 without blind retry or false success",
+          "duration": 49.04119999999966,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI reconciles failure 500 without blind retry or false success",
+          "status": "passed",
+          "title": "reconciles failure 500 without blind retry or false success",
+          "duration": 45.51599999999962,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI reconciles failure 0 without blind retry or false success",
+          "status": "passed",
+          "title": "reconciles failure 0 without blind retry or false success",
+          "duration": 47.13790000000154,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI expires the session on checkout401",
+          "status": "passed",
+          "title": "expires the session on checkout401",
+          "duration": 12.302299999999377,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI does not render checkout for Borrower",
+          "status": "passed",
+          "title": "does not render checkout for Borrower",
+          "duration": 7.038800000000265,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI reads own active loans and an opaque-ID detail",
+          "status": "passed",
+          "title": "reads own active loans and an opaque-ID detail",
+          "duration": 12.63669999999911,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI shows catalog names and the authenticated borrower username rather than internal IDs",
+          "status": "passed",
+          "title": "shows catalog names and the authenticated borrower username rather than internal IDs",
+          "duration": 15.994500000000698,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI keeps readable loans when catalog enrichment is unavailable",
+          "status": "passed",
+          "title": "keeps readable loans when catalog enrichment is unavailable",
+          "duration": 14.208000000000538,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI expires the session when the catalog enrichment returns401",
+          "status": "passed",
+          "title": "expires the session when the catalog enrichment returns401",
+          "duration": 14.305299999999988,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI refreshes the current loan detail instead of navigating back to the list",
+          "status": "passed",
+          "title": "refreshes the current loan detail instead of navigating back to the list",
+          "duration": 21.329200000000128,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI handles empty active loans and reload",
+          "status": "passed",
+          "title": "handles empty active loans and reload",
+          "duration": 13.222999999999956,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI handles loan-read error 403 safely",
+          "status": "passed",
+          "title": "handles loan-read error 403 safely",
+          "duration": 14.042100000000573,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI handles loan-read error 404 safely",
+          "status": "passed",
+          "title": "handles loan-read error 404 safely",
+          "duration": 15.529599999999846,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI handles loan-read error 503 safely",
+          "status": "passed",
+          "title": "handles loan-read error 503 safely",
+          "duration": 16.33139999999912,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "F-05 checkout and active-loan UI"
+          ],
+          "fullName": "F-05 checkout and active-loan UI denies the staff general-loan page before requesting private records",
+          "status": "passed",
+          "title": "denies the staff general-loan page before requesting private records",
+          "duration": 15.690899999999601,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243619054,
+      "endTime": 1794243619596.691,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/loan.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "LoginPage (ui-spec §1)"
+          ],
+          "fullName": "LoginPage (ui-spec §1) validates empty fields inline without calling the API",
+          "status": "passed",
+          "title": "validates empty fields inline without calling the API",
+          "duration": 183.17609999999877,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "LoginPage (ui-spec §1)"
+          ],
+          "fullName": "LoginPage (ui-spec §1) shows one generic message for invalid credentials, preserving username and clearing password",
+          "status": "passed",
+          "title": "shows one generic message for invalid credentials, preserving username and clearing password",
+          "duration": 352.4410000000007,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "LoginPage (ui-spec §1)"
+          ],
+          "fullName": "LoginPage (ui-spec §1) navigates to the catalog after a successful sign-in",
+          "status": "passed",
+          "title": "navigates to the catalog after a successful sign-in",
+          "duration": 389.3642999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "LoginPage (ui-spec §1)"
+          ],
+          "fullName": "LoginPage (ui-spec §1) shows a generic safe message with requestId on server failure (503) and clears the password while keeping the username",
+          "status": "passed",
+          "title": "shows a generic safe message with requestId on server failure (503) and clears the password while keeping the username",
+          "duration": 465.7562999999991,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "LoginPage (ui-spec §1)"
+          ],
+          "fullName": "LoginPage (ui-spec §1) clears the password on a network failure while keeping the username",
+          "status": "passed",
+          "title": "clears the password on a network failure while keeping the username",
+          "duration": 392.29739999999947,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "LoginPage (ui-spec §1)"
+          ],
+          "fullName": "LoginPage (ui-spec §1) clears the password when client-side validation fails (preserve only safe input)",
+          "status": "passed",
+          "title": "clears the password when client-side validation fails (preserve only safe input)",
+          "duration": 295.28560000000107,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "LoginPage (ui-spec §1)"
+          ],
+          "fullName": "LoginPage (ui-spec §1) password toggle is keyboard reachable in tab order and announces its state",
+          "status": "passed",
+          "title": "password toggle is keyboard reachable in tab order and announces its state",
+          "duration": 202.31860000000052,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794243620343,
+      "endTime": 1794243622624.3186,
+      "status": "passed",
+      "message": "",
+      "name": "client/src/test/login-page.test.tsx"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+✔ canonical source hashes tolerate CRLF checkout conversion but detect content changes (1.5708ms)
+✔ portable artifacts remove mixed-slash workspace, home, cache and temp paths without corrupting JSON or web URLs (2.0443ms)
+✔ candidate evidence cannot silently pass committed-source audit (28.1652ms)
+✔ evidence-only descendant HEAD is accepted only with matching source and tested Git blob (6979.5748ms)
+✔ dirty-source state never labels a working-tree candidate as a clean commit (2664.658ms)
+✔ setup must be clean, successful and from exactly the verification source commit (0.6147ms)
+✔ edited HTML, stylesheet, asset and build configs are dirty source (13625.0078ms)
+✔ deleted tracked source is reported dirty without ENOENT crash (3101.2935ms)
+✔ audit rejects omitted fingerprint keys, modified HTML and forged hashes (15678.1278ms)
+✔ shallow history fails with a full-clone prerequisite message (335.3609ms)
+✔ binary assets retain byte-exact fingerprints (0.2236ms)
+✔ removed working-tree option is rejected explicitly by verification and audit before execution (3151.1203ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 45574.5995

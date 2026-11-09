@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PEW-DIY — Main Screen Mockups (UI-01 design artifact)</title>
+<!--
+  UI-01 DESIGN ARTIFACT — documentation only.
+  This is a static visual mockup (no JavaScript, no framework, not part of the
+  application build). It renders the Confirmed design direction so reviewers
+  can evaluate it: Academic/University + Minimal & Clean, Classic Navy #313B7B,
+  Pure White #FFFFFF, centralized tokens (docs/architecture/frontend-change-proposal.md §8).
+  Implementation will use React + Vite + Tailwind v4 — this file is NOT that app.
+-->
+<style>
+  :root {
+    --color-primary: #313B7B;        /* Confirmed */
+    --color-primary-hover: #27305F;  /* Proposed */
+    --color-primary-soft: #EEF0F7;   /* Proposed */
+    --color-background: #FFFFFF;     /* Confirmed */
+    --color-text: #1F2430;
+    --color-text-muted: #5B6270;
+    --color-border: #D9DCE3;
+    --color-success: #2E7D32;
+    --color-danger: #B3261E;
+    --radius-control: 6px;
+    --radius-card: 8px;
+    --font-sans: Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text); background: #F4F5F8; }
+  h1, h2, h3 { color: var(--color-primary); font-weight: 600; }
+  .artifact-note { background: var(--color-primary-soft); color: var(--color-primary); padding: 12px 20px; font-size: 13px; border-bottom: 1px solid var(--color-border); }
+  .section { max-width: 1280px; margin: 0 auto; padding: 32px 20px; }
+  .section > h2 { font-size: 20px; margin-bottom: 4px; }
+  .caption { color: var(--color-text-muted); font-size: 13px; margin-bottom: 16px; }
+  .frame { border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); overflow: hidden; box-shadow: 0 1px 2px rgba(31,36,48,0.08); }
+  /* ── Nav (authenticated pages) ── */
+  .nav { display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-bottom: 1px solid var(--color-border); }
+  .nav .brand { display: flex; align-items: center; gap: 8px; color: var(--color-primary); font-weight: 600; }
+  .nav .links { display: flex; gap: 16px; margin-left: 12px; }
+  .nav .links a { color: var(--color-text-muted); text-decoration: none; font-size: 14px; }
+  .nav .links a.active { color: var(--color-primary); font-weight: 600; border-bottom: 2px solid var(--color-primary); }
+  .nav .account { margin-left: auto; font-size: 13px; color: var(--color-text-muted); }
+  .nav .account .chip { border: 1px solid var(--color-border); border-radius: 999px; padding: 4px 12px; }
+  /* ── Login ── */
+  .login-page { display: flex; align-items: center; justify-content: center; min-height: 520px; padding: 40px 16px; }
+  .login-card { width: 400px; max-width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 32px; box-shadow: 0 1px 2px rgba(31,36,48,0.08); }
+  .identity { text-align: center; margin-bottom: 24px; }
+  .identity .logo { display: inline-flex; align-items: center; gap: 8px; color: var(--color-primary); font-size: 22px; font-weight: 700; }
+  .identity .subtitle { color: var(--color-text-muted); font-size: 13px; margin-top: 6px; }
+  .login-card h3 { font-size: 16px; margin-bottom: 16px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .input { border: 1px solid var(--color-border); border-radius: var(--radius-control); padding: 10px 12px; font-size: 14px; width: 100%; background: var(--color-background); }
+  .input-wrap { position: relative; margin-bottom: 16px; }
+  .input-wrap .eye { position: absolute; right: 10px; top: 27px; color: var(--color-text-muted); font-size: 12px; }
+  .btn { border: none; border-radius: var(--radius-control); padding: 11px 18px; font-size: 14px; font-weight: 600; cursor: default; }
+  .btn-primary { background: var(--color-primary); color: #fff; width: 100%; }
+  .btn-secondary { background: var(--color-background); color: var(--color-primary); border: 1px solid var(--color-primary); }
+  /* ── Content ── */
+  .content { padding: 24px; }
+  .page-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+  .page-header h2 { font-size: 20px; }
+  .summary-chip { font-size: 13px; color: var(--color-text-muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--color-text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; padding: 8px 12px; border-bottom: 1px solid var(--color-border); }
+  td { padding: 12px; border-bottom: 1px solid var(--color-border); }
+  .badge { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; }
+  .badge-available { background: #E7F5E9; color: var(--color-success); }
+  .badge-unavailable { background: #FCEAEA; color: var(--color-danger); }
+  /* ── Item detail ── */
+  .detail-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  .detail-card, .request-panel { border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 20px; }
+  .back-link { color: var(--color-primary); font-size: 13px; text-decoration: none; margin-bottom: 16px; display: inline-block; }
+  dl { display: grid; grid-template-columns: 120px 1fr; row-gap: 10px; font-size: 14px; margin-top: 12px; }
+  dt { color: var(--color-text-muted); }
+  .qty-row { display: flex; gap: 8px; margin: 12px 0; }
+  .qty-input { width: 72px; }
+  .muted { color: var(--color-text-muted); font-size: 12px; }
+  .state-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+  .state-card { flex: 1; min-width: 260px; border: 1px dashed var(--color-border); border-radius: var(--radius-card); padding: 16px; font-size: 13px; }
+  .alert { border-radius: var(--radius-control); padding: 10px 14px; font-size: 13px; margin: 10px 0; }
+  .alert-error { background: #FCEAEA; color: var(--color-danger); border: 1px solid var(--color-danger); }
+  .alert-success { background: #E7F5E9; color: var(--color-success); border: 1px solid var(--color-success); }
+  .alert-info { background: var(--color-primary-soft); color: var(--color-primary); border: 1px solid var(--color-primary); }
+</style>
+</head>
+<body>
+
+<div class="artifact-note">
+  <strong>UI-01 design artifact (documentation only)</strong> — static mockup rendering the Confirmed design direction:
+  Classic Navy <code>#313B7B</code> · Pure White <code>#FFFFFF</code> · Academic/University + Minimal &amp; Clean.
+  Not application code; implementation will be React + Vite + Tailwind v4 per the Architecture Change Proposal.
+  <br><strong>Desktop-only rendering</strong> (composed at ≥1024px desktop widths — narrow widths show the desktop layout clipped, which is expected for this artifact). For tablet and mobile layouts see <code>wireframes.md</code> §2.2–2.3 (Catalog) and §3.2–3.3 (Item Detail).
+</div>
+
+<!-- ============ MOCKUP 1: LOGIN ============ -->
+<div class="section">
+  <h2>1. Login</h2>
+  <p class="caption">Centered card on white — academic identity (logo + wordmark), minimal form, primary navy button. (ui-spec.md §1 · wireframes.md §1)</p>
+  <div class="frame">
+    <div class="login-page">
+      <div class="login-card">
+        <div class="identity">
+          <div class="logo"><span aria-hidden="true">▣</span> PEW-DIY</div>
+          <div class="subtitle">D.I.Y. Room Equipment Borrowing System</div>
+        </div>
+        <h3>Sign in</h3>
+        <label for="mock-username">Username</label>
+        <div class="input-wrap">
+          <input id="mock-username" class="input" type="text" value="B-A" readonly>
+        </div>
+        <label for="mock-password">Password</label>
+        <div class="input-wrap">
+          <input id="mock-password" class="input" type="password" value="********" readonly>
+          <span class="eye" aria-label="Show password">👁</span>
+        </div>
+        <button class="btn btn-primary" type="button">Sign in</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MOCKUP 2: CATALOG ============ -->
+<div class="section">
+  <h2>2. Catalog</h2>
+  <p class="caption">AppShell nav with role-aware links + account menu; catalog as a data table (desktop) with availability badges. Search/filter appear only in Sprint 2 (FR-10). (ui-spec.md §2 · wireframes.md §2)</p>
+  <div class="frame">
+    <nav class="nav">
+      <span class="brand"><span aria-hidden="true">▣</span> PEW-DIY</span>
+      <span class="links">
+        <a href="#" class="active">Catalog</a>
+        <a href="#">My Requests</a>
+        <a href="#">My Loans</a>
+      </span>
+      <span class="account"><span class="chip">B-A ▾</span></span>
+    </nav>
+    <div class="content">
+      <div class="page-header">
+        <h2>Equipment Catalog</h2>
+        <span class="summary-chip">3 items · 2 available</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Description</th><th>Category</th><th style="text-align:right">Total</th><th style="text-align:right">Available</th><th>Availability</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--color-primary);font-weight:600">Arduino Uno Microcontroller Board</td>
+            <td class="muted">Microcontroller board based on ATmega...</td>
+            <td>Boards</td>
+            <td style="text-align:right">5</td>
+            <td style="text-align:right">3</td>
+            <td><span class="badge badge-available">AVAILABLE</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--color-primary);font-weight:600">ESP32 DevKit</td>
+            <td class="muted">WiFi/BLE development board</td>
+            <td>Boards</td>
+            <td style="text-align:right">3</td>
+            <td style="text-align:right">3</td>
+            <td><span class="badge badge-available">AVAILABLE</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--color-primary);font-weight:600">Soldering Iron</td>
+            <td class="muted">Adjustable temperature soldering tool</td>
+            <td>Tools</td>
+            <td style="text-align:right">2</td>
+            <td style="text-align:right">0</td>
+            <td><span class="badge badge-unavailable">UNAVAILABLE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MOCKUP 3: ITEM DETAIL ============ -->
+<div class="section">
+  <h2>3. Item Detail</h2>
+  <p class="caption">Two-zone card: item information left (Quantity Tracking display), Borrower request panel right. Action = "Request to borrow" (FR-11, Direct Checkout flow — no approval step). <strong>On 201 the UI navigates to My Requests and shows the confirmation there</strong> (f-04 §2/AC-F04-08). Quantity bounds pending OQ-02. (ui-spec.md §3 · wireframes.md §3)</p>
+  <div class="frame">
+    <nav class="nav">
+      <span class="brand"><span aria-hidden="true">▣</span> PEW-DIY</span>
+      <span class="links">
+        <a href="#" class="active">Catalog</a>
+        <a href="#">My Requests</a>
+        <a href="#">My Loans</a>
+      </span>
+      <span class="account"><span class="chip">B-A ▾</span></span>
+    </nav>
+    <div class="content">
+      <a class="back-link" href="#">← Back to catalog</a>
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="page-header" style="margin-bottom:0">
+            <h2>Arduino Uno Microcontroller Board</h2>
+            <span class="badge badge-available">AVAILABLE</span>
+          </div>
+          <dl>
+            <dt>Description</dt><dd>Microcontroller board based on the ATmega328P, suitable for beginner to advanced electronics projects.</dd>
+            <dt>Category</dt><dd>Boards</dd>
+            <dt>Total</dt><dd>5</dd>
+            <dt>Available</dt><dd><strong>3</strong> of 5 total</dd>
+          </dl>
+        </div>
+        <div class="request-panel">
+          <h3 style="font-size:15px;margin-bottom:12px">Request to borrow</h3>
+          <label for="mock-qty">Quantity</label>
+          <div class="qty-row">
+            <input id="mock-qty" class="input qty-input" type="number" value="1" readonly>
+            <button class="btn btn-primary" style="width:auto;flex:1" type="button">Submit</button>
+          </div>
+          <p class="muted">Limits pending team policy (OQ-02).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="state-row">
+    <div class="state-card">
+      <strong>Success state</strong>
+      <div class="alert alert-success">✓ Request submitted — redirecting to <strong>My Requests</strong> (confirmation shown there per f-04 §2/AC-F04-08)</div>
+    </div>
+    <div class="state-card">
+      <strong>Error state (409 insufficient availability)</strong>
+      <div class="alert alert-error">⚠ This item is no longer available.</div>
+    </div>
+    <div class="state-card">
+      <strong>Session expired (401)</strong>
+      <div class="alert alert-info">Your session has expired. Please sign in again.</div>
+    </div>
+    <div class="state-card">
+      <strong>Unavailable item (no request form)</strong>
+      <div style="color:var(--color-text-muted)">Soldering Iron &nbsp;<span class="badge badge-unavailable">UNAVAILABLE</span><br><br>This item is currently unavailable.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

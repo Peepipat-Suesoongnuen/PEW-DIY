@@ -1,0 +1,30 @@
+{
+  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "node": "v24.14.0",
+  "cases": [
+    {
+      "name": "stale_commit",
+      "exit_code": 1,
+      "error": "Setup evidence commit must exactly match verification tested_commit; rerun rehearse:sprint1 on this source commit",
+      "started_steps": 0,
+      "started_suites": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "candidate_setup",
+      "exit_code": 1,
+      "error": "Setup evidence must be from a clean source commit; rerun rehearse:sprint1",
+      "started_steps": 0,
+      "started_suites": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "missing_commit",
+      "exit_code": 1,
+      "error": "Setup evidence commit must exactly match verification tested_commit; rerun rehearse:sprint1 on this source commit",
+      "started_steps": 0,
+      "started_suites": 0,
+      "status": "PASS"
+    }
+  ]
+}

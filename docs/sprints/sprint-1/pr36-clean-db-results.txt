@@ -1,0 +1,34 @@
+PR #36 clean-database verification
+Source implementation/test commit: 6b4c35dc8d45f88217905b050db75fd7ad5ff5e4
+Recorded client date: 2026-11-06 (Asia/Bangkok)
+Setup: created a new isolated database in a temporary local PostgreSQL cluster; ran checked-in npm run migrate only. No manually added Loan DDL.
+Commands: npm run migrate; SELECT version(), to_regclass(...), column_default; npm test
+No production/development database or credential values are included.
+
+
+> pew-diy@1.0.0 migrate
+> tsx server/src/db/migrate.ts
+
+Migration complete.
+Node: v24.14.0
+Database version: PostgreSQL 18.4 on x86_64-windows, compiled by msvc-19.44.35227, 64-bit
+Relations: {"requests":"borrowing_requests","loans":null}
+created_at default: now()
+
+> pew-diy@1.0.0 test
+> vitest run
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.1.0 D:/Software_Engineering/PEW-DIY/PEW-DIY
+
+
+ Test Files  11 passed (11)
+      Tests  85 passed | 6 skipped (91)
+   Start at  23:54:09
+   Duration  13.00s (tests 56%, import 41%, transform 1%, worker 1%)
+
+    Isolate  11 workers spawned · ~220ms startup each (spawn + environment, per file)
+             at least ~2.20s faster with isolate: false — reuses workers across files instead of one per file

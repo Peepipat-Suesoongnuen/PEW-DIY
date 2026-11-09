@@ -1,0 +1,18 @@
+{
+  "tested_commit": "8fb84f4c0803b12cbdd65275e4361a0aaeb88a23",
+  "node": "v24.14.0",
+  "cases": [
+    {
+      "name": "omitted_hash_key",
+      "status": "PASS",
+      "exit_code": 1,
+      "error": "Source fingerprint key set is incomplete or differs from tested/current product files; rerun rehearsal and verification"
+    },
+    {
+      "name": "stale_setup_commit",
+      "status": "PASS",
+      "exit_code": 1,
+      "error": "Setup evidence commit must exactly match verification tested_commit; rerun rehearse:sprint1 on this source commit"
+    }
+  ]
+}

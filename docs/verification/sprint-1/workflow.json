@@ -1,0 +1,124 @@
+{
+  "captured_at": "2026-11-06T18:53:48.440Z",
+  "source": "GitHub connector PR metadata and final review submissions; local Git ancestry/merge authors independently checked",
+  "contract_commit": "d13617b0e0c70e925e2eca85ec397c30c0bd16b0",
+  "sampled_features": [
+    {
+      "issue": 8,
+      "pr": 22,
+      "url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/22",
+      "title": "feat(D1-06.1): Implement Authentication & RBAC (F-01) — 33/33 tests",
+      "author": "Peepipat-Suesoongnuen",
+      "base": "sprint/1-staging",
+      "branch": "feature/8-d1-06.1-authentication-rbac",
+      "head_sha": "288a1e3be3eb4689ff2e40a15379d1ed57684710",
+      "merge_sha": "58c0b13e91fd29dacb1e4fffa099bcbba47df248",
+      "merged": true,
+      "reviewer": "L0u1sss",
+      "review_url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/22#pullrequestreview-5776247539",
+      "review_state": "APPROVED",
+      "review_at": "2026-11-04T21:41:47Z",
+      "review_summary": "Reviewer reproduced missing-origin rejection with durable sessions, verified build/tests, approved backend foundation only; historical title/counts are stale."
+    },
+    {
+      "issue": 11,
+      "pr": 36,
+      "url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/36",
+      "title": "feat(D1-06.4): Implement Borrowing Request (F-04)",
+      "author": "L0u1sss",
+      "base": "sprint/1-staging",
+      "branch": "feature/11-borrowing-request",
+      "head_sha": "a080fa03415bd14b3a68f41e761654f2089e2be6",
+      "merge_sha": "de63590be05c8bb22c594be2ac6affe69f73ad8c",
+      "merged": true,
+      "reviewer": "Peepipat-Suesoongnuen",
+      "review_url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/36#pullrequestreview-5804196743",
+      "review_state": "APPROVED",
+      "review_at": "2026-11-06T17:22:21Z",
+      "review_summary": "Reviewer reconciled fresh versus residue Loan-table environments, checked safe ownership/transaction behavior and approved corrected docs; A-12 ratification still pending."
+    },
+    {
+      "issue": 12,
+      "pr": 37,
+      "url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37",
+      "title": "feat(D1-06.5): Implement Checkout and Active Loan (F-05)",
+      "author": "L0u1sss",
+      "base": "sprint/1-staging",
+      "branch": "feature/12-checkout-active-loan",
+      "head_sha": "70e7b5ef02b92b26745140f0485ad796ffbc52cc",
+      "merge_sha": "5b064eacae5749b9f7d64090e86b742941b5c8d0",
+      "merged": true,
+      "reviewer": "Peepipat-Suesoongnuen",
+      "review_url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37#pullrequestreview-5804916583",
+      "review_state": "APPROVED",
+      "review_at": "2026-11-06T18:20:12Z",
+      "review_summary": "Reviewer reports 115/70/51 on fresh PostgreSQL17.11, reviews transaction locks, role/ownership, due dates and constraints; A-12 ratification still pending."
+    }
+  ],
+  "remote_main": "7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c",
+  "remote_staging": "5b064eacae5749b9f7d64090e86b742941b5c8d0",
+  "release_ref": null,
+  "board_status": "NOT VERIFIED; no status changes made",
+  "a12_ratification": "PENDING; Issue11 comments empty and PR37 final review still requires artifact",
+  "account_identity": {
+    "user": "L0u1sss",
+    "teammate": "Peepipat-Suesoongnuen",
+    "basis": "explicit user identification in Issue13 work session; not an A-12 ratification"
+  },
+  "human_checks": {
+    "a12_ratification": {
+      "status": "PENDING",
+      "evidence": null
+    },
+    "readme_peer_reproduction": {
+      "status": "PENDING",
+      "evidence": null
+    },
+    "tdd_authenticity_review": {
+      "status": "PENDING",
+      "evidence": null
+    },
+    "contribution_disclosure": {
+      "status": "PENDING",
+      "evidence": null
+    },
+    "final_board": {
+      "status": "PENDING",
+      "evidence": null
+    },
+    "feature13_review_integration": {
+      "status": "VERIFIED",
+      "evidence": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5812734835; merged at ef58fae87e6a262a30df8b9d65480924add2d516",
+      "observed_on": "2026-11-10",
+      "reviewer": "Peepipat-Suesoongnuen",
+      "head_sha": "37e11d274ee0dfbff2ca37d4228058d75d00ebd7",
+      "merge_sha": "ef58fae87e6a262a30df8b9d65480924add2d516",
+      "merged_at": "2026-11-07T14:16:06Z"
+    },
+    "release_peer_review": {
+      "status": "PENDING",
+      "evidence": null
+    }
+  },
+  "release_candidate_snapshot": {
+    "observed_on": "2026-11-10",
+    "source": "GitHub PR42 and PR38 metadata; review5829522619; local Git ancestry",
+    "pr": 42,
+    "url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42",
+    "state": "OPEN",
+    "branch": "sprint/1-staging",
+    "candidate_sha": "d291873c10c2021d4eb5ebe733aa68012f813678",
+    "base": "main",
+    "base_sha": "7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c",
+    "author": "L0u1sss",
+    "reviewer": "Peepipat-Suesoongnuen",
+    "review_body_disposition": "Changes requested in review text; evidence/docs remediation and re-review required",
+    "review_url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42#pullrequestreview-5829522619",
+    "reviewer_reported_ci_runs": [
+      "42654888341",
+      "42655734483"
+    ],
+    "required_check_enforcement": "NOT_VERIFIED",
+    "main_release": "PENDING"
+  }
+}

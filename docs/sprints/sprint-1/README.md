@@ -1,0 +1,83 @@
+# Sprint 1 Engineering Contracts — Part E
+
+> **Project:** PEW-DIY | **Issue:** [#5 / D1-05](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5)
+>
+> **Revision:** 3 — 2026-11-10 | **Status:** Implemented candidate execution recorded; human/release gates remain pending
+>
+> **Historical contract-authoring baseline:** `c78ad95` — SRS rev 2, Part B rev 1, System SDS rev 2, Sprint Plan rev 3. English follows SRS A-07. The original documentation change supplied contracts rather than executed application results; current execution is recorded separately below.
+
+Historical F-05 execution (2026-11-07): see [F-05 evidence](tdd-evidence-f05.md) for115 server,70 client and51 browser passes on that earlier feature version. These numbers are historical, not the current integrated candidate results. F-01–F-05 and F-10 are integrated into sprint staging; shared-baseline review, team ratification and main release remain separate gates.
+
+Current F-10 verification (Refs #6 #13): [Part F evidence](../../verification/sprint-1/README.md) verifies clean source candidate `d291873c10c2021d4eb5ebe733aa68012f813678`, with evidence/documentation commit `7bdeba2`. Results:164 server,74 client and57 browser passes,12 tooling tests,49/49 application AC and57 contract AC rows (52 PASS/5 PARTIAL). Source fingerprints match104/104 files; normal audit exits0 with41 checks and7 pending gates; strict release audit exits2 `NOT_RELEASED`. [PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) proposes `sprint/1-staging` into `main` at `7bf6c8d`. The [latest re-review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42#pullrequestreview-5829944815) confirms technical evidence but requests documentation and human/release completion; it is not release approval. The earlier8676957 results (164/70/54) are historical. No candidate-only result is relabelled as a main release result.
+
+## 1. Purpose and Authoritative Sources
+
+These contracts elaborate Sprint 1 before implementation: feature identity/requirements, design/workflow/rules, UI/API/data specifications, observable AC, Software Test Specification (STS), Product DoD and revision history. `project_deliverable_1_v1.pdf` §3.5 (PDF p.4) and `group_work_specs_v1.pdf` §7/§8.2 (PDF pp.9–10) define that obligation. Original PDFs were read from the team's local `D:/Software_Engineering/PEW-DIY/lab-document/` directory; no copies are added to Git.
+
+Read the [SRS](../../srs.md), [Feature Inventory](../../features.md), [Traceability](../../traceability.md), [System SDS](../../system-sds.md), [Sprint Plan](../plan.md) and [repository instructions](../../../AGENT.md) as the upstream sources. Requirements are referenced by stable ID, not redefined in this directory. Detailed proposed wire contracts live here; actual runtime/schema commands remain contingent on the selected stack.
+
+| Prior PR checked, including discussions | Decision or correction carried forward |
+|---|---|
+| [#15 — SRS](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/15) | Seven-day due-date assignment in S1; quantity invariant; return close-accounting; restart/redeployment persistence split; OQ-02 quantity/partial-return coupling |
+| [#16 — Part B](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/16) | F-01–F-05 and F-10 are S1; F-10 is a named responsibility; S2/S3 feature allocation is retained |
+| [#17 — SDS](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/17) | Borrower-only request creation agreed for current scope; F-10 tag/coordination; stack/auth remain open and a merged draft is not AC-C-01/04 completion |
+| [#19 — AGENT reconciliation](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/19) | Already decided due-date/exclusive-item rules are not reopened; genuine OQ-01/OQ-02 remain open |
+| [#20 — Sprint Plan](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/20) | D1=8 Nov, Lab5=15 Nov; false schedule-conflict claim withdrawn; SDS-OQ-03 is a checkout contract/test gate; FR-19 remains S2 |
+
+Issue #5/#6 and #8–#13 were read for identity/scope/AC alignment. Older Issue #6 text still excludes all due-date rules and describes IDs as unknown; the merged SRS/Part B/Plan and Issue #12 clarification supersede those snapshots. Contracts retain S1 due-date assignment and real F-xx mappings without changing Issue bodies. Approval remains absent under Direct Checkout; no cancellation, return, search or reporting capability is added.
+
+## 2. Contract Index and Feature-to-Issue Alignment
+
+| Feature / responsibility | Implementation issue | Feature contract | Dependencies |
+|---|---|---|---|
+| F-01 Authentication/RBAC | [#8 / D1-06.1](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/8) | [Authentication](f-01-authentication.md) | Approved stack/auth design |
+| F-02 Seed/read catalog | [#9 / D1-06.2](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/9) | [Equipment Catalog](f-02-equipment-catalog.md) | F-01 |
+| F-03 Availability | [#10 / D1-06.3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/10) | [Equipment Availability](f-03-equipment-availability.md) | F-01/F-02; F-05 owns checkout writes |
+| F-04 Borrowing Request | [#11 / D1-06.4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/11) | [Borrowing Request](f-04-borrowing-request.md) | F-01/F-02/F-03 |
+| F-05 Checkout/Active Loan | [#12 / D1-06.5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/12) | [Checkout and Active Loan](f-05-checkout-active-loan.md) | F-01–F-04; quantity/calendar gates |
+| F-10 Integration/Verification | [#13 / D1-06.6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/13) | [Integration and Verification](f-10-integration-verification.md) | All F-01–F-05 |
+
+Shared artifacts: [route/envelope/security conventions](shared-conventions.md), [fixtures and test parameters](fixtures.md), [Product DoD](product-dod.md), and [AC↔TEST / requirements / existing Issue AC matrix](verification-matrix.md). Shared fields/routes/error codes are authoritative across these draft contracts; change them together rather than producing incompatible feature interpretations.
+
+## 3. Confirmed, Proposed and Open
+
+Confirmed baseline rules remain in the SRS; new methods/paths/payload names, schema details, test parameters and UI behavior are **Proposed** until this contract revision is reviewed/accepted. An API design proposal does not establish that the stack/auth mechanism was selected. The PR #17 Borrower-only creation agreement is recorded as team scope agreement, not a newly invented SRS prohibition on staff borrowing.
+
+| Decision gate | Required recorded decision | Affected work / status |
+|---|---|---|
+| SDS-OQ-01 | Stack selected in SDS rev 3 / PR #22; physical request schema implemented by #11 | Resolved stack choice; each feature still verifies its own runtime/query behavior |
+| SDS-OQ-02 | Server session + HttpOnly cookie + trusted-origin validation, idle60/absolute480 minutes (SDS rev 3 / PR #22) | Resolved; F-04 reuses the established guards |
+| SRS OQ-01 | Approved initial synthetic demo catalog content | F-02 seed; symbolic test catalog is a proposal, not a resolution; **Open** |
+| SRS OQ-02 | Choice recorded in A-12, explicit user decision 2026-11-06; team ratification pending PR #36: multi-unit up to current stock; no extra per-user cap; full return per loan | F-04 request and F-05 full checkout implemented; F-06 return remains Sprint 2 |
+| SDS-OQ-03 | User explicitly confirmed Asia/Bangkok, UTC checkout instant and local calendar date +7 during #12 implementation (2026-11-07) | F-05 date-boundary tests executed; shared-baseline peer review pending |
+| Contract proposal review | Accept/revise route inventory, schema/validation/error choices and test parameters with affected IDs | All six contracts; **Pending independent team review** |
+
+At the original Part E revision these gates were open. Later PR #22/SDS rev 3 selected stack/auth, and the explicit Issue #11 user decision (2026-11-06) recorded the quantity choice as A-12; shared-team ratification evidence remains pending PR #36. Quantity1 examples remain test vectors; current policy permits multi-unit requests bounded by live stock, without reserving units. S2/S3 policies and hosting selection remain at their existing targets; no extra implementation is authorized to close them here.
+
+## 4. Spec-First Versioning and Verification Handoff
+
+1. Review the complete source revision, resolve the above gates, and record decisions with actual human approval references. Update upstream SDS/SRS only where a decision actually changes their baseline; do not silently rewrite requirements to fit code.
+2. Commit the accepted contract/test-design revision **before** related implementation; record its real SHA in the implementation Issue/PR. This task's local revision history is not a substitute for a real prior spec commit.
+3. For meaningful domain/security rules, write the planned behavior test and capture authentic RED output, implement/correct it, capture GREEN and preserve regression coverage. Record actual files/commands/SHAs.
+4. Execute the planned STS on real software with the selected tools/DB; populate actual result evidence through F-10. Tests were PLANNED / NOT RUN at original contract authoring; current executed results are linked above and in Part F. Document coverage alone is not test execution.
+5. If a design changes, add a revision entry with reason, affected requirement/AC/TEST IDs, approval reference and verification impact. Retire superseded IDs without reuse. Follow the [Product DoD](product-dod.md) for feature review, staging integration, release and evidence.
+
+## 5. Issue #5 Acceptance Review
+
+| Criterion | Draft evidence | Current status |
+|---|---|---|
+| AC-E-01 | Six contracts with feature SDS, applicable UI/API/data, AC, STS and DoD | Content drafted; final contract baseline **pending decision gates and peer review** |
+| AC-E-02 | Stable AC-Fxx-nn definitions with explicit positive/negative/boundary/access outcomes | Drafted; policy-dependent outcomes explicitly gated |
+| AC-E-03 | Per-contract STS and [central mapping](verification-matrix.md), including levels/input/actions/expected results | Contract coverage plus actual execution in Part F;49/49 application AC, process/release rows remain partial |
+| AC-E-04 | Upstream requirement/feature/sprint and existing Issue AC alignment | Baseline preserved; unresolved choices not silently decided |
+| AC-E-05 | Revision tables, spec-first change procedure and [Product DoD](product-dod.md) | Contract/test history and execution evidence are recorded in Part F; full Product DoD, remaining human gates and main release are not declared complete |
+
+Issue #5 is not claimed Done: acceptance of the contracts, dependent team decisions and independent teammate review remain necessary. Issue #6 implementation and its release/test evidence are separate work.
+
+## 6. Revision History
+
+| Rev | Change | Basis |
+|---|---|---|
+| 1 — 2026-11-05 | Initial Part E source set with six contracts, shared conventions/fixtures, DoD and planned mappings | Source baseline c78ad95; Issue #5/#6/#8–#13; original PDFs and PR #15/#16/#17/#19/#20 |
+| 2 — 2026-11-06 | Reconciled current stack/auth and A-12 quantity resolutions; feature execution remains separately recorded with F-05-dependent cases partial | SDS rev 3/4; user decision in Issue #11 work session |
+| 3 — 2026-11-10 | Corrected current integrated results to164/74/57 and104 source fingerprints; explicitly labelled earlier F-05/F-10 counts historical and separated candidate execution from human/release completion | PR #42 review5829944815; tested source d291873; evidence commit7bdeba2 |
