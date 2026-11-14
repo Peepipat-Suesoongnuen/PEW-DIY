@@ -8,6 +8,7 @@ import { createPool } from "./db/pool";
 import { SessionStore } from "./services/session";
 import { AuthService } from "./services/auth";
 import { createApp } from "./routes/auth-routes";
+import { listenHttpServer } from "./http-server";
 
 const config = loadConfig();
 const pool = createPool(config.databaseUrl);
@@ -15,7 +16,7 @@ const sessions = new SessionStore(pool, config.session.idleMinutes, config.sessi
 const auth = new AuthService(pool, sessions);
 const app = createApp({ auth, config });
 
-app.listen(config.port, () => {
+listenHttpServer(app, config.port).on("listening", () => {
   // eslint-disable-next-line no-console
-  console.log(`PEW-DIY listening on http://localhost:${config.port}`);
+  console.log(`PEW-DIY listening on 0.0.0.0:${config.port}`);
 });
