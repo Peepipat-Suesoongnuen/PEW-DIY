@@ -4,6 +4,23 @@ import { migrate } from "../src/db/migrations";
 
 const databaseUrl = process.env.MIGRATION_TEST_DATABASE_URL;
 
+if (process.env.CI === "true") {
+  if (!databaseUrl) {
+    throw new Error("MIGRATION_TEST_DATABASE_URL is required in CI; the migration-repair test must not be skipped");
+  }
+
+  const migrationDatabaseName = decodeURIComponent(new URL(databaseUrl).pathname.slice(1));
+  const sharedCiDatabaseName = process.env.CI_TEST_DATABASE_URL
+    ? decodeURIComponent(new URL(process.env.CI_TEST_DATABASE_URL).pathname.slice(1))
+    : undefined;
+  if (
+    migrationDatabaseName !== "pewdiy_migration_repair_test" ||
+    migrationDatabaseName === sharedCiDatabaseName
+  ) {
+    throw new Error("CI migration-repair tests require a separate pewdiy_migration_repair_test database");
+  }
+}
+
 describe.skipIf(!databaseUrl)("database migration repair", () => {
   const pool = new Pool({ connectionString: databaseUrl });
 

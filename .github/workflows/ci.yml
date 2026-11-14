@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, 'sprint/**']
+  push:
+    branches: [main, 'sprint/**', 'ci/**', 'feature/**', 'fix/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Build and regression tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      # Both databases live only inside this job's disposable PostgreSQL service.
+      CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: pewdiy_ci
+          POSTGRES_DB: pewdiy_ci_test
+          # Disposable runner-only database; no production credentials.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pewdiy_ci -d pewdiy_ci_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.15.0'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+      - name: Install locked dependencies
+        run: |
+          npm ci --no-audit
+          npm --prefix client ci --no-audit
+      - name: Provision isolated migration-repair database
+        run: psql "$CI_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -c 'CREATE DATABASE pewdiy_migration_repair_test'
+      - name: Install Chromium and Linux dependencies
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Build, typecheck and run all regression suites
+        run: npm run test:ci
+        env:
+          NODE_ENV: test
+          MIGRATION_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_migration_repair_test
+      - name: Upload sanitized test reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-results/
+          if-no-files-found: warn
+          retention-days: 14
