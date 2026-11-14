@@ -97,7 +97,7 @@ describe("F10 complete protected-route inventory on production HTTP/real DB", ()
     const usersBefore = (await pool.query("SELECT id,username,role FROM users WHERE id=ANY($1::text[]) ORDER BY id", [ids])).rows;
     async function seed() {
       const proc = spawn(process.execPath, ["--import", "tsx", "server/src/db/seed.ts"], {
-        env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL!, SEED_PASSWORD_BA: password, SEED_PASSWORD_BB: password, SEED_PASSWORD_CA: password },
+        env: { ...process.env, NODE_ENV: "test", DATABASE_URL: process.env.TEST_DATABASE_URL!, SEED_PASSWORD_BA: password, SEED_PASSWORD_BB: password, SEED_PASSWORD_CA: password },
         stdio: "ignore", windowsHide: true,
       });
       const [code] = await once(proc, "exit"); expect(code).toBe(0);

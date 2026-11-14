@@ -117,6 +117,38 @@ CREATE TABLE IF NOT EXISTS loans (
   returned_by TEXT REFERENCES users(id)
 );
 CREATE INDEX IF NOT EXISTS loans_active_request_idx ON loans(request_id) WHERE returned_at IS NULL;
+
+-- CREATE TABLE IF NOT EXISTS does not repair constraints on an existing table.
+-- Restore the F-05 request relationship when upgrading an older/incomplete schema.
+-- PostgreSQL validates existing rows when adding the FK and aborts safely if
+-- orphaned request references exist; no rows are deleted or rewritten here.
+DO $migration$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint fk
+    WHERE fk.contype = 'f'
+      AND fk.conrelid = 'loans'::regclass
+      AND fk.confrelid = 'borrowing_requests'::regclass
+      AND fk.conkey = ARRAY[(
+        SELECT attnum FROM pg_attribute
+        WHERE attrelid = 'loans'::regclass
+          AND attname = 'request_id'
+          AND NOT attisdropped
+      )]::smallint[]
+      AND fk.confkey = ARRAY[(
+        SELECT attnum FROM pg_attribute
+        WHERE attrelid = 'borrowing_requests'::regclass
+          AND attname = 'id'
+          AND NOT attisdropped
+      )]::smallint[]
+  ) THEN
+    ALTER TABLE loans
+      ADD CONSTRAINT loans_request_id_fkey
+      FOREIGN KEY (request_id) REFERENCES borrowing_requests(id);
+  END IF;
+END
+$migration$;
 `;
 
 /** F-04 (#11): requests preserve history; no reservation/status counter or Loan DDL. */
