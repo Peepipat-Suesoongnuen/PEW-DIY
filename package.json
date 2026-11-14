@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "vitest run",
+    "test:ci": "node scripts/ci.mjs",
     "test:watch": "vitest",
     "test:client": "npm --prefix client test",
     "test:e2e": "playwright test --config e2e/playwright.config.ts",

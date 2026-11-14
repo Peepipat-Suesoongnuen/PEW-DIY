@@ -37,6 +37,14 @@
   --radius-card: 8px;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
+@supports not (scrollbar-gutter: stable) {
+  html { overflow-y: scroll; }
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-text);

@@ -61,6 +61,7 @@ jobs:
         run: npm run test:ci
         env:
           NODE_ENV: test
+          CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
           MIGRATION_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_migration_repair_test
       - name: Upload sanitized test reports
         if: ${{ !cancelled() }}

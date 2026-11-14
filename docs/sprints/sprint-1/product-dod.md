@@ -1,10 +1,10 @@
 # Sprint 1 Product Definition of Done
 
-> **Revision:** 1 — 2026-11-05 | **Status:** Proposed completion checklist, no checks executed or approvals claimed
+> **Revision:** 2 — 2026-11-10 | **Status:** Candidate verification recorded; full Product DoD and main release remain incomplete
 >
-> Basis: `project_deliverable_1_v1.pdf` §3.5–§3.6/§4.2; `group_work_specs_v1.pdf` §7–§8; [AGENT.md](../../../AGENT.md) §11–§13; [Sprint Plan](../plan.md). This checklist defines future evidence; creating these contracts does not satisfy it.
+> Basis: `project_deliverable_1_v1.pdf` §3.5–§3.6/§4.2; `group_work_specs_v1.pdf` §7–§8; [AGENT.md](../../../AGENT.md) §11–§13; [Sprint Plan](../plan.md). Individual evidence below does not imply the complete Product DoD is satisfied.
 
-Current local verification (Issue #13, 7 November2026): [Part F evidence](../../verification/sprint-1/README.md) records164 server,70 client and54 browser passes and all49 application AC checks. This does not check off shared-baseline approval, teammate reproduction, final board/disclosure, reviewed integration/main release or PDF submission. The checklist remains uncompleted until those actual artifacts exist.
+Current candidate: `d291873c10c2021d4eb5ebe733aa68012f813678` on `sprint/1-staging`, submitted in [PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) into `main` at `7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c`. [Part F evidence](../../verification/sprint-1/README.md) records164 server,74 client and57 browser passes and49/49 application AC. PR #38/F-10 is already merged at `ef58fae`; PR #41 UI fixes and PR #43 CI are integrated. The old `8676957` results (164/70/54) are historical, not current candidate evidence. Remaining gates include shared-baseline ratification, documented teammate reproduction, final board/disclosure/TDD authenticity, PR #42 re-review, required-check enforcement, main release/rerun and PDF assembly/submission. Compound checklist items below stay unchecked until every clause has evidence.
 
 ## 1. Feature Completion
 
@@ -43,3 +43,4 @@ Current local verification (Issue #13, 7 November2026): [Part F evidence](../../
 | Rev | Change | Basis |
 |---|---|---|
 | 1 — 2026-11-05 | Defined feature, product, release/evidence and honest-status completion requirements | Issue #5 AC-E-05; Issue #6/#13; original PDFs; AGENT.md; plan rev 3 |
+| 2 — 2026-11-10 | Updated candidate, integrated feature/CI status and164/74/57 results; distinguished historical evidence and remaining release/human gates without declaring full DoD | PR #42 review5829522619; candidate d291873; current Part F run |

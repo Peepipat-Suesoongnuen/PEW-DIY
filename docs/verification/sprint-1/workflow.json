@@ -87,12 +87,38 @@
       "evidence": null
     },
     "feature13_review_integration": {
-      "status": "PENDING",
-      "evidence": null
+      "status": "VERIFIED",
+      "evidence": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5812734835; merged at ef58fae87e6a262a30df8b9d65480924add2d516",
+      "observed_on": "2026-11-10",
+      "reviewer": "Peepipat-Suesoongnuen",
+      "head_sha": "37e11d274ee0dfbff2ca37d4228058d75d00ebd7",
+      "merge_sha": "ef58fae87e6a262a30df8b9d65480924add2d516",
+      "merged_at": "2026-11-07T14:16:06Z"
     },
     "release_peer_review": {
       "status": "PENDING",
       "evidence": null
     }
+  },
+  "release_candidate_snapshot": {
+    "observed_on": "2026-11-10",
+    "source": "GitHub PR42 and PR38 metadata; review5829522619; local Git ancestry",
+    "pr": 42,
+    "url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42",
+    "state": "OPEN",
+    "branch": "sprint/1-staging",
+    "candidate_sha": "d291873c10c2021d4eb5ebe733aa68012f813678",
+    "base": "main",
+    "base_sha": "7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c",
+    "author": "L0u1sss",
+    "reviewer": "Peepipat-Suesoongnuen",
+    "review_body_disposition": "Changes requested in review text; evidence/docs remediation and re-review required",
+    "review_url": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42#pullrequestreview-5829522619",
+    "reviewer_reported_ci_runs": [
+      "42654888341",
+      "42655734483"
+    ],
+    "required_check_enforcement": "NOT_VERIFIED",
+    "main_release": "PENDING"
   }
 }

@@ -2,13 +2,13 @@
 
 > **Project:** PEW-DIY | **Issue:** [#5 / D1-05](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5)
 >
-> **Revision:** 1 — 2026-11-05 | **Status:** Local draft for team decisions and independent peer review
+> **Revision:** 3 — 2026-11-10 | **Status:** Implemented candidate execution recorded; human/release gates remain pending
 >
-> **Source baseline:** `c78ad95` — SRS rev 2, Part B rev 1, System SDS rev 2, Sprint Plan rev 3. English follows SRS A-07. No application code/tests, executed results, approved contract baseline or release is supplied by this documentation change.
+> **Historical contract-authoring baseline:** `c78ad95` — SRS rev 2, Part B rev 1, System SDS rev 2, Sprint Plan rev 3. English follows SRS A-07. The original documentation change supplied contracts rather than executed application results; current execution is recorded separately below.
 
-Current execution update (2026-11-07): F-05 is implemented locally; see [F-05 evidence](tdd-evidence-f05.md) for 115 server, 70 client and 51 browser passes. The revision1 source/status wording above records initial contract authoring, not the current implementation state. Shared-baseline review, team ratification and release remain pending.
+Historical F-05 execution (2026-11-07): see [F-05 evidence](tdd-evidence-f05.md) for115 server,70 client and51 browser passes on that earlier feature version. These numbers are historical, not the current integrated candidate results. F-01–F-05 and F-10 are integrated into sprint staging; shared-baseline review, team ratification and main release remain separate gates.
 
-Current F-10 verification (Issue #13, 7 November2026): [Part F evidence](../../verification/sprint-1/README.md) records164 server,70 client and54 browser passes with49/49 application AC and57 total AC result rows. Human/process criteria and the main release remain partial/pending. This supplements the historical F-05-only snapshot above.
+Current F-10 verification (Refs #6 #13): [Part F evidence](../../verification/sprint-1/README.md) verifies clean source candidate `d291873c10c2021d4eb5ebe733aa68012f813678`, with evidence/documentation commit `7bdeba2`. Results:164 server,74 client and57 browser passes,12 tooling tests,49/49 application AC and57 contract AC rows (52 PASS/5 PARTIAL). Source fingerprints match104/104 files; normal audit exits0 with41 checks and7 pending gates; strict release audit exits2 `NOT_RELEASED`. [PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) proposes `sprint/1-staging` into `main` at `7bf6c8d`. The [latest re-review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42#pullrequestreview-5829944815) confirms technical evidence but requests documentation and human/release completion; it is not release approval. The earlier8676957 results (164/70/54) are historical. No candidate-only result is relabelled as a main release result.
 
 ## 1. Purpose and Authoritative Sources
 
@@ -59,7 +59,7 @@ At the original Part E revision these gates were open. Later PR #22/SDS rev 3 se
 1. Review the complete source revision, resolve the above gates, and record decisions with actual human approval references. Update upstream SDS/SRS only where a decision actually changes their baseline; do not silently rewrite requirements to fit code.
 2. Commit the accepted contract/test-design revision **before** related implementation; record its real SHA in the implementation Issue/PR. This task's local revision history is not a substitute for a real prior spec commit.
 3. For meaningful domain/security rules, write the planned behavior test and capture authentic RED output, implement/correct it, capture GREEN and preserve regression coverage. Record actual files/commands/SHAs.
-4. Execute the planned STS on real software with the selected tools/DB; populate actual result evidence through F-10. Current tests remain PLANNED / NOT RUN, and document coverage is not test execution.
+4. Execute the planned STS on real software with the selected tools/DB; populate actual result evidence through F-10. Tests were PLANNED / NOT RUN at original contract authoring; current executed results are linked above and in Part F. Document coverage alone is not test execution.
 5. If a design changes, add a revision entry with reason, affected requirement/AC/TEST IDs, approval reference and verification impact. Retire superseded IDs without reuse. Follow the [Product DoD](product-dod.md) for feature review, staging integration, release and evidence.
 
 ## 5. Issue #5 Acceptance Review
@@ -68,9 +68,9 @@ At the original Part E revision these gates were open. Later PR #22/SDS rev 3 se
 |---|---|---|
 | AC-E-01 | Six contracts with feature SDS, applicable UI/API/data, AC, STS and DoD | Content drafted; final contract baseline **pending decision gates and peer review** |
 | AC-E-02 | Stable AC-Fxx-nn definitions with explicit positive/negative/boundary/access outcomes | Drafted; policy-dependent outcomes explicitly gated |
-| AC-E-03 | Per-contract STS and [central mapping](verification-matrix.md), including levels/input/actions/expected results | Planned coverage; no runtime result claimed |
+| AC-E-03 | Per-contract STS and [central mapping](verification-matrix.md), including levels/input/actions/expected results | Contract coverage plus actual execution in Part F;49/49 application AC, process/release rows remain partial |
 | AC-E-04 | Upstream requirement/feature/sprint and existing Issue AC alignment | Baseline preserved; unresolved choices not silently decided |
-| AC-E-05 | Revision tables, spec-first change procedure and [Product DoD](product-dod.md) | Draft procedure/checklist; actual accepted spec SHA and execution evidence are future work |
+| AC-E-05 | Revision tables, spec-first change procedure and [Product DoD](product-dod.md) | Contract/test history and execution evidence are recorded in Part F; full Product DoD, remaining human gates and main release are not declared complete |
 
 Issue #5 is not claimed Done: acceptance of the contracts, dependent team decisions and independent teammate review remain necessary. Issue #6 implementation and its release/test evidence are separate work.
 
@@ -80,3 +80,4 @@ Issue #5 is not claimed Done: acceptance of the contracts, dependent team decisi
 |---|---|---|
 | 1 — 2026-11-05 | Initial Part E source set with six contracts, shared conventions/fixtures, DoD and planned mappings | Source baseline c78ad95; Issue #5/#6/#8–#13; original PDFs and PR #15/#16/#17/#19/#20 |
 | 2 — 2026-11-06 | Reconciled current stack/auth and A-12 quantity resolutions; feature execution remains separately recorded with F-05-dependent cases partial | SDS rev 3/4; user decision in Issue #11 work session |
+| 3 — 2026-11-10 | Corrected current integrated results to164/74/57 and104 source fingerprints; explicitly labelled earlier F-05/F-10 counts historical and separated candidate execution from human/release completion | PR #42 review5829944815; tested source d291873; evidence commit7bdeba2 |

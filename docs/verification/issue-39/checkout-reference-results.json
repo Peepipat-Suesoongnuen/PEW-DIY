@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-08",
+  "scope": "Checkout-reference UI correction tested before committing; original execution provenance retained. Historical 57-case browser results remain in results.json at their matched commit",
+  "review": "https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/41#pullrequestreview-5813989510",
+  "head_commit": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+  "tested_commit": null,
+  "version_kind": "WORKING_TREE_CANDIDATE",
+  "source_dirty_files": [
+    "client/src/components/LoanDetails.tsx",
+    "client/src/test/loan.test.tsx",
+    "e2e/specs/checkout.spec.ts"
+  ],
+  "fingerprint_format": "SHA-256; text CRLF normalized to LF; binary assets byte-exact; complete product/test/tooling manifest",
+  "changed_source_sha256": {
+    "client/src/components/LoanDetails.tsx": "900ab5aed1b4cd541b6555c018e5cd26cd0c92fd402a0a25bce5344026212ce5",
+    "client/src/test/loan.test.tsx": "eb22a87b54864d67d2a977cb49795f651ae3ad242a9d9592d59acec470e9426e",
+    "e2e/specs/checkout.spec.ts": "44a03510ec0347a1f2ddb09596fa50f6e4f9d1a70e583783a93617c55e701ee7"
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "postgresql": "18.4"
+  },
+  "red": {
+    "test": "shows committed loan and refreshes the submitted queue",
+    "failed": 1,
+    "passed": 0,
+    "not_selected": 16,
+    "production_baseline": "2b0df2d66455b23d8f3d0d613d6271f366adeaaf",
+    "meaning": "Changed regression assertion fails before borrower-reference fallback correction"
+  },
+  "client": {
+    "passed": 74,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "startTime": "2026-11-07T17:25:22.898Z",
+    "duration": 15735.903999999999,
+    "expected": 12,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "scope": "checkout.spec.ts and ui-layout.spec.ts; no retries"
+  },
+  "build_checks": {
+    "client_typecheck": "PASS",
+    "client_build": "PASS",
+    "server_build": "PASS",
+    "e2e_typecheck": "PASS"
+  },
+  "test_schema_cleanup": "COMPLETE"
+}

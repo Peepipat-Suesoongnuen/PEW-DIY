@@ -1,15 +1,16 @@
 # Sprint 1 Part F evidence pack — Issue #13 / F-10
 
-**Date:** 7 November2026 (Asia/Bangkok). **State:** PR #38 is open for review, not a main release or completed Product DoD. Latest observed PR head / evidence commit: `dad4cd8139034237c29f086a93c03a3305abf0e6`; tested source: `8676957c3dc40511508bfefb772576c6a4958e84`. Original submission: `2b76abbf7be1d6384ee4ae2dffa1808f71aeda82`, based on staging `5b064ea`. Remediation runs distinguish a working-tree candidate from a verified clean-source commit; the actual current state is recorded below. [verification.json](run/verification.json) records `head_commit`, nullable `tested_commit`, `version_kind`, dirty source files and canonical source fingerprints. A null tested_commit is explicitly not commit-verification. The user committed/pushed the original work and opened [PR #38](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38); no merge/main release/tag has occurred.
+**Date:** 10 November2026 (Asia/Bangkok). **State:** [release PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) is open from `sprint/1-staging` at candidate/tested source `d291873c10c2021d4eb5ebe733aa68012f813678` into `main` at `7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c`. PR #38/F-10 was merged at `ef58fae`; PR #41 UI fixes and PR #43 CI are integrated. This is candidate evidence, not a main release or completed Product DoD. [verification.json](run/verification.json) and [setup.json](run/setup.json) identify the same clean source commit; an evidence-only descendant must preserve every recorded source fingerprint. Refs #6 #13.
 
-Commit traceability for the reviewed rounds:
+Commit traceability (old raw runs are historical and recoverable at their evidence commits):
 
 | Round | Source / submission | Evidence / reviewed head |
 |---|---|---|
 | Original submission | `2b76abb` | Original evidence; historical setup61.812s |
 | First remediation | `8bff092` | `43bcdfe`; local PG18 setup22.417s |
 | Second remediation | `8fb84f4c0803b12cbdd65275e4361a0aaeb88a23` | `0316500e9b6ca93cf477b83f04d986adaf7a67ed`; local PG18 setup23.746s |
-| Current review corrections | `8676957c3dc40511508bfefb772576c6a4958e84` | `dad4cd8139034237c29f086a93c03a3305abf0e6`; source-preserving evidence commit; setup38.044s |
+| Historical PR38 corrections | `8676957c3dc40511508bfefb772576c6a4958e84` | `dad4cd8139034237c29f086a93c03a3305abf0e6`; historical164/70/54, setup38.044s |
+| Current PR42 candidate | `d291873c10c2021d4eb5ebe733aa68012f813678` | Current `run/`;164/74/57, setup timing in `setup.json`; candidate includes PR #41/#43 |
 
 The earlier independent re-review reports164/70/54 and5 tooling tests on `43bcdfe`, Node24.19.0/PostgreSQL17.11. The [earlier re-review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5807698601) targets historical head `0316500`, confirms both P2 fixes, reports164/70/54 and41 audit checks with8 pending gates, and requests documentation/CLI corrections. That review does not specify its toolchain versions. This is reviewer evidence, not a new local execution. The original61.812s, first remediation22.417s and reviewer's original11.957s are separate measurements.
 
@@ -34,16 +35,17 @@ For the PDF, embed the selected images, actual AC table and excerpts directly; e
 | Command/check | Passed | Failed | Skipped | Evidence |
 |---|---:|---:|---:|---|
 | Server Vitest suite | 164 | 0 | 0 | [server.json](run/server.json), [log](run/server-tests.txt) |
-| Client Vitest suite | 70 | 0 | 0 | [client.json](run/client.json), [log](run/client-tests.txt) |
-| Playwright, desktop/tablet/mobile Chromium | 54 | 0 | 0 | [browser.json](run/browser.json), [log](run/browser-tests.txt); zero flaky cases |
+| Client Vitest suite | 74 | 0 | 0 | [client.json](run/client.json), [log](run/client-tests.txt) |
+| Playwright, desktop/tablet/mobile Chromium | 57 | 0 | 0 | [browser.json](run/browser.json), [log](run/browser-tests.txt); zero flaky cases |
 | Server build, client typecheck/build | PASS | 0 | — | [server build](run/server-build.txt), [typecheck](run/client-typecheck.txt), [client build](run/client-build.txt) |
 | Application AC mapping | 49/49 | 0 missing | 0 | All F-01–F-05 application AC map to executed passing cases; process approval is separate |
 | Full contract mapping | 57 result rows | 0 missing | — | F-10 has3 PASS and5 PARTIAL rows because human/release requirements remain |
 | Intentional isolated runner-failure probe | Expected failure observed | 1 deliberate assertion | 0 | [probe JSON](run/runner-failure-probe.json): nonzero exit; excluded from product-suite counts |
+| Verification tooling regression | 12 | 0 | 0 | [helper-tests.txt](run/helper-tests.txt); executed on the same candidate source |
 
 Environment: Windows, **Node24.15.0**, **PostgreSQL18.4**, Vitest5.1.0, Playwright1.64.1; exact timings/commands are in `verification.json`. Two temporary schemas are created inside the dedicated test DB, migrated before test discovery, and removed afterward. Browser seed passwords are generated privately per run. No dependency was added; lockfiles remain unchanged.
 
-The49 new F-10 server cases include real production HTTP probes of every protected route for anonymous/invalid/expired/revoked sessions, wrong-role/owner manipulation, secure cookie attributes, actual seed reruns, and app-process restart with reauthentication and revoked-session replay. Including the route-inventory consistency test, this is **49 new cases** relative to the115-case F-05 suite. The exact runner total is164. Browser adds three complete integrated journeys (one per viewport) to the51-case F-05 suite.
+The49 new F-10 server cases include real production HTTP probes of every protected route for anonymous/invalid/expired/revoked sessions, wrong-role/owner manipulation, secure cookie attributes, actual seed reruns, and app-process restart with reauthentication and revoked-session replay. Including the route-inventory consistency test, this is **49 new cases** relative to the115-case F-05 suite. The exact runner total is164. Browser originally added three complete integrated journeys to the51-case F-05 suite; PR #41 adds three responsive layout cases, making57. The client suite is now74 after the loan-detail/checkout regression fixes. Historical70/54 results remain attributed to their earlier source commits.
 
 The initial mapping audit rejected three stale name references although all suites passed; the mapping was corrected to actual reported names. Assertions were not weakened. A rehearsal attempt on an already seeded DB was not used for this issue's evidence; the F-10 runner deliberately provisions virgin schemas so stale credentials/data cannot manufacture a pass.
 
@@ -96,24 +98,24 @@ Run `npm run rehearse:sprint1`, then `npm run verify:sprint1`, then `npm run aud
 
 ## Known gaps — not hidden by passing tests
 
-- Current remote main is the bootstrap `7bf6c8d`; staging is `5b064ea`; no release tag was observed. Feature13 was committed/pushed as `2b76abb` and submitted in PR #38; its latest review requests changes, and it is not merged/integrated. No release-version regression exists yet.
+- Observed main is the bootstrap `7bf6c8d`; staging/candidate is `d291873`. PR #38/F-10 is merged at `ef58fae`; release PR #42 is open and requires re-review of the evidence corrections. No main release/version regression is claimed.
 - A-12 quantity/full-return policy is explicitly user-confirmed but still lacks a shared-team ratification artifact. The user identified L0u1sss as themself and Peepipat-Suesoongnuen as their teammate; that identity confirmation is not a ratification of the policy.
 - Other-student README repetition, contribution/AI disclosure sign-off and human authenticity review of historical local RED evidence remain pending. RED commits are not invented.
 - GitHub Project/board final status is NOT VERIFIED; available GitHub connector tools expose no Project reader, and no board state was changed. A final board/history screenshot must be supplied from the real board before submission.
-- The actual catalog (OQ-01) remains open; all evidence uses synthetic items. Return/overdue/full history/reporting, Docker/CI/CD/GCP, cross-team UAT and final video are outside this Sprint1 increment.
-- Assemble the self-contained Parts A–F PDF with real team names/student IDs and final release reference before the8 November2026 23:59 submission; this evidence pack does not claim submission completion.
+- The actual catalog (OQ-01) remains open; all evidence uses synthetic items. Return/overdue/full history/reporting, Docker/CD/GCP, cross-team UAT and final video remain later work. CI is implemented in PR #43; required-check enforcement on main/staging is not yet verified.
+- Assemble the self-contained Parts A–F PDF with real team names/student IDs and final release reference. The D1 deadline was8 November2026 23:59; this evidence pack does not claim a completed or on-time submission.
 
-## PR38 review remediation and provenance
+## Historical PR38 review remediation and provenance
 
 The [independent PR38 review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5805879906) reports Node24.19.0/PostgreSQL17.11 verification of submitted head `2b76abb`:164 server,70 client,54 browser passes, build/typecheck/migrate:test PASS, and a warm-cache setup rehearsal of11.957s. These are reviewer-reported results for that head, separate from locally generated PG18 artifacts and the remediation candidate.
 
 Process AC-F10-04/05/06/07/08 now resolve to TEST-F10-04/05/06/07/08/09/10 artifact/process checks (suite/failure probe/setup/TDD/workflow/release/disclosure), not repeated E2E journey names. Human gates remain PARTIAL. Canonical fingerprints normalize CRLF to LF; audit checks both the tested Git blobs and current source and permits a later evidence-only descendant commit with identical source. The latest source must be committed before the default runner can label it CLEAN_SOURCE_COMMIT. Regenerating and committing evidence afterward does not require pretending an evidence commit tested itself.
 
-Latest remediation requires clean setup evidence from exactly the verification source commit before starting suites. The audit independently checks this relationship and the complete fingerprint key set, including HTML/CSS/configs/assets. Missing tracked files are dirty source rather than an ENOENT crash. NOT_RELEASED is stored as a pending check with an empty matched list; it does not count as a passing release check. Full Git history is required; shallow clones fail with an actionable prerequisite message. GitHub CI and branch protection remain known gaps, outside this remediation's authorization.
+The retained runner requires clean setup evidence from exactly the verification source commit before starting suites. The audit independently checks this relationship and the complete fingerprint key set, including HTML/CSS/configs/assets. Missing tracked files are dirty source rather than an ENOENT crash. NOT_RELEASED is stored as a pending check with an empty matched list; it does not count as a passing release check. Full Git history is required; shallow clones fail with an actionable prerequisite message. CI was absent during these historical PR38 rounds; PR #43 subsequently implemented it. Required-check enforcement remains a separate administration step.
 
 Second-remediation local round: clean source `8fb84f4c0803b12cbdd65275e4361a0aaeb88a23`, Node24.15.0/PostgreSQL18.4, setup23.746s;164 server,70 client,54 browser and11 tooling checks passed. Three real verifier preflight probes reject stale/candidate/missing-commit setup before any suite. Normal audit exits0 with41 structural checks; strict release audit exits2 NOT_RELEASED. The raw second-remediation records remain in historical evidence commit0316500. Current run/ files belong to the source SHA recorded by verification.json.
 
-## Current review corrections
+## Historical PR38 final corrections (superseded by the PR42 candidate run)
 
 GitHub PR38 was observed at published head / evidence commit `dad4cd8` on7 November2026, preserving tested source `8676957`. The [latest review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/38#pullrequestreview-5812473875) targets `dad4cd8`, confirms no outstanding P0/P1/P2, reports164/70/54 plus41 audit checks with8 pending gates, and requests only PR-body cleanup and explicit latest-head traceability. These are reviewer-reported local results, not a new local execution or GitHub CI. The local-only authorization of earlier agent work is distinct from subsequent repository publication. This round does not infer permission to push or edit GitHub. The user requested PR description updates in the chat rather than a repository draft file. Replace the complete PR body with the supplied chat text, removing the old appended Validation/Evidence paragraphs and duplicated Remaining gates section.
 
@@ -121,6 +123,14 @@ Working-tree candidate mode is removed: `verify:sprint1` accepts no options and 
 
 No retained raw artifact independently confirms the previously narrated tooling RED count of5 passed/5 failed; that claim is not treated as verified evidence. This is separate from existing F01/F05 domain/security TDD records. This round retains a new, specifically scoped CLI regression [RED log](tooling-option-red.txt) and [GREEN log](tooling-option-green.txt) for the removed working-tree option. These logs do not reconstruct or replace the missing historical RED run.
 
-Current local correction round: clean source `8676957c3dc40511508bfefb772576c6a4958e84`, Node24.15.0/PostgreSQL18.4; setup38.044s,164 server/70 client/54 browser and12 tooling tests passed, builds/typecheck PASS. Normal audit exit0 with41 checks and8 pending gates; strict release audit exit2 NOT_RELEASED. Both setup.json and verification.json name this same source SHA. The evidence commit containing these results is `dad4cd8139034237c29f086a93c03a3305abf0e6`; it preserves tested source `8676957c3dc40511508bfefb772576c6a4958e84`. The current documentation-only correction does not relabel the tested source or regenerate product results.
+Historical local correction round: clean source `8676957c3dc40511508bfefb772576c6a4958e84`, Node24.15.0/PostgreSQL18.4; setup38.044s,164 server/70 client/54 browser and12 tooling tests passed, builds/typecheck PASS. Normal audit exit0 with41 checks and8 pending gates; strict release audit exit2 NOT_RELEASED. Historical setup.json and verification.json in evidence commit `dad4cd8139034237c29f086a93c03a3305abf0e6` name that same source SHA. Retrieve those records from Git at `dad4cd8:docs/verification/sprint-1/run/`; current `run/` is regenerated for `d291873`, not relabelled old evidence.
+
+Retained one-off `run/audit-rejection-probes.json`, `run/setup-preflight-probes.json` and `run/source-guard-probe.json` are **historical tooling probes**, with their original source/version fields. They are not rerun by the normal F-10 sequence and do not establish candidate-level product results. In particular, the source-guard probe preserves an old CLI message mentioning the removed candidate option; current supported commands are the ones in README. Current candidate results are the regenerated setup, verification, suites/demo/races and normal/strict audit artifacts.
 
 The user requested removal of PR-specific draft/review-summary files. Review facts remain attributed above to their GitHub reviews, while required raw run evidence, workflow.json, test excerpts, RED/GREEN logs and release handoff remain. No PR-specific draft/summary files are required by the audit or retained here.
+
+## Current PR42 evidence correction
+
+The [10 November review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42#pullrequestreview-5829522619) identifies stale PR38 evidence and release status. It reports two green hosted runs (`42654888341`, `42655734483`),164/74/57 product tests,49/49 application AC, setup25.367s and normal audit exit0 on `d291873`. These are reviewer-reported results, separate from the newly generated local Node24.15.0/PG18.4 `run/` artifacts and their own timing. This local round runs rehearsal then verification then normal/strict audit on that same clean source, preserves the full104-file source manifest including `e2e/specs/ui-layout.spec.ts` and `scripts/ci.mjs`, and updates release status without changing product code or declaring a main release. The exact local duration, AC totals, audit checks and pending human gates are recorded in the linked JSON. Updated evidence publication requires authorization; current-head CI/re-review and the main release/rerun are still required.
+
+Actual local results for `d291873`: setup34.282s (target met),164 server/74 client/57 browser,12 tooling tests, builds/typecheck PASS; no failed/skipped/flaky product cases. Application AC49/49; contract rows52 PASS/5 PARTIAL. Normal audit exit0 with41 structural checks and7 pending gates; strict release audit exit2 `NOT_RELEASED`. The feature13 integration gate is now VERIFIED using PR #38 approval and merge metadata; the remaining human checks are not silently closed. The local timing is not the reviewer's25.367s measurement. No source code was changed in this evidence/docs round.
