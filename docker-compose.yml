@@ -1,0 +1,71 @@
+x-app-environment: &app_environment
+  NODE_ENV: production
+  DATABASE_URL: postgresql://${POSTGRES_USER:-pewdiy}:${POSTGRES_PASSWORD:-pewdiy-local-only}@db:5432/${POSTGRES_DB:-pewdiy}
+  PORT: 3000
+  APP_ORIGIN: http://localhost:5173
+  APP_TIMEZONE: Asia/Bangkok
+  SESSION_IDLE_MINUTES: 60
+  SESSION_ABSOLUTE_MINUTES: 480
+  SESSION_COOKIE_NAME: pew_session
+  SESSION_COOKIE_SECURE: "false"
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pewdiy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pewdiy-local-only}
+      POSTGRES_DB: ${POSTGRES_DB:-pewdiy}
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *app_environment
+      SEED_MODE: local-compose-demo
+      SEED_PASSWORD_BA: ${SEED_PASSWORD_BA:-}
+      SEED_PASSWORD_BB: ${SEED_PASSWORD_BB:-}
+      SEED_PASSWORD_CA: ${SEED_PASSWORD_CA:-}
+    command: ["sh", "-c", "node dist/db/migrate.js && node dist/db/seed.js"]
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment: *app_environment
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "127.0.0.1:5173:80"
+
+volumes:
+  postgres_data:

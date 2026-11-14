@@ -29,4 +29,21 @@ describe("production seed guard", () => {
       "Seed is disabled when NODE_ENV=production",
     );
   });
+
+  it("allows production seeding only for the explicit local Compose demo mode", () => {
+    expect(() => assertSeedAllowed({
+      NODE_ENV: "production",
+      SEED_MODE: "local-compose-demo",
+    })).not.toThrow();
+  });
+
+  it("rejects production seeding for any other or missing seed mode", () => {
+    expect(() => assertSeedAllowed({
+      NODE_ENV: "production",
+      SEED_MODE: "development",
+    })).toThrow("Seed is disabled when NODE_ENV=production");
+    expect(() => assertSeedAllowed({ NODE_ENV: "production" })).toThrow(
+      "Seed is disabled when NODE_ENV=production",
+    );
+  });
 });

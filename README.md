@@ -1,4 +1,4 @@
-﻿# PEW-DIY
+# PEW-DIY
 
 **D.I.Y. Room Equipment Borrowing System**
 
@@ -49,7 +49,22 @@ npm run build:client
 npm run dev
 ```
 
-Open `/login`, sign in as B-A (Borrower), B-B (second Borrower) or C-A (Custodian), using the privately supplied seed password. The server serves the React app and legacy `.html` pages. Seed reruns preserve existing credentials/data; changing SEED_PASSWORD_* does **not** reset an existing account. Use a fresh demo database when supplying new seed passwords.
+Open `/login`, sign in as B-A (Borrower), B-B (second Borrower) or C-A (Custodian), using the privately supplied seed password. The server serves the React application. Seed reruns preserve existing credentials/data; changing SEED_PASSWORD_* does **not** reset an existing account. Use a fresh demo database when supplying new seed passwords.
+
+### Docker Compose (Episode 3)
+
+Docker Compose starts PostgreSQL, applies migrations, seeds the local demo accounts/fixtures, then starts the API and React client. Set the three `SEED_PASSWORD_*` values privately in the ignored `.env` file before starting; the Compose migration container fails closed if any password is missing. The production seed guard remains enabled for deployed services: only the migration container receives the explicit `SEED_MODE=local-compose-demo` opt-in. Seed passwords are not passed to the long-running API container.
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# Set SEED_PASSWORD_BA, SEED_PASSWORD_BB and SEED_PASSWORD_CA in .env.
+$dockerBin = Join-Path $env:LOCALAPPDATA 'Programs\DockerDesktop\resources\bin'
+$env:PATH = "$dockerBin;$env:PATH"
+docker compose up --build -d
+docker compose ps -a
+```
+
+Open `http://localhost:5173/login`; the API readiness endpoint is `http://localhost:3000/api/ready`. PostgreSQL is published only on `127.0.0.1:15432` (container port 5432), and its data persists in the `postgres_data` volume. Do not use `docker compose down -v` unless intentionally deleting that database volume.
 
 The setup timing target is a running seeded login/catalog within15 minutes from the documented installed-tool prerequisites, including dependency installation, DB creation, configuration, migration, seed, build and startup. A local timed rehearsal is [recorded here](docs/verification/sprint-1/run/setup.json); caches and the pending other-student repetition are disclosed. This does not claim a clean OS install in15 minutes.
 
