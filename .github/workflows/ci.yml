@@ -19,6 +19,9 @@ jobs:
     name: Build and regression tests
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    env:
+      # Both databases live only inside this job's disposable PostgreSQL service.
+      CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
     services:
       postgres:
         image: postgres:17
@@ -50,12 +53,16 @@ jobs:
         run: |
           npm ci --no-audit
           npm --prefix client ci --no-audit
+      - name: Provision isolated migration-repair database
+        run: psql "$CI_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -c 'CREATE DATABASE pewdiy_migration_repair_test'
       - name: Install Chromium and Linux dependencies
         run: npx --no-install playwright install --with-deps chromium
       - name: Build, typecheck and run all regression suites
         run: npm run test:ci
         env:
+          NODE_ENV: test
           CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
+          MIGRATION_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_migration_repair_test
       - name: Upload sanitized test reports
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4

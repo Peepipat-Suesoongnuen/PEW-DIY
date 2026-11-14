@@ -17,6 +17,7 @@
  *        npm run seed
  */
 import { loadConfig } from "../config/config";
+import { assertSeedAllowed } from "./seed-safety";
 import { createPool, withTransaction } from "./pool";
 import { hashPassword } from "../services/password";
 import { seedEquipmentFixture, EquipmentInput } from "../services/catalog";
@@ -41,6 +42,8 @@ const EQUIPMENT: EquipmentInput[] = [
 ];
 
 async function main() {
+  // Refuse demo-data seeding in production before loading config or opening a DB connection.
+  assertSeedAllowed();
   const config = loadConfig();
   const pool = createPool(config.databaseUrl);
 
