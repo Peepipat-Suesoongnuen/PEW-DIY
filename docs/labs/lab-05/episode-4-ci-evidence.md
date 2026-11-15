@@ -16,18 +16,24 @@ gate*, first half). Tracking issue: **#53**. Pull Request: **#54** (`ci/4-pr-che
 | Workflow | `.github/workflows/ci-docker.yml` — name `CI & Docker Build` |
 | Job under test | **`test-and-docker`** (kept for the Episode 6 required check) |
 | Event | `pull_request` into `sprint/1-staging` (normal PR, not the release PR) |
-| CI run | https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/43725910299 — **success** |
-| `test-and-docker` job | https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/43725910299/job/132847675460 — 2m15s |
-| `docker-image` job | https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/43725910299/job/132847675319 — 0m31s |
-| PR head commit | `3090e40e60526c90bfa5e47e6e484bc6513a6d43` |
-| Tested commit | `710a539abff423a4481f690d95ec2a5a12937813` (GitHub's PR merge result of head `3090e40` into `bc1a7a1`) |
-| Run started | 2026-11-15T14:43:31Z |
-| Artifact | `ci-reports-43725910299-1` (`summary.json`, sanitized) |
+| CI run (current head) | https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/43726260982 — **success** |
+| `test-and-docker` job | https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/43726260982/job/132848736146 — 1m58s |
+| `docker-image` job | https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/43726260982/job/132848735773 — 0m40s |
+| PR head commit | `157c94c7a52d96d62945fc5ab37a83077b04e8d3` |
+| Tested commit | `8ba3cc81cec6ad2ea86e1de65f8501be0d2c349a` (GitHub's PR merge result of head `157c94c` into `bc1a7a1`) |
+| Run started | 2026-11-15T14:47:24Z |
+| Artifact | `ci-reports-43726260982-1` (`summary.json`, sanitized) |
+| CI status of the current PR head (always current) | https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/54/checks |
 
-GitHub Actions checks the PR **merge result** by default, so `710a539` is the commit the
-tests actually ran against. It contains no change beyond merging `3090e40` into staging.
-This document is refreshed by a documentation-only commit on the same PR; because it
-changes no product or test file, the tested code is exactly `3090e40`.
+GitHub Actions checks the PR **merge result** by default, so `8ba3cc8` is the commit the
+tests actually ran against. It contains no change beyond merging `157c94c` into staging.
+
+**Traceability note (AC-8):** `157c94c` is the revision whose run and test summary are
+recorded above. Updating this document necessarily adds one more documentation-only commit,
+and a file cannot contain the run ID of the commit that adds it. The table therefore also
+links the PR checks page, which always shows the CI result of whatever the current PR head
+is. The only difference between `157c94c` and the docs-only commit is this file; product
+and test files are byte-identical, so the run above tests exactly the code under review.
 
 ## 3. Test summary (from the run above)
 
@@ -71,7 +77,7 @@ Every `gcloud`/`openssl` call is a local stub; no Google Cloud project is contac
 | AC-2 | `pull_request.branches` covers `main` and `sprint/1-staging`; `workflow_call` + `workflow_dispatch` | `ci-docker.yml` `on:` block | Manual inspection (static) |
 | AC-3 | `permissions: contents: read`, concurrency, no GCP auth | `ci-docker.yml`; run log shows `GITHUB_TOKEN Permissions: Contents: read`; no `google-github-actions/auth` step | Manual inspection + run metadata |
 | AC-4 | `deploy/` scripts + offline tests; CI runs `bash -n` and the tests | §3.2 | Automated (hosted run) |
-| AC-5 | A normal PR into staging starts `test-and-docker` and it passes (C-01) | Run 43725910299 on PR #54, conclusions `success` | Automated (hosted run) |
+| AC-5 | A normal PR into staging starts `test-and-docker` and it passes (C-01) | Run 43726260982 on PR #54, conclusions `success` | Automated (hosted run) |
 | AC-6 | Release PR `sprint/1-staging` → `main` runs the same check and passes | Follow-up release PR (linked in Issue #53 when opened) | Automated (hosted run, later) |
 | AC-7 | `ci-docker.yml` + `deploy/` present on `main` | `git ls-tree origin/main …` after the release merge | Manual verification (later) |
 | AC-8 | C-01 records run link, tested commit and test summary | This document, §2–§3 | Manual evidence record |
