@@ -80,10 +80,10 @@ else
 fi
 
 DB_PASSWORD=""
-if exists gcloud sql users describe "$DB_USER" --instance "$SQL_INSTANCE" --project "$PROJECT_ID"; then
+if gcloud sql users list --instance "$SQL_INSTANCE" --project "$PROJECT_ID" --format='value(name)' 2>/dev/null | grep -qx "$DB_USER"; then
   echo "   user ${DB_USER} already exists (password untouched; it is already in Secret Manager)"
 else
-  DB_PASSWORD="$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32)"
+  DB_PASSWORD="$(openssl rand -hex 16)"
   if [ "$DRY_RUN" = "1" ]; then
     echo "   [plan] create user ${DB_USER} with a generated password"
   else
