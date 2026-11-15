@@ -36,7 +36,8 @@ set -euo pipefail
 #     even read the seed-password secrets: the one-off seed job runs as its own
 #     identity (pewdiy-seeder), the only one granted access to them. Any legacy
 #     grant of the runtime identity on the seed-password secrets (from an older
-#     version of this script) is revoked on upgrade (step 7c).
+#     version of this script) is revoked on EVERY run (step 7c), even when
+#     --demo is omitted.
 #
 # REFERENCES
 #   - gcloud run deploy : https://cloud.google.com/sdk/gcloud/reference/run/deploy
@@ -331,36 +332,55 @@ if [ "$SEED_DEMO_DATA" = "true" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# 7c. Revoke the legacy runtime grants on the seed-password secrets (--demo)
+# 7c. Revoke the legacy runtime grants on the seed-password secrets (ALWAYS)
 #     An earlier version of this script granted pewdiy-runner secretAccessor on
 #     the seed-password secrets. Secret Manager bindings persist independently
-#     of this script, so on an upgraded deployment they must be revoked
-#     explicitly or the API identity keeps its old access. Idempotent: the
-#     pre-check finds no legacy binding on a clean project and nothing changes.
-#     Only the exact principal + role pair is removed; the database-URL grant of
-#     the runtime identity is untouched. Asserted by test_deploy_stub.sh (the
-#     `upgrade` scenario starts with the legacy bindings present).
+#     of this script, so this cleanup runs on EVERY invocation — including the
+#     documented default command without --demo — over the three known seed-
+#     secret names. Only the exact principal + role pair is removed; the
+#     database-URL grant of the runtime identity and the seed-job identity's
+#     grants are untouched.
+#     Error handling: a confirmed NOT_FOUND (the secret does not exist) is
+#     skipped — there is nothing to revoke. Any OTHER lookup failure
+#     (permission denied, API disabled, network) aborts the deployment before
+#     anything is built or deployed, because silently skipping could leave a
+#     legacy grant in place. Asserted by test_deploy_stub.sh (upgrade with and
+#     without --demo start with the legacy bindings present; policy_error
+#     simulates an unreadable policy on an existing secret).
 # ------------------------------------------------------------------------------
-if [ "$SEED_DEMO_DATA" = "true" ]; then
-  for secret in "${SEED_SECRETS[@]}"; do
-    if [ "$DRY_RUN" = "1" ]; then
-      run_cmd gcloud secrets get-iam-policy "$secret" --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" --project "$PROJECT_ID"
-      run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
-        --member="serviceAccount:${SA_EMAIL}" \
-        --role="roles/secretmanager.secretAccessor" \
-        --project "$PROJECT_ID" --quiet
-    else
-      if gcloud secrets get-iam-policy "$secret" --project "$PROJECT_ID" \
-            --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" 2>/dev/null \
-          | grep -q "^roles/secretmanager.secretAccessor[[:space:]]*serviceAccount:${SA_EMAIL}\$"; then
+for secret in "$SECRET_SEED_BA" "$SECRET_SEED_BB" "$SECRET_SEED_CA"; do
+  if [ "$DRY_RUN" = "1" ]; then
+    run_cmd gcloud secrets get-iam-policy "$secret" --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" --project "$PROJECT_ID"
+    run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
+      --member="serviceAccount:${SA_EMAIL}" \
+      --role="roles/secretmanager.secretAccessor" \
+      --project "$PROJECT_ID" --quiet
+  else
+    policy_out=""
+    if policy_out="$(gcloud secrets get-iam-policy "$secret" --project "$PROJECT_ID" \
+          --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" 2>&1)"; then
+      if printf '%s\n' "$policy_out" | grep -q "^roles/secretmanager.secretAccessor[[:space:]]*serviceAccount:${SA_EMAIL}\$"; then
         run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
           --member="serviceAccount:${SA_EMAIL}" \
           --role="roles/secretmanager.secretAccessor" \
           --project "$PROJECT_ID" --quiet
       fi
+    else
+      # The lookup failed. Only a confirmed NOT_FOUND (the secret does not
+      # exist) may be skipped; any other error must abort, or a legacy grant
+      # could survive unnoticed.
+      case "$policy_out" in
+        *NOT_FOUND*)
+          # No such secret -> no legacy binding -> nothing to revoke.
+          ;;
+        *)
+          printf 'ERROR: cannot read the IAM policy of %s; aborting so a legacy %s grant cannot survive unnoticed:\n%s\n' \
+            "$secret" "$SA_EMAIL" "$policy_out" >&2
+          exit 1 ;;
+      esac
     fi
-  done
-fi
+  fi
+done
 
 # ==============================================================================
 # 8. Build & Push Unified Container Image via Cloud Build

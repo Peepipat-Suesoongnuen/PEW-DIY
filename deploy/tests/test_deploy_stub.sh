@@ -11,13 +11,18 @@
 #     demo      : --demo flag         -> seed secrets created/granted + seed job
 #     upgrade   : --demo on an old deployment whose policy still grants the API
 #                 identity the seed passwords -> those legacy grants are revoked
+#     upgrade_plain : the same old deployment upgraded WITHOUT --demo -> the
+#                 legacy grants are still revoked
+#     policy_error : an EXISTING seed secret has an unreadable IAM policy ->
+#                 the script aborts before building/deploying anything
 #   It also checks: `--edition=enterprise`, storage auto-increase off, min 0 /
 #   max 3 instances, no project-wide secretAccessor role, DB password == password
 #   inside DATABASE_URL, no seed secret/job without --demo, that the seed-
 #   password secrets are readable ONLY by the dedicated seed-job identity
 #   (pewdiy-seeder) and never by the API service account (pewdiy-runner), that
-#   legacy runtime grants on the seed-password secrets are revoked on upgrade
-#   (and nothing is revoked when there is nothing to revoke), that
+#   legacy runtime grants on the seed-password secrets are revoked on every
+#   upgrade path, with or without --demo (and nothing is revoked when there is
+#   nothing to revoke), that
 #   the migrate and seed job env carries every required loadConfig() key with its
 #   expected value (and still reads DATABASE_URL from Secret Manager), and that
 #   no password/secret value leaks into the output.
@@ -76,18 +81,27 @@ if [ "${1:-} ${2:-} ${3:-}" = 'secrets versions add' ]; then
   exit 0
 fi
 if [ "${1:-} ${2:-}" = 'secrets get-iam-policy' ]; then
-  # The upgrade scenario simulates an old deployment whose policy still grants
-  # the runtime identity access to the seed-password secrets. The secret name
-  # is $3 (gcloud secrets get-iam-policy NAME).
-  if [ "$STUB_MODE" = upgrade ]; then
-    case "${3:-}" in
-      pewdiy-seed-password-*)
-        printf 'roles/secretmanager.secretAccessor\t%s\n' \
-          "serviceAccount:pewdiy-runner@stub-gcp-project.iam.gserviceaccount.com"
-        ;;
-    esac
-  fi
-  exit 0
+  # Three behaviours (the secret name is $3 — gcloud secrets get-iam-policy NAME):
+  #   policy_error    -> one EXISTING seed secret has an unreadable policy
+  #                      (PERMISSION_DENIED): the script must abort.
+  #   upgrade[_plain] -> the legacy pewdiy-runner binding is still present.
+  #   anything else   -> the seed secrets do not exist (NOT_FOUND): skip.
+  case "$STUB_MODE" in
+    policy_error)
+      if [ "${3:-}" = "pewdiy-seed-password-ba" ]; then
+        echo "ERROR: (gcloud.secrets.get-iam-policy) PERMISSION_DENIED: Permission denied for secret ${3}." >&2
+        exit 1
+      fi
+      printf 'roles/secretmanager.secretAccessor\t%s\n' \
+        "serviceAccount:pewdiy-runner@stub-gcp-project.iam.gserviceaccount.com"
+      exit 0 ;;
+    upgrade|upgrade_plain)
+      printf 'roles/secretmanager.secretAccessor\t%s\n' \
+        "serviceAccount:pewdiy-runner@stub-gcp-project.iam.gserviceaccount.com"
+      exit 0 ;;
+  esac
+  echo "ERROR: (gcloud.secrets.get-iam-policy) NOT_FOUND: Secret [projects/stub-gcp-project/secrets/${3:-}] not found." >&2
+  exit 1
 fi
 if [ "${1:-} ${2:-} ${3:-}" = 'sql users list' ]; then
   if [ "$STUB_MODE" = first_run ]; then
@@ -146,7 +160,7 @@ assert_job_env() {  # $1 = job name, remaining args = key=value pairs
 }
 
 # --- Run every scenario and assert on what deploy.sh did ------------------------
-for MODE in first_run rerun partial job-fail demo upgrade; do
+for MODE in first_run rerun partial job-fail demo upgrade upgrade_plain policy_error; do
   export STUB_MODE="$MODE"
   [ "$MODE" != demo ] || export STUB_MODE=first_run
   export GCLOUD_LOG="$TEST_STATE_DIR/gcloud-$MODE.log"
@@ -156,18 +170,29 @@ for MODE in first_run rerun partial job-fail demo upgrade; do
   result=0
   bash "$DEPLOY_SCRIPT" ${args[@]+"${args[@]}"} > "$TEST_STATE_DIR/output" 2>&1 || result=$?
   expected=0
-  if [ "$MODE" = job-fail ]; then expected=1; fi
+  if [ "$MODE" = job-fail ] || [ "$MODE" = policy_error ]; then expected=1; fi
   if [ "$result" -ne "$expected" ]; then
     echo "FAIL $MODE: unexpected exit $result (wanted $expected)"
     exit 1
   fi
-  if [ "$MODE" = job-fail ]; then
-    if grep -q '^run deploy ' "$GCLOUD_LOG"; then
-      echo 'FAIL: service deployed after migration failure'; exit 1
-    fi
-  else
-    grep -q '^run deploy ' "$GCLOUD_LOG"
-  fi
+  case "$MODE" in
+    job-fail)
+      if grep -q '^run deploy ' "$GCLOUD_LOG"; then
+        echo 'FAIL: service deployed after migration failure'; exit 1
+      fi ;;
+    policy_error)
+      # An unreadable IAM policy on an existing seed secret must abort the run
+      # before anything is built, executed or deployed, and no revocation may be
+      # attempted afterwards.
+      if grep -Eq '^(builds submit|run jobs deploy|run jobs execute|run deploy) ' "$GCLOUD_LOG"; then
+        echo 'FAIL policy_error: continued after an unreadable IAM policy'; exit 1
+      fi
+      if grep -q '^secrets remove-iam-policy-binding ' "$GCLOUD_LOG"; then
+        echo 'FAIL policy_error: revocation attempted after an unreadable policy'; exit 1
+      fi ;;
+    *)
+      grep -q '^run deploy ' "$GCLOUD_LOG" ;;
+  esac
   if grep -q '^projects add-iam-policy-binding .*roles/secretmanager.secretAccessor' "$GCLOUD_LOG"; then
     echo 'FAIL: runtime has project-wide secret access'; exit 1
   fi
@@ -218,43 +243,50 @@ for MODE in first_run rerun partial job-fail demo upgrade; do
       echo 'FAIL: created the seed-job identity without --demo'; exit 1
     fi
   fi
-  # Legacy-grant revocation (PR #58 review): an old version of the script
+  # Legacy-grant revocation (PR #58/#59 reviews): an old version of the script
   # granted the runtime identity access to the seed-password secrets, and those
-  # bindings survive a script upgrade. In the upgrade scenario every one of them
-  # must be revoked (exact principal + role, database-URL grant untouched);
-  # everywhere else there is nothing to revoke and the policy must be left alone.
-  if [ "$MODE" = upgrade ]; then
-    for secret in pewdiy-seed-password-ba pewdiy-seed-password-bb pewdiy-seed-password-ca; do
-      revoke="$(grep "^secrets remove-iam-policy-binding $secret " "$GCLOUD_LOG" | head -n 1 || true)"
-      if [ -z "$revoke" ]; then
-        echo "FAIL $MODE: legacy runtime grant not revoked on ${secret}"; exit 1
+  # bindings survive a script upgrade. On every upgrade path (with and without
+  # --demo) each one must be revoked (exact principal + role; database-URL and
+  # seed-job grants untouched); everywhere else there is nothing to revoke and
+  # the policy must be left alone.
+  case "$MODE" in
+    upgrade|upgrade_plain)
+      for secret in pewdiy-seed-password-ba pewdiy-seed-password-bb pewdiy-seed-password-ca; do
+        revoke="$(grep "^secrets remove-iam-policy-binding $secret " "$GCLOUD_LOG" | head -n 1 || true)"
+        if [ -z "$revoke" ]; then
+          echo "FAIL $MODE: legacy runtime grant not revoked on ${secret}"; exit 1
+        fi
+        case "$revoke" in
+          *"--member=serviceAccount:pewdiy-runner@"*"--role=roles/secretmanager.secretAccessor"*) ;;
+          *) echo "FAIL $MODE: revoke targets the wrong principal or role: ${revoke}"; exit 1 ;;
+        esac
+      done
+      if grep -q '^secrets remove-iam-policy-binding pewdiy-database-url ' "$GCLOUD_LOG"; then
+        echo "FAIL $MODE: revoked the runtime database-URL grant"; exit 1
       fi
-      case "$revoke" in
-        *"--member=serviceAccount:pewdiy-runner@"*"--role=roles/secretmanager.secretAccessor"*) ;;
-        *) echo "FAIL $MODE: revoke targets the wrong principal or role: ${revoke}"; exit 1 ;;
-      esac
-    done
-    if grep -q '^secrets remove-iam-policy-binding pewdiy-database-url ' "$GCLOUD_LOG"; then
-      echo "FAIL $MODE: revoked the runtime database-URL grant"; exit 1
-    fi
-    if grep '^secrets remove-iam-policy-binding ' "$GCLOUD_LOG" | grep -q 'pewdiy-seeder@'; then
-      echo "FAIL $MODE: revoked the seed-job identity grant"; exit 1
-    fi
-  elif grep -q '^secrets remove-iam-policy-binding ' "$GCLOUD_LOG"; then
-    echo "FAIL $MODE: legacy revocation attempted with no legacy binding present"; exit 1
-  fi
+      if grep '^secrets remove-iam-policy-binding ' "$GCLOUD_LOG" | grep -q 'pewdiy-seeder@'; then
+        echo "FAIL $MODE: revoked the seed-job identity grant"; exit 1
+      fi ;;
+    *)
+      if grep -q '^secrets remove-iam-policy-binding ' "$GCLOUD_LOG"; then
+        echo "FAIL $MODE: legacy revocation attempted with no legacy binding present"; exit 1
+      fi ;;
+  esac
   # The migrate/seed commands run loadConfig(), so their job env must satisfy every
-  # required value even though they never serve HTTP.
-  assert_job_env pewdiy-migrate \
-    NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
-    APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
-    SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session
-  if [ "$MODE" = demo ] || [ "$MODE" = upgrade ]; then
-    assert_job_env pewdiy-seed \
+  # required value even though they never serve HTTP. (policy_error aborts before
+  # any job exists, so there is nothing to assert there.)
+  if [ "$MODE" != policy_error ]; then
+    assert_job_env pewdiy-migrate \
       NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
       APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
-      SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session \
-      SEED_MODE=cloud-demo
+      SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session
+    if [ "$MODE" = demo ] || [ "$MODE" = upgrade ]; then
+      assert_job_env pewdiy-seed \
+        NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
+        APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
+        SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session \
+        SEED_MODE=cloud-demo
+    fi
   fi
   case "$MODE" in
     first_run)
@@ -262,7 +294,7 @@ for MODE in first_run rerun partial job-fail demo upgrade; do
       grep -q -- '--no-storage-auto-increase' "$GCLOUD_LOG"
       grep -q '^sql users create ' "$GCLOUD_LOG" ;;
     partial) grep -q '^sql users set-password ' "$GCLOUD_LOG" ;;
-    rerun|upgrade)
+    rerun|upgrade|upgrade_plain)
       if grep -Eq '^(secrets create|sql users (create|set-password)) ' "$GCLOUD_LOG"; then
         echo "FAIL $MODE: replaced existing credentials"; exit 1
       fi ;;
