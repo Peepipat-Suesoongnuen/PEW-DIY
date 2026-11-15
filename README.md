@@ -53,13 +53,16 @@ Open `/login`, sign in as B-A (Borrower), B-B (second Borrower) or C-A (Custodia
 
 ### Docker Compose (Episode 3)
 
-Docker Compose starts PostgreSQL, applies migrations, seeds the local demo accounts/fixtures, then starts the API and React client. Set the three `SEED_PASSWORD_*` values privately in the ignored `.env` file before starting; the Compose migration container fails closed if any password is missing. The production seed guard remains enabled for deployed services: only the migration container receives the explicit `SEED_MODE=local-compose-demo` opt-in. Seed passwords are not passed to the long-running API container.
+Docker Compose starts PostgreSQL, applies migrations, seeds the local demo accounts/fixtures, then starts the API and React client. Set `POSTGRES_PASSWORD` and the three `SEED_PASSWORD_*` values privately in the ignored `.env` file before starting; there is **no committed default password**, so Compose fails closed if `POSTGRES_PASSWORD` is missing, and the migration container fails closed if a seed password is missing.
+
+The production seed guard stays enabled for deployed services. Only the one-off migration container receives the explicit `SEED_MODE=local-compose-demo` opt-in; the long-running API container receives neither the seed mode nor the seed passwords. `SEED_MODE` must never be set on a deployed production service. Deployment seeding, if used for Lab 6 UAT accounts, is a separate one-off job that additionally requires the `--cloud-demo` flag (`SEED_MODE=cloud-demo`); see [deployment.md](docs/labs/lab-05/deployment.md).
 
 ```powershell
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-# Set SEED_PASSWORD_BA, SEED_PASSWORD_BB and SEED_PASSWORD_CA in .env.
+# Set POSTGRES_PASSWORD, SEED_PASSWORD_BA, SEED_PASSWORD_BB and SEED_PASSWORD_CA in .env.
 $dockerBin = Join-Path $env:LOCALAPPDATA 'Programs\DockerDesktop\resources\bin'
 $env:PATH = "$dockerBin;$env:PATH"
+docker compose config --quiet
 docker compose up --build -d
 docker compose ps -a
 ```
@@ -104,7 +107,9 @@ Environment loading: app/scripts load optional `.env`; exported process variable
 
 ## Continuous integration
 
-[GitHub Actions CI](.github/workflows/ci.yml) runs on PRs into `main` or `sprint/**`, pushes to those branches and `ci/**`, `feature/**`, `fix/**`, and manual dispatch. It installs both lockfiles with `npm ci`, uses Node24.15.0 and a disposable PostgreSQL17 service, checks server/client/E2E TypeScript, builds both applications, and runs verification-tooling, server/API, client and Chromium E2E tests at desktop/tablet/mobile sizes. Empty, skipped, failing or flaky product suites fail the check; focused E2E tests are rejected. Reports are retained as sanitized workflow artifacts for14 days, without database contents, seed passwords or browser traces.
+[GitHub Actions CI](.github/workflows/ci.yml) runs on PRs into `main` or `sprint/**`, pushes to those branches and `ci/**`, `feature/**`, `fix/**`, `build/**`, and manual dispatch. It installs both lockfiles with `npm ci`, uses Node24.15.0 and a disposable PostgreSQL17 service, checks server/client/E2E TypeScript, builds both applications, and runs verification-tooling, server/API, client and Chromium E2E tests at desktop/tablet/mobile sizes. Empty, skipped, failing or flaky product suites fail the check; focused E2E tests are rejected. Reports are retained as sanitized workflow artifacts for14 days, without database contents, seed passwords or browser traces.
+
+A second job, **Docker image build and readiness**, builds the root `Dockerfile` from a clean checkout, runs the image against a disposable PostgreSQL service, waits for `/api/ready`, checks the SPA shell, and fails if a `.env` file was baked into the image. This is the repeatable C-03 evidence for R-01/R-02. The workflow also exposes `workflow_call`, so the release workflow can reuse the same required checks before deploying.
 
 To run the same checks locally with installed dependencies/Chromium and Node24.15+:
 

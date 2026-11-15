@@ -1,6 +1,7 @@
 x-app-environment: &app_environment
   NODE_ENV: production
-  DATABASE_URL: postgresql://${POSTGRES_USER:-pewdiy}:${POSTGRES_PASSWORD:-pewdiy-local-only}@db:5432/${POSTGRES_DB:-pewdiy}
+  # No committed default: POSTGRES_PASSWORD must come from the ignored .env file.
+  DATABASE_URL: postgresql://${POSTGRES_USER:-pewdiy}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in the ignored .env file}@db:5432/${POSTGRES_DB:-pewdiy}
   PORT: 3000
   APP_ORIGIN: http://localhost:5173
   APP_TIMEZONE: Asia/Bangkok
@@ -15,7 +16,8 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-pewdiy}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pewdiy-local-only}
+      # Fails closed when unset; never commit a password value.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in the ignored .env file}
       POSTGRES_DB: ${POSTGRES_DB:-pewdiy}
     ports:
       - "127.0.0.1:15432:5432"

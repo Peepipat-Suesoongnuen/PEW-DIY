@@ -13,8 +13,11 @@
  * E-MANY (3), E-ZERO (0) per fixtures.md. Non-destructive: never overwrites
  * existing totals, never touches users/requests/loans.
  *
- * Usage: SEED_PASSWORD_BA=... SEED_PASSWORD_BB=... SEED_PASSWORD_CA=... \
- *        npm run seed
+ * Usage (local):     SEED_PASSWORD_BA=... SEED_PASSWORD_BB=... SEED_PASSWORD_CA=... \
+ *                    npm run seed
+ * Usage (cloud demo): NODE_ENV=production SEED_MODE=cloud-demo SEED_PASSWORD_*=... \
+ *                    node dist/db/seed.js --cloud-demo
+ *                    Run only as a one-off Cloud Run job; never on the API service.
  */
 import { loadConfig } from "../config/config";
 import { assertSeedAllowed } from "./seed-safety";

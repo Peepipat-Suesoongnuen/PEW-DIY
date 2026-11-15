@@ -37,11 +37,25 @@ describe("production seed guard", () => {
     })).not.toThrow();
   });
 
+  it("allows cloud demo seeding only with the explicit --cloud-demo flag", () => {
+    expect(() => assertSeedAllowed(
+      { NODE_ENV: "production", SEED_MODE: "cloud-demo" },
+      ["--cloud-demo"],
+    )).not.toThrow();
+  });
+
+  it("rejects cloud demo seeding when the flag is missing", () => {
+    expect(() => assertSeedAllowed(
+      { NODE_ENV: "production", SEED_MODE: "cloud-demo" },
+      [],
+    )).toThrow("Seed mode cloud-demo requires the explicit --cloud-demo flag");
+  });
+
   it("rejects production seeding for any other or missing seed mode", () => {
     expect(() => assertSeedAllowed({
       NODE_ENV: "production",
       SEED_MODE: "development",
-    })).toThrow("Seed is disabled when NODE_ENV=production");
+    }, ["--cloud-demo"])).toThrow("Seed is disabled when NODE_ENV=production");
     expect(() => assertSeedAllowed({ NODE_ENV: "production" })).toThrow(
       "Seed is disabled when NODE_ENV=production",
     );
