@@ -28,6 +28,10 @@ skills/
 # Dependencies
 node_modules/
 
+# Python bytecode (deploy/ smoke-test unit tests)
+__pycache__/
+*.pyc
+
 # Build output
 dist/
 
