@@ -11,7 +11,8 @@
 #     demo      : --demo flag         -> seed secrets created/granted + seed job
 #   It also checks: `--edition=enterprise`, storage auto-increase off, min 0 /
 #   max 3 instances, no project-wide secretAccessor role, DB password == password
-#   inside DATABASE_URL, no seed secret/job without --demo, and that no
+#   inside DATABASE_URL, no seed secret/job without --demo, that the migrate and
+#   seed job env satisfies the app's required loadConfig() values, and that no
 #   password/secret value leaks into the output.
 #   Finally DRY_RUN=1 must make zero gcloud calls.
 #
@@ -129,6 +130,24 @@ for MODE in first_run rerun partial job-fail demo; do
     grep -q -- '--cloud-demo' "$GCLOUD_LOG"
   elif grep -q '^run jobs deploy pewdiy-seed ' "$GCLOUD_LOG"; then
     echo 'FAIL: created the seed job without --demo'; exit 1
+  fi
+  # The migrate/seed commands run loadConfig(), so their job env must satisfy every
+  # required value even though they never serve HTTP.
+  migrate_line="$(grep '^run jobs deploy pewdiy-migrate ' "$GCLOUD_LOG")"
+  case "$migrate_line" in
+    *APP_ORIGIN=*SESSION_COOKIE_NAME=pew_session*) ;;
+    *) echo 'FAIL: migration job env misses required app config'; exit 1 ;;
+  esac
+  if [ "$MODE" = demo ]; then
+    seed_line="$(grep '^run jobs deploy pewdiy-seed ' "$GCLOUD_LOG")"
+    case "$seed_line" in
+      *APP_ORIGIN=*SESSION_COOKIE_NAME=pew_session*) ;;
+      *) echo 'FAIL: seed job env misses required app config'; exit 1 ;;
+    esac
+    case "$seed_line" in
+      *SEED_MODE=cloud-demo*) ;;
+      *) echo 'FAIL: seed job env misses SEED_MODE'; exit 1 ;;
+    esac
   fi
   case "$MODE" in
     first_run)
