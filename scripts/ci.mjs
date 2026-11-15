@@ -16,7 +16,7 @@ const schemas = [];
 let admin;
 const report = { started_at: new Date().toISOString(), node: process.version,
   ...sourceState(root), source_sha256: sourceFingerprints(root),
-  workflow_sha256: canonicalHash(await readFile(path.join(root, ".github/workflows/ci.yml"), "utf8")),
+  workflow_sha256: canonicalHash(await readFile(path.join(root, ".github/workflows/ci-docker.yml"), "utf8")),
   event: process.env.GITHUB_EVENT_NAME ?? "local", steps: [], suites: {}, status: "FAIL" };
 
 async function run(label, script, args = [], env = {}, cwd = root) {

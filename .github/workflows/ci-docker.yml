@@ -1,0 +1,182 @@
+# ##############################################################################
+# CI — "CI & Docker Build" (Lab 5 Episode 4, R-05 / C-01)
+# ##############################################################################
+# WHAT THIS WORKFLOW DOES
+#   Runs the project's checks on every relevant Pull Request and is reused by
+#   the release workflow (Episode 7) through `workflow_call`:
+#     offline deploy-script tests (no GCP)
+#       -> full application regression suite (real PostgreSQL service)
+#       -> frontend build + production Docker build
+#   It does NOT deploy anything and never authenticates to Google Cloud.
+#
+# IMPORTANT (names the lab guide and Episode 6 depend on)
+#   - job id : test-and-docker  (Episode 6 makes it a required check)
+#   - the workflow is `ci-docker.yml` as required by the guide
+#
+# REFERENCES
+#   - Workflow syntax    : https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions
+#   - Reusable workflows : https://docs.github.com/en/actions/sharing-automations/reusing-workflows
+# ##############################################################################
+name: CI & Docker Build
+
+on:
+  pull_request:
+    # Normal PRs into staging and the release PR staging -> main.
+    branches: [main, 'sprint/**']
+  push:
+    branches: [main, 'sprint/**']
+  # Episode 7 deploy.yml calls this workflow so deployment waits for the checks.
+  workflow_call:
+  workflow_dispatch:
+
+# Least privilege: this workflow only needs to read the repository.
+permissions:
+  contents: read
+
+# A newer run on the same ref cancels the older one (saves minutes).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # IMPORTANT: job id must stay `test-and-docker`.
+  test-and-docker:
+    name: Build, tests and Docker build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      # Both databases live only inside this job's disposable PostgreSQL service.
+      CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: pewdiy_ci
+          POSTGRES_DB: pewdiy_ci_test
+          # Disposable runner-only database; no production credentials.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pewdiy_ci -d pewdiy_ci_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.15.0'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+
+      # Deployment scripts are tested offline: every gcloud/openssl call is a
+      # local stub, so this step needs no GCP access and costs nothing.
+      - name: Check deployment scripts without accessing GCP
+        run: |
+          bash -n deploy/deploy.sh deploy/teardown.sh deploy/release.sh
+          bash deploy/tests/test_deploy_stub.sh
+          bash deploy/tests/test_release_stub.sh
+          python3 -m unittest discover -s deploy/tests -p 'test_smoke.py'
+
+      - name: Install locked dependencies
+        run: |
+          npm ci --no-audit
+          npm --prefix client ci --no-audit
+      - name: Provision isolated migration-repair database
+        run: psql "$CI_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -c 'CREATE DATABASE pewdiy_migration_repair_test'
+      - name: Install Chromium and Linux dependencies
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Build, typecheck and run all regression suites
+        run: npm run test:ci
+        env:
+          NODE_ENV: test
+          CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
+          MIGRATION_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_migration_repair_test
+      - name: Verify the production Dockerfile builds
+        run: docker build --tag pewdiy:ci .
+      - name: Upload sanitized test reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ci-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+  # Extra proof for C-03: the built image runs and serves the SPA, and no .env
+  # file is baked into it. It never deploys or authenticates to Google Cloud.
+  docker-image:
+    name: Docker image readiness (C-03)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: pewdiy_ci
+          POSTGRES_DB: pewdiy_ci_test
+          # Disposable runner-only database; no production credentials.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pewdiy_ci -d pewdiy_ci_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build the root application image (C-03)
+        run: docker build --tag pewdiy:ci .
+      - name: Run the image against the database and prove readiness
+        run: |
+          docker run --detach --name pewdiy-ci --network host \
+            --env NODE_ENV=production \
+            --env PORT=3000 \
+            --env APP_ORIGIN=http://127.0.0.1:3000 \
+            --env DATABASE_URL=postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test \
+            --env SESSION_IDLE_MINUTES=60 \
+            --env SESSION_ABSOLUTE_MINUTES=480 \
+            --env SESSION_COOKIE_NAME=pew_session \
+            --env SESSION_COOKIE_SECURE=false \
+            --env APP_TIMEZONE=Asia/Bangkok \
+            pewdiy:ci
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:3000/api/ready; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "Container never became ready"
+            docker logs pewdiy-ci
+            exit 1
+          fi
+          curl --silent --fail --output /dev/null http://127.0.0.1:3000/login
+          echo "PASS container readiness and SPA shell"
+      - name: Prove no environment secret was baked into the image
+        run: |
+          if docker run --rm pewdiy:ci sh -c 'test -e /app/.env'; then
+            echo "A .env file was baked into the image"
+            exit 1
+          fi
+          echo "PASS no .env inside the image"
+      - name: Container logs
+        if: ${{ !cancelled() }}
+        run: docker logs pewdiy-ci || true
+      - name: Stop the container
+        if: ${{ always() }}
+        run: docker rm --force pewdiy-ci || true

@@ -17,6 +17,7 @@ import { createAuthMiddleware, AuthenticatedRequest } from "../services/authz";
 import { createEquipmentRouter } from "./equipment-routes";
 import { createRequestRouter } from "./request-routes";
 import { createLoanRouter } from "./loan-routes";
+import { createHealthRouter } from "./health-routes";
 import { LoanService } from "../services/loan";
 import type { BorrowingRequestService } from "../services/borrowing-request";
 import { AppConfig } from "../config/config";
@@ -89,6 +90,10 @@ export function createApp({ auth, config, requests, loans }: AppDeps): express.A
     deny();
   }
   app.use("/api", requireTrustedOrigin);
+
+  // Readiness is intentionally public and mounted before protected API routes.
+  // It reuses AuthService's existing pool; no second database pool is created.
+  app.use("/api", createHealthRouter(auth.pool));
 
   // POST /api/auth/login — available without existing credential.
   router.post("/auth/login", async (req: Request, res: Response) => {
