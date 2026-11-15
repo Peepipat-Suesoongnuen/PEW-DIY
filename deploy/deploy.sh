@@ -337,31 +337,50 @@ fi
 #     the seed-password secrets. Secret Manager bindings persist independently
 #     of this script, so this cleanup runs on EVERY invocation — including the
 #     documented default command without --demo — over the three known seed-
-#     secret names. Idempotent: a missing secret or a missing binding is
-#     skipped, so nothing changes on a clean project. Only the exact principal
-#     + role pair is removed; the database-URL grant of the runtime identity
-#     and the seed-job identity's grants are untouched. Asserted by
-#     test_deploy_stub.sh (upgrade with and without --demo start with the
-#     legacy bindings present).
+#     secret names. Only the exact principal + role pair is removed; the
+#     database-URL grant of the runtime identity and the seed-job identity's
+#     grants are untouched.
+#     Error handling: a confirmed NOT_FOUND (the secret does not exist) is
+#     skipped — there is nothing to revoke. Any OTHER lookup failure
+#     (permission denied, API disabled, network) aborts the deployment before
+#     anything is built or deployed, because silently skipping could leave a
+#     legacy grant in place. Asserted by test_deploy_stub.sh (upgrade with and
+#     without --demo start with the legacy bindings present; policy_error
+#     simulates an unreadable policy on an existing secret).
 # ------------------------------------------------------------------------------
 for secret in "$SECRET_SEED_BA" "$SECRET_SEED_BB" "$SECRET_SEED_CA"; do
   if [ "$DRY_RUN" = "1" ]; then
-      run_cmd gcloud secrets get-iam-policy "$secret" --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" --project "$PROJECT_ID"
-      run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
-        --member="serviceAccount:${SA_EMAIL}" \
-        --role="roles/secretmanager.secretAccessor" \
-        --project "$PROJECT_ID" --quiet
-    else
-      if gcloud secrets get-iam-policy "$secret" --project "$PROJECT_ID" \
-            --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" 2>/dev/null \
-          | grep -q "^roles/secretmanager.secretAccessor[[:space:]]*serviceAccount:${SA_EMAIL}\$"; then
+    run_cmd gcloud secrets get-iam-policy "$secret" --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" --project "$PROJECT_ID"
+    run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
+      --member="serviceAccount:${SA_EMAIL}" \
+      --role="roles/secretmanager.secretAccessor" \
+      --project "$PROJECT_ID" --quiet
+  else
+    policy_out=""
+    if policy_out="$(gcloud secrets get-iam-policy "$secret" --project "$PROJECT_ID" \
+          --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" 2>&1)"; then
+      if printf '%s\n' "$policy_out" | grep -q "^roles/secretmanager.secretAccessor[[:space:]]*serviceAccount:${SA_EMAIL}\$"; then
         run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
           --member="serviceAccount:${SA_EMAIL}" \
           --role="roles/secretmanager.secretAccessor" \
           --project "$PROJECT_ID" --quiet
       fi
+    else
+      # The lookup failed. Only a confirmed NOT_FOUND (the secret does not
+      # exist) may be skipped; any other error must abort, or a legacy grant
+      # could survive unnoticed.
+      case "$policy_out" in
+        *NOT_FOUND*)
+          # No such secret -> no legacy binding -> nothing to revoke.
+          ;;
+        *)
+          printf 'ERROR: cannot read the IAM policy of %s; aborting so a legacy %s grant cannot survive unnoticed:\n%s\n' \
+            "$secret" "$SA_EMAIL" "$policy_out" >&2
+          exit 1 ;;
+      esac
     fi
-  done
+  fi
+done
 
 # ==============================================================================
 # 8. Build & Push Unified Container Image via Cloud Build
