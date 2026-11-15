@@ -43,7 +43,9 @@ services:
       SEED_PASSWORD_BA: ${SEED_PASSWORD_BA:-}
       SEED_PASSWORD_BB: ${SEED_PASSWORD_BB:-}
       SEED_PASSWORD_CA: ${SEED_PASSWORD_CA:-}
-    command: ["sh", "-c", "node dist/db/migrate.js && node dist/db/seed.js"]
+    # The explicit flag is required by server/src/db/seed-safety.ts; without it
+    # production seeding is rejected. Only this one-shot service passes it.
+    command: ["sh", "-c", "node dist/db/migrate.js && node dist/db/seed.js --local-compose-demo"]
 
   server:
     build:
