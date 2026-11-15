@@ -34,7 +34,9 @@ set -euo pipefail
 #     refuses to seed production otherwise). The API service never receives
 #     SEED_MODE or any seed password, and its identity (pewdiy-runner) cannot
 #     even read the seed-password secrets: the one-off seed job runs as its own
-#     identity (pewdiy-seeder), the only one granted access to them.
+#     identity (pewdiy-seeder), the only one granted access to them. Any legacy
+#     grant of the runtime identity on the seed-password secrets (from an older
+#     version of this script) is revoked on upgrade (step 7c).
 #
 # REFERENCES
 #   - gcloud run deploy : https://cloud.google.com/sdk/gcloud/reference/run/deploy
@@ -325,6 +327,38 @@ if [ "$SEED_DEMO_DATA" = "true" ]; then
       --member="serviceAccount:${SEED_SA_EMAIL}" \
       --role="roles/secretmanager.secretAccessor" \
       --project "$PROJECT_ID" --quiet
+  done
+fi
+
+# ------------------------------------------------------------------------------
+# 7c. Revoke the legacy runtime grants on the seed-password secrets (--demo)
+#     An earlier version of this script granted pewdiy-runner secretAccessor on
+#     the seed-password secrets. Secret Manager bindings persist independently
+#     of this script, so on an upgraded deployment they must be revoked
+#     explicitly or the API identity keeps its old access. Idempotent: the
+#     pre-check finds no legacy binding on a clean project and nothing changes.
+#     Only the exact principal + role pair is removed; the database-URL grant of
+#     the runtime identity is untouched. Asserted by test_deploy_stub.sh (the
+#     `upgrade` scenario starts with the legacy bindings present).
+# ------------------------------------------------------------------------------
+if [ "$SEED_DEMO_DATA" = "true" ]; then
+  for secret in "${SEED_SECRETS[@]}"; do
+    if [ "$DRY_RUN" = "1" ]; then
+      run_cmd gcloud secrets get-iam-policy "$secret" --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" --project "$PROJECT_ID"
+      run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
+        --member="serviceAccount:${SA_EMAIL}" \
+        --role="roles/secretmanager.secretAccessor" \
+        --project "$PROJECT_ID" --quiet
+    else
+      if gcloud secrets get-iam-policy "$secret" --project "$PROJECT_ID" \
+            --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" 2>/dev/null \
+          | grep -q "^roles/secretmanager.secretAccessor[[:space:]]*serviceAccount:${SA_EMAIL}\$"; then
+        run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
+          --member="serviceAccount:${SA_EMAIL}" \
+          --role="roles/secretmanager.secretAccessor" \
+          --project "$PROJECT_ID" --quiet
+      fi
+    fi
   done
 fi
 

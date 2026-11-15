@@ -9,11 +9,15 @@
 #     partial   : DB secret missing   -> DB user password reset + secret created
 #     job-fail  : migration fails     -> script exits 1, service NOT deployed
 #     demo      : --demo flag         -> seed secrets created/granted + seed job
+#     upgrade   : --demo on an old deployment whose policy still grants the API
+#                 identity the seed passwords -> those legacy grants are revoked
 #   It also checks: `--edition=enterprise`, storage auto-increase off, min 0 /
 #   max 3 instances, no project-wide secretAccessor role, DB password == password
 #   inside DATABASE_URL, no seed secret/job without --demo, that the seed-
 #   password secrets are readable ONLY by the dedicated seed-job identity
 #   (pewdiy-seeder) and never by the API service account (pewdiy-runner), that
+#   legacy runtime grants on the seed-password secrets are revoked on upgrade
+#   (and nothing is revoked when there is nothing to revoke), that
 #   the migrate and seed job env carries every required loadConfig() key with its
 #   expected value (and still reads DATABASE_URL from Secret Manager), and that
 #   no password/secret value leaks into the output.
@@ -69,6 +73,20 @@ if [ "${1:-} ${2:-} ${3:-}" = 'run jobs execute' ]; then
 fi
 if [ "${1:-} ${2:-} ${3:-}" = 'secrets versions add' ]; then
   cat > "$TEST_STATE_DIR/payload-${4}"
+  exit 0
+fi
+if [ "${1:-} ${2:-}" = 'secrets get-iam-policy' ]; then
+  # The upgrade scenario simulates an old deployment whose policy still grants
+  # the runtime identity access to the seed-password secrets. The secret name
+  # is $3 (gcloud secrets get-iam-policy NAME).
+  if [ "$STUB_MODE" = upgrade ]; then
+    case "${3:-}" in
+      pewdiy-seed-password-*)
+        printf 'roles/secretmanager.secretAccessor\t%s\n' \
+          "serviceAccount:pewdiy-runner@stub-gcp-project.iam.gserviceaccount.com"
+        ;;
+    esac
+  fi
   exit 0
 fi
 if [ "${1:-} ${2:-} ${3:-}" = 'sql users list' ]; then
@@ -128,13 +146,13 @@ assert_job_env() {  # $1 = job name, remaining args = key=value pairs
 }
 
 # --- Run every scenario and assert on what deploy.sh did ------------------------
-for MODE in first_run rerun partial job-fail demo; do
+for MODE in first_run rerun partial job-fail demo upgrade; do
   export STUB_MODE="$MODE"
   [ "$MODE" != demo ] || export STUB_MODE=first_run
   export GCLOUD_LOG="$TEST_STATE_DIR/gcloud-$MODE.log"
   rm -f "$TEST_STATE_DIR/sql-pass" "$TEST_STATE_DIR"/payload-*
   args=()
-  if [ "$MODE" = demo ]; then args+=(--demo); fi
+  if [ "$MODE" = demo ] || [ "$MODE" = upgrade ]; then args+=(--demo); fi
   result=0
   bash "$DEPLOY_SCRIPT" ${args[@]+"${args[@]}"} > "$TEST_STATE_DIR/output" 2>&1 || result=$?
   expected=0
@@ -154,7 +172,7 @@ for MODE in first_run rerun partial job-fail demo; do
     echo 'FAIL: runtime has project-wide secret access'; exit 1
   fi
   grep -q '^secrets add-iam-policy-binding pewdiy-database-url .*roles/secretmanager.secretAccessor' "$GCLOUD_LOG"
-  if [ "$MODE" = demo ]; then
+  if [ "$MODE" = demo ] || [ "$MODE" = upgrade ]; then
     # IAM boundary (PR #57 review): each seed-password secret is readable by the
     # dedicated seed-job identity (pewdiy-seeder) ONLY. The long-running API's
     # identity (pewdiy-runner) must never be granted access to any of them.
@@ -200,13 +218,38 @@ for MODE in first_run rerun partial job-fail demo; do
       echo 'FAIL: created the seed-job identity without --demo'; exit 1
     fi
   fi
+  # Legacy-grant revocation (PR #58 review): an old version of the script
+  # granted the runtime identity access to the seed-password secrets, and those
+  # bindings survive a script upgrade. In the upgrade scenario every one of them
+  # must be revoked (exact principal + role, database-URL grant untouched);
+  # everywhere else there is nothing to revoke and the policy must be left alone.
+  if [ "$MODE" = upgrade ]; then
+    for secret in pewdiy-seed-password-ba pewdiy-seed-password-bb pewdiy-seed-password-ca; do
+      revoke="$(grep "^secrets remove-iam-policy-binding $secret " "$GCLOUD_LOG" | head -n 1 || true)"
+      if [ -z "$revoke" ]; then
+        echo "FAIL $MODE: legacy runtime grant not revoked on ${secret}"; exit 1
+      fi
+      case "$revoke" in
+        *"--member=serviceAccount:pewdiy-runner@"*"--role=roles/secretmanager.secretAccessor"*) ;;
+        *) echo "FAIL $MODE: revoke targets the wrong principal or role: ${revoke}"; exit 1 ;;
+      esac
+    done
+    if grep -q '^secrets remove-iam-policy-binding pewdiy-database-url ' "$GCLOUD_LOG"; then
+      echo "FAIL $MODE: revoked the runtime database-URL grant"; exit 1
+    fi
+    if grep '^secrets remove-iam-policy-binding ' "$GCLOUD_LOG" | grep -q 'pewdiy-seeder@'; then
+      echo "FAIL $MODE: revoked the seed-job identity grant"; exit 1
+    fi
+  elif grep -q '^secrets remove-iam-policy-binding ' "$GCLOUD_LOG"; then
+    echo "FAIL $MODE: legacy revocation attempted with no legacy binding present"; exit 1
+  fi
   # The migrate/seed commands run loadConfig(), so their job env must satisfy every
   # required value even though they never serve HTTP.
   assert_job_env pewdiy-migrate \
     NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
     APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
     SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session
-  if [ "$MODE" = demo ]; then
+  if [ "$MODE" = demo ] || [ "$MODE" = upgrade ]; then
     assert_job_env pewdiy-seed \
       NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
       APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
@@ -219,9 +262,9 @@ for MODE in first_run rerun partial job-fail demo; do
       grep -q -- '--no-storage-auto-increase' "$GCLOUD_LOG"
       grep -q '^sql users create ' "$GCLOUD_LOG" ;;
     partial) grep -q '^sql users set-password ' "$GCLOUD_LOG" ;;
-    rerun)
+    rerun|upgrade)
       if grep -Eq '^(secrets create|sql users (create|set-password)) ' "$GCLOUD_LOG"; then
-        echo 'FAIL: rerun replaced existing credentials'; exit 1
+        echo "FAIL $MODE: replaced existing credentials"; exit 1
       fi ;;
   esac
   if [ -f "$TEST_STATE_DIR/sql-pass" ]; then
