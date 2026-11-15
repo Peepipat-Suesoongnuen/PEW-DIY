@@ -293,6 +293,12 @@ run_cmd gcloud builds submit \
 
 APP_ENV="NODE_ENV=production,APP_TIMEZONE=Asia/Bangkok,SESSION_IDLE_MINUTES=60,SESSION_ABSOLUTE_MINUTES=480,SESSION_COOKIE_NAME=pew_session,SESSION_COOKIE_SECURE=true"
 
+# The migration and seed commands call the app's fail-closed loadConfig(), which
+# requires PORT, APP_ORIGIN and the SESSION_* values even though a batch job
+# never serves requests or sets a cookie. Without them the job exits with
+# "Missing required configuration" before touching the database.
+JOB_ENV="NODE_ENV=production,APP_TIMEZONE=Asia/Bangkok,PORT=3000,APP_ORIGIN=http://localhost:3000,SESSION_IDLE_MINUTES=60,SESSION_ABSOLUTE_MINUTES=480,SESSION_COOKIE_NAME=pew_session"
+
 # ==============================================================================
 # 9. Create/Update & Execute the Cloud Run Job for migrations
 #    IMPORTANT: if this job fails the script stops BEFORE deploying the service,
@@ -305,7 +311,7 @@ run_cmd gcloud run jobs deploy "$MIGRATE_JOB_NAME" \
   --service-account "$SA_EMAIL" \
   --set-cloudsql-instances "$SQL_CONN_NAME" \
   --set-secrets "DATABASE_URL=${SECRET_DB_URL}:latest" \
-  --set-env-vars "NODE_ENV=production,APP_TIMEZONE=Asia/Bangkok" \
+  --set-env-vars "$JOB_ENV" \
   --command "node" \
   --args "dist/db/migrate.js" \
   --max-retries 1 \
@@ -334,7 +340,7 @@ if [ "$SEED_DEMO_DATA" = "true" ]; then
     --service-account "$SA_EMAIL" \
     --set-cloudsql-instances "$SQL_CONN_NAME" \
     --set-secrets "DATABASE_URL=${SECRET_DB_URL}:latest,${SEED_SECRET_ARGS%,}" \
-    --set-env-vars "NODE_ENV=production,SEED_MODE=cloud-demo,APP_TIMEZONE=Asia/Bangkok" \
+    --set-env-vars "${JOB_ENV},SEED_MODE=cloud-demo" \
     --command "node" \
     --args "dist/db/seed.js,--cloud-demo" \
     --max-retries 0 \

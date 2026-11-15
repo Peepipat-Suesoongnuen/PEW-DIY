@@ -11,7 +11,9 @@
 #     demo      : --demo flag         -> seed secrets created/granted + seed job
 #   It also checks: `--edition=enterprise`, storage auto-increase off, min 0 /
 #   max 3 instances, no project-wide secretAccessor role, DB password == password
-#   inside DATABASE_URL, no seed secret/job without --demo, and that no
+#   inside DATABASE_URL, no seed secret/job without --demo, that the migrate and
+#   seed job env carries every required loadConfig() key with its expected value
+#   (and still reads DATABASE_URL from Secret Manager), and that no
 #   password/secret value leaks into the output.
 #   Finally DRY_RUN=1 must make zero gcloud calls.
 #
@@ -93,6 +95,36 @@ export PROJECT_ID=stub-gcp-project
 export REGION=asia-southeast1
 export DRY_RUN=0
 
+# --- Assertions -----------------------------------------------------------------
+# The migrate/seed commands call the app's fail-closed loadConfig(), so their job
+# env must carry every required non-secret key with the exact expected value, and
+# DATABASE_URL must still come from Secret Manager. Extracting the single
+# --set-env-vars value (never a substring match) means a dropped or mistyped key
+# fails here instead of at job startup.
+assert_job_env() {  # $1 = job name, remaining args = key=value pairs
+  local job="$1" line envs pair
+  shift
+  line="$(grep "^run jobs deploy ${job} " "$GCLOUD_LOG" | head -n 1 || true)"
+  if [ -z "$line" ]; then
+    echo "FAIL $MODE: no deploy command recorded for ${job}"; exit 1
+  fi
+  case "$line" in
+    *"--set-env-vars"*) ;;
+    *) echo "FAIL $MODE: ${job} has no --set-env-vars"; exit 1 ;;
+  esac
+  envs=" $(printf '%s\n' "$line" | sed -n 's/.*--set-env-vars \([^ ]*\).*/\1/p' | tr ',' ' ') "
+  for pair in "$@"; do
+    case "$envs" in
+      *" ${pair} "*) ;;
+      *) echo "FAIL $MODE: ${job} env missing or wrong: ${pair}"; exit 1 ;;
+    esac
+  done
+  case "$line" in
+    *"--set-secrets DATABASE_URL=pewdiy-database-url:latest"*) ;;
+    *) echo "FAIL $MODE: ${job} does not read DATABASE_URL from Secret Manager"; exit 1 ;;
+  esac
+}
+
 # --- Run every scenario and assert on what deploy.sh did ------------------------
 for MODE in first_run rerun partial job-fail demo; do
   export STUB_MODE="$MODE"
@@ -129,6 +161,19 @@ for MODE in first_run rerun partial job-fail demo; do
     grep -q -- '--cloud-demo' "$GCLOUD_LOG"
   elif grep -q '^run jobs deploy pewdiy-seed ' "$GCLOUD_LOG"; then
     echo 'FAIL: created the seed job without --demo'; exit 1
+  fi
+  # The migrate/seed commands run loadConfig(), so their job env must satisfy every
+  # required value even though they never serve HTTP.
+  assert_job_env pewdiy-migrate \
+    NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
+    APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
+    SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session
+  if [ "$MODE" = demo ]; then
+    assert_job_env pewdiy-seed \
+      NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
+      APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
+      SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session \
+      SEED_MODE=cloud-demo
   fi
   case "$MODE" in
     first_run)
