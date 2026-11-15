@@ -194,6 +194,13 @@ Result: **12 passed / 12**.
 Preconditions for every row: a clean checkout of the verified commit on a GitHub-hosted
 `ubuntu-24.04` runner; no repository secret is required.
 
+> **Episode 4 note (history preserved):** these rows record the CI run as it existed at
+> `e17295c`, when the workflow file was `.github/workflows/ci.yml` and the jobs were named
+> `Build and regression tests` / `Docker image build and readiness`. Episode 4 renamed the
+> file to `.github/workflows/ci-docker.yml` and the check job to **`Build, tests and Docker
+> build`** (id `test-and-docker`); the run IDs below are unchanged history, not reruns under
+> the new name. See [Episode 4 evidence](episode-4-ci-evidence.md).
+
 | ID | Check identifier | Inputs | Expected | Actual | AC |
 |---|---|---|---|---|---|
 | CI-01 | Job `Build and regression tests` | `npm ci` for root and client, disposable PostgreSQL 17 service, Chromium | Server/API, client, E2E and verification-tooling suites pass; both builds succeed | Success at `e17295c` (run 43715264311) | AC-11, AC-13 (evidence only) |
