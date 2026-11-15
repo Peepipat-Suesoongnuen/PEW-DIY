@@ -78,6 +78,17 @@ class SmokeTests(unittest.TestCase):
                 smoke.check('https://demo.test')
             self.assertEqual(req.call_args.args[1], '/api/auth/logout')
 
+    @patch.dict('os.environ', {'SMOKE_USERNAME': 'smoke', 'SMOKE_PASSWORD': 'test-only'}, clear=True)
+    def test_session_is_logged_out_when_login_response_is_incomplete(self):
+        def incomplete_login(base, path, data=None, jar=None, **kwargs):
+            if path == '/api/auth/login':
+                return b'{"data":{}}'
+            return self.authenticated(base, path, data, jar)
+        with patch.object(smoke, 'request', side_effect=incomplete_login) as req:
+            with self.assertRaisesRegex(RuntimeError, 'Login smoke'):
+                smoke.check('https://demo.test')
+            self.assertEqual(req.call_args.args[1], '/api/auth/logout')
+
     @patch.dict('os.environ', {'SMOKE_USERNAME': 'smoke'}, clear=True)
     def test_partial_credentials_are_rejected(self):
         with patch.object(smoke, 'request', side_effect=self.response):

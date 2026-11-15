@@ -115,10 +115,13 @@ def check(base):
     jar = http.cookiejar.CookieJar()
     logged_in = False
     try:
-        login = json.loads(request(
-            base, '/api/auth/login', {'username': username, 'password': password}, jar=jar))
-        role = login['data']['user']['role']
+        body = request(
+            base, '/api/auth/login', {'username': username, 'password': password}, jar=jar)
+        # A successful login response already set the session cookie, so cleanup
+        # (logout) is required even if the body below is malformed.
         logged_in = True
+        login = json.loads(body)
+        role = login['data']['user']['role']
         request(base, '/api/auth/me', jar=jar)
         catalog = json.loads(request(base, '/api/equipment', jar=jar))
         if not isinstance(catalog.get('data'), list):
