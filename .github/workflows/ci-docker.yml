@@ -1,25 +1,49 @@
-name: CI
+# ##############################################################################
+# CI — "CI & Docker Build" (Lab 5 Episode 4, R-05 / C-01)
+# ##############################################################################
+# WHAT THIS WORKFLOW DOES
+#   Runs the project's checks on every relevant Pull Request and is reused by
+#   the release workflow (Episode 7) through `workflow_call`:
+#     offline deploy-script tests (no GCP)
+#       -> full application regression suite (real PostgreSQL service)
+#       -> frontend build + production Docker build
+#   It does NOT deploy anything and never authenticates to Google Cloud.
+#
+# IMPORTANT (names the lab guide and Episode 6 depend on)
+#   - job id : test-and-docker  (Episode 6 makes it a required check)
+#   - the workflow is `ci-docker.yml` as required by the guide
+#
+# REFERENCES
+#   - Workflow syntax    : https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions
+#   - Reusable workflows : https://docs.github.com/en/actions/sharing-automations/reusing-workflows
+# ##############################################################################
+name: CI & Docker Build
 
 on:
   pull_request:
+    # Normal PRs into staging and the release PR staging -> main.
     branches: [main, 'sprint/**']
   push:
-    branches: [main, 'sprint/**', 'ci/**', 'feature/**', 'fix/**', 'build/**']
+    branches: [main, 'sprint/**']
+  # Episode 7 deploy.yml calls this workflow so deployment waits for the checks.
   workflow_call:
   workflow_dispatch:
 
+# Least privilege: this workflow only needs to read the repository.
 permissions:
   contents: read
 
+# A newer run on the same ref cancels the older one (saves minutes).
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  checks:
-    name: Build and regression tests
+  # IMPORTANT: job id must stay `test-and-docker`.
+  test-and-docker:
+    name: Build, tests and Docker build
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       # Both databases live only inside this job's disposable PostgreSQL service.
       CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
@@ -39,17 +63,29 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - name: Setup Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24.15.0'
           cache: npm
           cache-dependency-path: |
             package-lock.json
             client/package-lock.json
+
+      # Deployment scripts are tested offline: every gcloud/openssl call is a
+      # local stub, so this step needs no GCP access and costs nothing.
+      - name: Check deployment scripts without accessing GCP
+        run: |
+          bash -n deploy/deploy.sh deploy/teardown.sh deploy/release.sh
+          bash deploy/tests/test_deploy_stub.sh
+          bash deploy/tests/test_release_stub.sh
+          python3 -m unittest discover -s deploy/tests -p 'test_smoke.py'
+
       - name: Install locked dependencies
         run: |
           npm ci --no-audit
@@ -64,17 +100,21 @@ jobs:
           NODE_ENV: test
           CI_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_ci_test
           MIGRATION_TEST_DATABASE_URL: postgresql://pewdiy_ci@127.0.0.1:5432/pewdiy_migration_repair_test
+      - name: Verify the production Dockerfile builds
+        run: docker build --tag pewdiy:ci .
       - name: Upload sanitized test reports
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ci-reports-${{ github.run_id }}-${{ github.run_attempt }}
           path: ci-results/
           if-no-files-found: warn
           retention-days: 14
 
+  # Extra proof for C-03: the built image runs and serves the SPA, and no .env
+  # file is baked into it. It never deploys or authenticates to Google Cloud.
   docker-image:
-    name: Docker image build and readiness
+    name: Docker image readiness (C-03)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -93,7 +133,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Build the root application image (C-03)
