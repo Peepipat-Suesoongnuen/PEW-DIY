@@ -11,10 +11,12 @@
 #     demo      : --demo flag         -> seed secrets created/granted + seed job
 #   It also checks: `--edition=enterprise`, storage auto-increase off, min 0 /
 #   max 3 instances, no project-wide secretAccessor role, DB password == password
-#   inside DATABASE_URL, no seed secret/job without --demo, that the migrate and
-#   seed job env carries every required loadConfig() key with its expected value
-#   (and still reads DATABASE_URL from Secret Manager), and that no
-#   password/secret value leaks into the output.
+#   inside DATABASE_URL, no seed secret/job without --demo, that the seed-
+#   password secrets are readable ONLY by the dedicated seed-job identity
+#   (pewdiy-seeder) and never by the API service account (pewdiy-runner), that
+#   the migrate and seed job env carries every required loadConfig() key with its
+#   expected value (and still reads DATABASE_URL from Secret Manager), and that
+#   no password/secret value leaks into the output.
 #   Finally DRY_RUN=1 must make zero gcloud calls.
 #
 # HOW TO RUN (repo root, needs bash):  bash deploy/tests/test_deploy_stub.sh
@@ -153,14 +155,50 @@ for MODE in first_run rerun partial job-fail demo; do
   fi
   grep -q '^secrets add-iam-policy-binding pewdiy-database-url .*roles/secretmanager.secretAccessor' "$GCLOUD_LOG"
   if [ "$MODE" = demo ]; then
+    # IAM boundary (PR #57 review): each seed-password secret is readable by the
+    # dedicated seed-job identity (pewdiy-seeder) ONLY. The long-running API's
+    # identity (pewdiy-runner) must never be granted access to any of them.
     for secret in pewdiy-seed-password-ba pewdiy-seed-password-bb pewdiy-seed-password-ca; do
-      grep -q "^secrets add-iam-policy-binding $secret " "$GCLOUD_LOG"
+      binding="$(grep "^secrets add-iam-policy-binding $secret " "$GCLOUD_LOG" || true)"
+      if [ -z "$binding" ]; then
+        echo "FAIL $MODE: no secret access binding recorded for ${secret}"; exit 1
+      fi
+      case "$binding" in
+        *"--member=serviceAccount:pewdiy-seeder@"*) ;;
+        *) echo "FAIL $MODE: ${secret} is not readable by the seed-job identity"; exit 1 ;;
+      esac
+      case "$binding" in
+        *"serviceAccount:pewdiy-runner@"*)
+          echo "FAIL $MODE: API service account can read ${secret}"; exit 1 ;;
+      esac
     done
+    # The runtime identity gets the database URL secret and nothing else.
+    if grep '^secrets add-iam-policy-binding ' "$GCLOUD_LOG" \
+        | grep -- '--member=serviceAccount:pewdiy-runner@' \
+        | grep -q 'pewdiy-seed-password'; then
+      echo "FAIL $MODE: runtime identity granted a seed-password secret"; exit 1
+    fi
+    # Job identities: the seed job runs as pewdiy-seeder; the migration job and
+    # the API service run as pewdiy-runner and never see a seed secret.
+    grep -q '^run jobs deploy pewdiy-seed .*--service-account pewdiy-seeder@' "$GCLOUD_LOG"
+    grep -q '^run jobs deploy pewdiy-migrate .*--service-account pewdiy-runner@' "$GCLOUD_LOG"
+    grep -q '^run deploy pewdiy .*--service-account pewdiy-runner@' "$GCLOUD_LOG"
+    if grep '^run jobs deploy pewdiy-migrate ' "$GCLOUD_LOG" | grep -q 'pewdiy-seed-password'; then
+      echo "FAIL $MODE: migration job received a seed-password secret"; exit 1
+    fi
+    if grep '^run deploy pewdiy ' "$GCLOUD_LOG" | grep -q 'pewdiy-seed-password'; then
+      echo "FAIL $MODE: API service received a seed-password secret"; exit 1
+    fi
     grep -q '^run jobs deploy pewdiy-seed ' "$GCLOUD_LOG"
     grep -q 'SEED_MODE=cloud-demo' "$GCLOUD_LOG"
     grep -q -- '--cloud-demo' "$GCLOUD_LOG"
-  elif grep -q '^run jobs deploy pewdiy-seed ' "$GCLOUD_LOG"; then
-    echo 'FAIL: created the seed job without --demo'; exit 1
+  else
+    if grep -q '^run jobs deploy pewdiy-seed ' "$GCLOUD_LOG"; then
+      echo 'FAIL: created the seed job without --demo'; exit 1
+    fi
+    if grep -q 'pewdiy-seeder' "$GCLOUD_LOG"; then
+      echo 'FAIL: created the seed-job identity without --demo'; exit 1
+    fi
   fi
   # The migrate/seed commands run loadConfig(), so their job env must satisfy every
   # required value even though they never serve HTTP.
