@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import path from "path";
 import { describe, expect, it } from "vitest";
 import { assertSeedAllowed } from "../src/db/seed-safety";
 
@@ -87,5 +89,33 @@ describe("production seed guard", () => {
       .not.toThrow();
     expect(() => assertSeedAllowed({ NODE_ENV: "test", SEED_MODE: "local-compose-demo" }, []))
       .not.toThrow();
+  });
+});
+
+describe("env template hygiene", () => {
+  const envExample = readFileSync(path.resolve(process.cwd(), ".env.example"), "utf8");
+  const composeYml = readFileSync(path.resolve(process.cwd(), "docker-compose.yml"), "utf8");
+
+  const valueOf = (key: string): string | undefined => {
+    const line = envExample.split("\n").find((l) => l.trimStart().startsWith(`${key}=`));
+    return line?.slice(line.indexOf("=") + 1).trim();
+  };
+
+  it("ships no usable POSTGRES_PASSWORD in .env.example", () => {
+    // A copy of the template must not start the stack with a publicly known
+    // credential: the value stays empty until the user sets their own.
+    expect(valueOf("POSTGRES_PASSWORD")).toBe("");
+  });
+
+  it("ships no usable SEED_PASSWORD_* values in .env.example", () => {
+    for (const key of ["SEED_PASSWORD_BA", "SEED_PASSWORD_BB", "SEED_PASSWORD_CA"]) {
+      expect(valueOf(key)).toBe("");
+    }
+  });
+
+  it("keeps Compose failing closed on an unset or empty POSTGRES_PASSWORD", () => {
+    // `${POSTGRES_PASSWORD:?...}` rejects both unset and empty, so the empty
+    // template value and the Compose fail-closed contract agree.
+    expect(composeYml).toContain("${POSTGRES_PASSWORD:?");
   });
 });
