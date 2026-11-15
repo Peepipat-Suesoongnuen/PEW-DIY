@@ -32,7 +32,11 @@ set -euo pipefail
 #   - Offline test: deploy/tests/test_deploy_stub.sh
 #   - Seeding requires both SEED_MODE=cloud-demo and --cloud-demo (the app
 #     refuses to seed production otherwise). The API service never receives
-#     SEED_MODE or any seed password.
+#     SEED_MODE or any seed password, and its identity (pewdiy-runner) cannot
+#     even read the seed-password secrets: the one-off seed job runs as its own
+#     identity (pewdiy-seeder), the only one granted access to them. Any legacy
+#     grant of the runtime identity on the seed-password secrets (from an older
+#     version of this script) is revoked on upgrade (step 7c).
 #
 # REFERENCES
 #   - gcloud run deploy : https://cloud.google.com/sdk/gcloud/reference/run/deploy
@@ -109,6 +113,10 @@ MIGRATE_JOB_NAME="pewdiy-migrate"
 SEED_JOB_NAME="pewdiy-seed"
 SA_NAME="pewdiy-runner"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+# Dedicated identity for the one-off demo seed job (--demo only). The
+# long-running API must never be able to read the seed-password secrets.
+SEED_SA_NAME="pewdiy-seeder"
+SEED_SA_EMAIL="${SEED_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 SQL_CONN_NAME="${PROJECT_ID}:${REGION}:${SQL_INSTANCE}"
 IMAGE_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${SERVICE_NAME}:latest"
 
@@ -195,8 +203,10 @@ fi
 
 # ==============================================================================
 # 5. Create Dedicated Runtime Service Account & IAM bindings (idempotent)
+#    This is the identity of the long-running API and the migration job.
 #    Least privilege: cloudsql.client only here; secret access is granted per
-#    secret after the secrets exist (step 7).
+#    secret after the secrets exist (step 7) and is limited to the database URL
+#    secret. The demo seed-password secrets are never readable by this identity.
 # ==============================================================================
 if [ "$DRY_RUN" = "1" ]; then
   run_cmd gcloud iam service-accounts describe "$SA_EMAIL" --project "$PROJECT_ID"
@@ -246,9 +256,12 @@ fi
 # 7. Seed passwords in Secret Manager (only with --demo)
 #    The app seeds three demo accounts (B-A, B-B, C-A) from SEED_PASSWORD_*.
 #    Passwords are generated once, stored only in Secret Manager and never
-#    printed. The long-running API never receives them.
+#    printed. The long-running API never receives them and its identity can
+#    never read them: the seed-password secrets are granted ONLY to the
+#    dedicated seed-job identity created in step 7b.
 # ==============================================================================
 RUNTIME_SECRETS=("$SECRET_DB_URL")
+SEED_SECRETS=()
 SEED_SECRET_ARGS=""
 if [ "$SEED_DEMO_DATA" = "true" ]; then
   for pair in "BA:${SECRET_SEED_BA}" "BB:${SECRET_SEED_BB}" "CA:${SECRET_SEED_CA}"; do
@@ -267,7 +280,7 @@ if [ "$SEED_DEMO_DATA" = "true" ]; then
       fi
     fi
     SEED_SECRET_ARGS="${SEED_SECRET_ARGS}SEED_PASSWORD_${account}=${secret}:latest,"
-    RUNTIME_SECRETS+=("$secret")
+    SEED_SECRETS+=("$secret")
   done
 fi
 
@@ -281,6 +294,73 @@ for secret in "${RUNTIME_SECRETS[@]}"; do
     --role="roles/secretmanager.secretAccessor" \
     --project "$PROJECT_ID" --quiet
 done
+
+# ------------------------------------------------------------------------------
+# 7b. Dedicated seed-job identity (only with --demo)
+#     Least-privilege boundary: the long-running API runs as pewdiy-runner and
+#     must never be able to read the demo seed passwords, even through a
+#     compromised API process. The one-off seed job runs as its own identity
+#     pewdiy-seeder, which reads the database URL secret and the three seed-
+#     password secrets. No other identity gets the seed secrets.
+#     deploy/tests/test_deploy_stub.sh asserts this boundary offline.
+# ------------------------------------------------------------------------------
+if [ "$SEED_DEMO_DATA" = "true" ]; then
+  if [ "$DRY_RUN" = "1" ]; then
+    run_cmd gcloud iam service-accounts describe "$SEED_SA_EMAIL" --project "$PROJECT_ID"
+    run_cmd gcloud iam service-accounts create "$SEED_SA_NAME" --display-name="PEW-DIY Demo Seed Job Account" --project "$PROJECT_ID"
+  else
+    if ! gcloud iam service-accounts describe "$SEED_SA_EMAIL" --project "$PROJECT_ID" >/dev/null 2>&1; then
+      run_cmd gcloud iam service-accounts create "$SEED_SA_NAME" \
+        --display-name="PEW-DIY Demo Seed Job Account" \
+        --project "$PROJECT_ID"
+    fi
+  fi
+
+  run_cmd gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:${SEED_SA_EMAIL}" \
+    --role="roles/cloudsql.client" \
+    --condition=None \
+    --quiet
+
+  for secret in "$SECRET_DB_URL" "${SEED_SECRETS[@]}"; do
+    run_cmd gcloud secrets add-iam-policy-binding "$secret" \
+      --member="serviceAccount:${SEED_SA_EMAIL}" \
+      --role="roles/secretmanager.secretAccessor" \
+      --project "$PROJECT_ID" --quiet
+  done
+fi
+
+# ------------------------------------------------------------------------------
+# 7c. Revoke the legacy runtime grants on the seed-password secrets (--demo)
+#     An earlier version of this script granted pewdiy-runner secretAccessor on
+#     the seed-password secrets. Secret Manager bindings persist independently
+#     of this script, so on an upgraded deployment they must be revoked
+#     explicitly or the API identity keeps its old access. Idempotent: the
+#     pre-check finds no legacy binding on a clean project and nothing changes.
+#     Only the exact principal + role pair is removed; the database-URL grant of
+#     the runtime identity is untouched. Asserted by test_deploy_stub.sh (the
+#     `upgrade` scenario starts with the legacy bindings present).
+# ------------------------------------------------------------------------------
+if [ "$SEED_DEMO_DATA" = "true" ]; then
+  for secret in "${SEED_SECRETS[@]}"; do
+    if [ "$DRY_RUN" = "1" ]; then
+      run_cmd gcloud secrets get-iam-policy "$secret" --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" --project "$PROJECT_ID"
+      run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
+        --member="serviceAccount:${SA_EMAIL}" \
+        --role="roles/secretmanager.secretAccessor" \
+        --project "$PROJECT_ID" --quiet
+    else
+      if gcloud secrets get-iam-policy "$secret" --project "$PROJECT_ID" \
+            --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" 2>/dev/null \
+          | grep -q "^roles/secretmanager.secretAccessor[[:space:]]*serviceAccount:${SA_EMAIL}\$"; then
+        run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
+          --member="serviceAccount:${SA_EMAIL}" \
+          --role="roles/secretmanager.secretAccessor" \
+          --project "$PROJECT_ID" --quiet
+      fi
+    fi
+  done
+fi
 
 # ==============================================================================
 # 8. Build & Push Unified Container Image via Cloud Build
@@ -331,13 +411,15 @@ fi
 # ==============================================================================
 # 10. Optional demo seed job (only with --demo)
 #     Separate from the migration job and never part of the API service.
+#     Runs as its own identity (pewdiy-seeder), not the API's pewdiy-runner,
+#     so the API service account cannot read the seed-password secrets.
 #     Both SEED_MODE=cloud-demo and --cloud-demo are required by the app.
 # ==============================================================================
 if [ "$SEED_DEMO_DATA" = "true" ]; then
   run_cmd gcloud run jobs deploy "$SEED_JOB_NAME" \
     --image "$IMAGE_URI" \
     --region "$REGION" \
-    --service-account "$SA_EMAIL" \
+    --service-account "$SEED_SA_EMAIL" \
     --set-cloudsql-instances "$SQL_CONN_NAME" \
     --set-secrets "DATABASE_URL=${SECRET_DB_URL}:latest,${SEED_SECRET_ARGS%,}" \
     --set-env-vars "${JOB_ENV},SEED_MODE=cloud-demo" \
@@ -400,6 +482,7 @@ printf '%s\n' "Readiness Check: ${SERVICE_URL}/api/ready"
 printf '%s\n' "Database URL   : Stored in Secret Manager: ${SECRET_DB_URL} (not printed)."
 if [ "$SEED_DEMO_DATA" = "true" ]; then
   printf '%s\n' "Seed passwords : Stored in Secret Manager: ${SECRET_SEED_BA}, ${SECRET_SEED_BB}, ${SECRET_SEED_CA} (not printed)."
+  printf '%s\n' "Seed identity   : ${SEED_SA_EMAIL} (only the seed job can read them; the API identity ${SA_EMAIL} cannot)."
   printf '%s\n' "Demo accounts  : B-A (BORROWER), B-B (BORROWER), C-A (CUSTODIAN)."
 fi
 printf '%s\n' "=================================================================="

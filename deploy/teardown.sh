@@ -59,6 +59,8 @@ MIGRATE_JOB_NAME="pewdiy-migrate"
 SEED_JOB_NAME="pewdiy-seed"
 SA_NAME="pewdiy-runner"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+SEED_SA_NAME="pewdiy-seeder"
+SEED_SA_EMAIL="${SEED_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
 SECRET_DB_URL="pewdiy-database-url"
 SECRET_SEED_BA="pewdiy-seed-password-ba"
@@ -75,7 +77,7 @@ echo "  - Cloud Run Jobs    : ${MIGRATE_JOB_NAME}, ${SEED_JOB_NAME}"
 echo "  - Cloud SQL Instance: ${SQL_INSTANCE} (ALL DATABASE DATA WILL BE LOST)"
 echo "  - Artifact Registry : ${REPO_NAME}"
 echo "  - Secrets           : ${SECRET_DB_URL}, ${SECRET_SEED_BA}, ${SECRET_SEED_BB}, ${SECRET_SEED_CA}"
-echo "  - Service Account   : ${SA_EMAIL}"
+echo "  - Service Accounts : ${SA_EMAIL}, ${SEED_SA_EMAIL}"
 echo "=================================================================="
 
 # ------------------------------------------------------------------------------
@@ -102,5 +104,6 @@ run_cmd gcloud secrets delete "$SECRET_SEED_BA" --project "$PROJECT_ID" --quiet 
 run_cmd gcloud secrets delete "$SECRET_SEED_BB" --project "$PROJECT_ID" --quiet || true
 run_cmd gcloud secrets delete "$SECRET_SEED_CA" --project "$PROJECT_ID" --quiet || true
 run_cmd gcloud iam service-accounts delete "$SA_EMAIL" --project "$PROJECT_ID" --quiet || true
+run_cmd gcloud iam service-accounts delete "$SEED_SA_EMAIL" --project "$PROJECT_ID" --quiet || true
 
 echo "Teardown completed."
