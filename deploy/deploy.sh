@@ -36,7 +36,8 @@ set -euo pipefail
 #     even read the seed-password secrets: the one-off seed job runs as its own
 #     identity (pewdiy-seeder), the only one granted access to them. Any legacy
 #     grant of the runtime identity on the seed-password secrets (from an older
-#     version of this script) is revoked on upgrade (step 7c).
+#     version of this script) is revoked on EVERY run (step 7c), even when
+#     --demo is omitted.
 #
 # REFERENCES
 #   - gcloud run deploy : https://cloud.google.com/sdk/gcloud/reference/run/deploy
@@ -331,19 +332,20 @@ if [ "$SEED_DEMO_DATA" = "true" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# 7c. Revoke the legacy runtime grants on the seed-password secrets (--demo)
+# 7c. Revoke the legacy runtime grants on the seed-password secrets (ALWAYS)
 #     An earlier version of this script granted pewdiy-runner secretAccessor on
 #     the seed-password secrets. Secret Manager bindings persist independently
-#     of this script, so on an upgraded deployment they must be revoked
-#     explicitly or the API identity keeps its old access. Idempotent: the
-#     pre-check finds no legacy binding on a clean project and nothing changes.
-#     Only the exact principal + role pair is removed; the database-URL grant of
-#     the runtime identity is untouched. Asserted by test_deploy_stub.sh (the
-#     `upgrade` scenario starts with the legacy bindings present).
+#     of this script, so this cleanup runs on EVERY invocation — including the
+#     documented default command without --demo — over the three known seed-
+#     secret names. Idempotent: a missing secret or a missing binding is
+#     skipped, so nothing changes on a clean project. Only the exact principal
+#     + role pair is removed; the database-URL grant of the runtime identity
+#     and the seed-job identity's grants are untouched. Asserted by
+#     test_deploy_stub.sh (upgrade with and without --demo start with the
+#     legacy bindings present).
 # ------------------------------------------------------------------------------
-if [ "$SEED_DEMO_DATA" = "true" ]; then
-  for secret in "${SEED_SECRETS[@]}"; do
-    if [ "$DRY_RUN" = "1" ]; then
+for secret in "$SECRET_SEED_BA" "$SECRET_SEED_BB" "$SECRET_SEED_CA"; do
+  if [ "$DRY_RUN" = "1" ]; then
       run_cmd gcloud secrets get-iam-policy "$secret" --flatten="bindings[].members" --format="value(bindings.role,bindings.members)" --project "$PROJECT_ID"
       run_cmd gcloud secrets remove-iam-policy-binding "$secret" \
         --member="serviceAccount:${SA_EMAIL}" \
@@ -360,7 +362,6 @@ if [ "$SEED_DEMO_DATA" = "true" ]; then
       fi
     fi
   done
-fi
 
 # ==============================================================================
 # 8. Build & Push Unified Container Image via Cloud Build
