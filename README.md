@@ -1,4 +1,4 @@
-﻿# PEW-DIY
+# PEW-DIY
 
 **D.I.Y. Room Equipment Borrowing System**
 
@@ -49,7 +49,25 @@ npm run build:client
 npm run dev
 ```
 
-Open `/login`, sign in as B-A (Borrower), B-B (second Borrower) or C-A (Custodian), using the privately supplied seed password. The server serves the React app and legacy `.html` pages. Seed reruns preserve existing credentials/data; changing SEED_PASSWORD_* does **not** reset an existing account. Use a fresh demo database when supplying new seed passwords.
+Open `/login`, sign in as B-A (Borrower), B-B (second Borrower) or C-A (Custodian), using the privately supplied seed password. The server serves the React application. Seed reruns preserve existing credentials/data; changing SEED_PASSWORD_* does **not** reset an existing account. Use a fresh demo database when supplying new seed passwords.
+
+### Docker Compose (Episode 3)
+
+Docker Compose starts PostgreSQL, applies migrations, seeds the local demo accounts/fixtures, then starts the API and React client. Set `POSTGRES_PASSWORD` and the three `SEED_PASSWORD_*` values privately in the ignored `.env` file before starting; there is **no committed default password**, so Compose fails closed if `POSTGRES_PASSWORD` is missing, and the migration container fails closed if a seed password is missing.
+
+The production seed guard stays enabled for deployed services, and production seeding is a **two-step opt-in**: it needs both a `SEED_MODE` value **and** the matching command-line flag, so an environment variable alone can never seed. Only the one-shot migration service passes `SEED_MODE=local-compose-demo` together with `--local-compose-demo`; the long-running API container receives neither the seed mode nor the seed passwords. `SEED_MODE` must never be set on a deployed production service. A later one-off deployment job for Lab 6 UAT accounts will follow the same rule (`SEED_MODE=cloud-demo` plus `--cloud-demo`). See [episode-3-docker-evidence.md](docs/labs/lab-05/episode-3-docker-evidence.md).
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# Set POSTGRES_PASSWORD, SEED_PASSWORD_BA, SEED_PASSWORD_BB and SEED_PASSWORD_CA in .env.
+$dockerBin = Join-Path $env:LOCALAPPDATA 'Programs\DockerDesktop\resources\bin'
+$env:PATH = "$dockerBin;$env:PATH"
+docker compose config --quiet
+docker compose up --build -d
+docker compose ps -a
+```
+
+Open `http://localhost:5173/login`; the API readiness endpoint is `http://localhost:3000/api/ready`. PostgreSQL is published only on `127.0.0.1:15432` (container port 5432), and its data persists in the `postgres_data` volume. Do not use `docker compose down -v` unless intentionally deleting that database volume.
 
 The setup timing target is a running seeded login/catalog within15 minutes from the documented installed-tool prerequisites, including dependency installation, DB creation, configuration, migration, seed, build and startup. A local timed rehearsal is [recorded here](docs/verification/sprint-1/run/setup.json); caches and the pending other-student repetition are disclosed. This does not claim a clean OS install in15 minutes.
 
@@ -89,7 +107,9 @@ Environment loading: app/scripts load optional `.env`; exported process variable
 
 ## Continuous integration
 
-[GitHub Actions CI](.github/workflows/ci.yml) runs on PRs into `main` or `sprint/**`, pushes to those branches and `ci/**`, `feature/**`, `fix/**`, and manual dispatch. It installs both lockfiles with `npm ci`, uses Node24.15.0 and a disposable PostgreSQL17 service, checks server/client/E2E TypeScript, builds both applications, and runs verification-tooling, server/API, client and Chromium E2E tests at desktop/tablet/mobile sizes. Empty, skipped, failing or flaky product suites fail the check; focused E2E tests are rejected. Reports are retained as sanitized workflow artifacts for14 days, without database contents, seed passwords or browser traces.
+[GitHub Actions CI](.github/workflows/ci.yml) runs on PRs into `main` or `sprint/**`, pushes to those branches and `ci/**`, `feature/**`, `fix/**`, `build/**`, and manual dispatch. It installs both lockfiles with `npm ci`, uses Node24.15.0 and a disposable PostgreSQL17 service, checks server/client/E2E TypeScript, builds both applications, and runs verification-tooling, server/API, client and Chromium E2E tests at desktop/tablet/mobile sizes. Empty, skipped, failing or flaky product suites fail the check; focused E2E tests are rejected. Reports are retained as sanitized workflow artifacts for14 days, without database contents, seed passwords or browser traces.
+
+A second job, **Docker image build and readiness**, builds the root `Dockerfile` from a clean checkout, runs the image against a disposable PostgreSQL service, waits for `/api/ready`, checks the SPA shell, and fails if a `.env` file was baked into the image. This is the repeatable C-03 evidence for R-01/R-02. The workflow also exposes `workflow_call`, so the release workflow can reuse the same required checks before deploying.
 
 To run the same checks locally with installed dependencies/Chromium and Node24.15+:
 

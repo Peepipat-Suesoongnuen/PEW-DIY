@@ -13,8 +13,17 @@
  * E-MANY (3), E-ZERO (0) per fixtures.md. Non-destructive: never overwrites
  * existing totals, never touches users/requests/loans.
  *
- * Usage: SEED_PASSWORD_BA=... SEED_PASSWORD_BB=... SEED_PASSWORD_CA=... \
- *        npm run seed
+ * Usage (local):     SEED_PASSWORD_BA=... SEED_PASSWORD_BB=... SEED_PASSWORD_CA=... \
+ *                    npm run seed
+ * Usage (Compose):   NODE_ENV=production SEED_MODE=local-compose-demo SEED_PASSWORD_*=... \
+ *                    node dist/db/seed.js --local-compose-demo
+ *                    Run only from the one-shot Compose `migrate` service.
+ * Usage (cloud demo): NODE_ENV=production SEED_MODE=cloud-demo SEED_PASSWORD_*=... \
+ *                    node dist/db/seed.js --cloud-demo
+ *                    Run only as a one-off Cloud Run job; never on the API service.
+ *
+ * In production both the mode and its matching flag are required, so a stray
+ * environment variable on a long-running service can never trigger a seed.
  */
 import { loadConfig } from "../config/config";
 import { assertSeedAllowed } from "./seed-safety";
