@@ -41,7 +41,7 @@ concurrency:
 jobs:
   # IMPORTANT: job id must stay `test-and-docker`.
   test-and-docker:
-    name: Build, tests and Docker build
+    name: test-and-docker
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
