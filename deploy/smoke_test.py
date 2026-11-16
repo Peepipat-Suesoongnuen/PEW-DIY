@@ -9,10 +9,11 @@ WHAT THIS SCRIPT DOES
 
     Checks (in order)
       1. GET /api/ready        -> {"status": "ready", "db": "connected"}
-      2. GET /login            -> HTML (the built SPA shell is served)
-      3. GET /api/equipment    -> 401 without a session (auth is enforced; the
+      2. GET /                 -> HTML (the built SPA shell is served)
+      3. GET /login            -> HTML (the login route is served directly)
+      4. GET /api/equipment    -> 401 without a session (auth is enforced; the
                                   access restriction required by C-04)
-      4. OPTIONAL login test   -> login, /api/auth/me, GET /api/equipment and
+      5. OPTIONAL login test   -> login, /api/auth/me, GET /api/equipment and
                                   logout. Runs only if BOTH env vars
                                   SMOKE_USERNAME and SMOKE_PASSWORD are set
                                   (set both or neither). The session is always
@@ -94,6 +95,7 @@ def check(base):
     checks = (
         ('/api/ready', lambda b: json.loads(b).get('status') == 'ready'
             and json.loads(b).get('db') == 'connected'),
+        ('/', lambda b: b'<html' in b.lower()),
         ('/login', lambda b: b'<html' in b.lower()),
     )
     for path, predicate in checks:
