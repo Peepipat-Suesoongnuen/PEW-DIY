@@ -23,7 +23,10 @@
 #   legacy runtime grants on the seed-password secrets are revoked on every
 #   upgrade path, with or without --demo (and nothing is revoked when there is
 #   nothing to revoke), that
-#   the migrate and seed job env carries every required loadConfig() key with its
+#   no job or service command sets the reserved PORT explicitly (Cloud Run
+#   injects it), that the batch jobs carry no HTTP/session configuration
+#   (they run loadDatabaseConfig()), that
+#   the migrate and seed job env carries every required loadDatabaseConfig() key with its
 #   expected value (and still reads DATABASE_URL from Secret Manager), and that
 #   no password/secret value leaks into the output.
 #   Finally DRY_RUN=1 must make zero gcloud calls.
@@ -130,9 +133,10 @@ export REGION=asia-southeast1
 export DRY_RUN=0
 
 # --- Assertions -----------------------------------------------------------------
-# The migrate/seed commands call the app's fail-closed loadConfig(), so their job
-# env must carry every required non-secret key with the exact expected value, and
-# DATABASE_URL must still come from Secret Manager. Extracting the single
+# The migrate/seed commands call the app's fail-closed loadDatabaseConfig():
+# their job env must carry the non-secret database configuration and nothing
+# HTTP-related. PORT is reserved by Cloud Run (setting it explicitly fails the
+# deploy), so no recorded command may set it. Extracting the single
 # --set-env-vars value (never a substring match) means a dropped or mistyped key
 # fails here instead of at job startup.
 assert_job_env() {  # $1 = job name, remaining args = key=value pairs
@@ -153,9 +157,42 @@ assert_job_env() {  # $1 = job name, remaining args = key=value pairs
       *) echo "FAIL $MODE: ${job} env missing or wrong: ${pair}"; exit 1 ;;
     esac
   done
+  case "$envs" in
+    *" PORT="*|*" APP_ORIGIN="*|*" SESSION_"*)
+      echo "FAIL $MODE: ${job} carries HTTP configuration:${envs}"; exit 1 ;;
+  esac
   case "$line" in
     *"--set-secrets DATABASE_URL=pewdiy-database-url:latest"*) ;;
     *) echo "FAIL $MODE: ${job} does not read DATABASE_URL from Secret Manager"; exit 1 ;;
+  esac
+  case "$line" in
+    *"--set-cloudsql-instances "*) ;;
+    *) echo "FAIL $MODE: ${job} is not attached to Cloud SQL"; exit 1 ;;
+  esac
+}
+
+# The Cloud Run service must not set the reserved PORT either: Cloud Run injects
+# it and the API reads it from the environment at startup.
+assert_service_env() {  # remaining args = key=value pairs that must be present
+  local line envs pair
+  line="$(grep '^run deploy pewdiy ' "$GCLOUD_LOG" | head -n 1 || true)"
+  if [ -z "$line" ]; then
+    echo "FAIL $MODE: no service deploy command recorded"; exit 1
+  fi
+  envs=" $(printf '%s\n' "$line" | sed -n 's/.*--set-env-vars \([^ ]*\).*/\1/p' | tr ',' ' ') "
+  for pair in "$@"; do
+    case "$envs" in
+      *" ${pair} "*) ;;
+      *) echo "FAIL $MODE: service env missing or wrong: ${pair}"; exit 1 ;;
+    esac
+  done
+  case "$envs" in
+    *" PORT="*)
+      echo "FAIL $MODE: service sets the reserved PORT explicitly"; exit 1 ;;
+  esac
+  case "$line" in
+    *"--set-secrets DATABASE_URL=pewdiy-database-url:latest"*"--add-cloudsql-instances "*|*"--add-cloudsql-instances "*"--set-secrets DATABASE_URL=pewdiy-database-url:latest"*) ;;
+    *) echo "FAIL $MODE: service lost its Secret Manager or Cloud SQL configuration"; exit 1 ;;
   esac
 }
 
@@ -191,7 +228,9 @@ for MODE in first_run rerun partial job-fail demo upgrade upgrade_plain policy_e
         echo 'FAIL policy_error: revocation attempted after an unreadable policy'; exit 1
       fi ;;
     *)
-      grep -q '^run deploy ' "$GCLOUD_LOG" ;;
+      grep -q '^run deploy ' "$GCLOUD_LOG"
+      assert_service_env NODE_ENV=production APP_TIMEZONE=Asia/Bangkok \
+        SESSION_COOKIE_NAME=pew_session APP_ORIGIN=http://placeholder.invalid ;;
   esac
   if grep -q '^projects add-iam-policy-binding .*roles/secretmanager.secretAccessor' "$GCLOUD_LOG"; then
     echo 'FAIL: runtime has project-wide secret access'; exit 1
@@ -272,19 +311,15 @@ for MODE in first_run rerun partial job-fail demo upgrade upgrade_plain policy_e
         echo "FAIL $MODE: legacy revocation attempted with no legacy binding present"; exit 1
       fi ;;
   esac
-  # The migrate/seed commands run loadConfig(), so their job env must satisfy every
-  # required value even though they never serve HTTP. (policy_error aborts before
-  # any job exists, so there is nothing to assert there.)
+  # The migrate/seed commands run loadDatabaseConfig(), so their job env must
+  # satisfy it without any HTTP configuration. (policy_error aborts before any
+  # job exists, so there is nothing to assert there.)
   if [ "$MODE" != policy_error ]; then
     assert_job_env pewdiy-migrate \
-      NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
-      APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
-      SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session
+      NODE_ENV=production APP_TIMEZONE=Asia/Bangkok
     if [ "$MODE" = demo ] || [ "$MODE" = upgrade ]; then
       assert_job_env pewdiy-seed \
-        NODE_ENV=production APP_TIMEZONE=Asia/Bangkok PORT=3000 \
-        APP_ORIGIN=http://localhost:3000 SESSION_IDLE_MINUTES=60 \
-        SESSION_ABSOLUTE_MINUTES=480 SESSION_COOKIE_NAME=pew_session \
+        NODE_ENV=production APP_TIMEZONE=Asia/Bangkok \
         SEED_MODE=cloud-demo
     fi
   fi

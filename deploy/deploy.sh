@@ -393,11 +393,12 @@ run_cmd gcloud builds submit \
 
 APP_ENV="NODE_ENV=production,APP_TIMEZONE=Asia/Bangkok,SESSION_IDLE_MINUTES=60,SESSION_ABSOLUTE_MINUTES=480,SESSION_COOKIE_NAME=pew_session,SESSION_COOKIE_SECURE=true"
 
-# The migration and seed commands call the app's fail-closed loadConfig(), which
-# requires PORT, APP_ORIGIN and the SESSION_* values even though a batch job
-# never serves requests or sets a cookie. Without them the job exits with
-# "Missing required configuration" before touching the database.
-JOB_ENV="NODE_ENV=production,APP_TIMEZONE=Asia/Bangkok,PORT=3000,APP_ORIGIN=http://localhost:3000,SESSION_IDLE_MINUTES=60,SESSION_ABSOLUTE_MINUTES=480,SESSION_COOKIE_NAME=pew_session"
+# The migration and seed commands need the database only: they call the app's
+# fail-closed loadDatabaseConfig(), which requires DATABASE_URL (from Secret
+# Manager). No HTTP or session configuration belongs on a batch job — and
+# Cloud Run RESERVES PORT and injects it itself: setting it explicitly fails
+# the deployment with "The following reserved env names were provided: PORT".
+JOB_ENV="NODE_ENV=production,APP_TIMEZONE=Asia/Bangkok"
 
 # ==============================================================================
 # 9. Create/Update & Execute the Cloud Run Job for migrations
@@ -464,6 +465,9 @@ fi
 #     Cost controls: min-instances 0, max-instances 3.
 #     APP_ORIGIN must equal the public URL (anti-CSRF origin check), so it is
 #     set in a follow-up update once the URL is known.
+#     PORT is RESERVED by Cloud Run and injected automatically (the API reads
+#     it from the environment at startup); --port 3000 only tells the platform
+#     which container port to route to. Never put PORT in --set-env-vars.
 # ==============================================================================
 run_cmd gcloud run deploy "$SERVICE_NAME" \
   --image "$IMAGE_URI" \
@@ -473,7 +477,7 @@ run_cmd gcloud run deploy "$SERVICE_NAME" \
   --service-account "$SA_EMAIL" \
   --add-cloudsql-instances "$SQL_CONN_NAME" \
   --set-secrets "DATABASE_URL=${SECRET_DB_URL}:latest" \
-  --set-env-vars "${APP_ENV},PORT=3000,APP_ORIGIN=http://placeholder.invalid" \
+  --set-env-vars "${APP_ENV},APP_ORIGIN=http://placeholder.invalid" \
   --min-instances 0 \
   --max-instances 3 \
   --memory 512Mi \

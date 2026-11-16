@@ -56,6 +56,26 @@ function requiredPositiveInt(name: string, env: NodeJS.ProcessEnv): number {
   return n;
 }
 
+/**
+ * Database-only configuration for processes that never serve HTTP and never
+ * set a cookie (migration and seed jobs). They must not be forced to provide
+ * HTTP/session settings — and Cloud Run reserves PORT for services, so a job
+ * that requires it would need an env var the platform refuses to set.
+ * Fail-closed like loadConfig(): a missing DATABASE_URL throws; there is no
+ * built-in URL fallback and no default credentials.
+ */
+export interface DatabaseConfig {
+  databaseUrl: string;
+}
+
+export function loadDatabaseConfig(
+  env: NodeJS.ProcessEnv = process.env,
+): DatabaseConfig {
+  return {
+    databaseUrl: required("DATABASE_URL", env),
+  };
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (env.APP_TIMEZONE) new Intl.DateTimeFormat("en-US", { timeZone: env.APP_TIMEZONE }).format();
   return {
