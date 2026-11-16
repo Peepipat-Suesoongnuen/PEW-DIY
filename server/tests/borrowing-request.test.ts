@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
-import type { Pool } from "pg";
+import type { Pool } from "px";
 import type express from "express";
 import { createApp } from "../src/routes/auth-routes";
 import { loadConfig } from "../src/config/config";
