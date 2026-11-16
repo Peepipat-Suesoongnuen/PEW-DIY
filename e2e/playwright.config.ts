@@ -10,7 +10,14 @@ try {
   // .env is optional at runtime (CI policy is defined at Lab 5).
 }
 
-const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
+const serverPort = process.env.PORT ?? "3000";
+const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${serverPort}`;
+const baseUrl = new URL(baseURL);
+const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+
+if (!testDatabaseUrl) {
+  throw new Error("TEST_DATABASE_URL is required; E2E must use an isolated test database.");
+}
 
 export default defineConfig({
   testDir: "./specs",
@@ -24,11 +31,20 @@ export default defineConfig({
   },
   webServer: {
     command: "npm run dev",
-    // Readiness probe = the legacy login page: it proves the app is up AND
-    // that legacy .html pages keep being served (ARCH-01 §12.1 coexistence).
-    url: `${baseURL}/login.html`,
+    // Readiness probe uses the current React login route, not the retired
+    // legacy .html page.
+    url: `${baseURL}/login`,
+    // The integration spec writes directly through TEST_DATABASE_URL, so the
+    // app under test must use that same database. Keep its trusted origin and
+    // listening port aligned with Playwright's baseURL.
+    env: {
+      DATABASE_URL: testDatabaseUrl,
+      PORT: baseUrl.port || serverPort,
+      APP_ORIGIN: baseUrl.origin,
+    },
     cwd: "..",
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a developer/Compose server that may point at another DB.
+    reuseExistingServer: false,
     timeout: 60_000,
   },
   projects: [

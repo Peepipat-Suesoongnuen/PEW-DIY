@@ -2,12 +2,12 @@
  * Migration runner — applies versioned migrations to the target database.
  * Usage: npx tsx src/db/migrate.ts
  */
-import { loadConfig } from "../config/config";
+import { loadDatabaseConfig } from "../config/config";
 import { createPool } from "./pool";
 import { migrate } from "./migrations";
 
 async function main() {
-  const config = loadConfig();
+  const config = loadDatabaseConfig();
   const pool = createPool(config.databaseUrl);
   await migrate(pool);
   console.log("Migration complete.");

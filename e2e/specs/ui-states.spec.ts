@@ -79,7 +79,7 @@ test.describe("shared UI states (f-02 §3 / ui-spec §0.3)", () => {
     await expect(page.getByText("Your session has expired. Please sign in again.")).toBeVisible();
   });
 
-  test("serving contract: app shell at / and /api unknown routes stay JSON (AC-1)", async ({ page, request }) => {
+  test("serving contract: React routes receive the app shell and /api unknown routes stay JSON (AC-1)", async ({ page, request }) => {
     const shell = await request.get("/");
     expect(shell.status()).toBe(200);
     expect(shell.headers()["content-type"]).toContain("text/html");
@@ -93,12 +93,14 @@ test.describe("shared UI states (f-02 §3 / ui-spec §0.3)", () => {
     expect(apiUnknown.headers()["content-type"]).toContain("application/json");
     expect((await apiUnknown.json()).error.code).toBeTruthy();
 
-    // Unknown HTML navigations get the SPA shell (ARCH-01 §12.1), while real
-    // files win: legacy pages keep being served alongside the React app.
+    // The current React login route and client-side routes receive the SPA
+    // shell. Do not require the retired legacy /login.html page.
+    const reactLogin = await request.get("/login");
+    expect(reactLogin.status()).toBe(200);
+    expect(reactLogin.headers()["content-type"]).toContain("text/html");
+
     const spaRoute = await request.get("/some/client/route");
     expect(spaRoute.status()).toBe(200);
     expect(spaRoute.headers()["content-type"]).toContain("text/html");
-    const legacy = await request.get("/login.html");
-    expect(legacy.status()).toBe(200);
   });
 });
