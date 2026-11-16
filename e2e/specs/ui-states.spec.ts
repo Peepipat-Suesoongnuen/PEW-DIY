@@ -93,11 +93,17 @@ test.describe("shared UI states (f-02 §3 / ui-spec §0.3)", () => {
     expect(apiUnknown.headers()["content-type"]).toContain("application/json");
     expect((await apiUnknown.json()).error.code).toBeTruthy();
 
-    // The current React login route and client-side routes receive the SPA
-    // shell. Do not require the retired legacy /login.html page.
+    // The React login route receives the SPA shell.
     const reactLogin = await request.get("/login");
     expect(reactLogin.status()).toBe(200);
     expect(reactLogin.headers()["content-type"]).toContain("text/html");
+
+    // Legacy HTML remains a supported serving contract until migration P4.
+    // Assert its distinct page content so the SPA fallback cannot mask its removal.
+    const legacyLogin = await request.get("/login.html");
+    expect(legacyLogin.status()).toBe(200);
+    expect(legacyLogin.headers()["content-type"]).toContain("text/html");
+    expect(await legacyLogin.text()).toContain('id="login-form"');
 
     const spaRoute = await request.get("/some/client/route");
     expect(spaRoute.status()).toBe(200);
