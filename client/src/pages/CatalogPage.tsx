@@ -87,7 +87,7 @@ export function CatalogPage() {
               {state.items.map((item) => (
                 <tr
                   key={item.id}
-                  className="cursor-pointer hover:bg-white/50"
+                  className="cursor-pointer transition-colors hover:bg-primary/5 focus-within:bg-primary/5"
                   onClick={() => navigate(itemPath(item.id))}
                 >
                   <td className="px-4 py-3">
