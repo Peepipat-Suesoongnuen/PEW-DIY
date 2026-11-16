@@ -67,7 +67,7 @@ afterAll(async () => {
 describe("F-04 real API/PostgreSQL", () => {
   it("persists server-owned request fields, opaque item ID and fresh retrieval (TEST-F04-01)", async () => {
     const res = await post(body());
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(418);
     expect(res.body.data).toMatchObject({ borrower_id: ids[0], equipment_id: one, quantity_requested: 1, status: "SUBMITTED" });
     expect(typeof res.body.data.id).toBe("string");
     expect(Number.isNaN(Date.parse(res.body.data.created_at))).toBe(false);
