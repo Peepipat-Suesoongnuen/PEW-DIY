@@ -48,7 +48,7 @@ function fixture(t, ref) {
   });
   const work = path.join(dir, "repo");
   // Existing history only: no synthetic commits, refs or changes in the user's repo.
-  execFileSync("git", ["clone", "--quiet", "--shared", root, work], { stdio: "pipe", windowsHide: true });
+  execFileSync("git", ["-c", "core.autocrlf=false", "clone", "--quiet", "--shared", root, work], { stdio: "pipe", windowsHide: true });
   if (ref) execFileSync("git", ["checkout", "--quiet", "--detach", ref], { cwd: work, stdio: "pipe", windowsHide: true });
   return work;
 }

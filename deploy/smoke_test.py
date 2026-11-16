@@ -9,10 +9,11 @@ WHAT THIS SCRIPT DOES
 
     Checks (in order)
       1. GET /api/ready        -> {"status": "ready", "db": "connected"}
-      2. GET /login            -> HTML (the built SPA shell is served)
-      3. GET /api/equipment    -> 401 without a session (auth is enforced; the
+      2. GET /                 -> HTML (the built SPA shell is served)
+      3. GET /login            -> HTML (the login route is served directly)
+      4. GET /api/equipment    -> 401 without a session (auth is enforced; the
                                   access restriction required by C-04)
-      4. OPTIONAL login test   -> login, /api/auth/me, GET /api/equipment and
+      5. OPTIONAL login test   -> login, /api/auth/me, GET /api/equipment and
                                   logout. Runs only if BOTH env vars
                                   SMOKE_USERNAME and SMOKE_PASSWORD are set
                                   (set both or neither). The session is always
@@ -35,6 +36,7 @@ import os
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 
@@ -45,6 +47,12 @@ def request(base, path, data=None, jar=None):
     headers = {}
     if data is not None:
         headers['Content-Type'] = 'application/json'
+        service = urllib.parse.urlsplit(base)
+        if service.scheme not in ('http', 'https') or not service.netloc:
+            raise ValueError('SERVICE_URL must be an absolute HTTP(S) URL')
+        # The API rejects state-changing requests without trusted Origin/Referer.
+        # Derive Origin from the configured service URL; never accept user input.
+        headers['Origin'] = service.scheme + '://' + service.netloc
     payload = json.dumps(data).encode() if data is not None else None
     req = urllib.request.Request(base + path, headers=headers, data=payload)
     if jar is not None:
@@ -94,6 +102,7 @@ def check(base):
     checks = (
         ('/api/ready', lambda b: json.loads(b).get('status') == 'ready'
             and json.loads(b).get('db') == 'connected'),
+        ('/', lambda b: b'<html' in b.lower()),
         ('/login', lambda b: b'<html' in b.lower()),
     )
     for path, predicate in checks:
