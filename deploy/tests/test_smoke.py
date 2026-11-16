@@ -11,7 +11,8 @@ import importlib.util
 from pathlib import Path
 import unittest
 import urllib.error
-from unittest.mock import patch
+from http.cookiejar import CookieJar
+from unittest.mock import MagicMock, patch
 
 spec = importlib.util.spec_from_file_location('smoke', Path(__file__).parents[1] / 'smoke_test.py')
 smoke = importlib.util.module_from_spec(spec)
@@ -96,6 +97,20 @@ class SmokeTests(unittest.TestCase):
         with patch.object(smoke, 'request', side_effect=self.response):
             with self.assertRaisesRegex(RuntimeError, 'both SMOKE_USERNAME'):
                 smoke.check('https://demo.test')
+
+    def test_state_changing_requests_include_service_origin(self):
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = b'{}'
+        opener = MagicMock()
+        opener.open.return_value = response
+        with patch.object(smoke.urllib.request, 'build_opener', return_value=opener):
+            smoke.request('https://demo.test', '/api/auth/login', data={}, jar=CookieJar())
+            smoke.request('https://demo.test', '/api/auth/logout', data={}, jar=CookieJar())
+
+        requests = [item.args[0] for item in opener.open.call_args_list]
+        self.assertEqual([req.get_header('Origin') for req in requests], [
+            'https://demo.test', 'https://demo.test',
+        ])
 
 
 if __name__ == '__main__':

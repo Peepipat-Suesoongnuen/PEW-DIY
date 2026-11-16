@@ -36,6 +36,7 @@ import os
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 
@@ -46,6 +47,12 @@ def request(base, path, data=None, jar=None):
     headers = {}
     if data is not None:
         headers['Content-Type'] = 'application/json'
+        service = urllib.parse.urlsplit(base)
+        if service.scheme not in ('http', 'https') or not service.netloc:
+            raise ValueError('SERVICE_URL must be an absolute HTTP(S) URL')
+        # The API rejects state-changing requests without trusted Origin/Referer.
+        # Derive Origin from the configured service URL; never accept user input.
+        headers['Origin'] = service.scheme + '://' + service.netloc
     payload = json.dumps(data).encode() if data is not None else None
     req = urllib.request.Request(base + path, headers=headers, data=payload)
     if jar is not None:

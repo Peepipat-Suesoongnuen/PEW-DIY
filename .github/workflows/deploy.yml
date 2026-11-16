@@ -59,10 +59,12 @@ on:
 permissions:
   contents: read
 
-# Queue releases; do not interrupt a running migration or deployment.
+# Queue releases; do not interrupt a running migration or deployment. Keep up
+# to 100 pending releases so a newer push cannot replace an earlier pending run.
 concurrency:
   group: deploy-demo
   cancel-in-progress: false
+  queue: max
 
 jobs:
   # ----------------------------------------------------------------------------
