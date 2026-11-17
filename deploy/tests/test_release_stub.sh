@@ -43,6 +43,7 @@ export ROLLBACK=true
 bash "$ROOT/deploy/release.sh"
 if grep -q 'run jobs' "$CALL_LOG"; then echo 'Rollback ran migration' >&2; exit 1; fi
 grep -q 'run services update ' "$CALL_LOG"
+grep -q 'run services update-traffic .*--to-latest' "$CALL_LOG"
 echo 'PASS rollback reuses image without touching migration job'
 
 for failure in image migration; do
