@@ -10,6 +10,9 @@
 #     4) runs deploy/release.sh (verify image -> migrate -> update service),
 #     5) smoke-tests the public URL (deploy/smoke_test.py),
 #     6) writes a deployment summary.
+#   A manual run deploys an already-published image by full commit SHA. It does
+#   not run CI, build, migration or seed; this supports Episode 8 rollback and
+#   roll-forward without changing the database.
 #
 # ⚠️ DO NOT RENAME (the lab guide refers to these names):
 #   - job `test-and-docker` (defined in ci-docker.yml, called by `test` below)
@@ -49,11 +52,17 @@
 name: Deploy demo
 
 # ------------------------------------------------------------------------------
-# Trigger: push to main after a release merge.
+# Trigger: automatic release on main, or manual deployment of an existing image.
 # ------------------------------------------------------------------------------
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Full 40-character commit SHA of an image already in Artifact Registry'
+        required: true
+        type: string
 
 # Least privilege by default; the deploy job adds `id-token: write` below.
 permissions:
@@ -71,14 +80,18 @@ jobs:
   # Job 1: run the CI workflow (which exposes the required test-and-docker job).
   # ----------------------------------------------------------------------------
   test:
+    if: github.event_name == 'push'
     uses: ./.github/workflows/ci-docker.yml
 
   # ----------------------------------------------------------------------------
-  # Job 2: build, migrate, deploy, smoke-test.
-  # GitHub's default success() condition runs this only after CI succeeds.
+  # Job 2: automatic run builds/migrates; manual run reuses an existing image.
+  # Push deployments require successful CI; manual deployments skip that job.
   # ----------------------------------------------------------------------------
   deploy:
     needs: test
+    # Manual image-only deployments intentionally skip the reusable CI job.
+    # `always()` is needed because `needs.test` is skipped for workflow_dispatch.
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || needs.test.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # ⚠️ Do not rename: GitHub environment holding the GCP variables/secrets.
@@ -93,8 +106,11 @@ jobs:
       # CHANGE ME: names of your Cloud Run service and migration job.
       SERVICE_NAME: pewdiy
       MIGRATE_JOB_NAME: pewdiy-migrate
-      # Image tag is always the full commit SHA that triggered this release.
-      IMAGE_TAG: ${{ github.sha }}
+      # Automatic releases use the triggering commit; manual runs select an
+      # existing image by its full commit SHA.
+      IMAGE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.image_tag || github.sha }}
+      # Manual runs deploy an existing image only: no migration or seed.
+      ROLLBACK: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       # ------------------------------------------------------------------------
       # 1. Get the source code (no git credentials kept on the runner)
@@ -114,6 +130,10 @@ jobs:
         run: |
           test -n "$PROJECT_ID" && test -n "$REGION"
           test -n "$WIF_PROVIDER" && test -n "$WIF_SERVICE_ACCOUNT"
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REF" != refs/heads/main ]]; then
+            echo 'Manual image deployments are allowed only from the main branch.' >&2
+            exit 1
+          fi
           [[ "$IMAGE_TAG" =~ ^[0-9a-f]{40}$ ]] || { echo 'Image tag must be a full 40-character commit SHA.'; exit 1; }
 
       # ------------------------------------------------------------------------
@@ -128,11 +148,13 @@ jobs:
       - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
       # ------------------------------------------------------------------------
-      # 4. Build and push the image for this exact commit.
+      # 4. Build and push only for automatic releases. Manual runs must reuse
+      #    the already-published image selected by image_tag.
       #    PEW-DIY image path `.../pewdiy/pewdiy` must match the
       #    Artifact Registry repo and service names (see deploy/release.sh).
       # ------------------------------------------------------------------------
       - name: Build and push image
+        if: github.event_name == 'push'
         run: |
           gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
           IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/pewdiy/pewdiy:$IMAGE_TAG"
@@ -140,11 +162,11 @@ jobs:
           docker push "$IMAGE"
 
       # ------------------------------------------------------------------------
-      # 5. Verify image -> run migration job -> update the Cloud Run service
-      #    (all logic lives in deploy/release.sh). Exports SERVICE_URL and
+      # 5. Verify image -> (automatic release only: migrate) -> update service.
+      #    All logic lives in deploy/release.sh; exports SERVICE_URL and
       #    DEPLOYED_IMAGE for the next steps.
       # ------------------------------------------------------------------------
-      - name: Verify image, migrate and deploy
+      - name: Verify image and deploy (migration only for automatic release)
         run: bash deploy/release.sh
 
       # ------------------------------------------------------------------------
@@ -170,9 +192,14 @@ jobs:
         run: |
           {
             echo '### PEW-DIY demo deployment'
-            echo "- Commit image tag: \`$IMAGE_TAG\`"
+            echo "- Image tag: \`$IMAGE_TAG\`"
             echo "- Digest: \`$DEPLOYED_IMAGE\`"
             echo "- URL: $SERVICE_URL"
+            if [[ "$ROLLBACK" == true ]]; then
+              echo '- Mode: existing image deployment (build, migration and seed skipped).'
+            else
+              echo '- Mode: automatic release (build and migration completed).'
+            fi
             echo '- Smoke test: passed (database readiness, SPA page and anonymous authorization).'
             echo '- See smoke step for optional login check status.'
           } >> "$GITHUB_STEP_SUMMARY"
