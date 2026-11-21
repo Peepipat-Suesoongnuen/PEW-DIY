@@ -14,13 +14,17 @@ The product scope is the implemented Sprint 1 features **F-01–F-05** and their
 
 The automated checks in the evidence pack are supporting evidence only; they do not replace the other team's manual, user-facing execution or its independent decision.
 
+### Tracker reconciliation
+
+Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) and child Issues [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)–[#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) are **OPEN**. Issues #80–#82 were reopened because their closed/completed states conflicted with the documented criteria and evidence: [PR #85](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/85) leaves the parent handoff pending, [PR #86](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/86) records unresolved Part A blockers, and [PR #87](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/87) records Part B as blocked. No rationale for the original closures was recorded in those issue histories. This is a tracker correction only; no UAT execution, partner result, or instructor/TA notification is claimed.
+
 ### Current completion state
 
 | Part | State |
 |---|---|
-| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | Cases, deployment record, and F-05 implementation trace are documented; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
+| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | **BLOCKED** — cases, deployment record, and F-05 implementation trace are documented; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
 | B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **BLOCKED** — no partner handoff, case package, release/access details, or test window is recorded; no partner-case execution is evidenced, and no instructor/TA notification is documented. |
-| C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **Pending** actual execution/findings; no findings have been invented. |
+| C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **BLOCKED** — neither UAT direction has a completed results package to triage; no finding disposition or “none received” claim is recorded. |
 | D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **Pending** triage and partner retest. No acceptance is claimed. |
 
 ## 2. Release handoff — complete before inviting testers
@@ -217,7 +221,14 @@ Cleanup performed and by whom:
 
 ### Findings reported by the UAT Team
 
-For every reproducible failure, open or link a tracking Issue and retain the evidence with the case record.
+Part C covers both directions: findings from our independent UAT of the partner product in [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82), and findings the partner reports after testing PEW-DIY in [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81). For every reproducible failure, open or link a tracking Issue and retain the evidence with the case record.
+
+| UAT direction | Available results | Triage state |
+|---|---|---|
+| Partner tests PEW-DIY ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | No completed partner case results are recorded; the handoff remains blocked. | **BLOCKED** — no actual finding set to disposition. |
+| PEW-DIY tests partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | No partner handoff, cases, release, access, or session is recorded. | **BLOCKED** — no actual finding set to disposition. |
+
+No finding records are available to triage yet. This is **not** a `None received` result: record that only after the relevant agreed UAT session is complete and its testers confirm the final results. Do not infer that no defects exist from the absence of records.
 
 | Field | Required record |
 |---|---|
@@ -229,7 +240,24 @@ For every reproducible failure, open or link a tracking Issue and retain the evi
 | Severity and user impact | Critical / major / minor per course rubric; explain impact and workaround, if any |
 | Owner, fix status, disposition | Named owner, reasoned decision, status, and partner notification |
 
-Triage every finding received about PEW-DIY, including a recorded `None received` only after the partner confirms the completed test set. Reproduce and clarify before dismissal. A failed Sprint 1 requirement is not an enhancement. Critical/major accepted defects block acceptance; minor defects must be fixed or explicitly accepted by the UAT Team as documented limitations. An out-of-scope enhancement need not be implemented.
+Triage every actual finding received from either UAT direction, including duplicates and justified not-defects. Reproduce and clarify before disposition. A failed Sprint 1 requirement is not an enhancement. Critical/major accepted defects block acceptance; minor defects must be fixed or explicitly accepted by the UAT Team as documented limitations. An out-of-scope enhancement need not be implemented.
+
+Copy this record for each actual finding; keep the expected and actual results separate:
+
+```text
+Finding / Issue ID:
+UAT direction, product/team, and reporter:
+Tested release SHA / image / revision:
+UAT case and Sprint 1 requirement / AC:
+Synthetic preconditions and reproduction steps:
+Expected result:
+Actual result:
+Evidence IDs:
+Severity and user impact:
+Disposition and evidence-based rationale:
+Owner and status:
+Partner notification and response:
+```
 
 ### Correction and independent retest record
 
