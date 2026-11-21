@@ -1,6 +1,6 @@
 # Lab 6 — Independent Sprint 1 UAT
 
-> **Tracking:** Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) · Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) · Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) · Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) · Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)
+> **Tracking:** Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) · Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) · Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) · Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) · Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) · UAT blocker coordination [#90](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/90)
 >
 > **Source:** `Lab_6_Sprint_1_UAT.pdf`, Parts A–D and submission checklist
 >
@@ -25,6 +25,7 @@ GitHub issue states as of 2026-11-22:
 | Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | **CLOSED — completed** |
 | Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) | **OPEN** |
 | Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** |
+| UAT blocker coordination [#90](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/90) | **OPEN** |
 
 These are the current tracker states, not completion evidence. The evidence state for each UAT part is shown separately below; closing an issue does not establish that its handoff, execution, or acceptance criteria were met. No UAT execution, partner result, or instructor/TA notification is claimed.
 
@@ -53,6 +54,18 @@ The [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/action
 | Handoff date and agreed test window | **PENDING** |
 | Private credential handoff channel | **PENDING — use the course-approved private channel; never record credential values here** |
 | Deployment smoke-check evidence | [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) succeeded, including deployment verification and public-URL smoke checks. It reused an existing image (build/push skipped); it did not prepare isolated UAT data or a reset procedure. |
+
+### External prerequisite coordination — Issue #90
+
+This register tracks who must provide each missing prerequisite and the next safe action. Responsible parties are roles because no individual names have been provided.
+
+| Prerequisite | Responsible role | Current status and evidence | Next action |
+|---|---|---|---|
+| Current PEW-DIY deployed revision | Product Team deployment owner (individual not identified) | Run #6 records commit `b03c904`, image digest, and revision `pewdiy-00008-mfk` on 2026-11-19; the active revision has not been reconfirmed. [Deployment evidence](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) | Verify the live revision and image immediately before handoff; record the check. |
+| Isolated UAT deployment/database, fixture mapping, and reset/cleanup procedure | Product Team and deployment owner (individual not identified) | **BLOCKED** — no owner-approved isolated environment, fixture mapping, or reset/cleanup owner and procedure is recorded. [Part A](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | Identify the owner, approve a dedicated environment and synthetic data/reset procedure, then record its URL and fixture mapping. |
+| Product/UAT participants, private account handoff, and session time | Product Team and UAT Team (students not identified) | **PENDING** — names/IDs, private handoff channel, and schedule are not recorded. | Confirm both teams' participants and session time; deliver account credentials privately and record only role labels here. |
+| Partner identity, release, cases, safe access/setup, and test window | Partner Product Team (team/individuals not identified) | **BLOCKED** — no partner handoff or case package is recorded. [Part B](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | Obtain the exact scope/release, deployed URL/revision, cases, access/setup/cleanup instructions, tester identities, and agreed window. |
+| Instructor/TA escalation if the partner or access is unavailable | UAT Team (sender not identified) | **NOT RECORDED** — no notification or response is documented; partner unavailability itself is not asserted. | If the partner, deployment, access, or replacement tester is unavailable, notify the instructor/TA promptly through the course-approved channel and retain the actual notification and response. |
 
 ### F-05 release traceability
 
