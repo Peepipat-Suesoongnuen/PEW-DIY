@@ -14,9 +14,19 @@ The product scope is the implemented Sprint 1 features **F-01–F-05** and their
 
 The automated checks in the evidence pack are supporting evidence only; they do not replace the other team's manual, user-facing execution or its independent decision.
 
-### Tracker reconciliation
+### Current tracker state
 
-Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) and child Issues [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)–[#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) are **OPEN**. Issues #80–#83 were reopened because their closed/completed states conflicted with the documented criteria and evidence: [PR #85](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/85) leaves the parent handoff pending, [PR #86](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/86) records unresolved Part A blockers, [PR #87](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/87) records Part B as blocked, and [PR #88](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/88) records Part C as blocked pending UAT results. No rationale for the original closures was recorded in those issue histories. This is a tracker correction only; no UAT execution, partner result, or instructor/TA notification is claimed.
+GitHub issue states as of 2026-11-22:
+
+| Issue | GitHub state |
+|---|---|
+| Parent [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) | **CLOSED — completed** |
+| Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | **CLOSED — completed** |
+| Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | **CLOSED — completed** |
+| Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) | **OPEN** |
+| Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** |
+
+These are the current tracker states, not completion evidence. The evidence state for each UAT part is shown separately below; closing an issue does not establish that its handoff, execution, or acceptance criteria were met. No UAT execution, partner result, or instructor/TA notification is claimed.
 
 ### Current completion state
 
