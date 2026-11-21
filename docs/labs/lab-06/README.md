@@ -16,7 +16,7 @@ The automated checks in the evidence pack are supporting evidence only; they do 
 
 ### Tracker reconciliation
 
-Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) and child Issues [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)–[#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) are **OPEN**. Issues #80–#82 were reopened because their closed/completed states conflicted with the documented criteria and evidence: [PR #85](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/85) leaves the parent handoff pending, [PR #86](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/86) records unresolved Part A blockers, and [PR #87](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/87) records Part B as blocked. No rationale for the original closures was recorded in those issue histories. This is a tracker correction only; no UAT execution, partner result, or instructor/TA notification is claimed.
+Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) and child Issues [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)–[#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) are **OPEN**. Issues #80–#83 were reopened because their closed/completed states conflicted with the documented criteria and evidence: [PR #85](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/85) leaves the parent handoff pending, [PR #86](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/86) records unresolved Part A blockers, [PR #87](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/87) records Part B as blocked, and [PR #88](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/88) records Part C as blocked pending UAT results. No rationale for the original closures was recorded in those issue histories. This is a tracker correction only; no UAT execution, partner result, or instructor/TA notification is claimed.
 
 ### Current completion state
 
@@ -25,7 +25,7 @@ Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) a
 | A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | **BLOCKED** — cases, deployment record, and F-05 implementation trace are documented; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
 | B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **BLOCKED** — no partner handoff, case package, release/access details, or test window is recorded; no partner-case execution is evidenced, and no instructor/TA notification is documented. |
 | C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **BLOCKED** — neither UAT direction has a completed results package to triage; no finding disposition or “none received” claim is recorded. |
-| D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **Pending** triage and partner retest. No acceptance is claimed. |
+| D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **BLOCKED** — Part C has no completed UAT results to triage, so no accepted finding is ready for correction or retest. No final decision is claimed. |
 
 ## 2. Release handoff — complete before inviting testers
 
@@ -263,11 +263,13 @@ Partner notification and response:
 
 For each accepted defect, preserve the complete trace: original finding → RED regression test that fails on the defective version → GREEN fix → relevant regression results → fix branch from `sprint/1-staging` → substantive teammate PR review → passing CI/staging integration → reviewed release to `main` → deployed revision and smoke check → independent retest by the UAT Team.
 
+**Part D status: BLOCKED.** Neither UAT direction has a completed results package for Part C to triage, so there are no accepted findings to correct or independently retest. No Part D execution or final decision is claimed. Missing results are not a `None received` disposition or evidence that no defect exists. Only if completed UAT and triage establish that no legitimate defect exists should an instructor/TA-approved controlled exercise be considered; no approval or exercise is recorded.
+
 | Finding / Issue | RED test, command, SHA, actual output | Fix / GREEN result and regression output | PR review / CI / release | Deployed revision / smoke check | Partner retest case, tester, actual result |
 |---|---|---|---|---|---|
 | **PENDING — populate only for a real accepted defect** | | | | | |
 
-If no legitimate product defect is found, do not fabricate one or deliberately break the accepted release. Follow the course requirement: request an instructor/TA-approved controlled exercise on an isolated version/branch, keep it separate from the healthy accepted release, and preserve the same RED/GREEN/review/release/retest chain. Record any unavailable exercise or replacement tester as an unresolved dependency.
+Only after the relevant UAT sessions and Part C triage are complete, if no legitimate product defect is found, do not fabricate one or deliberately break the accepted release. Follow the course requirement: request an instructor/TA-approved controlled exercise on an isolated version/branch, keep it separate from the healthy accepted release, and preserve the same RED/GREEN/review/release/retest chain. Record any unavailable exercise or replacement tester as an unresolved dependency.
 
 ## 5. Partner UAT, final decision, and submission
 
