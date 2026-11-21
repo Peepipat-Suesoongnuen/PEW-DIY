@@ -9,6 +9,7 @@ A university equipment-borrowing system for the D.I.Y. Room, which supports stud
 - [Software Requirements Specification (SRS)](docs/srs.md)
 - [System-Level Design Specification (SDS)](docs/system-sds.md)
 - [Sprint 1 Engineering Contracts (Part E)](docs/sprints/sprint-1/README.md) — feature specifications, AC/STS mapping and Product DoD
+- [Lab 6 Sprint 1 UAT handoff](docs/labs/lab-06/README.md) — executable Product Team cases, safe handoff requirements and evidence templates (Issue [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80))
 
 ## Project Structure
 
