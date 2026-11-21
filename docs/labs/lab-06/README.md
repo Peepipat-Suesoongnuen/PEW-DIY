@@ -19,7 +19,7 @@ The automated checks in the evidence pack are supporting evidence only; they do 
 | Part | State |
 |---|---|
 | A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | Cases, deployment record, and F-05 implementation trace are documented; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
-| B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **Pending** partner identity, release, access, and scheduled execution. |
+| B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **BLOCKED** — no partner handoff, case package, release/access details, or test window is recorded; no partner-case execution is evidenced, and no instructor/TA notification is documented. |
 | C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **Pending** actual execution/findings; no findings have been invented. |
 | D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **Pending** triage and partner retest. No acceptance is claimed. |
 
@@ -198,14 +198,18 @@ All cases below start as **NOT RUN**. The UAT Team fills actual results and evid
 Copy one record per case. Complete actual result in the UAT Team's own words; do not copy the expected result into that field.
 
 ```text
-Case ID:
-UAT tester / team:
+Case ID / partner package version:
+Product / partner team:
+Partner requirement / acceptance criterion:
+Both student testers (names/IDs) and who performed each action:
 Date and start/end time (timezone):
 Tested release tag + full commit SHA:
 Deployed image digest / service revision:
 Environment URL:
 Synthetic inputs / account labels / record IDs:
+Expected result (as provided by the product team):
 Actual result:
+Protected data/state before and after (for forbidden/denied actions):
 Outcome: NOT RUN | PASS | FAIL | BLOCKED
 Evidence IDs / filenames:
 Cleanup performed and by whom:
@@ -241,14 +245,16 @@ If no legitimate product defect is found, do not fabricate one or deliberately b
 
 Part B (our team testing the other team's product) needs the partner team's handoff. Record it separately; do not treat our own automated suite as independent partner testing.
 
+**Part B execution status: BLOCKED.** The current Issue #82 and repository handoff records do not identify the partner team or students, provide the partner's Sprint 1 cases or deployed release, or give safe access/setup/cleanup instructions and a test window. No partner-case execution is recorded, and no result or evidence is claimed. The UAT-01–UAT-08 cases in §3 are for PEW-DIY and are not substitutes for partner-provided cases. No instructor/TA notification or response is recorded; Issue #82 requires prompt notification when the partner, deployment, access, or replacement tester is unavailable. Send that notification through the course-approved channel and retain the actual response; this record does not claim it was sent.
+
 | Partner handoff field | Value |
 |---|---|
-| Partner project/team and both participating students/IDs | **PENDING** |
-| Partner Sprint 1 scope, release SHA/tag, deployed revision and URL | **PENDING** |
-| Received UAT case package, private account labels, and safe setup/cleanup | **PENDING** |
-| Agreed test window and tester assignments | **PENDING** |
-| Case-by-case actual outcomes, evidence, findings, and partner retest | **PENDING** |
-| If blocked: notification to instructor/TA and response | **PENDING — retain actual notification evidence** |
+| Partner project/team and both participating students/IDs | **BLOCKED — not provided in Issue #82 or the current handoff records** |
+| Partner Sprint 1 scope, release SHA/tag, deployed revision and URL | **BLOCKED — not provided** |
+| Received UAT case package, private account labels, and safe setup/cleanup | **BLOCKED — not received** |
+| Agreed test window and tester assignments | **BLOCKED — not agreed** |
+| Case-by-case actual outcomes, evidence, findings, and partner retest | **NOT RUN — no partner cases or release were provided** |
+| If blocked: notification to instructor/TA and response | **NOT RECORDED — send promptly through the course-approved channel and retain actual evidence** |
 
 The independent UAT Team records exactly one final decision for the specific deployed revision:
 
