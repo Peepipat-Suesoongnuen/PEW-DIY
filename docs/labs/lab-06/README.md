@@ -14,11 +14,15 @@ The product scope is the implemented Sprint 1 features **F-01–F-05** and their
 
 The automated checks in the evidence pack are supporting evidence only; they do not replace the other team's manual, user-facing execution or its independent decision.
 
+### Tracker reconciliation
+
+Parent [Issue #80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) and child Issues [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)–[#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) are **OPEN**. Issues #80–#82 were reopened because their closed/completed states conflicted with the documented criteria and evidence: [PR #85](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/85) leaves the parent handoff pending, [PR #86](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/86) records unresolved Part A blockers, and [PR #87](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/87) records Part B as blocked. No rationale for the original closures was recorded in those issue histories. This is a tracker correction only; no UAT execution, partner result, or instructor/TA notification is claimed.
+
 ### Current completion state
 
 | Part | State |
 |---|---|
-| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | Cases, deployment record, and F-05 implementation trace are documented; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
+| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | **BLOCKED** — cases, deployment record, and F-05 implementation trace are documented; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
 | B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **BLOCKED** — no partner handoff, case package, release/access details, or test window is recorded; no partner-case execution is evidenced, and no instructor/TA notification is documented. |
 | C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **BLOCKED** — neither UAT direction has a completed results package to triage; no finding disposition or “none received” claim is recorded. |
 | D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **Pending** triage and partner retest. No acceptance is claimed. |
