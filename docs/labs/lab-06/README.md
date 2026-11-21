@@ -18,16 +18,16 @@ The automated checks in the evidence pack are supporting evidence only; they do 
 
 GitHub issue states as of 2026-11-22:
 
-| Issue | GitHub state |
-|---|---|
-| Parent [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) | **CLOSED — completed** |
-| Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | **CLOSED — completed** |
-| Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | **CLOSED — completed** |
-| Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) | **OPEN** |
-| Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** |
-| UAT blocker coordination [#90](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/90) | **OPEN** |
+| Issue | GitHub state | Acceptance evidence |
+|---|---|---|
+| Parent [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) | **CLOSED** | **INCOMPLETE** — required child work and Lab 6 evidence are still pending. The issue body says to keep it open until these are complete. |
+| Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | **CLOSED** | **BLOCKED** — current-revision confirmation, isolated UAT setup, private access, and scheduling remain pending. |
+| Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | **CLOSED** | **BLOCKED** — partner handoff and independent execution evidence are absent. |
+| Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) | **OPEN** | **BLOCKED** — neither UAT direction has completed results to triage. |
+| Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** | **BLOCKED** — triage, correction/retest, and final decision are pending. |
+| UAT blocker coordination [#90](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/90) | **OPEN** | Coordination register is documented; external prerequisites remain pending. |
 
-These are the current tracker states, not completion evidence. The evidence state for each UAT part is shown separately below; closing an issue does not establish that its handoff, execution, or acceptance criteria were met. No UAT execution, partner result, or instructor/TA notification is claimed.
+GitHub state is not completion evidence. Issues #80–#82 are currently closed in GitHub, while their acceptance evidence remains incomplete as recorded above and in prior issue comments. Their closure records point to merged PRs #85–#87; those PRs documented pending or blocked UAT work, not completed acceptance. Reopening the issues requires an authorized maintainer action. No UAT execution, partner result, or instructor/TA notification is claimed.
 
 ### Current completion state
 
