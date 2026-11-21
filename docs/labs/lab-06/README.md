@@ -18,27 +18,29 @@ The automated checks in the evidence pack are supporting evidence only; they do 
 
 | Part | State |
 |---|---|
-| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | Cases and templates prepared below; the handoff is not ready until the release and environment fields in §2 are completed and shared privately. |
+| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | Cases and templates are prepared and the last deployment record is captured in §2; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
 | B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **Pending** partner identity, release, access, and scheduled execution. |
 | C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **Pending** actual execution/findings; no findings have been invented. |
 | D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **Pending** triage and partner retest. No acceptance is claimed. |
 
 ## 2. Release handoff — complete before inviting testers
 
-The following values must identify the *same* release throughout execution and in the final acceptance record. The current repository `main` commit is not evidence of a deployed release; complete these fields from the actual deployment and review/run records. See the [Lab 5 deployment guide](../lab-05/deployment.md) for the release and smoke-check procedure.
+The [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) records the release actually deployed on 2026-11-19. Its commit, image digest, and revision below identify that deployment at that time; they do not prove that the revision is still current. Before handoff, confirm the live revision and record any change. See the [Lab 5 deployment guide](../lab-05/deployment.md) for the release and smoke-check procedure.
 
 | Handoff field | Value |
 |---|---|
 | Product team / project | PEW-DIY / D.I.Y. Room Equipment Borrowing System |
-| Sprint 1 requirements and contract revision | F-01–F-05; record the exact reviewed contract/version used for the release |
-| Git release tag and full commit SHA | **PENDING — verify from the release record** |
-| Deployed image digest and active service revision | **PENDING — verify from the deployment workflow/revision** |
-| UAT application URL and verification time | **PENDING — verify the active URL before the session** |
+| Sprint 1 requirements and contract revision | F-01 rev 2; F-02 rev 2; F-03 rev 4; F-04 rev 5; F-05 rev 3, from deployed source commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` |
+| Git release tag and full commit SHA | No Git release tag is recorded in the deployment evidence. Deployed source commit / image tag: `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` (`main`) |
+| Deployed image digest and revision at deployment time | `asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/pewdiy@sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`; Cloud Run revision `pewdiy-00008-mfk` was serving 100% of traffic at 2026-11-19 16:51:03 UTC. **Reconfirm the active revision before UAT.** |
+| Public demo URL and read-only verification | [https://pewdiy-qtz73ahnlq-as.a.run.app](https://pewdiy-qtz73ahnlq-as.a.run.app) — checked 2026-11-22: `/` and `/login` returned HTTP 200; `/api/ready` returned `{"status":"ready","db":"connected"}`. This is not an approved isolated UAT URL. |
 | Product Team participants | **PENDING — record both students and IDs in the submission PDF** |
 | UAT Team / independent tester names | **PENDING — record both students and IDs before execution** |
 | Handoff date and agreed test window | **PENDING** |
 | Private credential handoff channel | **PENDING — use the course-approved private channel; never record credential values here** |
-| Deployment smoke-check evidence | **PENDING — link the actual run and its result** |
+| Deployment smoke-check evidence | [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) succeeded, including deployment verification and public-URL smoke checks. It reused an existing image (build/push skipped); it did not prepare isolated UAT data or a reset procedure. |
+
+The public demo above is currently confirmed reachable, but its connected database is not an isolated UAT database. The checks on 2026-11-22 were read-only; **do not run state-changing UAT cases against this shared service**. A separate owner-approved UAT deployment/database, its URL, fixture mapping, reset operator/procedure, and current active revision have not yet been verified. Do not invite testers until those items and the private account handoff are complete.
 
 If the deployed revision changes after handoff, stop, record the new version, and obtain the UAT Team's agreement before continuing. Results from different revisions must not be combined into one acceptance decision.
 
