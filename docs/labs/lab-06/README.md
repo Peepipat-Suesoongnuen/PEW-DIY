@@ -4,7 +4,7 @@
 >
 > **Source:** `Lab_6_Sprint_1_UAT.pdf`, Parts A–D and submission checklist
 >
-> **Status:** UAT plan prepared; release handoff, execution, findings, retest, and acceptance are **pending**. This document does not claim that a partner test or acceptance has occurred.
+> **Status:** Isolated UAT environment (`pewdiy-uat`) provisioned and smoke-tested on 2026-11-22; participant names/IDs, private credential delivery, schedule, execution, findings, retest, and acceptance remain **pending**. This document does not claim that a partner test or acceptance has occurred.
 
 ## 1. Purpose, roles, and scope
 
@@ -21,7 +21,7 @@ GitHub issue states as of 2026-11-22:
 | Issue | GitHub state | Acceptance evidence |
 |---|---|---|
 | Parent [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) | **OPEN** | **INCOMPLETE** — required child work and Lab 6 evidence are still pending. Reopened 2026-11-21; the issue body says to keep it open until these are complete. |
-| Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | **OPEN** | **BLOCKED** — current-revision confirmation, isolated UAT setup, private access, and scheduling remain pending. Reopened 2026-11-21. |
+| Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | **OPEN** | **IN PROGRESS** — isolated UAT deployment (`pewdiy-uat`), database (`pewdiy_uat`), seed, and reset job are provisioned and smoke-tested; participant names/IDs, private credential delivery, and test window remain pending. Reopened 2026-11-21. |
 | Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | **OPEN** | **BLOCKED** — partner handoff and independent execution evidence are absent. Reopened 2026-11-21. |
 | Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) | **OPEN** | **BLOCKED** — neither UAT direction has completed results to triage. |
 | Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** | **BLOCKED** — triage, correction/retest, and final decision are pending. |
@@ -33,7 +33,7 @@ GitHub state is not completion evidence. Issues #80–#82 were closed by merged 
 
 | Part | State |
 |---|---|
-| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | **BLOCKED** — cases, deployment record, and F-05 implementation trace are documented; handoff is still blocked on current-revision confirmation, an isolated UAT environment, private access, and team scheduling. |
+| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | **IN PROGRESS** — cases, F-05 implementation trace, and isolated UAT service/DB (`pewdiy-uat` / `pewdiy_uat`) are ready; participant names/IDs, private credential delivery, and scheduling remain pending. |
 | B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **BLOCKED** — no partner handoff, case package, release/access details, or test window is recorded; no partner-case execution is evidenced, and no instructor/TA notification is documented. |
 | C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **BLOCKED** — neither UAT direction has a completed results package to triage; no finding disposition or “none received” claim is recorded. |
 | D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **BLOCKED** — Part C has no completed UAT results to triage, so no accepted finding is ready for correction or retest. No final decision is claimed. |
@@ -48,7 +48,8 @@ The [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/action
 | Sprint 1 requirements and contract revision | F-01 rev 2; F-02 rev 2; F-03 rev 4; F-04 rev 5; F-05 rev 3. F-05 implementation commit `70e7b5ef02b92b26745140f0485ad796ffbc52cc` is included in deployed source commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`; see the traceability note below. |
 | Git release tag and full commit SHA | No Git release tag is recorded in the deployment evidence. Deployed source commit / image tag: `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` (`main`) |
 | Deployed image digest and revision at deployment time | `asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/pewdiy@sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`; Cloud Run revision `pewdiy-00008-mfk` was serving 100% of traffic at 2026-11-19 16:51:03 UTC. **Reconfirm the active revision before UAT.** |
-| Public demo URL and read-only verification | [https://pewdiy-qtz73ahnlq-as.a.run.app](https://pewdiy-qtz73ahnlq-as.a.run.app) — checked 2026-11-22: `/` and `/login` returned HTTP 200; `/api/ready` returned `{"status":"ready","db":"connected"}`. This is not an approved isolated UAT URL. |
+| Public demo URL and read-only verification | [https://pewdiy-qtz73ahnlq-as.a.run.app](https://pewdiy-qtz73ahnlq-as.a.run.app) — checked 2026-11-22: `/` and `/login` returned HTTP 200; `/api/ready` returned `{"status":"ready","db":"connected"}`. Shared demo only; do not run state-changing UAT here. |
+| Isolated UAT service URL and tested release | [https://pewdiy-uat-qtz73ahnlq-as.a.run.app](https://pewdiy-uat-qtz73ahnlq-as.a.run.app) — Cloud Run service `pewdiy-uat` (`asia-southeast1`, project `cpe334-2026-pew-diy`); active revision `pewdiy-uat-00002-bnt` serving `100%` traffic on image `asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/pewdiy@sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4` (`main` commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`). Connected to dedicated database `pewdiy_uat` on `pewdiy-pg` (`APP_ORIGIN` matches the UAT URL). `python deploy/smoke_test.py https://pewdiy-uat-qtz73ahnlq-as.a.run.app` passed on 2026-11-22 (`/api/ready`, `/`, `/login`, `/api/equipment` 401; optional login check skipped). |
 | Product Team participants | **PENDING — record both students and IDs in the submission PDF** |
 | UAT Team / independent tester names | **PENDING — record both students and IDs before execution** |
 | Handoff date and agreed test window | **PENDING** |
@@ -62,8 +63,8 @@ This register tracks who must provide each missing prerequisite and the next saf
 
 | Prerequisite | Responsible role | Current status and evidence | Next action |
 |---|---|---|---|
-| Current PEW-DIY deployed revision | Product Team deployment owner (individual not identified) | Run #6 records commit `b03c904`, image digest, and revision `pewdiy-00008-mfk` on 2026-11-19; the active revision has not been reconfirmed. [Deployment evidence](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) | Verify the live revision and image immediately before handoff; record the check. |
-| Isolated UAT deployment/database, fixture mapping, and reset/cleanup procedure | Product Team and deployment owner (individual not identified) | **BLOCKED** — environment and operator approval and confirmation of the deployed fixtures are pending. [Part A](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | Adapt and approve the proposed setup below, then record the environment URL, actual fixture mapping, and named operator. |
+| Current PEW-DIY deployed revision | Product Team deployment owner (`peepipat2549@gmail.com`) | Confirmed on 2026-11-22: demo `pewdiy` runs `pewdiy-00008-mfk` and isolated UAT `pewdiy-uat` runs `pewdiy-uat-00002-bnt` (100% traffic, commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`, digest `sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`). | Reconfirm revision if redeployed; record any `UAT-08` restart revision. |
+| Isolated UAT deployment/database, fixture mapping, and reset/cleanup procedure | Product Team deployment owner (`peepipat2549@gmail.com`) | **READY** — `pewdiy-uat` (`https://pewdiy-uat-qtz73ahnlq-as.a.run.app`), database `pewdiy_uat`, migrations (`pewdiy-uat-migrate-stqff`), seed (`pewdiy-uat-seed-zxhdz`), and reset job (`pewdiy-uat-reset`) provisioned and smoke-tested on 2026-11-22. | Coordinate reset/restart windows with testers during execution. |
 | Product/UAT participants, private account handoff, and session time | Product Team and UAT Team (students not identified) | **PENDING** — names/IDs, private handoff channel, and schedule are not recorded. | Confirm both teams' participants and session time; deliver account credentials privately and record only role labels here. |
 | Partner identity, release, cases, safe access/setup, and test window | Partner Product Team (team/individuals not identified) | **BLOCKED** — no partner handoff or case package is recorded. [Part B](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | Obtain the exact scope/release, deployed URL/revision, cases, access/setup/cleanup instructions, tester identities, and agreed window. |
 | Instructor/TA escalation if the partner or access is unavailable | UAT Team (sender not identified) | **NOT RECORDED** — no notification or response is documented; partner unavailability itself is not asserted. | If the partner, deployment, access, or replacement tester is unavailable, notify the instructor/TA promptly through the course-approved channel and retain the actual notification and response. |
@@ -80,7 +81,7 @@ If the deployed revision changes after handoff, stop, record the new version, an
 
 ### Accounts, data, and safe environment
 
-- Provide the labels and roles **B-A** (Borrower A), **B-B** (Borrower B), and **C-A** (Custodian A). The Product Team sends their usable credentials privately. Record only the labels/roles in the PDF and evidence; never record passwords, cookies, tokens, hashes, or credential screenshots.
+- Provide the labels and roles **B-A** (Borrower A), **B-B** (Borrower B), and **C-A** (Custodian A). `pewdiy-uat` seeds `B-A`, `B-B`, and `C-A` only (there is no `B-C` account; use `B-B` for the second Borrower steps). Their generated passwords are stored in Secret Manager (`pewdiy-uat-seed-password-ba`, `pewdiy-uat-seed-password-bb`, `pewdiy-uat-seed-password-ca`) and sent privately through the team channel. Record only the labels/roles in the PDF and evidence; never record passwords, cookies, tokens, hashes, or credential screenshots.
 - Use synthetic data only. Preferred test fixtures are [E-ONE](../../sprints/sprint-1/fixtures.md) (total 1), [E-MANY](../../sprints/sprint-1/fixtures.md) (total 3), and [E-ZERO](../../sprints/sprint-1/fixtures.md) (total 0). Before execution, map each symbolic label to the actual catalog item and record its visible name/ID in the private run record. Do not assume the deployed catalog contains these fixtures.
 - Run state-changing scenarios only against a **dedicated, isolated UAT deployment/database** whose owner has approved the test data and reset procedure. A successful checkout permanently changes inventory state in Sprint 1; there is no Sprint 1 return or delete-request workflow. Do not run these cases on a shared/production dataset or reset a shared database.
 - Before each case, the Product Team prepares the stated starting state in the isolated environment and gives the UAT Team the required account labels and item/record references. Reset only that isolated UAT database using its documented owner-approved procedure. Never use application startup, an undocumented endpoint, or an unapproved production seed/reset to clean data.
@@ -88,9 +89,7 @@ If the deployed revision changes after handoff, stop, record the new version, an
 
 ### Proposed fixture preparation and case order
 
-The deployment owner approves a dedicated UAT service and PostgreSQL database, confirms that the service uses the intended immutable image digest and the dedicated database, and names the setup and cleanup operator. Record the UAT URL, source SHA, image digest, revision, database identifier without credentials, and the approved setup and cleanup method in the handoff. These approvals and environment details are pending.
-
-After the owner confirms the target, apply the migrations and seed synthetic data using one-off jobs from the UAT image. The current image provides `node dist/db/migrate.js` for migration and `SEED_MODE=cloud-demo` with `node dist/db/seed.js --cloud-demo` for the seed job. Supply the three `SEED_PASSWORD_*` values privately to the seed job and share the credentials with testers through the approved channel. Verify readiness, sign-in for all three accounts, and the expected catalog quantities before starting. [Lab 5 job and environment reference](../lab-05/deployment.md)
+The isolated UAT environment (`pewdiy-uat`) is provisioned on `pewdiy_uat` with the exact `main` image digest (`@sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`). Migrations (`pewdiy-uat-migrate`) and seeding (`pewdiy-uat-seed` with `SEED_MODE=cloud-demo` and `--cloud-demo`) ran cleanly against `pewdiy_uat`. Reset between case groups is performed by the deployment owner via `gcloud run jobs execute pewdiy-uat-reset --region asia-southeast1 --wait --project cpe334-2026-pew-diy` (clears `loans`, `borrowing_requests`, and `sessions` while preserving `users` and `equipment`). Restart without DB reset for `UAT-08` is performed via `gcloud run services update pewdiy-uat` with the same image digest.
 
 | Fixture label | Seeded equipment ID | Display name | Starting total / available |
 |---|---|---|---|
