@@ -104,7 +104,7 @@ Product-side fixture rehearsal on 2026-11-22 used a clean checkout of `b03c90435
 | Order | Cases | Required starting state and records to keep |
 |---|---|---|
 | 1 | UAT-01 → UAT-02 → UAT-03 → UAT-04 → UAT-08 | Start with fresh seed data. Carry the UAT-03 request into UAT-04. Preserve the resulting request and loan through UAT-08 and keep the same database attached for the restart. |
-| 2 | UAT-05 | Start with a fresh dataset (or carry over the `UAT-04` state where `B-A` holds the `E-ONE` loan and `B-B` submits a competing `E-ONE` request). Both Borrowers have requests against `E-ONE` before `C-A` rejects the unfulfilled second request. |
+| 2 | UAT-05 | Start with a fresh dataset (`E-ONE` `1/1`, zero requests and loans). Both Borrowers create their requests against the same one-unit fixture before `C-A` checks out `B-A`'s request and attempts `B-B`'s. |
 | 3 | UAT-06 | Use the preserved post-`UAT-05`/`UAT-08` dataset where `B-A` owns the checked-out `E-ONE` request and active loan, and `B-B` owns a submitted `E-ONE` request (`0` active loans). Record `B-A`'s request/loan IDs and `B-B`'s submitted request ID for cross-owner and borrower-checkout denial checks. |
 | 4 | UAT-07 | Use a clean `E-MANY` baseline (`total 3 / available 3`, `0` requests/loans on `fixture-e-many`; prior `E-ONE` records from `UAT-03`–`UAT-05` may remain on the preserved post-`UAT-08` dataset when recorded in the before/after counts). |
 
@@ -194,10 +194,10 @@ Interim partner execution on `pewdiy-uat` (`2026-11-22`, revisions `pewdiy-uat-0
 - **Preconditions:** Using the preserved post-`UAT-05`/`UAT-08` dataset, `B-A` owns the checked-out `E-ONE` request (`3334c7cb-35f7-43a0-ba8b-8f722b241e7e`) and active loan (`27ba9193-5f91-4edc-b8d2-fb2af7453693`), while `B-B` owns a submitted `E-ONE` request (`32486ac4-d501-41f8-9f57-a511b7a2c2a5`, `0` active loans). Record these synthetic IDs; `B-B` and `B-A` sign in to separate sessions.
 - **Actions:**
   1. As `B-B`, open `/requests/<B-A-request-id>` and `/loans/<B-A-loan-id>` (or call `GET /api/requests/<B-A-request-id>` and `GET /api/loans/<B-A-loan-id>`) in `B-B`'s authenticated browser. Record the visible/HTTP rejection without copying any private record fields.
-  2. As `B-A`, replace the ID below with a synthetic submitted-request ID, then run it in the browser developer console on the **same application origin**:
+  2. As `B-A`, target `B-B`'s submitted `E-ONE` request ID (`32486ac4-d501-41f8-9f57-a511b7a2c2a5`) as a cross-owner Borrower checkout attempt in the browser developer console on the **same application origin**:
      ```js
-     const OWN_SUBMITTED_REQUEST_ID = 'paste-own-synthetic-request-id';
-     fetch('/api/requests/' + encodeURIComponent(OWN_SUBMITTED_REQUEST_ID) + '/checkout', {
+     const TARGET_REQUEST_ID = '32486ac4-d501-41f8-9f57-a511b7a2c2a5';
+     fetch('/api/requests/' + encodeURIComponent(TARGET_REQUEST_ID) + '/checkout', {
        method: 'POST',
        headers: { 'Content-Type': 'application/json' },
        body: '{}'
@@ -281,12 +281,12 @@ Part C covers both directions: findings from our independent UAT of the partner 
 The following redacted server-side checks were executed directly against `https://pewdiy-uat-qtz73ahnlq-as.a.run.app` (active revision `pewdiy-uat-00003-8c5`, `100%` traffic) on `2026-11-22 22:00` ICT (`Asia/Bangkok`) with no secrets or session cookies retained:
 
 * **`EV-UAT06-API-01` (`UAT-06` cross-owner & role denial):**
-  * **Actors / roles:** `B-B` (`BORROWER`) attempting to read `B-A`'s synthetic loan (`27ba9193-5f91-4edc-b8d2-fb2af7453693`) and request (`3334c7cb-35f7-43a0-ba8b-8f722b241e7e`); `B-A` (`BORROWER`) attempting `POST /api/requests/<id>/checkout`.
+  * **Actors / roles:** `B-B` (`BORROWER`) attempting to read `B-A`'s synthetic loan (`27ba9193-5f91-4edc-b8d2-fb2af7453693`) and request (`3334c7cb-35f7-43a0-ba8b-8f722b241e7e`); `B-A` (`BORROWER`) attempting cross-owner `POST /api/requests/32486ac4-d501-41f8-9f57-a511b7a2c2a5/checkout` against `B-B`'s submitted `E-ONE` request.
   * **Actual server responses (`pewdiy-uat-00003-8c5`):**
     ```text
     UAT06_BB_READ_BA_LOAN: 403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
     UAT06_BB_READ_BA_REQ:  403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
-    UAT06_BORROWER_CHECKOUT: 403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
+    UAT06_BA_CHECKOUT_BB_SUBMITTED: 403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
     ```
   * **Before/after protected state:** No `B-A` record fields disclosed. Counts remained unchanged: `B-A` requests `1 → 1`, `B-A` active loans `1 → 1`, `B-B` requests `1 → 1`, `B-B` active loans `0 → 0`; catalog stock (`total / available`) remained `E-ONE: 1/0 → 1/0`, `E-MANY: 3/3 → 3/3`, `E-ZERO: 0/0 → 0/0`.
 * **`EV-UAT07-API-01` (`UAT-07` quantity `4` on `E-MANY` `3/3` stock, plus `0` and forged `borrower_id`):**
