@@ -4,7 +4,7 @@
 >
 > **Source:** `Lab_6_Sprint_1_UAT.pdf`, Parts A–D and submission checklist
 >
-> **Status:** UAT plan prepared; release handoff, execution, findings, retest, and acceptance are **pending**. This document does not claim that a partner test or acceptance has occurred.
+> **Status:** The partner reported a successful read-only demo smoke check. The UAT handoff is **BLOCKED** pending an approved isolated environment. All eight UAT cases are **NOT RUN**.
 
 ## 1. Purpose, roles, and scope
 
@@ -27,7 +27,7 @@ GitHub issue states as of 2026-11-22:
 | Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** | **BLOCKED** — triage, correction/retest, and final decision are pending. |
 | UAT blocker coordination [#90](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/90) | **OPEN** | Coordination register is documented; external prerequisites remain pending. |
 
-GitHub state is not completion evidence. Issues #80–#82 were closed by merged PRs #85–#87 on 2026-11-21 and reopened the same day with recorded rationale: those PRs documented pending or blocked UAT work, not completed acceptance. All six tracked issues are OPEN as of 2026-11-22, verified against the public issue pages. Their acceptance evidence remains incomplete as recorded above and in the issue comments. No UAT execution, partner result, or instructor/TA notification is claimed.
+GitHub state is not completion evidence. Issues #80–#82 were closed by merged PRs #85–#87 on 2026-11-21 and reopened the same day with recorded rationale: those PRs documented pending or blocked UAT work, not completed acceptance. All six tracked issues are OPEN as of 2026-11-22, verified against the public issue pages. Their acceptance evidence remains incomplete as recorded above and in the issue comments.
 
 ### Current completion state
 
@@ -38,7 +38,7 @@ GitHub state is not completion evidence. Issues #80–#82 were closed by merged 
 | C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **BLOCKED** — neither UAT direction has a completed results package to triage; no finding disposition or “none received” claim is recorded. |
 | D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **BLOCKED** — Part C has no completed UAT results to triage, so no accepted finding is ready for correction or retest. No final decision is claimed. |
 
-## 2. Release handoff — complete before inviting testers
+## 2. Release handoff — complete before running UAT
 
 The [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) records the release actually deployed on 2026-11-19. Its commit, image digest, and revision below identify that deployment at that time; they do not prove that the revision is still current. Before handoff, confirm the live revision and record any change. See the [Lab 5 deployment guide](../lab-05/deployment.md) for the release and smoke-check procedure.
 
@@ -48,13 +48,38 @@ The [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/action
 | Sprint 1 requirements and contract revision | F-01 rev 2; F-02 rev 2; F-03 rev 4; F-04 rev 5; F-05 rev 3. F-05 implementation commit `70e7b5ef02b92b26745140f0485ad796ffbc52cc` is included in deployed source commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`; see the traceability note below. |
 | Git release tag and full commit SHA | No Git release tag is recorded in the deployment evidence. Deployed source commit / image tag: `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` (`main`) |
 | Deployed image digest and revision at deployment time | `asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/pewdiy@sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`; Cloud Run revision `pewdiy-00008-mfk` was serving 100% of traffic at 2026-11-19 16:51:03 UTC. **Reconfirm the active revision before UAT.** |
-| Public demo URL and read-only verification | [https://pewdiy-qtz73ahnlq-as.a.run.app](https://pewdiy-qtz73ahnlq-as.a.run.app) — checked 2026-11-22: `/` and `/login` returned HTTP 200; `/api/ready` returned `{"status":"ready","db":"connected"}`. This is not an approved isolated UAT URL. |
+| Public demo URL and read-only verification | [https://pewdiy-qtz73ahnlq-as.a.run.app](https://pewdiy-qtz73ahnlq-as.a.run.app) uses a shared database. On 2026-11-22, `/` and `/login` returned HTTP 200 and `/api/ready` returned `{"status":"ready","db":"connected"}`. |
+| Isolated UAT service URL and tested release | **BLOCKED** — the deployment owner still needs to confirm the service URL, serving revision, source SHA, image digest, dedicated database, and permission to change synthetic data. |
 | Product Team participants | **PENDING — record both students and IDs in the submission PDF** |
 | UAT Team / independent tester names | **PENDING — record both students and IDs before execution** |
 | Handoff date and agreed test window | **PENDING** |
 | Private credential handoff channel | **PENDING — use the course-approved private channel; never record credential values here** |
 | Deployment smoke-check evidence | [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) succeeded, including deployment verification and public-URL smoke checks. It reused an existing image (build/push skipped); it did not prepare isolated UAT data or a reset procedure. |
 | Release regression baseline | [CI & Docker Build on `main`](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44566327436) succeeded for the exact release commit above. A product-side local `npm run test:ci` on 2026-11-22 identified the same commit as `CLEAN_SOURCE_COMMIT` and passed 195 server, 74 client, and 57 Chromium cases with zero failed or skipped cases. |
+
+### Reported demo smoke check
+
+The partner tester reported that the Sign in form rendered, `/` and `/login` returned HTTP 200, and `/api/ready` reported a database connection. Record this as **PASS — partner-reported read-only demo smoke check**. The tester stopped before signing in, submitting a request, or checking out equipment. The shared demo is available for read-only smoke checks. UAT-01 through UAT-08 remain **NOT RUN** while the handoff is **BLOCKED**.
+
+### Partner follow-up request
+
+The partner's UAT request is recorded with the following prerequisites; missing items remain blockers and must not be marked PASS:
+
+| Request | Required evidence before state-changing UAT |
+|---|---|
+| Isolated UAT URL | A dedicated Cloud Run service URL whose database is separate from the shared demo and whose owner approves synthetic request/checkout actions. |
+| Active release | Cloud Run revision name, full source commit SHA or immutable image digest, and confirmation of 100% traffic allocation or the tested traffic split. |
+| Test fixtures | Visible catalog name and ID for E-ONE (`1/1`), E-MANY (`3/3`), and E-ZERO (`0/0`), plus confirmation of the seeded account roles and zero starting requests/loans. |
+| Reset and restart | Named operator, owner-approved reset/reseed procedure, cleanup method, and a scheduled UAT-08 restart window that retains the same database. |
+| Private credentials | B-A, B-B or separately approved B-C, and C-A credentials supplied privately. If a previously shared credential is changed, rotate it and send the replacement privately. |
+
+Before execution, record the actual fixture mappings and service details in the handoff table; do not assume that E-ONE, E-MANY, or E-ZERO exists under a different name.
+
+### Find and confirm the isolated UAT URL
+
+1. In Google Cloud Console, open **Cloud Run → Services** in the project that hosts the test deployment. The demo is in `cpe334-2026-pew-diy`. Check the selected project and clear service filters if the UAT service is missing. The deployment owner chooses the UAT service name.
+2. Open the UAT service and copy its **URL** from the service details. Check which revision gets traffic for that URL and record it with the full source commit SHA and image digest. Confirm with the deployment owner that the service uses the dedicated test database and that testers can create requests and check out synthetic stock. Record who can reset the database and restart the service. [Cloud Run service details](https://docs.cloud.google.com/run/docs/managing/services) · [Cloud Run traffic and revision details](https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration)
+3. If the team has only a shared demo, coordinate a dedicated service and test database with the deployment owner. Keep the UAT handoff **BLOCKED** until the environment is approved. If the test environment stays unavailable, notify the instructor or TA through the course channel and retain the notice and any response for the submission.
 
 ### External prerequisite coordination — Issue #90
 
@@ -74,13 +99,12 @@ F-05 revision 3 was implemented in [PR #37](https://github.com/Peepipat-Suesoong
 
 The local [F-05 TDD record](../../sprints/sprint-1/tdd-evidence-f05.md) fingerprints a different candidate: 10 of its 20 source-manifest entries differ from commit `70e7b5e`. Its local test counts therefore do **not** validate the deployed implementation. The applicable committed-code evidence is the [independent review of PR #37](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37#pullrequestreview-5804916583), which reports verification of exact commit `70e7b5e` (115 server, 70 client, 51 browser tests; build/typecheck passed on a fresh PostgreSQL 17.11 environment). Those are reviewer-reported results for the implementation commit, not a fresh test run on deployed commit `b03c904` and not independent partner UAT.
 
-The public demo above is currently confirmed reachable, but its connected database is not an isolated UAT database. The checks on 2026-11-22 were read-only; **do not run state-changing UAT cases against this shared service**. A separate owner-approved UAT deployment/database, its URL, fixture mapping, reset operator/procedure, and current active revision have not yet been verified. Do not invite testers until those items and the private account handoff are complete.
-
 If the deployed revision changes after handoff, stop, record the new version, and obtain the UAT Team's agreement before continuing. Results from different revisions must not be combined into one acceptance decision.
 
 ### Accounts, data, and safe environment
 
-- Provide the labels and roles **B-A** (Borrower A), **B-B** (Borrower B), and **C-A** (Custodian A). The Product Team sends their usable credentials privately. Record only the labels/roles in the PDF and evidence; never record passwords, cookies, tokens, hashes, or credential screenshots.
+- Provide the labels and roles **B-A** (Borrower A), **B-B** (Borrower B), and **C-A** (Custodian A). Use **B-B** by default. Use **B-C** in the B-B steps only after the deployment owner verifies that B-C is a separate `BORROWER` account from B-A on the isolated deployment. Record the approved mapping in the handoff and in the UAT-05 and UAT-06 results.
+- If previously shared credentials are still valid, coordinate any rotation with the account owner. The Product Team sends valid credentials through the team's approved private channel. Record only account labels and roles in GitHub, the PDF, and test evidence. Redact passwords, cookies, tokens, hashes, and credential fields in screenshots.
 - Use synthetic data only. Preferred test fixtures are [E-ONE](../../sprints/sprint-1/fixtures.md) (total 1), [E-MANY](../../sprints/sprint-1/fixtures.md) (total 3), and [E-ZERO](../../sprints/sprint-1/fixtures.md) (total 0). Before execution, map each symbolic label to the actual catalog item and record its visible name/ID in the private run record. Do not assume the deployed catalog contains these fixtures.
 - Run state-changing scenarios only against a **dedicated, isolated UAT deployment/database** whose owner has approved the test data and reset procedure. A successful checkout permanently changes inventory state in Sprint 1; there is no Sprint 1 return or delete-request workflow. Do not run these cases on a shared/production dataset or reset a shared database.
 - Before each case, the Product Team prepares the stated starting state in the isolated environment and gives the UAT Team the required account labels and item/record references. Reset only that isolated UAT database using its documented owner-approved procedure. Never use application startup, an undocumented endpoint, or an unapproved production seed/reset to clean data.
@@ -106,10 +130,10 @@ Product-side fixture rehearsal on 2026-11-22 used a clean checkout of `b03c90435
 |---|---|---|
 | 1 | UAT-01 → UAT-02 → UAT-03 → UAT-04 → UAT-08 | Start with fresh seed data. Carry the UAT-03 request into UAT-04. Preserve the resulting request and loan through UAT-08 and keep the same database attached for the restart. |
 | 2 | UAT-05 | Start with a fresh dataset. Both Borrowers create their requests against the same one-unit fixture before C-A checks either out. |
-| 3 | UAT-06 | Start with a fresh dataset. B-B submits a quantity-one request for E-ONE and C-A checks it out. B-B and B-A each submit a separate quantity-one request for E-MANY. Record both submitted request IDs and B-B's active loan ID for the case. |
+| 3 | UAT-06 | Start with a fresh dataset. B-B or the separately approved B-C submits a quantity-one request for E-ONE and C-A checks it out. B-B/B-C and B-A each submit a separate quantity-one request for E-MANY. Record both submitted request IDs and the second Borrower's active loan ID for the case. |
 | 4 | UAT-07 | Start with a fresh dataset, with E-MANY at `3/3` and zero requests and loans. |
 
-Capture the approved clean baseline after verifying seed accounts, stock, and zero requests and loans. Restore that baseline in the dedicated UAT database for each fresh dataset so the release and database connection stay the same. Rerunning the seed preserves existing rows and credentials. Before a reset, close test sessions, retain redacted results and any defect evidence, and have the operator verify the exact database and service against the handoff record. After a reset, recheck the dataset preconditions and share any changed credentials privately. After the final case or retest, the operator follows the agreed evidence retention and cleanup procedure for the UAT resources.
+The named reset operator captures the approved clean baseline after verifying the test accounts, fixture stock, and zero requests and loans. Before a reset, testers close their sessions and retain redacted results and any defect evidence. The operator verifies the service and dedicated database against the handoff, restores the baseline to that database, and rechecks the account access, fixture stock, and empty request and loan lists. Restore the baseline when a group requires a fresh dataset. Preserve the UAT-03 request and UAT-04 loan through UAT-08. Rerunning the seed preserves existing rows and credentials. Verify that restored accounts use the intended credentials and share any changes privately. After the final case or retest, the operator follows the agreed evidence retention and cleanup procedure.
 
 ## 3. Executable UAT cases
 
@@ -177,14 +201,14 @@ All cases below start as **NOT RUN**. The UAT Team fills actual results and evid
 
 - **Requirements:** F-04 `AC-F04-02/06/09`; F-05 `AC-F05-02/03/04`; F-03 `AC-F03-03/07`.
 - **Purpose / roles:** Exercise the stock boundary and verify a stale request cannot create a second loan.
-- **Preconditions:** Fresh isolated E-ONE with total/available `1/1` and zero requests and loans. B-A, B-B, and C-A can sign in. Use two separate Borrower sessions.
+- **Preconditions:** Fresh isolated E-ONE with total/available `1/1` and zero requests and loans. B-A, B-B or separately approved B-C, and C-A can sign in. Use two separate Borrower sessions and record the approved substitution.
 - **Actions:**
-  1. B-A submits quantity `1`; B-B submits quantity `1` before either request is checked out.
+  1. B-A submits quantity `1`; B-B or the approved B-C submits quantity `1` before either request is checked out.
   2. Confirm both requests are visible to their respective Borrowers and the item remains `1/AVAILABLE`.
   3. As C-A, check out B-A's request.
-  4. Still as C-A, attempt to check out B-B's previously submitted request.
+  4. Still as C-A, attempt to check out the second Borrower's previously submitted request.
   5. Re-read the two request statuses, active loans, and item availability using the permitted UI.
-- **Expected:** Both requests may be submitted without reserving stock. The first checkout creates one loan and changes availability to zero. The competing checkout is rejected with a safe insufficient-stock message; B-B's request remains unfulfilled, no second loan is created, and availability never becomes negative.
+- **Expected:** Both requests may be submitted without reserving stock. The first checkout creates one loan and changes availability to zero. The competing checkout is rejected with a safe insufficient-stock message; the second Borrower's request remains unfulfilled, no second loan is created, and availability never becomes negative.
 - **Setup/cleanup:** Uses a fresh E-ONE state; do not repeat against the same already-consumed fixture. Reset only the approved isolated database.
 - **Evidence:** Capture both pre-checkout requests, the rejected checkout, and the final unchanged/consistent state. Include request/loan IDs and before/after quantities.
 
@@ -192,9 +216,9 @@ All cases below start as **NOT RUN**. The UAT Team fills actual results and evid
 
 - **Requirements:** F-01 `AC-F01-04/05/08/09/12`; F-04 `AC-F04-04/10`; F-05 `AC-F05-07/08`.
 - **Purpose / roles:** Verify role and owner restrictions using a real browser session, not only hidden UI controls.
-- **Preconditions:** B-A and B-B each have a submitted E-MANY request. B-B also owns the active E-ONE loan prepared above. Record the two request IDs and the loan ID as synthetic references. B-A is signed in.
+- **Preconditions:** B-A and B-B (or separately approved B-C) each have a submitted E-MANY request. The second Borrower also owns the active E-ONE loan prepared above. Record the two request IDs and the loan ID as synthetic references. B-A is signed in.
 - **Actions:**
-  1. As B-A, open `/requests/<B-B-request-id>` and `/loans/<B-B-loan-id>` in the same authenticated browser. Record the visible rejection without copying any private record fields.
+  1. As B-A, open `/requests/<second-Borrower-request-id>` and `/loans/<second-Borrower-loan-id>` in the same authenticated browser. Record the visible rejection without copying any private record fields.
   2. Replace the ID below with B-A's own synthetic submitted-request ID, then run it in the browser developer console on the **same application origin**:
      ```js
      const OWN_SUBMITTED_REQUEST_ID = 'paste-own-synthetic-request-id';
@@ -205,7 +229,7 @@ All cases below start as **NOT RUN**. The UAT Team fills actual results and evid
      }).then(async r => ({ status: r.status, body: await r.json().catch(() => null) }));
      ```
   3. Record the returned status/code, then re-open the request, loan list, and catalog as the authorized owners/C-A to verify whether anything changed.
-- **Expected:** Cross-owner detail attempts are forbidden and disclose no B-B record contents. Borrower checkout returns HTTP `403` with a safe error; the request remains submitted and no loan or stock change occurs. A hidden checkout button alone is not a pass.
+- **Expected:** Cross-owner detail attempts are forbidden and disclose no second Borrower's record contents. Borrower checkout returns HTTP `403` with a safe error; the request remains submitted and no loan or stock change occurs. A hidden checkout button alone is not a pass.
 - **Setup/cleanup:** Use only the isolated synthetic test deployment. The console request uses the current same-origin session; do not print or copy cookie/session values.
 - **Evidence:** Record response status/error code, affected request/loan counts and stock before/after. Redact console output that contains credentials or unrelated private data.
 
@@ -237,7 +261,7 @@ All cases below start as **NOT RUN**. The UAT Team fills actual results and evid
 
 - **Requirements:** F-01 `AC-F01-06/11`; F-02 `AC-F02-08`; F-04 `AC-F04-07`; F-05 `AC-F05-09`.
 - **Purpose / roles:** Verify server-side records survive an application restart without reset/reseed.
-- **Preconditions:** Isolated deployment has a recorded request and active loan. The deployment owner approves the restart procedure and confirms the same database will remain attached. Save synthetic record IDs and a redacted before-state snapshot.
+- **Preconditions:** Isolated deployment has a recorded request and active loan. Arrange a test window with the named deployment owner after UAT-04. The owner approves the restart procedure and confirms the same database will remain attached. If the owner or a safe restart window is unavailable, record this case as **BLOCKED**. Before the restart, record the serving revision, image digest, database identifier, synthetic record IDs, and a redacted before-state snapshot.
 - **Actions:**
   1. As B-A, record the own request/loan IDs, statuses, quantities, due date, and stock values. Sign out.
   2. Ask the deployment owner to restart/redeploy the **same immutable application image digest** against the same database, without changing application code, migration, seed, or data. Record the resulting service revision. If the image digest or database changes, stop and establish a new tested-release baseline before continuing.
