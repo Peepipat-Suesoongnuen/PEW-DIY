@@ -4,7 +4,7 @@
 >
 > **Source:** `Lab_6_Sprint_1_UAT.pdf`, Parts A–D and submission checklist
 >
-> **Status:** Partner UAT executed on `pewdiy-uat` (`pewdiy-uat-00002-bnt` and restarted `pewdiy-uat-00003-8c5`) on 2026-11-22; Finding 05 triaged as an **Accepted Minor UX Limitation** pending final UAT Team sign-off. Part B (testing partner product) remains pending.
+> **Status:** Interim partner UAT results received on `pewdiy-uat` (`pewdiy-uat-00002-bnt` and restarted `pewdiy-uat-00003-8c5`, 2026-11-22); live `UAT-06`/`UAT-07` API corroboration logs attached, and Finding 05 is proposed/accepted by the Product Team as a Minor UX Limitation pending UAT Team agreement and final sign-off. Part B (testing the partner product) remains blocked.
 
 ## 1. Purpose, roles, and scope
 
@@ -20,23 +20,23 @@ GitHub issue states as of 2026-11-22:
 
 | Issue | GitHub state | Acceptance evidence |
 |---|---|---|
-| Parent [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) | **OPEN** | **INCOMPLETE** — required child work and Lab 6 evidence are still pending. Reopened 2026-11-21; the issue body says to keep it open until these are complete. |
-| Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | **OPEN** | **IN PROGRESS** — isolated UAT deployment (`pewdiy-uat`), database (`pewdiy_uat`), seed, and reset job are provisioned and smoke-tested; participant names/IDs, private credential delivery, and test window remain pending. Reopened 2026-11-21. |
-| Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | **OPEN** | **BLOCKED** — partner handoff and independent execution evidence are absent. Reopened 2026-11-21. |
-| Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) | **OPEN** | **BLOCKED** — neither UAT direction has completed results to triage. |
-| Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** | **BLOCKED** — triage, correction/retest, and final decision are pending. |
-| UAT blocker coordination [#90](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/90) | **OPEN** | Coordination register is documented; external prerequisites remain pending. |
+| Parent [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80) | **OPEN** | **INCOMPLETE** — interim partner UAT results are under review; formal signed decision and Part B remain pending. Reopened 2026-11-21; keep open until complete. |
+| Part A [#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81) | **OPEN** | **IN PROGRESS** — isolated UAT deployment (`pewdiy-uat`, `pewdiy_uat`), seed, reset job, and `UAT-08` restart (`pewdiy-uat-00003-8c5`) completed; formal participant names/IDs and final signed per-case records remain pending. |
+| Part B [#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | **OPEN** | **BLOCKED** — partner handoff and independent execution evidence on the partner product are absent. Reopened 2026-11-21. |
+| Part C [#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83) | **OPEN** | **IN PROGRESS** — interim partner v4 report received (Finding 05 + `UAT-07` UX observation); Product Team proposed/accepted Finding 05 as a Minor UX Limitation pending UAT Team agreement; Part B findings remain blocked. |
+| Part D [#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84) | **OPEN** | **PENDING UAT TEAM CONFIRMATION** — awaiting UAT Team agreement on Finding 05 Minor Limitation and signed final decision in §5. |
+| UAT blocker coordination [#90](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/90) | **OPEN** | PEW-DIY UAT environment/credentials delivered privately; partner Part B handoff prerequisites remain blocked. |
 
-GitHub state is not completion evidence. Issues #80–#82 were closed by merged PRs #85–#87 on 2026-11-21 and reopened the same day with recorded rationale: those PRs documented pending or blocked UAT work, not completed acceptance. All six tracked issues are OPEN as of 2026-11-22, verified against the public issue pages. Their acceptance evidence remains incomplete as recorded above and in the issue comments. No UAT execution, partner result, or instructor/TA notification is claimed.
+GitHub state is not completion evidence. Issues #80–#82 were closed by merged PRs #85–#87 on 2026-11-21 and reopened the same day with recorded rationale: those PRs documented pending or blocked UAT work, not completed acceptance. All six tracked issues remain OPEN as of 2026-11-22. Interim partner UAT execution on PEW-DIY (`2026-11-22`) and Product Team API corroboration logs (`pewdiy-uat-00003-8c5`) are recorded below, while formal participant names/IDs, final UAT Team sign-off, and Part B remain pending.
 
 ### Current completion state
 
 | Part | State |
 |---|---|
-| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | **IN PROGRESS** — cases, F-05 implementation trace, and isolated UAT service/DB (`pewdiy-uat` / `pewdiy_uat`) are ready; participant names/IDs, private credential delivery, and scheduling remain pending. |
+| A — PEW-DIY UAT preparation/handoff ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | **IN PROGRESS** — `pewdiy-uat` / `pewdiy_uat` provisioned, credentials delivered privately, and interim partner execution (`2026-11-22`) received; formal participant names/IDs and signed per-case records remain pending. |
 | B — Independent UAT of partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | **BLOCKED** — no partner handoff, case package, release/access details, or test window is recorded; no partner-case execution is evidenced, and no instructor/TA notification is documented. |
-| C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **BLOCKED** — neither UAT direction has a completed results package to triage; no finding disposition or “none received” claim is recorded. |
-| D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **BLOCKED** — Part C has no completed UAT results to triage, so no accepted finding is ready for correction or retest. No final decision is claimed. |
+| C — Findings and triage ([#83](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/83)) | **IN PROGRESS** — interim partner v4 report triaged (Finding 05 proposed/accepted by Product Team as Minor UX Limitation, pending UAT Team agreement); Part B findings remain blocked. |
+| D — Fixes/retest/final decision ([#84](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/84)) | **PENDING UAT TEAM CONFIRMATION** — awaiting UAT Team agreement on Finding 05 Minor Limitation and signed final decision in §5 (`Decision: NOT RECORDED`). |
 
 ## 2. Release handoff — complete before inviting testers
 
@@ -65,7 +65,7 @@ This register tracks who must provide each missing prerequisite and the next saf
 |---|---|---|---|
 | Current PEW-DIY deployed revision | Product Team deployment owner (`peepipat2549@gmail.com`) | Confirmed on 2026-11-22: demo `pewdiy` runs `pewdiy-00008-mfk` and isolated UAT `pewdiy-uat` runs `pewdiy-uat-00002-bnt` (100% traffic, commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`, digest `sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`). | Reconfirm revision if redeployed; record any `UAT-08` restart revision. |
 | Isolated UAT deployment/database, fixture mapping, and reset/cleanup procedure | Product Team deployment owner (`peepipat2549@gmail.com`) | **READY** — `pewdiy-uat` (`https://pewdiy-uat-qtz73ahnlq-as.a.run.app`), database `pewdiy_uat`, migrations (`pewdiy-uat-migrate-stqff`), seed (`pewdiy-uat-seed-zxhdz`), and reset job (`pewdiy-uat-reset`) provisioned and smoke-tested on 2026-11-22. | Coordinate reset/restart windows with testers during execution. |
-| Product/UAT participants, private account handoff, and session time | Product Team and UAT Team (students not identified) | **PENDING** — names/IDs, private handoff channel, and schedule are not recorded. | Confirm both teams' participants and session time; deliver account credentials privately and record only role labels here. |
+| Product/UAT participants, private account handoff, and session time | Product Team and UAT Team (names/IDs pending in this file) | **PARTIAL** — UAT credentials were delivered privately for the 2026-11-22 session (`20:40–21:44` ICT), and interim partner results were received; formal student names/IDs for both teams remain pending for the final PDF. | Record both teams' student names/IDs in the final PDF and §5 sign-off. |
 | Partner identity, release, cases, safe access/setup, and test window | Partner Product Team (team/individuals not identified) | **BLOCKED** — no partner handoff or case package is recorded. [Part B](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | Obtain the exact scope/release, deployed URL/revision, cases, access/setup/cleanup instructions, tester identities, and agreed window. |
 | Instructor/TA escalation if the partner or access is unavailable | UAT Team (sender not identified) | **NOT RECORDED** — no notification or response is documented; partner unavailability itself is not asserted. | If the partner, deployment, access, or replacement tester is unavailable, notify the instructor/TA promptly through the course-approved channel and retain the actual notification and response. |
 
@@ -81,7 +81,7 @@ If the deployed revision changes after handoff, stop, record the new version, an
 
 ### Accounts, data, and safe environment
 
-- Provide the labels and roles **B-A** (Borrower A), **B-B** (Borrower B), and **C-A** (Custodian A). `pewdiy-uat` seeds `B-A`, `B-B`, and `C-A` only (there is no `B-C` account; use `B-B` for the second Borrower steps). Their generated passwords are stored in Secret Manager (`pewdiy-uat-seed-password-ba`, `pewdiy-uat-seed-password-bb`, `pewdiy-uat-seed-password-ca`) and **must be delivered privately through the team's approved channel before execution (delivery currently pending)**. Record only the labels/roles in the PDF and evidence; never record passwords, cookies, tokens, hashes, or credential screenshots.
+- Provide the labels and roles **B-A** (Borrower A), **B-B** (Borrower B), and **C-A** (Custodian A). `pewdiy-uat` seeds `B-A`, `B-B`, and `C-A` only (there is no `B-C` account; use `B-B` for the second Borrower steps). Their generated passwords are stored in Secret Manager (`pewdiy-uat-seed-password-ba`, `pewdiy-uat-seed-password-bb`, `pewdiy-uat-seed-password-ca`) and delivered privately through the team's approved channel (never recorded in Git, logs, or the PDF). Record only the labels/roles in the PDF and evidence; never record passwords, cookies, tokens, hashes, or credential screenshots.
 - Use synthetic data only. Preferred test fixtures are [E-ONE](../../sprints/sprint-1/fixtures.md) (total 1), [E-MANY](../../sprints/sprint-1/fixtures.md) (total 3), and [E-ZERO](../../sprints/sprint-1/fixtures.md) (total 0). Before execution, map each symbolic label to the actual catalog item and record its visible name/ID in the private run record. Do not assume the deployed catalog contains these fixtures.
 - Run state-changing scenarios only against a **dedicated, isolated UAT deployment/database** whose owner has approved the test data and reset procedure. A successful checkout permanently changes inventory state in Sprint 1; there is no Sprint 1 return or delete-request workflow. Do not run these cases on a shared/production dataset or reset a shared database.
 - Before each case, the Product Team prepares the stated starting state in the isolated environment and gives the UAT Team the required account labels and item/record references. Reset only that isolated UAT database using its documented owner-approved procedure. Never use application startup, an undocumented endpoint, or an unapproved production seed/reset to clean data.
@@ -112,7 +112,7 @@ Capture the approved clean baseline after verifying seed accounts, stock, and ze
 
 ## 3. Executable UAT cases
 
-All cases below start as **NOT RUN**. The UAT Team fills actual results and evidence during execution. Keep expected and actual results separate. Record one outcome per case: `PASS`, `FAIL`, or `BLOCKED`; a blocked case is not a pass.
+Interim partner execution on `pewdiy-uat` (`2026-11-22`, revisions `pewdiy-uat-00002-bnt` and `pewdiy-uat-00003-8c5`) reported `UAT-01`–`UAT-04` and `UAT-08` as passed, `UAT-05` with a Minor UX message finding, and `UAT-06`/`UAT-07` corroborated by live API logs on `pewdiy-uat-00003-8c5` (§4). Formal per-case records with tester names/IDs and the final signed decision remain pending. Keep expected and actual results separate. Record one outcome per case: `PASS`, `FAIL`, or `BLOCKED`; a blocked case is not a pass.
 
 ### UAT-01 — Sign-in, role-specific navigation, and logout
 
@@ -273,15 +273,39 @@ Part C covers both directions: findings from our independent UAT of the partner 
 
 | UAT direction | Available results | Triage state |
 |---|---|---|
-| Partner tests PEW-DIY ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | Partner executed `UAT-01`–`UAT-08` on `pewdiy-uat` (`pewdiy-uat-00002-bnt` / `pewdiy-uat-00003-8c5`) on 2026-11-22; `UAT-01`–`04`, `08` passed, `UAT-06`/`07` corroborated with live API `403`/`409` logs on `pewdiy-uat-00003-8c5`, and `UAT-05` reported a Minor UX message finding. | **TRIAGED (Option A)** — Finding 05 accepted as a **Minor UX Limitation**; awaiting partner UAT Team final sign-off (`Accepted with explicitly documented minor limitations`). |
+| Partner tests PEW-DIY ([#81](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/81)) | Partner interim v4 report executed `UAT-01`–`UAT-08` on `pewdiy-uat` (`pewdiy-uat-00002-bnt` / `pewdiy-uat-00003-8c5`) on 2026-11-22 (`20:40–21:44` ICT), corroborated by live API logs `EV-UAT06-API-01` and `EV-UAT07-API-01` on `pewdiy-uat-00003-8c5`. Formal per-case tester sign-off remains pending. | **IN PROGRESS (Option A proposed)** — Finding 05 proposed/accepted by Product Team as an **Accepted Defect (Known Minor UX Limitation)**; pending UAT Team agreement and final sign-off. |
 | PEW-DIY tests partner product ([#82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)) | No partner handoff, cases, release, access, or session is recorded. | **BLOCKED** — no actual finding set to disposition. |
+
+### Corroborated Live API Evidence on `pewdiy-uat-00003-8c5`
+
+The following redacted server-side checks were executed directly against `https://pewdiy-uat-qtz73ahnlq-as.a.run.app` (active revision `pewdiy-uat-00003-8c5`, `100%` traffic) on `2026-11-22 22:00` ICT (`Asia/Bangkok`) with no secrets or session cookies retained:
+
+* **`EV-UAT06-API-01` (`UAT-06` cross-owner & role denial):**
+  * **Actors / roles:** `B-B` (`BORROWER`) attempting to read `B-A`'s synthetic loan (`27ba9193-5f91-4edc-b8d2-fb2af7453693`) and request (`3334c7cb-35f7-43a0-ba8b-8f722b241e7e`); `B-A` (`BORROWER`) attempting `POST /api/requests/<id>/checkout`.
+  * **Actual server responses (`pewdiy-uat-00003-8c5`):**
+    ```text
+    UAT06_BB_READ_BA_LOAN: 403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
+    UAT06_BB_READ_BA_REQ:  403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
+    UAT06_BORROWER_CHECKOUT: 403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
+    ```
+  * **Before/after protected state:** No `B-A` record fields disclosed; `B-A` retained `1` request and `1` active loan, and catalog stock remained `E-ONE` `0/1`, `E-MANY` `3/3`, `E-ZERO` `0/0`.
+* **`EV-UAT07-API-01` (`UAT-07` quantity `4` on `3/3` stock, plus `0` and forged `borrower_id`):**
+  * **Actor / role:** `B-A` (`BORROWER`) calling `POST /api/requests` on `fixture-e-many` (`3/3` available).
+  * **Actual server responses (`pewdiy-uat-00003-8c5`):**
+    ```text
+    UAT07_QTY_4: 409 {'error': {'code': 'INSUFFICIENT_AVAILABILITY', 'message': 'Requested quantity exceeds current availability.'}}
+    UAT07_QTY_0: 400 {'error': {'code': 'VALIDATION_ERROR', 'message': 'Invalid request.'}}
+    UAT07_FORGED_OWNER: 400 {'error': {'code': 'VALIDATION_ERROR', 'message': 'Invalid request.'}}
+    UAT07_QTY_4_BEFORE_AFTER: {'requests_before': 1, 'requests_after': 1, 'e_many_avail_before': 3, 'e_many_avail_after': 3}
+    ```
+  * **Before/after protected state:** `B-A` submitted-request count remained `1 -> 1` (no request created) and `fixture-e-many` `quantity_available` remained `3 -> 3` (`3/3`).
 
 ### Triaged Findings on PEW-DIY (2026-11-22)
 
-| Finding ID | Case / Req | Severity & Classification | Summary & Evidence-Based Disposition | Owner & Status |
+| Finding ID | Reporter / Case / Req | Severity & Classification | Summary, Evidence & Disposition | Owner & Status |
 |---|---|---|---|---|
-| **Finding 05** | `UAT-05` (`F-05` checkout conflict UX) | **Minor — Accepted Defect (Known Limitation)** | Duplicate/out-of-stock checkout is correctly rejected (`E-ONE` stays `0/1`, no second loan created), but UI displays `"This request cannot be checked out. Refresh requests and availability."` (`client/src/components/CheckoutRequest.tsx`) instead of explicitly stating insufficient stock. Product Team accepts this as a **Minor UX Limitation** for Sprint 1 (deferred to post-Sprint 1 UX improvement), pending UAT Team agreement in the final decision. | Product Team — **Accepted as Minor Limitation** (awaiting UAT Team final sign-off) |
-| **UAT-07 UX Note** | `UAT-07` (`F-04` request form) | **Minor — UX Enhancement** | Browser range validation blocks `0` and `4` on submit and API rejects `0`/`4`/`999`/forged `borrower_id` (`400`/`409`, no writes), while the submit button remains visually enabled. Not a Sprint 1 contract defect; logged as a post-Sprint 1 enhancement. | Product Team — **Enhancement (deferred)** |
+| **Finding 05** | Partner UAT Team (interim v4 report, `2026-11-22`) / `UAT-05` (`F-05` checkout conflict UX) | **Minor — Accepted Defect (Known Limitation)** | Duplicate/out-of-stock checkout is rejected (`E-ONE` remains `0/1`, no second loan created; partner evidence `E02a–d`), but UI displays `"This request cannot be checked out. Refresh requests and availability."` (`client/src/components/CheckoutRequest.tsx`) instead of explicitly stating insufficient stock. Product Team accepts this as a **Known Minor UX Limitation** for Sprint 1 (deferred for post-Sprint 1 copy improvement) and notified the UAT Team on `2026-11-22`. | Product Team — **Proposed/accepted by Product Team; pending UAT Team agreement** |
+| **UAT-07 UX Note** | Partner UAT Team (interim v4 report, `2026-11-22`) / `UAT-07` (`F-04` request form) | **Minor — Enhancement (deferred)** | Browser range validation blocks `0` and `4` on submit (`E04a–d`) and API rejects `0`/`4`/`999`/forged `borrower_id` (`EV-UAT07-API-01`), while the submit button remains visually enabled. Not a Sprint 1 contract defect; logged as a post-Sprint 1 UX enhancement. | Product Team — **Enhancement (deferred)** |
 
 | Field | Required record |
 |---|---|
@@ -316,7 +340,7 @@ Partner notification and response:
 
 For each accepted defect, preserve the complete trace: original finding → RED regression test that fails on the defective version → GREEN fix → relevant regression results → fix branch from `sprint/1-staging` → substantive teammate PR review → passing CI/staging integration → reviewed release to `main` → deployed revision and smoke check → independent retest by the UAT Team.
 
-**Part D status: PENDING FINAL SIGN-OFF (Option A — Minor Limitation).** No Critical or Major defects were found in partner UAT on `pewdiy-uat` (`pewdiy-uat-00002-bnt` / `pewdiy-uat-00003-8c5`). Finding 05 is triaged as an **Accepted Minor UX Limitation** (core transaction and inventory invariants pass). Live server-side API evidence for `UAT-06` (`403 FORBIDDEN` on cross-owner `B-B` → `B-A` loan/request) and `UAT-07` (`409 INSUFFICIENT_AVAILABILITY` on quantity `4` with `1 → 1` requests and `3 → 3` stock) on `pewdiy-uat-00003-8c5` has been supplied to the UAT Team. Awaiting the UAT Team's independent final decision (`Accepted with explicitly documented minor limitations`).
+**Part D status: PENDING UAT TEAM CONFIRMATION.** Finding 05 has been proposed/accepted by the Product Team as a **Known Minor UX Limitation** (Option A), and live server-side API corroboration logs (`EV-UAT06-API-01`, `EV-UAT07-API-01`) on `pewdiy-uat-00003-8c5` have been supplied to the UAT Team. Final defect closure, per-case signed records, and the independent Sprint 1 acceptance decision (`Decision: NOT RECORDED` in §5) remain pending until confirmed by the UAT Team.
 
 | Finding / Issue | RED test, command, SHA, actual output | Fix / GREEN result and regression output | PR review / CI / release | Deployed revision / smoke check | Partner retest case, tester, actual result |
 |---|---|---|---|---|---|
