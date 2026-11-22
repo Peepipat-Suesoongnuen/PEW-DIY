@@ -51,9 +51,9 @@ The [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/action
 | Public demo URL and read-only verification | [https://pewdiy-qtz73ahnlq-as.a.run.app](https://pewdiy-qtz73ahnlq-as.a.run.app) — checked 2026-11-22: `/` and `/login` returned HTTP 200; `/api/ready` returned `{"status":"ready","db":"connected"}`. Shared demo only; do not run state-changing UAT here. |
 | Isolated UAT service URL and tested release | [https://pewdiy-uat-qtz73ahnlq-as.a.run.app](https://pewdiy-uat-qtz73ahnlq-as.a.run.app) — Cloud Run service `pewdiy-uat` (`asia-southeast1`, project `cpe334-2026-pew-diy`); initial UAT revision `pewdiy-uat-00002-bnt`, restarted without DB reset for `UAT-08` to active revision `pewdiy-uat-00003-8c5` (`100%` traffic) on the same immutable image `asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/pewdiy@sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4` (`main` commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`). Connected to dedicated database `pewdiy_uat` on `pewdiy-pg` (`APP_ORIGIN` matches the UAT URL). |
 | Product Team participants | **PENDING — record both students and IDs in the submission PDF** |
-| UAT Team / independent tester names | **PENDING — record both students and IDs before execution** |
-| Handoff date and agreed test window | **PENDING** |
-| Private credential handoff channel | **PENDING — use the course-approved private channel; never record credential values here** |
+| UAT Team / independent tester names | **PENDING — record both students and IDs in the submission PDF and §5 sign-off** |
+| Handoff date and agreed test window | `2026-11-22` (interim session `20:40–21:44` ICT; `UAT-08` restart `21:07` ICT; final sign-off pending) |
+| Private credential handoff channel | Delivered privately via the team's approved channel on `2026-11-22` (never record credential values here) |
 | Deployment smoke-check evidence | [Deploy demo run #6](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44570631696) succeeded, including deployment verification and public-URL smoke checks. It reused an existing image (build/push skipped); it did not prepare isolated UAT data or a reset procedure. |
 | Release regression baseline | [CI & Docker Build on `main`](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/actions/runs/44566327436) succeeded for the exact release commit above. A product-side local `npm run test:ci` on 2026-11-22 identified the same commit as `CLEAN_SOURCE_COMMIT` and passed 195 server, 74 client, and 57 Chromium cases with zero failed or skipped cases. |
 
@@ -63,7 +63,7 @@ This register tracks who must provide each missing prerequisite and the next saf
 
 | Prerequisite | Responsible role | Current status and evidence | Next action |
 |---|---|---|---|
-| Current PEW-DIY deployed revision | Product Team deployment owner (`peepipat2549@gmail.com`) | Confirmed on 2026-11-22: demo `pewdiy` runs `pewdiy-00008-mfk` and isolated UAT `pewdiy-uat` runs `pewdiy-uat-00002-bnt` (100% traffic, commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`, digest `sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`). | Reconfirm revision if redeployed; record any `UAT-08` restart revision. |
+| Current PEW-DIY deployed revision | Product Team deployment owner (`peepipat2549@gmail.com`) | Confirmed on `2026-11-22`: demo `pewdiy` runs `pewdiy-00008-mfk`; isolated UAT `pewdiy-uat` ran initial/pre-restart revision `pewdiy-uat-00002-bnt` (`20:40–21:07` ICT) and was restarted without DB reset for `UAT-08` to current/post-restart revision `pewdiy-uat-00003-8c5` (`21:07` ICT, `100%` traffic, commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`, digest `sha256:e636ea0c95b027e68ab07ca550a9ce57f2343f99603391cc161936a220cbc2d4`). | Reconfirm revision only if redeployed; record any further change before §5 sign-off. |
 | Isolated UAT deployment/database, fixture mapping, and reset/cleanup procedure | Product Team deployment owner (`peepipat2549@gmail.com`) | **READY** — `pewdiy-uat` (`https://pewdiy-uat-qtz73ahnlq-as.a.run.app`), database `pewdiy_uat`, migrations (`pewdiy-uat-migrate-stqff`), seed (`pewdiy-uat-seed-zxhdz`), and reset job (`pewdiy-uat-reset`) provisioned and smoke-tested on 2026-11-22. | Coordinate reset/restart windows with testers during execution. |
 | Product/UAT participants, private account handoff, and session time | Product Team and UAT Team (names/IDs pending in this file) | **PARTIAL** — UAT credentials were delivered privately for the 2026-11-22 session (`20:40–21:44` ICT), and interim partner results were received; formal student names/IDs for both teams remain pending for the final PDF. | Record both teams' student names/IDs in the final PDF and §5 sign-off. |
 | Partner identity, release, cases, safe access/setup, and test window | Partner Product Team (team/individuals not identified) | **BLOCKED** — no partner handoff or case package is recorded. [Part B](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82) | Obtain the exact scope/release, deployed URL/revision, cases, access/setup/cleanup instructions, tester identities, and agreed window. |
@@ -75,7 +75,7 @@ F-05 revision 3 was implemented in [PR #37](https://github.com/Peepipat-Suesoong
 
 The local [F-05 TDD record](../../sprints/sprint-1/tdd-evidence-f05.md) fingerprints a different candidate: 10 of its 20 source-manifest entries differ from commit `70e7b5e`. Its local test counts therefore do **not** validate the deployed implementation. The applicable committed-code evidence is the [independent review of PR #37](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37#pullrequestreview-5804916583), which reports verification of exact commit `70e7b5e` (115 server, 70 client, 51 browser tests; build/typecheck passed on a fresh PostgreSQL 17.11 environment). Those are reviewer-reported results for the implementation commit, not a fresh test run on deployed commit `b03c904` and not independent partner UAT.
 
-The public demo above (`https://pewdiy-qtz73ahnlq-as.a.run.app`) uses the shared `pewdiy` database; **do not run state-changing UAT cases against that shared demo**. Use only the newly provisioned isolated UAT service (`pewdiy-uat` at `https://pewdiy-uat-qtz73ahnlq-as.a.run.app`, revision `pewdiy-uat-00002-bnt`, database `pewdiy_uat`), whose migrations, seeded fixtures (`fixture-e-one`, `fixture-e-many`, `fixture-e-zero`), reset job (`pewdiy-uat-reset`), and smoke checks have been verified. Do not begin execution until the remaining pending items—private credential delivery, Product/UAT participant names and IDs, and the agreed test/restart window—are confirmed.
+The public demo above (`https://pewdiy-qtz73ahnlq-as.a.run.app`) uses the shared `pewdiy` database; **do not run state-changing UAT cases against that shared demo**. Use only the isolated UAT service (`pewdiy-uat` at `https://pewdiy-uat-qtz73ahnlq-as.a.run.app`, initial revision `pewdiy-uat-00002-bnt`, current post-restart revision `pewdiy-uat-00003-8c5`, database `pewdiy_uat`), whose migrations, seeded fixtures (`fixture-e-one`, `fixture-e-many`, `fixture-e-zero`), reset job (`pewdiy-uat-reset`), and smoke checks have been verified and whose credentials were delivered privately on `2026-11-22`. Formal student names/IDs, signed per-case records, and the final UAT Team decision in §5 remain pending.
 
 If the deployed revision changes after handoff, stop, record the new version, and obtain the UAT Team's agreement before continuing. Results from different revisions must not be combined into one acceptance decision.
 
@@ -99,14 +99,14 @@ The isolated UAT environment (`pewdiy-uat`) is provisioned on `pewdiy_uat` with 
 
 The table lists the defaults in the [Sprint 1 seed script](../../../server/src/db/seed.ts). Confirm each ID, name, and starting quantity on the dedicated deployment and record any approved substitute in the execution record.
 
-Product-side fixture rehearsal on 2026-11-22 used a clean checkout of `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`, Node.js 24.15.0, and a temporary local PostgreSQL 18.4 instance. `npm run migrate` and `npm run seed` succeeded. The second seed reported all six existing records preserved. Readback confirmed fixture totals `1`, `3`, and `0`, B-A/B-B as Borrowers, C-A as Custodian, and zero requests and loans. Partner execution on the approved deployed environment remains pending.
+Product-side fixture rehearsal on 2026-11-22 used a clean checkout of `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`, Node.js 24.15.0, and a temporary local PostgreSQL 18.4 instance. `npm run migrate` and `npm run seed` succeeded. The second seed reported all six existing records preserved. Readback confirmed fixture totals `1`, `3`, and `0`, B-A/B-B as Borrowers, C-A as Custodian, and zero requests and loans. Interim partner execution on `pewdiy-uat` (`2026-11-22`) is recorded in §4; formal signed per-case records remain pending.
 
 | Order | Cases | Required starting state and records to keep |
 |---|---|---|
 | 1 | UAT-01 → UAT-02 → UAT-03 → UAT-04 → UAT-08 | Start with fresh seed data. Carry the UAT-03 request into UAT-04. Preserve the resulting request and loan through UAT-08 and keep the same database attached for the restart. |
-| 2 | UAT-05 | Start with a fresh dataset. Both Borrowers create their requests against the same one-unit fixture before C-A checks either out. |
-| 3 | UAT-06 | Start with a fresh dataset. B-B submits a quantity-one request for E-ONE and C-A checks it out. B-B and B-A each submit a separate quantity-one request for E-MANY. Record both submitted request IDs and B-B's active loan ID for the case. |
-| 4 | UAT-07 | Start with a fresh dataset, with E-MANY at `3/3` and zero requests and loans. |
+| 2 | UAT-05 | Start with a fresh dataset (or carry over the `UAT-04` state where `B-A` holds the `E-ONE` loan and `B-B` submits a competing `E-ONE` request). Both Borrowers have requests against `E-ONE` before `C-A` rejects the unfulfilled second request. |
+| 3 | UAT-06 | Use the preserved post-`UAT-05`/`UAT-08` dataset where `B-A` owns the checked-out `E-ONE` request and active loan, and `B-B` owns a submitted `E-ONE` request (`0` active loans). Record `B-A`'s request/loan IDs and `B-B`'s submitted request ID for cross-owner and borrower-checkout denial checks. |
+| 4 | UAT-07 | Use a clean `E-MANY` baseline (`total 3 / available 3`, `0` requests/loans on `fixture-e-many`; prior `E-ONE` records from `UAT-03`–`UAT-05` may remain on the preserved post-`UAT-08` dataset when recorded in the before/after counts). |
 
 Capture the approved clean baseline after verifying seed accounts, stock, and zero requests and loans. Restore that baseline in the dedicated UAT database for each fresh dataset so the release and database connection stay the same. Rerunning the seed preserves existing rows and credentials. Before a reset, close test sessions, retain redacted results and any defect evidence, and have the operator verify the exact database and service against the handoff record. After a reset, recheck the dataset preconditions and share any changed credentials privately. After the final case or retest, the operator follows the agreed evidence retention and cleanup procedure for the UAT resources.
 
@@ -191,10 +191,10 @@ Interim partner execution on `pewdiy-uat` (`2026-11-22`, revisions `pewdiy-uat-0
 
 - **Requirements:** F-01 `AC-F01-04/05/08/09/12`; F-04 `AC-F04-04/10`; F-05 `AC-F05-07/08`.
 - **Purpose / roles:** Verify role and owner restrictions using a real browser session, not only hidden UI controls.
-- **Preconditions:** B-A and B-B each have a submitted E-MANY request. B-B also owns the active E-ONE loan prepared above. Record the two request IDs and the loan ID as synthetic references. B-A is signed in.
+- **Preconditions:** Using the preserved post-`UAT-05`/`UAT-08` dataset, `B-A` owns the checked-out `E-ONE` request (`3334c7cb-35f7-43a0-ba8b-8f722b241e7e`) and active loan (`27ba9193-5f91-4edc-b8d2-fb2af7453693`), while `B-B` owns a submitted `E-ONE` request (`32486ac4-d501-41f8-9f57-a511b7a2c2a5`, `0` active loans). Record these synthetic IDs; `B-B` and `B-A` sign in to separate sessions.
 - **Actions:**
-  1. As B-A, open `/requests/<B-B-request-id>` and `/loans/<B-B-loan-id>` in the same authenticated browser. Record the visible rejection without copying any private record fields.
-  2. Replace the ID below with B-A's own synthetic submitted-request ID, then run it in the browser developer console on the **same application origin**:
+  1. As `B-B`, open `/requests/<B-A-request-id>` and `/loans/<B-A-loan-id>` (or call `GET /api/requests/<B-A-request-id>` and `GET /api/loans/<B-A-loan-id>`) in `B-B`'s authenticated browser. Record the visible/HTTP rejection without copying any private record fields.
+  2. As `B-A`, replace the ID below with a synthetic submitted-request ID, then run it in the browser developer console on the **same application origin**:
      ```js
      const OWN_SUBMITTED_REQUEST_ID = 'paste-own-synthetic-request-id';
      fetch('/api/requests/' + encodeURIComponent(OWN_SUBMITTED_REQUEST_ID) + '/checkout', {
@@ -204,7 +204,7 @@ Interim partner execution on `pewdiy-uat` (`2026-11-22`, revisions `pewdiy-uat-0
      }).then(async r => ({ status: r.status, body: await r.json().catch(() => null) }));
      ```
   3. Record the returned status/code, then re-open the request, loan list, and catalog as the authorized owners/C-A to verify whether anything changed.
-- **Expected:** Cross-owner detail attempts are forbidden and disclose no B-B record contents. Borrower checkout returns HTTP `403` with a safe error; the request remains submitted and no loan or stock change occurs. A hidden checkout button alone is not a pass.
+- **Expected:** Cross-owner detail attempts are forbidden (`403`) and disclose no `B-A` record contents. Borrower checkout returns HTTP `403` with a safe error; request counts, loan counts, and stock remain unchanged. A hidden checkout button alone is not a pass.
 - **Setup/cleanup:** Use only the isolated synthetic test deployment. The console request uses the current same-origin session; do not print or copy cookie/session values.
 - **Evidence:** Record response status/error code, affected request/loan counts and stock before/after. Redact console output that contains credentials or unrelated private data.
 
@@ -212,7 +212,7 @@ Interim partner execution on `pewdiy-uat` (`2026-11-22`, revisions `pewdiy-uat-0
 
 - **Requirements:** F-04 `AC-F04-02/03/09`; F-05 `AC-F05-11`; F-02/F-03 stock boundaries.
 - **Purpose / roles:** Confirm rejected values and forged server-owned fields do not create or alter domain records.
-- **Preconditions:** Fresh isolated available item with total/available `3/3`, no requests or loans; B-A is signed in. Record request/loan counts and stock before the test.
+- **Preconditions:** `E-MANY` (`fixture-e-many`) has `total 3 / available 3` and zero requests or loans on `fixture-e-many`; `B-A` is signed in. (When executed on the preserved post-`UAT-08` dataset without resetting `E-ONE`, record `B-A`'s and `B-B`'s existing `E-ONE` request/loan counts from `UAT-03`–`UAT-05` before and after the test.) Record request/loan counts and stock before the test.
 - **Actions:**
   1. Replace the item placeholder below with the recorded synthetic item ID, then submit quantity `0` and quantity `4` in separate calls from the same-origin browser console:
      ```js
@@ -288,9 +288,9 @@ The following redacted server-side checks were executed directly against `https:
     UAT06_BB_READ_BA_REQ:  403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
     UAT06_BORROWER_CHECKOUT: 403 {'error': {'code': 'FORBIDDEN', 'message': 'Access denied.'}}
     ```
-  * **Before/after protected state:** No `B-A` record fields disclosed; `B-A` retained `1` request and `1` active loan, and catalog stock remained `E-ONE` `0/1`, `E-MANY` `3/3`, `E-ZERO` `0/0`.
-* **`EV-UAT07-API-01` (`UAT-07` quantity `4` on `3/3` stock, plus `0` and forged `borrower_id`):**
-  * **Actor / role:** `B-A` (`BORROWER`) calling `POST /api/requests` on `fixture-e-many` (`3/3` available).
+  * **Before/after protected state:** No `B-A` record fields disclosed. Counts remained unchanged: `B-A` requests `1 → 1`, `B-A` active loans `1 → 1`, `B-B` requests `1 → 1`, `B-B` active loans `0 → 0`; catalog stock (`total / available`) remained `E-ONE: 1/0 → 1/0`, `E-MANY: 3/3 → 3/3`, `E-ZERO: 0/0 → 0/0`.
+* **`EV-UAT07-API-01` (`UAT-07` quantity `4` on `E-MANY` `3/3` stock, plus `0` and forged `borrower_id`):**
+  * **Actor / role & dataset context:** `B-A` (`BORROWER`) calling `POST /api/requests` on `fixture-e-many` (`total 3 / available 3`, `0` requests/loans on `E-MANY`). Run on the preserved post-`UAT-08` dataset, where `B-A` already held `1` checked-out `E-ONE` request (`3334c7cb-35f7-43a0-ba8b-8f722b241e7e`) and `1` active `E-ONE` loan (`27ba9193-5f91-4edc-b8d2-fb2af7453693`) from `UAT-03`/`UAT-04`.
   * **Actual server responses (`pewdiy-uat-00003-8c5`):**
     ```text
     UAT07_QTY_4: 409 {'error': {'code': 'INSUFFICIENT_AVAILABILITY', 'message': 'Requested quantity exceeds current availability.'}}
@@ -298,7 +298,7 @@ The following redacted server-side checks were executed directly against `https:
     UAT07_FORGED_OWNER: 400 {'error': {'code': 'VALIDATION_ERROR', 'message': 'Invalid request.'}}
     UAT07_QTY_4_BEFORE_AFTER: {'requests_before': 1, 'requests_after': 1, 'e_many_avail_before': 3, 'e_many_avail_after': 3}
     ```
-  * **Before/after protected state:** `B-A` submitted-request count remained `1 -> 1` (no request created) and `fixture-e-many` `quantity_available` remained `3 -> 3` (`3/3`).
+  * **Before/after protected state:** `B-A` total requests `1 → 1` (`0 → 0` on `E-MANY`), `B-A` active loans `1 → 1` (`0 → 0` on `E-MANY`), `fixture-e-many` stock (`total / available`) `3/3 → 3/3`.
 
 ### Triaged Findings on PEW-DIY (2026-11-22)
 
