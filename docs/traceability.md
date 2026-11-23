@@ -3,7 +3,7 @@
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Deliverable:** D1-02 Part B — Feature Inventory and Traceability | **Issue:** [D1-02]
 > **Status:** Draft for team review | **Language:** English (team decision A-07)
-> **Sources of truth:** `docs/srs.md` (rev 2, approved) · `docs/features.md` (companion)
+> **Sources of truth:** `docs/srs.md` (rev 6) · `docs/features.md` (rev 2, companion)
 > **Reference:** `project_deliverable_1_v1.pdf` §3.2 — matrix form: **Requirement → Feature or responsibility → Sprint and verification**
 
 ---
@@ -38,7 +38,7 @@
 | FR-17 Borrower requests return; Custodian confirms return → close loan + restore availability, atomic | F-06 | Sprint 2; Sprint 2 contracts (`f-06-return.md`, atomicity per NFR-06 S2) |
 | FR-18 Custodian views all room loans (active, return-pending, overdue, history) | F-08 | Sprint 2; Sprint 2 contracts (`f-08-catalog-search-loans.md`) |
 | FR-19 Overdue computation, overdue list for custodians, & dismissible/clearable in-app alerts | F-07 | Sprint 2; Sprint 2 contracts (`f-07-overdue-status.md`) |
-| FR-20 Inventory reports/summaries | F-09 | Sprint 3 (contracts + initial summary implemented & tested in D2); `docs/sprints/sprint-3/f-09-inventory-reporting.md` |
+| FR-20 Inventory reports/summaries | F-09 | Sprint 3 (contracts drafted; summary implementation & tests pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)); `docs/sprints/sprint-3/f-09-inventory-reporting.md` |
 | FR-21 Borrower borrow/return history | F-08 | Sprint 2; Sprint 2 contracts (`f-08-catalog-search-loans.md`) |
 
 ## 3. Business Rules (BR-01 – BR-13)

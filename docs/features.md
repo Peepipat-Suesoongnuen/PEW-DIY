@@ -3,8 +3,8 @@
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Deliverable:** D1-02 Part B — Feature Inventory and Traceability | **Issue:** [D1-02]
 > **Status:** Draft for team review | **Language:** English (team decision A-07)
-> **Source of truth:** `docs/srs.md` (approved, rev 2). This document references requirement IDs and does not restate requirement text.
-> **Reference:** `project_deliverable_1_v1.pdf` §3.2 | **Companion document:** `docs/traceability.md`
+> **Source of truth:** `docs/srs.md` (rev 6). This document references requirement IDs and does not restate requirement text.
+> **Reference:** `project_deliverable_1_v1.pdf` §3.2 | **Companion document:** `docs/traceability.md` (rev 3)
 > ID conventions: `F-xx` features and named system responsibilities · `SN-xx` stakeholder needs (defined in this document only)
 
 ---

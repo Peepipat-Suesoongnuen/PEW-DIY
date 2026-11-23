@@ -4,9 +4,9 @@
 >
 > **Deliverable:** D1-03 Part C — System-Level SDS | **Issue:** [#3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/3)
 >
-> **Revision:** 6, 2026-11-07 | **Status:** Draft for team decision and peer review
+> **Revision:** 7, 2026-11-23 | **Status:** Updated baseline for Sprint 1 + Sprint 2/3 contract architecture
 >
-> **Baseline:** [SRS](srs.md) rev 2 and [Feature Inventory](features.md) rev 1, present at commit `9d3c57b`
+> **Baseline:** [SRS](srs.md) rev 6 and [Feature Inventory](features.md) rev 2 (reconciled for Sprint 2; original D1 snapshot at `9d3c57b`)
 >
 > **Language:** English (SRS A-07). This is a design specification; no application, migration, authentication mechanism, or deployment is implemented by this document.
 
@@ -26,7 +26,7 @@ The PDF files were read from the team's local `D:/Software_Engineering/PEW-DIY/l
 
 **Status vocabulary:** **Confirmed** means supported by the SRS or the course documents; **Proposed** means an engineering choice in this draft awaiting team review; **Open** means a decision is still required. All new implementation choices below are **Proposed**, even when phrased as instructions for a future implementation. They are not claims about existing software.
 
-**Reconciliation:** Issue #1/#3 and the older `AGENT.md` snapshot still describe some decisions as open. SRS A-03/BR-07 already fix the seven-calendar-day loan period, and A-04/BR-03 already fix the quantity interpretation of exclusive-item protection. Those decisions are carried forward. SRS OQ-01/OQ-02 and the stack/session choices remain open.
+**Reconciliation:** Historical Issue #1/#3 and D1 draft notes described stack, session, and SRS OQ decisions as open; subsequent revisions (§2.1, §10, SRS rev 6) resolved `SDS-OQ-01..04` and `SRS OQ-02..06`, while retaining explicit synthetic catalog labeling under `OQ-01` until room staff populate real catalog items via `F-08` (`FR-09`).
 
 ## 2. Technology Stack and Architecture
 
@@ -381,18 +381,18 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 | SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 now verifiable |
 | SDS-OQ-03 — calendar policy | **User-confirmed for implementation**: Asia/Bangkok calendar date +7, UTC event timestamps; 2026-11-07 session decision | Recorded in §3; shared-baseline peer review pending |
 | SDS-OQ-04 — hosting | **Resolved (Lab 5, PR #57/#79):** GCP Cloud Run (`pewdiy`, `pewdiy-uat`) + Cloud SQL PostgreSQL (`pewdiy-pg`) + Artifact Registry + Secret Manager + WIF CI/CD | See `docs/labs/lab-05/deployment.md` |
-| SRS OQ-02..OQ-06, A-10..A-12 | **Resolved for Sprint 2 (`docs/srs.md` rev 6):** `request_bundles` multi-item support, `approval_status` (`PENDING/APPROVED/REJECTED/CANCELLED`), `1–14` day duration, full-return with two-step return notice (`return_requested_at`) + Custodian confirm (`returned_at`), `image_url`/`catalog_status`, search/filter/sort, and `notifications` table | Implemented under `docs/sprints/sprint-2/` contracts |
+| SRS OQ-02..OQ-06, A-10..A-12 | **Resolved for Sprint 2 (`docs/srs.md` rev 6):** `request_bundles` multi-item support, `approval_status` (`PENDING/APPROVED/REJECTED/CANCELLED`), `1–14` day duration, full-return with two-step return notice (`return_requested_at`) + Custodian confirm (`returned_at`), `image_url`/`catalog_status`, search/filter/sort, and `notifications` table | Specified and contracted under `docs/sprints/sprint-2/` (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) |
 
-| Issue criterion | Evidence in this draft | Honest status |
+| Issue criterion | Evidence in this specification | Reconciled status |
 |---|---|---|
-| AC-C-01 — stack, layers, communication, rule enforcement | §2, §3.3 | Layers/enforcement documented; **pending exact team-selected stack** |
-| AC-C-02 — entities, relationships, constraints, ownership, migrations/seed | §3–§4 | Logical design/procedure documented; OQ-02 and stack-specific commands remain explicit gates |
-| AC-C-03 — server role/record matrix | §6.2 | Documented for team/peer review; API enforcement not implemented by this issue |
-| AC-C-04 — credentials and full auth lifecycle | §7 | Alternatives and lifecycle obligations documented; **pending selected mechanism and expiry/transport policy** |
-| AC-C-05 — env/secrets/DB/Docker/durable deployment design | §8 | Design candidates documented; actual infrastructure is later work |
-| AC-C-06 — SRS consistency and no invented resolutions | §1, §3.4, §9–§10; stable IDs throughout | Baseline decisions retained; open decisions labelled and not silently resolved |
+| AC-C-01 — stack, layers, communication, rule enforcement | §2, §2.1, §3.3 | **Resolved & implemented for Sprint 1** (Node.js 24/Express 5/PostgreSQL 17/React 19, PR #22 & PR #33) |
+| AC-C-02 — entities, relationships, constraints, ownership, migrations/seed | §3–§4 | Sprint 1 schema/migrations (`001`–`003`) implemented; Sprint 2 additions (`004`) contracted pending Issues #99/#100 |
+| AC-C-03 — server role/record matrix | §6.2 | Sprint 1 RBAC enforced server-side; Sprint 2 endpoint additions contracted pending Issue #99 |
+| AC-C-04 — credentials and full auth lifecycle | §7 | **Resolved & implemented for Sprint 1** (Argon2id + DB-backed `HttpOnly` sessions + anti-CSRF, PR #22) |
+| AC-C-05 — env/secrets/DB/Docker/durable deployment design | §8 | Lab 5 Docker/CI/GCP topology implemented and verified (`docs/labs/lab-05/deployment.md`) |
+| AC-C-06 — SRS consistency and no invented resolutions | §1, §3.4, §9–§10; stable IDs throughout | Reconciled against `docs/srs.md` rev 6; Sprint 2/3 items remain labeled as contracted until `#99`/`#100` merge |
 
-This local document is not a claim that Issue #3 is Done. Resolve the decisions blocking AC-C-01/04, review all proposed choices with the team, and obtain independent teammate review through the repository workflow before completion. No implementation-test, CI, peer-approval or deployment result is claimed.
+Notes above distinguish between **Sprint 1 implemented baseline (`d079bc6`)** and **Sprint 2/3 architecture contracts** under `docs/sprints/sprint-2/` and `docs/sprints/sprint-3/` (implementation tracked in Issues #99 and #100).
 
 ## 11. Revision History
 

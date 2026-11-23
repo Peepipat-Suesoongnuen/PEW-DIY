@@ -3,7 +3,7 @@
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Deliverable:** D1-04 Part D — Three-Sprint Plan | **Issue:** [#4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/4)
 > **Status:** Draft for team review | **Language:** English (SRS A-07)
-> **Baseline:** [SRS](../srs.md) rev 2 · [Feature Inventory](../features.md) rev 1 · [Traceability](../traceability.md) rev 1 · [System SDS](../system-sds.md) rev 2
+> **Baseline:** [SRS](../srs.md) rev 6 · [Feature Inventory](../features.md) rev 2 · [Traceability](../traceability.md) rev 3 · [System SDS](../system-sds.md) rev 7
 > **Reference:** `project_deliverable_1_v1.pdf` §3.4 · `group_work_specs_v1.pdf` §4, §7
 > Status vocabulary: **Confirmed** (baseline/course backed) · **Proposed** (awaiting team confirmation) · **Open** (decision still required)
 
@@ -103,10 +103,10 @@ Sprint 1:   F-01 → F-02 → F-03 → F-04 → F-05 → F-10 (integration) → 
 Sprint 2:   F-05 ─┬→ F-06 (Return) → F-07 (Overdue) ─┐
             F-02 ─┴→ F-08 (Catalog mgmt/search/views) ┴→ integration → RC
 Sprint 3:   F-06/F-07/F-08 data → F-09 (Reporting) + hardening → final release
-Decision gates before implementation: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (calendar/timezone policy — tied to F-05 checkout contract/tests per SDS §10), OQ-01 (seed catalog), OQ-02 (quantity/return semantics)
+Decision gates status: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (Asia/Bangkok calendar policy), SDS-OQ-04 (Cloud Run/Cloud SQL), and SRS OQ-02..OQ-06 are resolved in SRS rev 6 / SDS rev 7; synthetic seed fixtures under OQ-01 remain explicitly documented.
 ```
 
-Rule: every feature is implemented on a branch from `sprint/1-staging` under its engineering contract, peer-reviewed, and integrated before release (AGENTS/AGENT.md §11.3).
+Rule: every feature is implemented on a branch from the current sprint staging branch (`sprint/1-staging` for Sprint 1; `sprint/2-staging` for Sprint 2) under its engineering contract, peer-reviewed, and integrated before release (`AGENT.md` §11.3).
 
 ## 7. Baseline Coverage Check (AC-D-02)
 
@@ -145,11 +145,11 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 
 
 | Item | Impact | Target |
 |---|---|---|
-| SDS-OQ-01 (stack), SDS-OQ-02 (session/token) | Block Sprint 1 implementation and AC-C-01/04 closure | Immediately — before [D1-05] baseline |
-| SDS-OQ-03 (calendar/timezone policy) | User-confirmed Asia/Bangkok calendar date +7, UTC timestamps during #12 (2026-11-07); SDS rev6 and F-05 evidence | Implementation choice recorded; shared-baseline review pending |
+| SDS-OQ-01 (stack), SDS-OQ-02 (session/token) | Stack & auth foundation (`AC-C-01/04`) | **Resolved (SDS rev 3 / PR #22 / UI-02 PR #33)** — Node.js 24 + Express 5 + PostgreSQL 17 + React/Vite + server sessions |
+| SDS-OQ-03 (calendar/timezone policy) | Due-date and overdue date boundaries | **Resolved (`Asia/Bangkok` + UTC timestamps)** — confirmed in Sprint 1 F-05 and carried to Sprint 2 |
 | **Demo video length conflict** — master spec §9 + `project_final_delivery_v1.pdf` §2 say ≤ 10 min; `project_final_delivery_v1.pdf` §3.5 says ≤ 4 min | Final Delivery rubric compliance | Confirm with instructor/TA; **plan ≤ 4 min meanwhile** (stricter limit satisfies both readings) — recorded per PR #20 review |
-| SRS OQ-01 (actual catalog) | Seed fixtures | Before Sprint 1 seed |
-| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | Before [D1-05] baseline |
+| SRS OQ-01 (actual catalog) | Seed fixtures vs real room catalog | Synthetic fixtures (`E-ONE`/`E-MANY`/`E-ZERO`) active for Sprint 1/2; real catalog management contracted via `FR-09` (`F-08`) |
+| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | **Resolved (`A-12`, SRS rev 6)** — multi-unit up to stock, full-return only with two-step notice/confirm (`F-06`) |
 | Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | **Resolved — 8 Nov confirmed** by §4 table row and §9 (removed as OQ per PR #20 review rev 3) |
 | Team capacity split (§8) | Task assignment | Team confirmation |
 
