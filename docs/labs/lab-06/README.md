@@ -4,7 +4,7 @@
 >
 > **Source:** `Lab_6_Sprint_1_UAT.pdf`, Parts A–D and submission checklist
 >
-> **Status (Reconciled 2026-11-23):** Lab 6 completed and submitted (`TH-056_P2_lab6_sec131`); GitHub Issues `#80–#84` and `#90` were closed on `2026-11-23` and PR #96 promoted Lab 6 docs to `main` (`d079bc6`). Partner team **NutTiew** (`@Tanaboonnnnn`, `@Chxtamos`) executed `UAT-01–UAT-08` on `pewdiy-uat` (`pewdiy-uat-00002-bnt` → `pewdiy-uat-00003-8c5`, `b03c904`), and PEW-DIY executed independent UAT on NutTiew (`UAT-NT-01..06 PASS`). `Finding 05` (Minor UX) and `UAT-07 UX Note` are carried into the Sprint 2 / Deliverable 2 Defect Register for remediation. Historical interim logs below are preserved as submitted history.
+> **Status (Reconciled 2026-11-23):** Part A interim UAT (`UAT-01–UAT-08`) was executed on `pewdiy-uat` (`b03c904`) with `Finding 05` (Minor UX) and `UAT-07 UX Note` carried into Sprint 2 Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) / [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100) for remediation. Although GitHub Issues `#80–#84` and `#90` were closed during Lab 6 submission (`TH-056_P2_lab6_sec131`), formal Part B partner handoff/release/execution evidence, Finding 05 UAT Team confirmation, and the signed §5 final acceptance decision are not yet attached in this repository and remain recorded as `BLOCKED` / `NOT RECORDED` in §1, §4, and §5 below.
 
 ## 1. Purpose, roles, and scope
 
