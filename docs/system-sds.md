@@ -19,53 +19,35 @@ The requirements baseline remains in the [SRS](srs.md), feature ownership in the
 | `project_deliverable_1_v1.pdf` | §3.3, PDF p.3 | Part C content: architecture/data/UI/API/access/configuration design |
 | `group_work_specs_v1.pdf` | §5.1–§5.3, PDF pp.3–4; §8.1, PDF p.10 | Logical layers, durable storage, identity/access, design now and Docker/GCP implementation in Lab 5 |
 | [Issue #1](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/1), [Issue #2](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/2) | Issue bodies and comments checked 2026-11-04; both closed, no comments | Upstream scope; resulting local SRS and Part B documents supply stable IDs |
-| [Issue #3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/3) | Scope, tasks, AC-C-01–AC-C-06 | This document's deliverables and unresolved stack/session choices |
+| [Issue #3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/3) | Scope, tasks, AC-C-01–AC-C-06 | Initial Part C scope (`AC-C-01`–`AC-C-06`); open stack/session choices listed in Issue #3 were subsequently resolved in rev 3 |
 | [Repository instructions](../AGENT.md) | §2–§3, §11–§16 | Verify actual stack, preserve requirements, distinguish proposals and open questions |
 
 The PDF files were read from the team's local `D:/Software_Engineering/PEW-DIY/lab-document/` directory; they are not tracked repository files. For the final D1 hand-in, include the complete Part C content in the combined PDF as required by `project_deliverable_1_v1.pdf` §4.1; a repository link alone is insufficient.
 
-**Status vocabulary:** **Confirmed** means supported by the SRS or the course documents; **Proposed** means an engineering choice in this draft awaiting team review; **Open** means a decision is still required. All new implementation choices below are **Proposed**, even when phrased as instructions for a future implementation. They are not claims about existing software.
+**Status vocabulary:** **Confirmed** means supported by the SRS or course documents; **Resolved / Implemented** means team-approved decisions backed by merged Sprint 1 / Lab 5 implementation (`PR #22`, `PR #33`, `PR #57`/`#79`); **Proposed / Contracted** means Sprint 2/3 contract or design additions whose implementation is pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100); **Open** means a decision is still required.
 
-**Reconciliation:** Historical Issue #1/#3 and D1 draft notes described stack, session, and SRS OQ decisions as open; subsequent revisions (§2.1, §10, SRS rev 6) resolved `SDS-OQ-01..04` and `SRS OQ-02..06`, while retaining explicit synthetic catalog labeling under `OQ-01` until room staff populate real catalog items via `F-08` (`FR-09`).
+**Reconciliation:** Historical Issue #1/#3 and revision-1 draft notes described stack, session, and SRS OQ decisions as open; subsequent revisions (§2.1, §7.2, §10, SRS rev 6) resolved `SDS-OQ-01..04` and `SRS OQ-02..06`, while retaining explicit synthetic catalog labeling under `OQ-01` until room staff populate real catalog items via `F-08` (`FR-09`).
 
 ## 2. Technology Stack and Architecture
 
-### 2.1 Verified Stack Status and Selection Criteria
+### 2.1 Selected and Implemented Stack (`SDS-OQ-01/02` Resolved)
 
-The local baseline contains documentation only: no application source, runtime manifest, dependency lockfile, database schema, or Lab 1–4 application evidence. Neither checked PDF nor Issue #1/#2 identifies a mandatory framework/database. **No exact technology stack can currently be recorded as selected.** This is an explicit AC-C-01 gap, not permission to infer a stack from another project in the workspace.
+The team selected and implemented the Sprint 1 stack below (`SDS-OQ-01/02` resolved at rev 3 via `PR #22`; frontend stack added at `UI-02` via `PR #33`). Component details and runnable manifests live in `package.json`, `client/package.json`, `server/src/`, `client/src/`, and `e2e/`.
 
-| Layer | Confirmed responsibility | Open selection and evidence needed |
+| Layer | Selected & Implemented Technology | Verification / Evidence |
 |---|---|---|
-| Web UI | Browser interface for F-01–F-09, validation feedback and role-aware navigation | Framework or server-rendered UI, language and supported version; use actual Lab experience if supplied |
-| API/application | Authentication, authorization, validation, domain rules and transactions | Runtime, framework, maintained auth/hash libraries, test runner and supported versions |
-| Database | Persistent users, catalog, requests and loans; enforce integrity and atomicity | Engine/version, driver or ORM, migration tool, locking/isolation behavior |
-| Identity transport | Login/current-user/logout under FR-01–FR-05 | Server session versus token design, transport, expiry and revocation policy (§7) |
+| **Web UI** | React 19 + Vite + TypeScript + Tailwind CSS v4 (`@theme` tokens) + Lucide Icons, served via Express SPA fallback (`client/dist`) | PR #33 (`ARCH-01`, `docs/sprints/sprint-1/ui-02-evidence.md`); legacy `.html` coexistence until Sprint 2 Phase P4 (#100) |
+| **Runtime / API** | Node.js 24 + TypeScript + Express 5 | PR #22 implementation; `package.json` / `package-lock.json` |
+| **Database** | PostgreSQL 17 (`pg` driver; parameterized SQL + ordered SQL migrations `001`–`003`) | PR #22 `server/src/db` (Sprint 2 migration `004` contracted pending #99) |
+| **Password Hashing** | Argon2id via `@node-rs/argon2` | PR #22 `server/src/services/password.ts` |
+| **Identity Transport** | DB-backed opaque server session (`sessions`, SHA-256 key) + `HttpOnly` cookie (`SameSite=Lax`) + trusted-origin anti-CSRF (`APP_ORIGIN`), idle `60` min / absolute `480` min | PR #22 `server/src/services/session.ts`, `auth-routes.ts`; `TEST-F01-07/08/15/16` |
+| **Test Tooling** | Vitest + Supertest (server), Vitest + Testing Library (client), Playwright Chromium (3 viewports E2E) | `server/tests/`, `client/src/test/`, `e2e/` |
 
-**Proposed selection approach:** reuse a team-familiar Lab stack if its actual code/configuration is provided. Otherwise compare a browser UI plus API framework and transactional relational database against an integrated web framework with the same logical responsibilities. A relational model is proposed because foreign keys and checkout transactions directly support the ownership and quantity invariants; a different database needs an equally explicit consistency strategy. No named framework, vendor, package version, or runnable setup command is asserted here.
+#### Historical Revision-1 Snapshot (Superseded by Rev 3 & PR #33)
 
-Before [D1-05] is baselined, record the team's exact selections and rationale in this table, pin supported dependency versions in implementation manifests, and replace the setup outline in §4 with verified README commands. Criteria are team familiarity, testability of protected APIs, atomic checkout, reproducible migrations/seed, and later Docker/GCP suitability. Stack approval is recorded as SDS-OQ-01 in §10.
+> **Historical note:** At revision 1 (`9d3c57b`), before application source existed, the repository held documentation only and no stack could yet be recorded (`AC-C-01` gap). That gap is closed by the resolved selections above; the criteria preserved here (team familiarity, protected API testability, atomic DB transactions, reproducible migrations/seed, Docker/GCP suitability) guided that selection.
 
-**Update (revision 3 — SDS-OQ-01/02 resolved):** the team selected and implemented the stack below (decision D1/D2, 2026-11-03/04; implemented in PR #22, merged). The status text above is retained as the historical record at revision 1.
-
-| Layer | Selection (revision 3) | Evidence |
-|---|---|---|
-| Runtime/framework | Node.js 24 + TypeScript 7 + Express 5 | PR #22 implementation; `package.json`/`package-lock.json` (pinned) |
-| Database | PostgreSQL 17 (`pg` driver; versioned SQL migrations) | PR #22 `server/src/db` |
-| Password hashing | argon2id via `@node-rs/argon2` | PR #22 `server/src/services/password.ts` |
-| Identity transport | Server session + HttpOnly cookie (SameSite=Lax) + trusted-origin anti-CSRF; idle/absolute expiry; durable revocation in DB | PR #22 `server/src/services/session.ts`, `auth-routes.ts`; tests TEST-F01-07/08/15/16 |
-| Test tooling | Vitest + Supertest | PR #22 `server/tests` (39 tests) |
-
-**Update (UI-02, Issue #33 — frontend selection recorded per ARCH-01 P1 gate):**
-the Web UI layer is now selected and implemented: **React + Vite + TypeScript +
-Tailwind CSS v4 (CSS-first `@theme` tokens) + Lucide Icons** (Approved team
-decisions; ARCH-01 proposal PR #29). The built client (`client/dist`) is served
-by the same Express application (SPA history fallback for non-`/api` HTML
-navigations; legacy `.html` pages coexist until migration phase P4 — ARCH-01
-§12.1). Component/page tests: Vitest + Testing Library (`client/src/test`);
-Core UI E2E: Playwright (`e2e/`, three confirmed viewports). Evidence:
-`docs/sprints/sprint-1/ui-02-evidence.md`.
-
-### 2.2 Logical Architecture — Proposed Modular Monolith
+### 2.2 Logical Architecture — Modular Monolith
 
 The course permits a modular monolith: UI, API/application, and database are logical responsibilities, not a requirement for three servers or containers. One application can serve the UI and API; the database remains a durable store.
 
