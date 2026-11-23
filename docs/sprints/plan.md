@@ -149,7 +149,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 
 | SDS-OQ-03 (calendar/timezone policy) | Due-date and overdue date boundaries | **Resolved (`Asia/Bangkok` + UTC timestamps)** — confirmed in Sprint 1 F-05 and carried to Sprint 2 |
 | **Demo video length conflict** — master spec §9 + `project_final_delivery_v1.pdf` §2 say ≤ 10 min; `project_final_delivery_v1.pdf` §3.5 says ≤ 4 min | Final Delivery rubric compliance | Confirm with instructor/TA; **plan ≤ 4 min meanwhile** (stricter limit satisfies both readings) — recorded per PR #20 review |
 | SRS OQ-01 (actual catalog) | Seed fixtures vs real room catalog | Synthetic fixtures (`E-ONE`/`E-MANY`/`E-ZERO`) active for Sprint 1/2; real catalog management contracted via `FR-09` (`F-08`) |
-| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | **Resolved (`A-12`, SRS rev 6)** — multi-unit up to stock, full-return only with two-step notice/confirm (`F-06`) |
+| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | **Policy decision resolved (`A-12`, SRS rev 6); shared-team baseline ratification pending PR #98** — multi-unit up to stock, full-return only with two-step notice/confirm (`F-06`) |
 | Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | **Resolved — 8 Nov confirmed** by §4 table row and §9 (removed as OQ per PR #20 review rev 3) |
 | Team capacity split (§8) | Task assignment | Team confirmation |
 

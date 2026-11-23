@@ -69,7 +69,7 @@ Core UI E2E: Playwright (`e2e/`, three confirmed viewports). Evidence:
 
 The course permits a modular monolith: UI, API/application, and database are logical responsibilities, not a requirement for three servers or containers. One application can serve the UI and API; the database remains a durable store.
 
-**Physical layout (revision 3, FIX-A):** the repository separates frontend and backend directories — `client/` (frontend application; structure prepared, framework not yet chosen — the framework decision belongs to UI work) and `server/` (`server/src` application code: config/db/routes/services; `server/tests` tests, kept outside the build output). This is a directory-level separation of the same logical layers below; **the deployment topology is unchanged** — one application container serves UI and API (§8.2, Lab 5 R-01).
+**Physical layout (reconciled rev 3–7):** the repository separates frontend and backend directories — `client/` (React 19 + Vite + TypeScript + Tailwind CSS v4 SPA, selected/implemented in PR #33; legacy `.html` coexistence until Sprint 2 Phase P4) and `server/` (`server/src` application code: config/db/routes/services; `server/tests` tests, kept outside the build output). This is a directory-level separation of the same logical layers below; **the deployment topology is unchanged** — one application container serves UI and API (§8.2, Lab 5 R-01).
 
 ```mermaid
 flowchart LR
@@ -99,9 +99,9 @@ Keep identity/access, catalog/availability, borrowing/loans, and later reporting
 
 ## 3. Data Model and Consistency
 
-### 3.1 Proposed Logical Entities
+### 3.1 Logical Entities (Sprint 1 Implemented; Sprint 2 Contracted)
 
-Field names and logical types below are design proposals, not an implemented SQL/ORM schema. Primary-key representation (integer/UUID), text lengths and migration syntax await SDS-OQ-01. Every FK is required unless marked optional. No individual serial-number entity is introduced (SRS A-01).
+With `SDS-OQ-01` resolved (§2.1), Sprint 1 SQL migrations (`001`–`003` in `server/src/db/migrations.ts`) implement `users`, `sessions`, `equipment`, `borrowing_requests`, and `loans` using PostgreSQL `TEXT` IDs, `INTEGER` quantities, and `TIMESTAMPTZ`/`DATE` columns. Sprint 2 additions (`image_url`, `catalog_status`, `request_bundles`, `approval_status`, `requested_days`, `return_requested_at`, `notifications`) are **contracted in `docs/sprints/sprint-2/` (pending Issue #99 migration `004`)**. No individual serial-number entity is introduced (SRS A-01).
 
 | Entity | Principal fields | Integrity, ownership, and use |
 |---|---|---|
@@ -164,7 +164,7 @@ At request creation, the application validates availability from the DB before p
 
 ### 3.4 Return, Dates, and Later-Sprint Extensions
 
-**Current A-12 choice (user decision, 2026-11-06; shared-team ratification pending PR #36):** multiple units up to current available stock; no additional per-borrower cap; full return per loan. Request-time quantity bounds are enforced by F-04. The alternatives below are historical design options; full-quantity return is selected, and no partial-return implementation is authorized by Issue #11.
+**Current A-12 / SRS OQ-02 policy status (policy decision resolved for design/contracts; shared-team baseline peer ratification pending PR #98):** multiple units up to current available stock; no additional per-borrower cap; full-quantity return per loan (user decisions 2026-11-06 and 2026-11-23). Request-time quantity bounds are enforced by F-04 (Sprint 1); Sprint 2 two-step return notice (`request-return`) → Custodian confirm (`return`) is contracted in `docs/sprints/sprint-2/f-06-return.md` (implementation pending Issues #99/#100). The alternatives table below records the historical D1 design trade-off; full-quantity return is selected and no partial-return implementation is authorized.
 
 | Alternative awaiting team decision | Data and consistency impact |
 |---|---|
@@ -179,7 +179,7 @@ Sprint 2 adds return, overdue, catalog management/search, full history and Custo
 
 ## 4. Database Setup, Migrations, and Synthetic Seed
 
-The following is the **proposed reproducible procedure**, not a list of currently runnable commands. Exact engine/tool commands are blocked by SDS-OQ-01 and belong in README when the application exists (NFR-08).
+With `SDS-OQ-01` resolved (§2.1), runnable Sprint 1 setup, migration (`001`–`003`), seed, and test commands are documented in `README.md` and `package.json` (`NFR-08`). Sprint 2 schema migration `004` is contracted pending Issue #99. The baseline procedure below defines the required invariants:
 
 1. Install the pinned runtime/database tooling selected by the team. Configure an isolated development database and a separate test database; neither uses real university data.
 2. Supply ignored local environment values using a future `.env.example` containing names/placeholders only. Validate required DB/auth configuration before accepting requests; fail with a safe message when incomplete.
@@ -281,13 +281,13 @@ Feature contracts must exercise every existing protected endpoint with unauthent
 
 ### 7.1 Shared Requirements and Proposed Credential Handling
 
-FR-01–FR-03, BR-10 and NFR-03 require real login/current-user/logout and salted password hashes. Use a maintained password-hashing library, verify via its comparison function and never return/log the stored hash. **Proposed algorithm candidate:** Argon2id where the selected runtime supports it; library/version and benchmarked cost remain team decisions. Fast general-purpose hashing or reversible password encryption is not an acceptable substitute. See [OWASP Password Storage guidance](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
+FR-01–FR-03, BR-10 and NFR-03 require real login/current-user/logout and salted password hashes. **Selected & implemented (`SDS-OQ-01/02`, PR #22):** Argon2id via `@node-rs/argon2` (`server/src/services/password.ts`), verified via constant-time hash comparison and never returned or logged. Fast general-purpose hashing or reversible password encryption is prohibited. See [OWASP Password Storage guidance](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
 
 Login accepts credentials over HTTPS when deployed and returns the same safe error for unknown user and incorrect password. Resolve role/identity from trusted server state. Current-user returns only the safe identity fields needed by the UI; every protected operation independently validates authentication and authorization. Credential fixture handling follows §4; no real accounts or third-party identity integration are introduced.
 
-### 7.2 Open Choice: Server Session Versus Tokens
+### 7.2 Selected Strategy (`SDS-OQ-02` Resolved) vs Historical Alternatives
 
-No checked source selects session/token strategy. These are alternatives for SDS-OQ-02, not two mechanisms to implement together:
+**Resolved & implemented in Sprint 1 (PR #22, verifying AC-C-04):** PostgreSQL-backed opaque server session (`sessions` table storing SHA-256 hashed session key) delivered via `HttpOnly` cookie (`pew_session`, `SameSite=Lax`, `Secure=true` over HTTPS), `Origin`/`Referer` anti-CSRF (`APP_ORIGIN`), idle timeout `60` minutes (`SESSION_IDLE_MINUTES`), and hard absolute lifetime `480` minutes (`SESSION_ABSOLUTE_MINUTES`), verified by `server/tests/auth.test.ts`, `session.test.ts`, and `auth-routes.test.ts`. The table below preserves the historical D1 design comparison that led to selecting server sessions over stateless tokens:
 
 | Lifecycle | Proposed server-session option | Proposed token option |
 |---|---|---|
@@ -298,23 +298,21 @@ No checked source selects session/token strategy. These are alternatives for SDS
 | Logout | Invalidate the server session and clear browser cookie/private UI state; replay of its old ID is denied | Revoke the current session/token identifier server-side and clear client state; specify how already issued access credentials are rejected |
 | Scaling/durability | DB or another approved shared store; process-only memory is insufficient for a multi-instance deployment | Revocation/session state must also be shared if used; token-only validation cannot provide immediate revocation by clearing the browser |
 
-**Proposed tradeoff:** a server session is the simpler candidate for a single browser application requiring observable current-session invalidation, while tokens require explicit revocation/storage choices. The team must approve one. A purely stateless JWT that remains valid after client-only logout does not meet the proposed FR-02 replay-denial behavior; do not label token deletion as server invalidation. Session ID renewal, server expiry, logout and cookie attributes should follow the [OWASP Session Management guidance](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).
-
-Exact timeout durations, cookie names, token claims/keys, refresh behavior, CSRF mechanism and session schema remain open until SDS-OQ-02 is resolved. [D1-05] must document creation → valid current-user → expiry/revocation → denied old credential, plus logout replay and browser identity clearing. Neither option's implementation or security tests are claimed complete here.
+**Historical tradeoff rationale:** server sessions were selected for a single-origin browser application requiring observable server-side session invalidation and logout replay denial (FR-02). Exact cookie names, timeout durations (`60`/`480`), anti-CSRF checks, and `sessions` schema are closed under `SDS-OQ-02` and tested in Sprint 1 (`TEST-F01-07/08/15/16`). Any future Sprint 2/3 auth extensions remain out of current scope until explicitly contracted.
 
 ## 8. Configuration and Deployment Design
 
 ### 8.1 Proposed Configuration Inventory
 
-Names below are logical proposals to map to the selected runtime, not existing application variables or an `.env.example` implementation. No real values are included.
+Names below map to the active configuration contract implemented in `server/src/config/config.ts` and documented in `.env.example` (no secret values are committed).
 
 | Configuration | Classification / purpose |
 |---|---|
-| `APP_ENV`, `PORT`, `LOG_LEVEL` | Non-secret environment/HTTP/log settings; validate allowed values |
-| `DATABASE_URL` or equivalent host/name/user/credential inputs | Secret if credentials are included; correct dev/test/deployed durable store |
-| `APP_ORIGIN`, optional explicit allowed origins | Non-secret origin and CORS/credential/CSRF configuration, matching chosen browser topology |
-| `APP_TIMEZONE` | Non-secret business date zone; `Asia/Bangkok`, user-confirmed for #12; no host-zone fallback |
-| Session idle/absolute timeout inputs | Non-secret durations, required only for the chosen session policy; values pending SDS-OQ-02 |
+| `NODE_ENV`, `PORT`, `LOG_LEVEL` | Non-secret environment/HTTP/log settings; fail-closed validation |
+| `DATABASE_URL` / `TEST_DATABASE_URL` | Secret when credentialed; dev/test/deployed PostgreSQL store |
+| `APP_ORIGIN` | Non-secret trusted browser origin for anti-CSRF `Origin`/`Referer` validation |
+| `APP_TIMEZONE` | Non-secret business date zone; `Asia/Bangkok` (fail-closed if invalid/absent) |
+| `SESSION_IDLE_MINUTES`, `SESSION_ABSOLUTE_MINUTES`, `SESSION_COOKIE_NAME`, `SESSION_COOKIE_SECURE` | Non-secret session policy inputs (`60`, `480`, `pew_session`, `true` over HTTPS; resolved in `SDS-OQ-02`) |
 | Session-protection secret or token signing key, if required by selected library | Secret; choose only inputs used by the selected auth mechanism, no hard-coded defaults |
 | Demo credential seed inputs | Secret local/private inputs used only during explicit seed; never logged or stored as plaintext fixtures |
 | Deployment project/region/service/database/image identifiers | Non-secret identifiers to record after Lab 5 choices; not proof that resources exist |
@@ -376,12 +374,12 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 | Question | Impact / next evidence required | Target |
 |---|---|---|
 | SRS OQ-01 | Team supplies actual initial catalog; until then fixtures remain labelled synthetic/proposed | Before Sprint 1 seed implementation |
-| SRS OQ-02 | **User choice recorded; team ratification pending — A-12:** multi-unit up to current stock, no additional per-borrower cap, full return per loan (explicit user decision 2026-11-06) | F-04 request validation now implemented; Loan/return behavior remains #12/Sprint 2 |
-| SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + Vitest/Supertest (team decision D1; PR #22) | Closed — AC-C-01 now verifiable |
-| SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 now verifiable |
-| SDS-OQ-03 — calendar policy | **User-confirmed for implementation**: Asia/Bangkok calendar date +7, UTC event timestamps; 2026-11-07 session decision | Recorded in §3; shared-baseline peer review pending |
+| SRS OQ-02 / A-12 | **Policy decision resolved for Sprint 1/2 (`docs/srs.md` rev 6); shared-team baseline peer ratification pending PR #98:** multi-unit up to availability, full-quantity return only, no additional per-borrower cap, plus Sprint 2 two-step return notice → Custodian confirm | F-04 validation implemented in S1; Sprint 2 return flow contracted in `f-06-return.md` (pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) |
+| SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + React 19 + Vitest/Supertest (team decision D1; PR #22 & PR #33) | Closed — AC-C-01 implemented & verified |
+| SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 implemented & verified |
+| SDS-OQ-03 — calendar policy | **User-confirmed for implementation**: Asia/Bangkok calendar date +7, UTC event timestamps; 2026-11-07 session decision | Recorded in §3; shared-baseline peer review pending PR #98 |
 | SDS-OQ-04 — hosting | **Resolved (Lab 5, PR #57/#79):** GCP Cloud Run (`pewdiy`, `pewdiy-uat`) + Cloud SQL PostgreSQL (`pewdiy-pg`) + Artifact Registry + Secret Manager + WIF CI/CD | See `docs/labs/lab-05/deployment.md` |
-| SRS OQ-02..OQ-06, A-10..A-12 | **Resolved for Sprint 2 (`docs/srs.md` rev 6):** `request_bundles` multi-item support, `approval_status` (`PENDING/APPROVED/REJECTED/CANCELLED`), `1–14` day duration, full-return with two-step return notice (`return_requested_at`) + Custodian confirm (`returned_at`), `image_url`/`catalog_status`, search/filter/sort, and `notifications` table | Specified and contracted under `docs/sprints/sprint-2/` (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) |
+| SRS OQ-03..OQ-06, A-10..A-11 | **Policy decisions resolved for Sprint 2 contracts (`docs/srs.md` rev 6); shared-team baseline peer ratification pending PR #98:** `request_bundles`, `approval_status` (`PENDING/APPROVED/REJECTED/CANCELLED`), `1–14` day duration, `image_url`/`catalog_status`, search/filter/sort, and `notifications` table | Specified and contracted under `docs/sprints/sprint-2/` (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) |
 
 | Issue criterion | Evidence in this specification | Reconciled status |
 |---|---|---|
