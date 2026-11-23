@@ -8,7 +8,7 @@
 >
 > **Baseline:** [SRS](srs.md) rev 6 and [Feature Inventory](features.md) rev 2 (reconciled for Sprint 2; original D1 snapshot at `9d3c57b`)
 >
-> **Language:** English (SRS A-07). This is a design specification; no application, migration, authentication mechanism, or deployment is implemented by this document.
+> **Language:** English (SRS A-07). This is a system-level design specification: sections below document the **Implemented & Verified Sprint 1 + Lab 5 baseline (`d079bc6`)** alongside **Contracted / Planned Sprint 2 & Sprint 3 extensions (pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100))**, while preserving early Deliverable 1 option analyses as **Historical / Superseded** context.
 
 ## 1. Sources, Status, and Design Boundaries
 
@@ -85,16 +85,17 @@ Keep identity/access, catalog/availability, borrowing/loans, and later reporting
 
 With `SDS-OQ-01` resolved (§2.1), Sprint 1 SQL migrations (`001`–`003` in `server/src/db/migrations.ts`) implement `users`, `sessions`, `equipment`, `borrowing_requests`, and `loans` using PostgreSQL `TEXT` IDs, `INTEGER` quantities, and `TIMESTAMPTZ`/`DATE` columns. Sprint 2 additions (`image_url`, `catalog_status`, `request_bundles`, `approval_status`, `requested_days`, `return_requested_at`, `notifications`) are **contracted in `docs/sprints/sprint-2/` (pending Issue #99 migration `004`)**. No individual serial-number entity is introduced (SRS A-01).
 
-| Entity | Principal fields | Integrity, ownership, and use |
+| Entity | Principal fields (Sprint 1 Implemented vs Sprint 2 Contracted `#99`) | Integrity, ownership, and use |
 |---|---|---|
-| **User** | `id` PK; `username` text; `password_hash` text; `role` constrained code | Unique username under a documented normalization policy; exactly one role, `BORROWER` or `CUSTODIAN`; never expose hash in responses. Seeded accounts; no registration feature (FR-01–FR-05, BR-10). |
-| **Equipment** | `id` PK; `name`, `description`, `category` text; `quantity_total` integer; proposed later `catalog_status` | Required catalog fields; `quantity_total >= 0`. Availability is derived (§3.3). Retirement/status semantics are a Sprint 2 proposal tied to A-10/FR-09, not a decided repair workflow. |
-| **BorrowingRequest** | `id` PK; `borrower_id` FK User; `equipment_id` FK Equipment; `quantity_requested` integer; `created_at` timestamp | `quantity_requested > 0`; permitted maximum depends on OQ-02. Owner is the authenticated Borrower, never a trusted client-selected user. Status is proposed as `SUBMITTED` or `CHECKED_OUT`, derived from whether its Loan exists. No approval status (FR-11–FR-13, A-02). |
-| **Loan** | `id` PK; `request_id` unique FK BorrowingRequest; `quantity_borrowed` integer; `checked_out_by` FK User; `checkout_at` timestamp; `due_on` date; `returned_at` optional timestamp; `returned_by` optional FK User | `quantity_borrowed > 0`. Borrower/equipment come from the linked request, preventing mismatched duplicate ownership fields. Service checks checkout actor is Custodian. Return fields apply from Sprint 2; final return accounting depends on OQ-02 (§3.4). Active Loan is a view of Loan state, not a second independently writable entity (FR-14–FR-17). |
+| **User** (`users` + `sessions`) | **Implemented (`001`):** `id` PK; `username` text; `password_hash` text; `role` constrained code (`BORROWER` / `CUSTODIAN`); `sessions` table (`id`, `user_id`, `token_hash`, `expires_at`, `absolute_expires_at`) | Unique username; exactly one role (`BORROWER` or `CUSTODIAN`); Argon2id `password_hash` never exposed in responses. Seeded accounts (`B-A`, `B-B`, `C-A`); no registration feature (FR-01–FR-05, BR-10). |
+| **Equipment** (`equipment`) | **Implemented (`002`):** `id` PK; `name`, `description`, `category` text; `quantity_total`, `quantity_available` integer<br>**Contracted (`004`, `#99`):** `image_url` (nullable text), `catalog_status` (`ACTIVE`/`RETIRED`, default `ACTIVE`) | Required catalog fields; `0 <= quantity_available <= quantity_total` (BR-03). Retirement/status semantics (`ACTIVE`/`RETIRED`, retire blocked when `quantity_available < quantity_total` under `BR-14`) and optional `image_url` are contracted for Sprint 2 (`F-08`, `A-10`/`FR-09`, pending Issue #99). |
+| **BorrowingRequest** (`borrowing_requests` + `request_bundles`) | **Implemented (`003`):** `id` PK; `borrower_id` FK User; `equipment_id` FK Equipment; `quantity_requested` integer; `status` (`SUBMITTED`/`CHECKED_OUT`); `submitted_at` timestamp<br>**Contracted (`004`, `#99`):** `request_bundles` table + `bundle_id`, `purpose_category`, `purpose_detail`, `requested_days` (`1..14`, default `7`), `approval_status` (`PENDING`/`APPROVED`/`REJECTED`/`CANCELLED`), `reviewed_by`, `reviewed_at`, `decision_note` | `quantity_requested >= 1` up to `quantity_available` at submission (`OQ-02` / `A-12` resolved: multi-unit up to current stock, no extra per-borrower cap). Owner is always the authenticated Borrower. Sprint 1 uses Direct Checkout (`A-02`, no approval state); Sprint 2 contracts add `A-11` non-reserving approval (`PENDING → APPROVED/REJECTED/CANCELLED → CHECKED_OUT`, `BR-12`, pending Issue #99). |
+| **Loan** (`loans`) | **Implemented (`003`):** `id` PK; `request_id` unique FK BorrowingRequest; `borrower_id`, `equipment_id`; `quantity` integer; `checked_out_by` FK User; `checked_out_at` timestamp; `due_on` date; `returned_at` optional timestamp; `returned_by` optional FK User<br>**Contracted (`004`, `#99`):** `return_requested_at` optional timestamp (`RETURN_PENDING` notice) | `quantity >= 1`. Borrower/equipment match the linked request. Service enforces that checkout actor is Custodian (`BR-04`). Full-quantity return policy (`OQ-02` / `A-12`) is resolved (§3.4); Sprint 2 two-step return (`request-return` → Custodian `return`) is contracted in `f-06-return.md` (pending Issue #99). |
+| **Notification** (`notifications`) | **Contracted (`004`, `#99`):** `id` PK; `user_id` FK User; `type` (`REQUEST_APPROVED`/`REQUEST_REJECTED`/`RETURN_CONFIRMED`/`LOAN_DUE_SOON`/`LOAN_OVERDUE`); `title`, `body`, `reference_id`, `read_at`, `created_at` | Contracted for Sprint 2 (`F-07` / `F-11`, `FR-19`, `BR-13`, pending Issue #99): stores persistent dismissible/clearable alerts per user without mutating request or loan records. |
 
-**Role representation:** the two role codes are a constrained field on User; a separate Role table is optional, with the same two permitted values and one role per user. No role-management API or multi-role account is proposed.
+**Role representation:** the two role codes are a constrained field on User; no role-management API or multi-role account exists.
 
-**Loan relationship proposal:** one request concerns one equipment type and is fulfilled by at most one loan for the requested quantity. This prevents a repeated checkout of the same request from creating another loan. Split fulfillment, quantity changes at checkout, and per-borrower limits are not assumed; [D1-05] must confirm the quantity contract with OQ-02. Do not hard-code either `quantity = 1` or unlimited multi-unit loans as a confirmed rule.
+**Loan relationship and resolved quantity policy (`OQ-02` / `A-12`):** one `borrowing_requests` row concerns one equipment type and is fulfilled by at most one `loans` row (`UNIQUE (request_id)`) for the full `quantity_requested`. Per resolved policy `A-12` (`docs/srs.md` rev 6), multi-unit requests up to current `quantity_available` are allowed with no additional per-borrower cap, and split fulfillment / partial return is prohibited. In Sprint 2 (`F-11`, pending Issue #99), a multi-item `request_bundles` parent groups multiple `borrowing_requests` rows while preserving the 1-request-to-1-loan invariant per item.
 
 ```mermaid
 erDiagram
@@ -140,65 +141,65 @@ Under full returns, an active loan contributes all `quantity_borrowed`; a fully 
 
 Every writer affecting held units or total quantity (checkout, later return, total adjustment) must use the same Equipment-first serialization protocol. The database must re-read held quantities **after** acquiring that lock with semantics that see preceding committed writers; a stale transaction snapshot is insufficient. Engine-specific implementation/isolation tests are a stack-selection gate. An in-process mutex cannot protect multiple API processes.
 
-For example, if PostgreSQL is selected, row locks can serialize writers to the same Equipment row; the proposed implementation would use a fresh post-lock read under an appropriate isolation level and retry transaction failures safely. This is an example, not a database selection. [PostgreSQL row-level locking documentation](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) describes the lock behavior.
+**Implemented PostgreSQL 17 row-level locking (`SDS-OQ-01` Resolved):** In `server/src/services/loan.ts` and `server/src/services/borrowing-request.ts`, PostgreSQL `SELECT ... FROM equipment WHERE id = $1 FOR UPDATE` serializes concurrent writers targeting the same Equipment row inside an explicit `BEGIN ... COMMIT` transaction (`server/src/db/pool.ts`), re-reading post-lock `quantity_available` and rolling back completely on any validation, conflict (`409`), or DB error (`TEST-F05-04/05/08`). [PostgreSQL row-level locking documentation](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) describes the lock behavior.
 
 At request creation, the application validates availability from the DB before persisting the request (BR-01); use the same equipment lock to make that check and insert consistent with checkout. No inventory decrement occurs at this step under the confirmed non-reservation model (Direction A, 2026-11-06; SRS BR-12). Later quantity reductions must reject `new_total < held` under the lock. A repeated checkout returns a safe conflict and never creates a duplicate loan; after an uncertain network response the UI re-fetches request state before retrying.
 
 ### 3.4 Return, Dates, and Later-Sprint Extensions
 
-**Current A-12 / SRS OQ-02 policy status (policy decision resolved for design/contracts; shared-team baseline peer ratification pending PR #98):** multiple units up to current available stock; no additional per-borrower cap; full-quantity return per loan (user decisions 2026-11-06 and 2026-11-23). Request-time quantity bounds are enforced by F-04 (Sprint 1); Sprint 2 two-step return notice (`request-return`) → Custodian confirm (`return`) is contracted in `docs/sprints/sprint-2/f-06-return.md` (implementation pending Issues #99/#100). The alternatives table below records the historical D1 design trade-off; full-quantity return is selected and no partial-return implementation is authorized.
+**Resolved A-12 / SRS OQ-02 policy status (`docs/srs.md` rev 6; shared-team baseline peer ratification tracked in PR #98):** multiple units up to current available stock; no additional per-borrower cap; **full-quantity return only** per loan (user decisions 2026-11-06 and 2026-11-23). Request-time quantity bounds are enforced by F-04 (Sprint 1); Sprint 2 two-step return notice (`request-return`) → Custodian confirm (`return`) is contracted in `docs/sprints/sprint-2/f-06-return.md` (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). The table below preserves the **historical D1 design comparison**; full-quantity return is the selected policy and the partial-return option was **rejected**:
 
-| Alternative awaiting team decision | Data and consistency impact |
+| Historical D1 return option | Status & data/consistency impact |
 |---|---|
-| Full-quantity return only | `returned_at`/`returned_by` are set atomically when all borrowed units return. Loan remains active until that event. A repeat return changes nothing and is rejected as a conflict. |
-| Partial returns allowed | Add persisted returned-quantity accounting (e.g., Return records with loan/quantity/Custodian/time). Enforce `0 <= total_returned <= quantity_borrowed`; held quantity is `quantity_borrowed - total_returned`. Close only when held reaches zero. Record return and availability effect in the same locked transaction. |
+| **Full-quantity return only (Selected — `A-12` / `BR-09`)** | **Selected policy:** `returned_at`/`returned_by` are set atomically when all borrowed units of the loan return (after optional Borrower `return_requested_at` notice in Sprint 2 `F-06`). Loan remains active until Custodian confirmation. A repeat return changes nothing and is rejected with `409 ALREADY_RETURNED`. |
+| Partial returns allowed *(Historical rejected alternative)* | **Rejected / Not Selected (`A-12`):** Would have required separate partial-return records and `quantity_borrowed - total_returned` remaining-held tracking. Excluded from the core schema and product scope. |
 
-The partial-return schema is conditional, not part of the fixed core ERD. If selected, earlier partial returns live in Return records; keep Loan `returned_at`/`returned_by` unset until all units have returned. The loan stays active, contributes its remaining held quantity, and remains eligible for overdue calculation until closure. Either alternative must satisfy BR-09; closing a partially returned loan would incorrectly free held units. Do not implement a partial-return contract before OQ-02 is resolved.
+> **Historical note on rejected partial-return option:** Because full-quantity return was selected under `A-12` (`OQ-02` closed), no partial-return table or partial-quantity parameter is part of the schema or Sprint 2 `F-06` contract. Closing an active loan always restores its full `quantity` (`quantity_borrowed`) to `equipment.quantity_available` in a single atomic transaction (`BR-09`, `NFR-06`).
 
-**Date representation — user-confirmed for Issue #12 (2026-11-07):** store event timestamps as UTC instants; calculate `due_on` as the checkout's calendar date in `Asia/Bangkok` plus seven calendar days (A-03/BR-07). The user explicitly answered “ยืนยันใช้ Asia/Bangkok” in the implementation session, resolving SDS-OQ-03 for implementation; this is not fabricated teammate approval. Configure `APP_TIMEZONE=Asia/Bangkok`; an absent zone disables checkout with safe503, and an invalid zone fails startup. Overdue remains Sprint 2: its planned derivation is `active AND business_current_date > due_on` (BR-08), with equality not overdue. Clients cannot choose the due date. See [F-05 contract and execution evidence](sprints/sprint-1/f-05-checkout-active-loan.md) for local-midnight/month/year boundary tests. Shared-baseline peer review remains required.
+**Date representation — user-confirmed for Issue #12 (2026-11-07):** store event timestamps as UTC instants; calculate `due_on` as the checkout's calendar date in `Asia/Bangkok` plus seven calendar days in Sprint 1 (A-03/BR-07; extended to `1–14` requested calendar days, default `7`, in Sprint 2 `F-11`). The user explicitly answered “ยืนยันใช้ Asia/Bangkok” in the implementation session, resolving SDS-OQ-03 for implementation; this is not fabricated teammate approval. Configure `APP_TIMEZONE=Asia/Bangkok`; an absent zone disables checkout with safe 503, and an invalid zone fails startup. Overdue is contracted in Sprint 2 (`F-07`): its derivation is `returned_at IS NULL AND business_current_date > due_on` (BR-08), with equality not overdue. Clients cannot choose the due date. See [F-05 contract and execution evidence](sprints/sprint-1/f-05-checkout-active-loan.md) for local-midnight/month/year boundary tests.
 
-Sprint 2 adds return, overdue, catalog management/search, full history and Custodian all-loan views (F-06–F-08); Sprint 3 reporting (F-09) reads the same persisted catalog/loan data. No separate reporting database, scheduled overdue mutation, penalties, or notification service is needed by the current baseline.
+Sprint 2 contracts add return (`F-06`), overdue & persistent in-app notifications (`F-07`), catalog management/search/filter/sort & full loan history (`F-08`), and request approval/bundles/1–14d duration/print slip (`F-11`) — all pending implementation in Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100); Sprint 3 reporting (`F-09`) reads the same persisted catalog/loan data. No separate reporting database, scheduled overdue mutation job, financial penalties, or external email/SMS notification service is used.
 
 ## 4. Database Setup, Migrations, and Synthetic Seed
 
-With `SDS-OQ-01` resolved (§2.1), runnable Sprint 1 setup, migration (`001`–`003`), seed, and test commands are documented in `README.md` and `package.json` (`NFR-08`). Sprint 2 schema migration `004` is contracted pending Issue #99. The baseline procedure below defines the required invariants:
+With `SDS-OQ-01` resolved (§2.1), runnable Sprint 1 setup, ordered SQL migrations (`001_identity_and_sessions.sql`, `002_equipment_catalog.sql`, `003_requests_and_loans.sql` in `server/src/db/migrations/`), idempotent synthetic seed (`server/src/db/seed.ts`), and verification commands are **implemented and active** on `d079bc6` (`README.md`, `package.json`, `NFR-08`). Sprint 2 schema migration `004_sprint2_domain_extensions.sql` is **contracted pending Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)**. The implemented procedure and invariants are:
 
-1. Install the pinned runtime/database tooling selected by the team. Configure an isolated development database and a separate test database; neither uses real university data.
-2. Supply ignored local environment values using a future `.env.example` containing names/placeholders only. Validate required DB/auth configuration before accepting requests; fail with a safe message when incomplete.
-3. Apply ordered, version-controlled migrations to an empty database, recording the schema version. Proposed order: User/role constraints → Equipment → BorrowingRequest → Loan/FKs/checks/unique request link → chosen auth storage. Sprint 2 adds the agreed return/retirement schema through new migrations.
-4. Run an explicit, repeatable demo seed command. Use stable synthetic record keys and insert missing fixtures without resetting existing loans, stock, passwords, or role assignments on a second run. Destructive reset must be a separately invoked local/test operation, never an application startup step.
-5. Start the app and verify login, catalog read, request, checkout, and read-back. Restart the app with the same store and compare persisted records. Later recreate the app container against that store to verify redeployment durability (Lab 5).
+1. **Pinned runtime & isolated databases (Implemented):** Node.js 24 + PostgreSQL 17 (`package.json` scripts) use an isolated development database (`DATABASE_URL`) and disposable test databases/schemas (`TEST_DATABASE_URL` / `CI_TEST_DATABASE_URL`); neither uses real university data.
+2. **Tracked `.env.example` & fail-closed config (Implemented):** `.env.example` provides non-secret variable names and placeholders only. `server/src/config/config.ts` validates required DB/auth/timezone settings before accepting requests and fails closed when incomplete.
+3. **Ordered SQL migrations (Implemented `001`–`003`; Contracted `004` in `#99`):** `npm run migrate` (and `npm run migrate:test`) applies version-controlled SQL migrations recorded in `schema_migrations`: `001` (`users`, `sessions`) → `002` (`equipment`) → `003` (`borrowing_requests`, `loans` with FKs, checks, and unique `request_id`). Sprint 2 adds `004_sprint2_domain_extensions.sql` (`image_url`, `catalog_status`, `request_bundles`, `approval_status`, `requested_days`, `return_requested_at`, `notifications`) in Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99).
+4. **Idempotent synthetic seed (Implemented):** `npm run seed` (`server/src/db/seed.ts`) inserts deterministic synthetic fixtures (`docs/sprints/sprint-1/fixtures.md`) using `ON CONFLICT DO NOTHING` so existing loans, stock, passwords, and role assignments are preserved on re-runs. Destructive reset is never an application startup step.
+5. **Restart & redeployment durability (Implemented & Verified):** Verified by `server/tests/restart-e2e.test.ts`, `npm run verify:sprint1`, and Lab 5/6 Cloud Run + Cloud SQL (`pewdiy-pg`) restart/redeploy checks (`C-05`, `UAT-08`).
 
-| Proposed seed fixture | Purpose / unresolved detail |
+| Implemented seed fixture (`server/src/db/seed.ts`) | Purpose & `OQ-01` synthetic-catalog status |
 |---|---|
-| Two distinct Borrower accounts and one Custodian account | Own-versus-other record tests and role-denied API calls; usernames are synthetic. Password values arrive through an ignored local/private seed procedure and are never written into tracked fixtures, this document, logs, or the deliverable PDF. |
-| Small deterministic equipment catalog | Include synthetic single-unit and multi-unit totals to exercise BR-03; actual names/categories await OQ-01. Example fixtures are test/demo data, not the team's approved initial inventory. |
-| Clean demo borrowing state | No pre-existing loans required for the happy path; create requests/loans through the API. Isolated tests may build deterministic held/zero-stock/rollback scenarios without mutating the demo store. |
+| `B-A` (`borrower_a`), `B-B` (`borrower_b`), `C-A` (`custodian_a`) | Two Borrower accounts and one Custodian account for own-vs-other record tests and role-denied API calls. Passwords are supplied via transient local/private seed environment variables (`SEED_BORROWER_A_PASSWORD`, etc.), hashed with Argon2id, and never written to Git, logs, or PDFs. |
+| `E-ONE` (`1/1`), `E-MANY` (`3/3`), `E-ZERO` (`0/0`) | Deterministic synthetic catalog exercising single-unit exclusivity (`BR-03`), multi-unit pooling (`A-12`), and zero-stock rejection (`BR-01`/`BR-02`). Under `SRS OQ-01`, these fixtures remain explicitly labeled synthetic test/demo data; room staff can add/edit actual room items in Sprint 2 via `F-08` (`FR-09`). |
+| Clean initial borrowing state | Zero pre-existing requests or loans after fresh seed; all requests and loans are created through the transactional service layer. |
 
-Seed only salted password hashes; generate hashes with the selected password library from transient local input. Fixture identity/content is repeatable even though secure hash salts vary. Protect seed logs from credential/hash output. The `project_deliverable_1_v1.pdf` §4.4 private-access/seed-procedure option avoids publishing demo passwords in Git or the PDF.
+Seed only salted Argon2id password hashes; generate hashes from transient local/CI input and protect logs from credential/hash output (`project_deliverable_1_v1.pdf` §4.4).
 
-**Proposed constraints/indexes:** FK-backed owner/item lookups; unique normalized username and `Loan.request_id`; positive request/loan quantities and nonnegative totals; request index on `(borrower_id, created_at)` and Equipment FK; loan lookup by request and active/due date as supported by the chosen schema. Cross-row stock limits require the transaction protocol, not merely a per-row `CHECK`. Preserve migration history; test each revision on an empty database and an upgraded fixture database.
+**Implemented constraints & indexes (`001`–`003`, plus `004` contracted in `#99`):** FK-backed owner/item lookups; unique username and `loans.request_id`; positive request/loan quantities and `0 <= quantity_available <= quantity_total` checks; indexes on request borrower/submission timestamp and loan request/borrower/equipment keys. Cross-row stock limits are enforced by the `SELECT ... FOR UPDATE` transaction protocol (§3.3) in addition to row `CHECK` constraints.
 
 ## 5. Main Screens and Shared UI Behavior
 
-All routes below are **proposed UI names**. Role-based visibility helps navigation; §6 controls API access regardless of the UI.
+Sprint 1 routes (`/login`, `/catalog`, `/equipment/:id`, `/requests`, `/loans`, `/custodian/requests`) are **implemented in React 19 (`client/src/`)** on `d079bc6`. Sprint 2/3 screens and enhancements (`/requests/new`, loan return/overdue/history tabs, catalog CRUD modal, notification bell, `/reports`) are **contracted pending Issue [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)**. Role-based visibility helps navigation; §6 controls API access regardless of the UI.
 
-| Screen / navigation | Role and data shown | Feature / allocation |
+| Screen / navigation | Role and data shown | Feature / allocation & status |
 |---|---|---|
-| Login → catalog | Both roles; generic invalid-credentials feedback; fetch current-user identity after login/reload | F-01, Sprint 1 |
-| Catalog → item detail → request form | Both roles read name/category/quantity/availability; only Borrower submits a request | F-02/F-03/F-04, Sprint 1; search/filter F-08 in Sprint 2 |
-| My requests | Borrower, own submitted/checked-out requests only | F-04, Sprint 1 |
-| My active loans | Borrower, own item/quantity/checkout/due data | F-05, Sprint 1; full history F-08 in Sprint 2 |
-| Submitted requests → checkout result | Custodian, submitted requests and checkout action; show the newly created loan | F-04/F-05, Sprint 1 |
-| Loan management / return / overdue | Custodian, all loans and return/overdue controls | F-06/F-07/F-08, Sprint 2 |
-| Catalog management / history | Custodian catalog writes; Borrower own full history | F-08, Sprint 2 |
-| Inventory reports | Custodian, inventory/loan/overdue summaries | F-09, Sprint 3 |
+| Login → catalog | Both roles; generic invalid-credentials feedback; fetch current-user identity after login/reload | F-01, Sprint 1 (**Implemented**) |
+| Catalog → item detail → request form | Both roles read name/category/quantity/availability; only Borrower submits a request | F-02/F-03/F-04, Sprint 1 (**Implemented**); search/filter/sort & item images F-08 in Sprint 2 (**Contracted `#100`**) |
+| My requests & Create request | Borrower, own requests; Sprint 2 adds multi-item bundle creation (`/requests/new`), purpose, 1–14d duration, and cancel | F-04, Sprint 1 (**Implemented**); Sprint 2 extensions F-11 (**Contracted `#100`**) |
+| My active loans & loan slip | Borrower, own item/quantity/checkout/due data; Sprint 2 adds return notice (`request-return`), full history, and printable loan slip | F-05, Sprint 1 (**Implemented**); F-06/F-08/F-11 in Sprint 2 (**Contracted `#100`**) |
+| Submitted requests → approve / reject / checkout | Custodian, submitted requests and checkout action; Sprint 2 adds `approve`/`reject` gate (`A-11`) before checkout | F-04/F-05, Sprint 1 (**Implemented**); F-11 in Sprint 2 (**Contracted `#100`**) |
+| Loan management / return / overdue | Custodian, all loans (`ACTIVE`, `RETURN_PENDING`, `OVERDUE`, `RETURNED`) and confirm-return controls | F-06/F-07/F-08, Sprint 2 (**Contracted `#100`**) |
+| Catalog management / notifications | Custodian catalog CRUD (`ACTIVE`/`RETIRED`, `image_url`); persistent in-app notification bell for both roles | F-07/F-08, Sprint 2 (**Contracted `#100`**) |
+| Inventory reports (`/reports`) | Custodian, inventory/loan/overdue summary cards and tables | F-09, Sprint 3 (**Contracted `#100`**) |
 
 Provide visible navigation appropriate to the current server-returned role and an accessible logout action. Do not expose a general Custodian all-loans list in Sprint 1 merely because the checkout response includes a created loan (FR-18 is Sprint 2).
 
-| State | Proposed shared behavior |
+| State | Shared UI/API behavior (Implemented in Sprint 1; carried across Sprint 2/3 contracts) |
 |---|---|
-| Validation | Show field errors next to inputs, preserve safe entered data, and repeat validation on the server. Quantity choices await OQ-02; never calculate the authoritative due date/availability in the browser. |
+| Validation | Show field errors next to inputs, preserve safe entered data, and repeat validation on the server. Multi-unit quantity bounds (`1..quantity_available`, `OQ-02` / `A-12`) are enforced; never calculate the authoritative due date/availability in the browser. |
 | Loading / mutation | Indicate loading, prevent duplicate form submission while pending, and update from the committed API response. Do not show checkout success before commit. |
 | Empty | Distinguish an empty catalog, no own requests/loans, and zero availability. Zero availability is a valid state; disable request affordance with an explanation. |
 | Conflict | Explain that stock or request state changed; re-fetch current availability/request state. No automatic repeated checkout after an ambiguous response. |
@@ -207,9 +208,9 @@ Provide visible navigation appropriate to the current server-returned role and a
 
 ## 6. API Conventions and Role/Record Access
 
-### 6.1 Proposed API Conventions
+### 6.1 API Conventions (Implemented in Sprint 1; Extended by Sprint 2/3 Contracts)
 
-Use a consistent prefix such as `/api`, JSON request/response bodies, and resource-oriented names such as `equipment`, `requests`, and `loans`. Authentication operations cover login, current-user and logout. These names are **proposals**, not final endpoint contracts; exact paths/methods/payloads, pagination and test IDs are fixed in [D1-05].
+All endpoints use `/api/*`, JSON request/response bodies, and resource-oriented routes (`/api/auth/*`, `/api/equipment/*`, `/api/requests/*`, `/api/loans/*` implemented in Sprint 1; `/api/request-bundles/*`, `/api/notifications/*`, `/api/reports/summary` contracted for Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). Exact paths, payloads, and test IDs live in `docs/sprints/sprint-1/`, `docs/sprints/sprint-2/`, and `docs/sprints/sprint-3/`.
 
 Success returns a documented `data` object/list (or an explicitly documented empty response). Errors use a consistent safe envelope, for example:
 
@@ -261,7 +262,7 @@ Feature contracts must exercise every existing protected endpoint with unauthent
 
 ## 7. Credentials and Authentication Lifecycle
 
-### 7.1 Shared Requirements and Proposed Credential Handling
+### 7.1 Shared Requirements and Implemented Credential Handling
 
 FR-01–FR-03, BR-10 and NFR-03 require real login/current-user/logout and salted password hashes. **Selected & implemented (`SDS-OQ-01/02`, PR #22):** Argon2id via `@node-rs/argon2` (`server/src/services/password.ts`), verified via constant-time hash comparison and never returned or logged. Fast general-purpose hashing or reversible password encryption is prohibited. See [OWASP Password Storage guidance](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
 
@@ -271,22 +272,22 @@ Login accepts credentials over HTTPS when deployed and returns the same safe err
 
 **Resolved & implemented in Sprint 1 (PR #22, verifying AC-C-04):** PostgreSQL-backed opaque server session (`sessions` table storing SHA-256 hashed session key) delivered via `HttpOnly` cookie (`pew_session`, `SameSite=Lax`, `Secure=true` over HTTPS), `Origin`/`Referer` anti-CSRF (`APP_ORIGIN`), idle timeout `60` minutes (`SESSION_IDLE_MINUTES`), and hard absolute lifetime `480` minutes (`SESSION_ABSOLUTE_MINUTES`), verified by `server/tests/auth.test.ts`, `session.test.ts`, and `auth-routes.test.ts`. The table below preserves the historical D1 design comparison that led to selecting server sessions over stateless tokens:
 
-| Lifecycle | Proposed server-session option | Proposed token option |
+| Lifecycle | Selected server-session strategy (**Implemented in PR #22**) | Historical token alternative *(Not selected)* |
 |---|---|---|
-| Creation | After credential verification, generate a new unpredictable opaque session ID; associate user, creation/expiry and revocation state in durable/shared session storage | Issue signed token with validated subject/expiry and, if needed, a server-tracked session/token identifier; signing algorithm/key policy must be fixed |
-| Transport | Cookie with `HttpOnly`, `Secure` when deployed, appropriate `SameSite`/path; protect state-changing requests against CSRF | Document bearer-header or protected-cookie transport, safe client storage and XSS considerations; cookie transport still needs CSRF controls |
-| Each protected request | Validate session existence, expiry/revocation and current user/role | Validate signature/allowed algorithm/issuer/audience as applicable, expiry, server revocation/session status and trusted role policy |
-| Expiry | Enforce documented idle and absolute expiry on the server | Enforce access-token expiry and explicit refresh policy if refresh exists; refresh tokens are not assumed by this SDS |
-| Logout | Invalidate the server session and clear browser cookie/private UI state; replay of its old ID is denied | Revoke the current session/token identifier server-side and clear client state; specify how already issued access credentials are rejected |
-| Scaling/durability | DB or another approved shared store; process-only memory is insufficient for a multi-instance deployment | Revocation/session state must also be shared if used; token-only validation cannot provide immediate revocation by clearing the browser |
+| Creation | After Argon2id credential verification, generate 32-byte CSPRNG opaque session token; store SHA-256 `token_hash`, `user_id`, `expires_at`, and `absolute_expires_at` in PostgreSQL `sessions` | *(Historical alternative)* Issue signed token with validated subject/expiry |
+| Transport | `HttpOnly` cookie (`pew_session`, `SameSite=Lax`, `Secure` when deployed); state-changing requests protected by `Origin`/`Referer` anti-CSRF (`APP_ORIGIN`) | *(Historical alternative)* Bearer-header or cookie transport |
+| Each protected request | Validate session existence in PostgreSQL, idle/absolute expiry, revocation state, and current user/role | *(Historical alternative)* Validate signature, expiry, and revocation status |
+| Expiry | Enforced server-side: `60` min idle (`SESSION_IDLE_MINUTES`) and `480` min absolute (`SESSION_ABSOLUTE_MINUTES`) | *(Historical alternative)* Access-token expiry + refresh policy |
+| Logout | Delete/invalidate server session row in PostgreSQL and clear browser cookie/private UI state; replay of old cookie is denied (`401`) | *(Historical alternative)* Server-side token revocation list |
+| Scaling/durability | Shared PostgreSQL `sessions` table survives process restart and multi-instance Cloud Run scaling (`TEST-F01-16`, `UAT-08`) | *(Historical alternative)* Shared revocation store required |
 
 **Historical tradeoff rationale:** server sessions were selected for a single-origin browser application requiring observable server-side session invalidation and logout replay denial (FR-02). Exact cookie names, timeout durations (`60`/`480`), anti-CSRF checks, and `sessions` schema are closed under `SDS-OQ-02` and tested in Sprint 1 (`TEST-F01-07/08/15/16`). Any future Sprint 2/3 auth extensions remain out of current scope until explicitly contracted.
 
 ## 8. Configuration and Deployment Design
 
-### 8.1 Proposed Configuration Inventory
+### 8.1 Active Configuration Inventory (`.env.example` & `server/src/config/config.ts`)
 
-Names below map to the active configuration contract implemented in `server/src/config/config.ts` and documented in `.env.example` (no secret values are committed).
+Names below map to the active configuration contract implemented in `server/src/config/config.ts` and documented in tracked `.env.example` (no secret values are committed).
 
 | Configuration | Classification / purpose |
 |---|---|
@@ -295,48 +296,44 @@ Names below map to the active configuration contract implemented in `server/src/
 | `APP_ORIGIN` | Non-secret trusted browser origin for anti-CSRF `Origin`/`Referer` validation |
 | `APP_TIMEZONE` | Non-secret business date zone; `Asia/Bangkok` (fail-closed if invalid/absent) |
 | `SESSION_IDLE_MINUTES`, `SESSION_ABSOLUTE_MINUTES`, `SESSION_COOKIE_NAME`, `SESSION_COOKIE_SECURE` | Non-secret session policy inputs (`60`, `480`, `pew_session`, `true` over HTTPS; resolved in `SDS-OQ-02`) |
-| Session-protection secret or token signing key, if required by selected library | Secret; choose only inputs used by the selected auth mechanism, no hard-coded defaults |
-| Demo credential seed inputs | Secret local/private inputs used only during explicit seed; never logged or stored as plaintext fixtures |
-| Deployment project/region/service/database/image identifiers | Non-secret identifiers to record after Lab 5 choices; not proof that resources exist |
+| `SEED_BORROWER_A_PASSWORD`, `SEED_BORROWER_B_PASSWORD`, `SEED_CUSTODIAN_A_PASSWORD` | Secret local/private inputs used only during explicit `npm run seed`; never logged or stored as plaintext fixtures |
+| `GCP_PROJECT_ID`, `GCP_REGION`, `CLOUD_RUN_SERVICE`, `CLOUD_SQL_INSTANCE`, `ARTIFACT_REGISTRY_REPO` | Non-secret deployment identifiers documented in `docs/labs/lab-05/deployment.md` (`cpe334-2026-pew-diy`, `asia-southeast1`, `pewdiy` / `pewdiy-uat`, `pewdiy-pg`) |
 
-Use ignored local configuration and a future tracked `.env.example` with placeholders; inject deployed secrets through an approved secret facility. Never bake credentials into an image, Git file, PDF, browser bundle, error or log. The app's database account uses only required data permissions; schema changes run through a controlled migration step rather than giving every app instance unrestricted schema rights.
+Use ignored local `.env` and the tracked `.env.example` template with placeholders; inject deployed secrets through GCP Secret Manager (`docs/labs/lab-05/deployment.md`). Never bake credentials into an image, Git file, PDF, browser bundle, error or log. The app's database account uses only required data permissions; schema changes run through an explicit migration step (`npm run migrate` / Cloud Run migration job) rather than resetting data on startup.
 
-### 8.2 Proposed Docker/GCP Topology — Lab 5 Implementation Pending
+### 8.2 Docker/GCP Topology — Implemented in Lab 5 (`SDS-OQ-04` Resolved)
 
-**Confirmed course boundary:** Part C needs a feasible design now; Docker, mandatory CI and real GCP setup are later work. No Dockerfile, CI workflow, GCP resource or actual deployment is delivered by this issue.
+**Implemented baseline (`SDS-OQ-04` resolved in Lab 5, PR #57 / PR #79):** While Part C originally captured a pre-Lab 5 candidate topology at Revision 1, the team subsequently implemented and verified the full containerization, CI/CD, and GCP Cloud Run + Cloud SQL topology documented in [Lab 5 Deployment Guide](labs/lab-05/deployment.md):
 
-**Subsequent CI implementation:** `.github/workflows/ci-docker.yml` (`CI & Docker Build`, job id `test-and-docker`) now defines build/type checks and tooling, server/API, client and three-viewport Chromium regression checks using Node24.15.0 and disposable PostgreSQL17, checks the `deploy/` scripts offline, and verifies the production Dockerfile builds. `npm run test:ci` records sanitized results outside the assessed Sprint1 evidence directory. See README Continuous integration for reproduction and required-check setup. This establishes PR CI configuration; repository required-check enforcement and GCP deployment remain separate verification/administration steps. It does not bypass the existing F-10 clean-source rehearsal/audit or human release gates.
+- **CI & Docker readiness (`C-01`–`C-03`):** `.github/workflows/ci-docker.yml` (`CI & Docker Build`, job `test-and-docker` + `Docker image readiness (C-03)`) runs TypeScript checks, build, server/API, client, and three-viewport Chromium E2E suites against Node 24 and disposable PostgreSQL 17, tests `deploy/` scripts offline, builds the multi-stage root `Dockerfile`, boots the container against PostgreSQL (`/api/ready` + SPA shell check), and verifies no `.env` is baked into the image.
+- **Automated GCP Release Pipeline (`C-04`–`C-06`):** `.github/workflows/deploy.yml` authenticates to GCP via keyless Workload Identity Federation (WIF), pushes immutable images tagged with the commit SHA to Artifact Registry (`asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/app`), runs database migrations against Cloud SQL PostgreSQL 17 (`pewdiy-pg`), and deploys to Cloud Run (`pewdiy` production and `pewdiy-uat` isolated UAT).
 
-| Component | Proposed plan and rationale | Open decision |
+| Component | Implemented Lab 5 selection & evidence (`docs/labs/lab-05/deployment.md`) | Status (`SDS-OQ-04`) |
 |---|---|---|
-| Application packaging | One reproducible application image can serve UI/API for the modular monolith; configure at runtime and bind the platform HTTP port | Selected stack determines build/start procedure |
-| Container image storage | GCP Artifact Registry or the approved Lab 5 registry, tied to release commit/image identity | Project/access/region and actual lab guidance |
-| HTTP application hosting | Candidate: Cloud Run with HTTPS ingress; alternative: container on Compute Engine under lab guidance | Service choice, cost/access and operational fit remain SDS-OQ-04 |
-| Persistent database | Candidate for a relational engine: Cloud SQL; VM-hosted DB on durable disk is another option requiring backup/operations work | Engine, connection method and storage lifecycle |
-| Secret/configuration delivery | Approved secret facility (candidate: Secret Manager) plus non-secret runtime configuration | IAM/access and chosen auth/DB requirements |
+| Application packaging | Multi-stage root `Dockerfile` + `.dockerignore` building `dist/client` and `dist/server`, listening on `0.0.0.0:$PORT` as non-root `node` user | **Resolved & Implemented** (`C-03`, PR #57) |
+| Container image storage | GCP Artifact Registry (`asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/app`), immutable digest per release SHA | **Resolved & Implemented** (`C-06`, PR #57/#79) |
+| HTTP application hosting | GCP Cloud Run (`pewdiy` active revision `pewdiy-00008-mfk`; isolated UAT `pewdiy-uat` revision `pewdiy-uat-00003-8c5`) with managed HTTPS ingress | **Resolved & Implemented** (`C-04`/`C-06`) |
+| Persistent database | GCP Cloud SQL for PostgreSQL 17 (`pewdiy-pg`, Unix socket `/cloudsql/cpe334-2026-pew-diy:asia-southeast1:pewdiy-pg`) | **Resolved & Implemented** (`C-05`, `UAT-08`) |
+| Secret/configuration delivery | GCP Secret Manager (`DATABASE_URL`) + Cloud Run env vars (`APP_ORIGIN`, `APP_TIMEZONE=Asia/Bangkok`, session settings) + WIF CI/CD | **Resolved & Implemented** (`R-02`, `R-07`) |
 
-Cloud Run's writable container filesystem does not survive instance shutdown, so a DB file inside that filesystem cannot be the durable store. Its ingress must listen on the configured `PORT` at `0.0.0.0`. These constraints support the proposed external-store topology; they do not select Cloud Run for the team. [Cloud Run container runtime contract](https://docs.cloud.google.com/run/docs/container-contract).
-
-If the team selects Cloud Run with Cloud SQL, use the documented connection mechanism and least-privilege service identity; plan connection limits for app scaling. This pairing is a feasible candidate, not provisioned infrastructure. [Cloud SQL connections from Cloud Run](https://docs.cloud.google.com/sql/docs/postgres/connect-run).
-
-On any topology, replacing the application image/container must preserve the same durable catalog, requests and loans (BR-11/NFR-04). Run migrations as an explicit deployment step, never reset/reseed production on every startup. Record actual deployed version, configuration procedure, migration result and read-back evidence after Lab 5 deployment exists. UI screenshots alone do not prove durability.
+Cloud Run's writable container filesystem is ephemeral, so all durable state lives in Cloud SQL PostgreSQL (`pewdiy-pg`). Replacing the application container revision preserves the durable catalog, requests, loans, and sessions (`BR-11`/`NFR-04`), verified across restart and redeployment (`C-05`, `UAT-08`). Migrations run as an explicit step and never reset or reseed existing records on startup.
 
 ## 9. Architecture Decision Register and Verification Handoff
 
-`AD-C-xx` identifies Part C design decisions/proposals without changing SRS `A-xx` IDs. Only baseline-backed rows are Confirmed; new design choices await team review.
+`AD-C-xx` identifies Part C design decisions without changing SRS `A-xx` IDs. All Sprint 1 and Lab 5 architecture decisions (`AD-C-01`–`AD-C-08`) are **Resolved & Implemented** on `d079bc6`; Sprint 2/3 contract extensions are noted where applicable:
 
-| ID / status | Decision or proposal | Rationale / consequence and baseline |
+| ID / status | Decision | Rationale / consequence and baseline |
 |---|---|---|
-| AD-C-01 — Confirmed basis | Quantity Tracking and exclusive-item protection | SRS A-01/A-04, BR-03 → Equipment quantities and held-unit invariant; no serial-level inventory |
-| AD-C-02 — Confirmed basis | Direct Checkout retains requests | SRS A-02, FR-11–FR-14 → persist intent then Custodian checkout; no approval subsystem |
-| AD-C-03 — Confirmed basis | Seven-calendar-day due date | SRS A-03/BR-07 → server-assigned date; Asia/Bangkok user-confirmed for #12 (rev 6) |
-| AD-C-04 — Proposed | Modular monolith with logical UI/API/DB boundaries | Fits course §5.1 and small team; business rules remain server-side without extra services |
-| AD-C-05 — Proposed | Derived availability and serialized Equipment writes | Avoid competing stock counters; enforce BR-03/NFR-05/06 with DB transactions, not browser state |
-| AD-C-06 — Proposed | One request → at most one loan; ownership through request | Prevent duplicate fulfillment and inconsistent borrower/item links; quantity/split fulfillment contract awaits OQ-02/[D1-05] |
-| AD-C-07 — Resolved (rev 3) | Exact stack and authentication strategy | Resolved: Node.js/TypeScript/Express/PostgreSQL + server session/cookie/trusted-origin (team decision D1/D2; PR #22) — see §2.1 |
-| AD-C-08 — Proposed | Durable store separate from application lifecycle | BR-11/NFR-04 and later GCP design; no data stored only in app memory/container filesystem |
+| AD-C-01 — Confirmed & Implemented | Quantity Tracking and exclusive-item protection | SRS A-01/A-04, BR-03 → Equipment quantities and held-unit invariant; no serial-level inventory |
+| AD-C-02 — Implemented (S1) / Extended by `A-11` (S2) | Direct Checkout in Sprint 1 (`A-02`); Non-reserving Approval Workflow in Sprint 2 (`A-11`) | Sprint 1 (`d079bc6`) implements Direct Checkout (`SUBMITTED → CHECKED_OUT`). Sprint 2 contracts (`f-11-approval-bundles-notifications.md`, pending `#99`/`#100`) add `PENDING → APPROVED/REJECTED/CANCELLED → CHECKED_OUT` while preserving non-reservation (`BR-12`) |
+| AD-C-03 — Confirmed & Implemented | Server-assigned due date in `Asia/Bangkok` (`7` days in S1; `1–14` days contracted in S2) | SRS A-03/BR-07 → `APP_TIMEZONE=Asia/Bangkok` confirmed (#12, rev 6); Sprint 2 extends `requested_days` to `1..14` (default `7`) |
+| AD-C-04 — Resolved & Implemented | Modular monolith with logical UI/API/DB boundaries | React 19 SPA (`client/`) + Express 5 (`server/`) packaged in one container (`Dockerfile`); business rules and RBAC enforced server-side |
+| AD-C-05 — Resolved & Implemented | Transactional availability and serialized Equipment writes (`SELECT ... FOR UPDATE`) | Enforce BR-03/NFR-05/06 with PostgreSQL row-locking transactions (`server/src/services/loan.ts`), not browser state |
+| AD-C-06 — Resolved & Implemented | One `borrowing_requests` row → at most one `loans` row (`UNIQUE (request_id)`); full-quantity checkout & return (`A-12`) | Prevents duplicate fulfillment; `OQ-02` / `A-12` closed with multi-unit up to stock and full-quantity return only (Sprint 2 `request_bundles` groups per-item requests) |
+| AD-C-07 — Resolved & Implemented (rev 3) | Exact stack and authentication strategy | Node.js 24/TypeScript/Express 5/PostgreSQL 17/React 19 + Argon2id + DB-backed `HttpOnly` session cookie + trusted-origin anti-CSRF (PR #22 & PR #33) — see §2.1 & §7.2 |
+| AD-C-08 — Resolved & Implemented (Lab 5) | Durable PostgreSQL store separate from container lifecycle | Verified locally (`restart-e2e.test.ts`) and on GCP Cloud Run + Cloud SQL (`pewdiy-pg`, `docs/labs/lab-05/deployment.md`) |
 
-The following are **planned checks for [D1-05]/[D1-06]**, not executed tests or invented TEST IDs. [Part B traceability](traceability.md) remains the authoritative requirement/sprint allocation.
+Sprint 1 verification checks below are **implemented and passing** in `server/tests/`, `client/src/test/`, and `e2e/` (see [Part F evidence](verification/sprint-1/README.md)); Sprint 2/3 checks are **contracted** in `docs/sprints/sprint-2/` and `docs/sprints/sprint-3/` (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). [Part B traceability](traceability.md) remains authoritative for requirement-to-sprint allocation.
 
 | Design concern / basis | Future verification to capture |
 |---|---|

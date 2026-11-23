@@ -59,5 +59,5 @@
 ---
 
 ## 5. Definition of Done & Revision History
-- Deliverable 2 Part C requires `AC-F09-01..03` implemented and tested (`TEST-F09-01..03`) and `AC-F09-04..05` explicitly tracked in the Remaining-Work Plan for 13 December.
-- **Rev 1 (2026-11-23):** Initial Sprint 3 contract created during Sprint 2 per `project_deliverable_2_v1.pdf` §3.3.
+- Deliverable 2 Part C targets `AC-F09-01..03` for implementation and testing in Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100) (`TEST-F09-01..03` — currently **Contracted / Planned** in this Docs PR) and tracks `AC-F09-04..05` in the Remaining-Work Plan for 13 December.
+- **Rev 1–2 (2026-11-23):** Initial Sprint 3 contract created during Sprint 2 per `project_deliverable_2_v1.pdf` §3.3; status marked Contracted/Planned pending Issues #99/#100.
