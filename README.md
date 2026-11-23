@@ -9,6 +9,7 @@ A university equipment-borrowing system for the D.I.Y. Room, which supports stud
 - [Software Requirements Specification (SRS)](docs/srs.md)
 - [System-Level Design Specification (SDS)](docs/system-sds.md)
 - [Sprint 1 Engineering Contracts (Part E)](docs/sprints/sprint-1/README.md) — feature specifications, AC/STS mapping and Product DoD
+- [Lab 6 Sprint 1 UAT handoff](docs/labs/lab-06/README.md) — executable Product Team cases, safe handoff requirements and evidence templates (Issue [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80))
 
 ## Project Structure
 
@@ -125,7 +126,7 @@ For the normal release path in group specification §5.3, a repository administr
 
 ## Sprint 1 verification and handoff
 
-F-01 through F-05 and F-10 are merged into sprint staging, together with PR #41 UI fixes and PR #43 CI. Release PR #42 proposes candidate `d291873c10c2021d4eb5ebe733aa68012f813678` from `sprint/1-staging` into `main` at `7bf6c8d7d1a220dbc05526c7b980fb31bde85d2c` (Refs #6 #13). [Part F evidence](docs/verification/sprint-1/README.md) records current candidate164 server/74 client/57 browser passes,49/49 application AC, setup and source fingerprints; older8676957 results are historical. The pack also contains screenshots, test/TDD/workflow references, contributions/AI-use disclosure and known gaps. Candidate verification is distinct from a main release. Current-head hosted checks/re-review, required-check enforcement, A-12 shared-team ratification, documented independent README repetition, final board/disclosure/TDD checks, main release/rerun and the submission PDF remain explicit gates.
+F-01 through F-05 and F-10 were integrated into `sprint/1-staging` together with PR #41 UI fixes and PR #43 CI, and historical Sprint 1 release [PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) merged candidate `d291873c10c2021d4eb5ebe733aa68012f813678` into `main` at `d8e3cc6a5cb19c2b8d034fb845a2aae0b99219e4` (2026-11-09 UTC). [Part F evidence](docs/verification/sprint-1/README.md) records the candidate `d291873` results (164 server/74 client/57 browser passes, 49/49 application AC, setup and source fingerprints; older `8676957` results are historical). Following Lab 5 deployment PR #79, the current deployed `main` commit is `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` (Cloud Run `pewdiy-00008-mfk` and isolated UAT `pewdiy-uat-00003-8c5`). Merging PR #42 or passing CI does not close remaining acceptance/process gates: A-12 shared-team ratification, documented independent README repetition, final board/disclosure/TDD checks, clean-source verification/audit on the release commit, and formal Lab 6 UAT sign-off / Part B remain explicit pending gates.
 
 ## Borrowing Requests (F-04 / Issue #11)
 

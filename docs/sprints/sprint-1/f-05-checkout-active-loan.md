@@ -1,6 +1,6 @@
 # F-05 — Checkout and Active Loan Contract
 
-> **Revision:** 3 — 2026-11-07 | **Contract approval:** Pending shared-baseline peer review; Direction A confirmed | **Implementation status:** Implemented locally on `feature/12-checkout-active-loan` (Issue #12); no commit/push | **Test status:** EXECUTED locally — see [evidence](tdd-evidence-f05.md); not a release/DoD claim
+> **Revision:** 3 — 2026-11-07 | **Contract approval:** Pending shared-baseline ratification; Direction A confirmed | **Implementation status:** Implemented in [PR #37](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37), commit `70e7b5e`; included in deployed source `b03c904` | **Test status:** Local candidate evidence is not release evidence; see the [exact-commit review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37#pullrequestreview-5804916583) and [traceability note](tdd-evidence-f05.md#release-traceability)
 >
 > Implementation Issue: [#12 / D1-06.5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/12); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). Implementation choices: SRS A-12 (multi-unit up to stock, no additional per-person cap, full return per loan) and explicitly user-confirmed Asia/Bangkok calendar policy. A-12 shared-team ratification evidence remains pending as stated in PR #36's final review; implementation success does not close that governance gate. Stack/session decisions remain SDS rev 3 / PR #22.
 
@@ -63,7 +63,7 @@ Loan response: `id`, `request_id`, projected `borrower_id`/`equipment_id`, `quan
 
 ## 5. Software Test Specification
 
-Use [fixtures](fixtures.md), separate DB connections for races and explicit server-clock control. Local execution uses PostgreSQL18.4; selected PostgreSQL17 verification remains for peer/CI, and is not inferred from prior PR results. Per-STS execution is recorded in [F-05 evidence](tdd-evidence-f05.md); the table below retains the stable test design.
+Use [fixtures](fixtures.md), separate DB connections for races and explicit server-clock control. The local candidate execution used PostgreSQL18.4; the independent reviewer separately reports PostgreSQL17.11 verification of commit `70e7b5e` in [PR #37](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37#pullrequestreview-5804916583). That review does not make the distinct local candidate results evidence for the deployed source. Per-STS local execution is recorded in [F-05 evidence](tdd-evidence-f05.md); the table below retains the stable test design.
 
 | Test ID | Linked AC | Level | Preconditions / input | Action | Expected result |
 |---|---|---|---|---|---|
@@ -86,7 +86,7 @@ Use [fixtures](fixtures.md), separate DB connections for races and explicit serv
 
 ## 6. Feature DoD and Revision
 
-Satisfy [Product DoD](product-dod.md) and all mapped AC/tests with the tested version identified. Local work is uncommitted: [source fingerprints](f05-source-manifest.json) identify the candidate against base `de63590`; no historical RED/GREEN commits are fabricated. Retain DB race results, rollback, ownership, date boundaries and actual RED/GREEN output. User-confirmed quantity/timezone choices permit this implementation; shared-team A-12 ratification and baseline peer review remain separate gates. Synthetic fixtures do not close OQ-01. Commit/review/integration/released-version evidence remains pending; deployment follows F-10/Lab 5 allocation.
+Satisfy [Product DoD](product-dod.md) and all mapped AC/tests with the tested version identified. The [source fingerprints](f05-source-manifest.json) preserve a local candidate against base `de63590`; no historical RED/GREEN commits are fabricated. That candidate differs from the implementation committed in PR #37, so its outputs are not release evidence. The deployed implementation is traceable through PR #37 and its exact-commit review as recorded above. User-confirmed quantity/timezone choices permit this implementation; shared-team A-12 ratification and shared-baseline approval remain separate gates. Synthetic fixtures do not close OQ-01.
 
 | Rev | Change | Basis |
 |---|---|---|

@@ -1,6 +1,6 @@
 # F-05 local implementation and verification evidence
 
-Issue [#12](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/12), contract [F-05 revision3](f-05-checkout-active-loan.md). Local candidate on `feature/12-checkout-active-loan`, based on merged PR #36 (`de63590be05c8bb22c594be2ac6affe69f73ad8c`). No commit/push/PR/review/release was performed for this change. [SHA-256 source manifest](f05-source-manifest.json) identifies the tested candidate; HEAD alone does not identify these uncommitted changes.
+Issue [#12](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/12), contract [F-05 revision3](f-05-checkout-active-loan.md). This file preserves local TDD results for a candidate on `feature/12-checkout-active-loan`, based on merged PR #36 (`de63590be05c8bb22c594be2ac6affe69f73ad8c`). The candidate itself was uncommitted and is identified by the [SHA-256 source manifest](f05-source-manifest.json); it is not the committed/released implementation. The manifest differs from PR #37's implementation commit in 10 of 20 files, so the local results below do not validate the deployed release.
 
 ## Decisions and authoritative sources
 
@@ -8,6 +8,12 @@ Issue [#12](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/12), contrac
 - Use SRS FR-14/15/16, BR-02/03/07/11/12 and NFR-04/05/06; F-05 rev2 was already recorded before implementation. No approval/return/overdue/reporting scope was added.
 - PR #36 is merged. Its [final review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/36#pullrequestreview-5804196743) explains earlier 85/6 fresh-DB versus 91/0 residue-DB results; neither is relabeled as this run. A-12 remains user-confirmed with team ratification pending shared-baseline closure. Apply multi-unit up to stock, no additional borrower cap and full checkout per request.
 - During this implementation the user explicitly confirmed **“ยืนยันใช้ Asia/Bangkok”** in response to the calendar-policy question. SDS revision6 records UTC event instants, Asia/Bangkok checkout date +7 calendar days, and fail-closed missing/invalid timezone. This is user confirmation, not an invented teammate approval.
+
+## Release traceability
+
+The committed F-05 implementation is PR #37 at [`70e7b5e`](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/commit/70e7b5ef02b92b26745140f0485ad796ffbc52cc), merged into `sprint/1-staging` at `5b064ea`. It is an ancestor of deployed source commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7`. The F-05 request/loan route and service files are unchanged between those commits; the later `auth-routes.ts` change adds readiness routing.
+
+For the committed implementation, use the [independent PR #37 review](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37#pullrequestreview-5804916583), which reports testing the exact commit `70e7b5e` on PostgreSQL 17.11 / Node 24.19: 115 server, 70 client, and 51 browser tests passed, with builds and typecheck passing. These are reviewer-reported results for `70e7b5e`, not results from the local candidate below or a fresh run against deployed commit `b03c904`. They are implementation verification, not independent UAT.
 
 ## Actual results
 
@@ -74,7 +80,7 @@ Test Files 1 passed (1)
 Tests 12 passed (12)
 ```
 
-The final fresh-DB full-suite run includes those12 unchanged assertions and 12 real-DB F-05 scenarios. These are actual local execution excerpts, not fabricated Git history or a collection/setup failure. Base SHA and final source fingerprint distinguish the uncommitted final version; a reviewed committed-version rerun remains part of the handoff.
+The final fresh-DB full-suite run includes those12 unchanged assertions and 12 real-DB F-05 scenarios. These are actual local execution excerpts, not fabricated Git history or a collection/setup failure. The base SHA and final source fingerprint distinguish this uncommitted candidate; a comparison with PR #37 confirms that this candidate is not the committed/released implementation. The exact-commit reviewer results are recorded separately above.
 
 ## Reproduction
 
@@ -93,4 +99,4 @@ npx --yes --package=node@24.15.0 node node_modules/vitest/vitest.mjs run
 
 For browser tests, use a separately migrated test DB and fresh locally supplied seed passwords. Set `PORT=3143`, `APP_ORIGIN=http://localhost:3143`, `E2E_BASE_URL=http://localhost:3143` and `TEST_DATABASE_URL` to that dedicated DB, run `npm run seed`, then `npx playwright test --config e2e/playwright.config.ts --workers=3`. F-05 uses temporary schemas; the test role needs CREATE SCHEMA permission. Local restart tests use ports3123/3158; race/browser test workers listen on OS-assigned loopback ports. No Docker or external deployment was used.
 
-Pending: human commit/push/PR, peer review, A-12 team-ratification artifact, shared-baseline acceptance, PostgreSQL17 candidate verification and later F-10 integration/release evidence. The task did not write GitHub comments, modify Issue/Project state or merge anything.
+At the time of this local run, the candidate had not been committed, reviewed, or released. PR #37 later supplied a separate committed implementation and exact-commit review, as documented above. A-12 team-ratification and shared-baseline acceptance remain pending; this local candidate's outputs must not be used as evidence for the deployed implementation.

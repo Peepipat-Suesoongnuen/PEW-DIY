@@ -1,8 +1,8 @@
 # F-04 — Borrowing Request Contract
 
-> **Revision:** 5 — 2026-11-07 | **Contract approval:** shared-baseline ratification pending | **Implementation:** PR #36 merged; F-05 transitions implemented locally in #12 | **Tests:** request-only historical results plus fresh F-05-dependent execution in [F-05 evidence](tdd-evidence-f05.md)
+> **Revision:** 5 — 2026-11-07 | **Contract approval:** shared-baseline ratification pending | **Implementation:** PR #36 merged; F-05 transitions implemented in [PR #37](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/37) | **Tests:** request-only historical results plus local F-05-dependent execution in [F-05 evidence](tdd-evidence-f05.md); distinguish from PR #37's committed-code review
 >
-> Implementation Issue: [#11 / D1-06.4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/11); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). The OQ-02 choice is recorded in user decision A-12; PR #36 is merged; shared-team ratification before baseline closure remains pending per its final review (2026-11-06): multi-unit up to current availability, no additional per-borrower cap, full return per loan. Stack/auth are already selected in SDS rev 3; fresh F-05 fulfillment verification is linked above; independent review of #12 and shared-baseline acceptance remain pending.
+> Implementation Issue: [#11 / D1-06.4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/11); contract Issue [#5](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/5). The OQ-02 choice is recorded in user decision A-12; PR #36 is merged; shared-team ratification before baseline closure remains pending per its final review (2026-11-06): multi-unit up to current availability, no additional per-borrower cap, full return per loan. Stack/auth are already selected in SDS rev 3; fresh F-05 fulfillment verification is linked above; PR #37's independent implementation review is recorded, while shared-baseline acceptance remains pending.
 
 ## 1. Identity, Requirements and Dependencies
 
