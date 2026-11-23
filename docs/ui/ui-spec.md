@@ -242,6 +242,6 @@ Heading hierarchy (h1 = item name); `DetailList` uses `<dl>/<dt>/<dd>`; quantity
 |---|---|---|---|
 | OQ-UI-1 | Typography: Inter-only vs Inter + serif headings | ARCH §8.2 left it open | Inter-only (most minimal) — team picks |
 | OQ-UI-2 | Quantity input bounds on Item Detail | SRS **OQ-02** (multi-unit loans + limits) unresolved | Render min=1 now; finalize bounds when OQ-02 decided (before F-04 contract baseline) |
-| OQ-UI-3 | Item images | No FR supports images (Gap) | Keep out; requires SRS change if wanted |
-| OQ-UI-4 | Sorting on Catalog | No FR supports sorting (Gap) | Keep out of scope |
+| OQ-UI-3 | Item images | Sprint 1 gap (`FR-06` had no image); **Sprint 2 (`docs/srs.md` rev 6) adds optional `image_url` + category preset fallback** | Resolved for Sprint 2 (`F-08` contract) |
+| OQ-UI-4 | Sorting on Catalog | Sprint 1 gap; **Sprint 2 (`docs/srs.md` rev 6, `FR-10`) adds catalog sorting** | Resolved for Sprint 2 (`F-08` contract) |
 | OQ-UI-5 | "Checkout Action" terminology on Item Detail | Task brief says "Checkout Action"; approved contracts define "Request to borrow" (FR-11) + custodian checkout (FR-14) | Spec follows approved SRS/contracts; **team confirm** the label wording |

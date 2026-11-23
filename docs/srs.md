@@ -94,36 +94,36 @@ The complete product covers the seven Theme 2 capabilities plus identity and acc
 
 | ID | Requirement | Priority / Sprint |
 |---|---|---|
-| FR-06 | The system shall maintain an equipment catalog where each item has a name, description, category, total quantity, and availability state. | Sprint 1 (seed + read) |
+| FR-06 | The system shall maintain an equipment catalog where each item has a name, description, category, total quantity, availability state, and (from Sprint 2) optional preview image (`image_url`) and catalog status (`ACTIVE`/`RETIRED`). | Sprint 1 (core) / Sprint 2 (`image_url`, `catalog_status`) |
 | FR-07 | The system shall compute and display **Available Quantity** for each item so users can check availability before requesting. | Sprint 1 |
 | FR-08 | The system shall provide a seeded demo catalog with reproducible seed data (synthetic). | Sprint 1 |
-| FR-09 | The system shall allow a Custodian to create, update, and retire catalog items and adjust total quantity. | Sprint 2 (full management) |
-| FR-10 | The system shall provide search/filter of the catalog (by name, category, availability). | Sprint 2 |
+| FR-09 | The system shall allow a Custodian to create, update, and retire catalog items (including optional `image_url`) and adjust total quantity. | Sprint 2 (full management) |
+| FR-10 | The system shall provide search, filter, and sorting of the catalog (by name/description query, category, availability, catalog status for custodians, and sort order). | Sprint 2 |
 
 ### 4.3 Borrowing Requests
 
 | ID | Requirement | Priority / Sprint |
 |---|---|---|
-| FR-11 | The system shall allow a Borrower to submit a borrowing request for an available item, persisting the request. | Sprint 1 |
-| FR-12 | The system shall allow a Borrower to view their own requests with status. | Sprint 1 |
-| FR-13 | The system shall allow a Custodian to view submitted requests. | Sprint 1 |
+| FR-11 | The system shall allow a Borrower to submit a borrowing request (single item or multi-item bundle from Sprint 2) for available items with borrowing purpose and requested duration (1–14 days), persist the request, and cancel own unfulfilled requests. | Sprint 1 (single) / Sprint 2 (bundle, purpose, duration, approval, cancel) |
+| FR-12 | The system shall allow a Borrower to view their own requests with status (`PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`, `CHECKED_OUT` in Sprint 2). | Sprint 1 / Sprint 2 (approval states) |
+| FR-13 | The system shall allow a Custodian to view submitted requests, and (from Sprint 2) approve or reject pending requests before checkout. | Sprint 1 (view) / Sprint 2 (approve/reject) |
 
 ### 4.4 Checkout, Active Loans, Return
 
 | ID | Requirement | Priority / Sprint |
 |---|---|---|
-| FR-14 | The system shall allow a Custodian to record checkout for a request/item, creating a persistent **Active Loan** and updating availability atomically. | Sprint 1 |
-| FR-15 | The system shall maintain Active Loan records (borrower, item, quantity, checkout date, due date, status). | Sprint 1 |
-| FR-16 | The system shall allow a Borrower to view their own active loans and loan history. | Sprint 1 (active) / Sprint 2 (full history) |
-| FR-17 | The system shall allow a Custodian to record return, closing the Active Loan and restoring availability atomically. | Sprint 2 |
-| FR-18 | The system shall allow a Custodian to view all active loans. | Sprint 2 |
+| FR-14 | The system shall allow a Custodian to record checkout for an approved request/bundle, creating persistent **Active Loan(s)** and updating availability atomically. | Sprint 1 / Sprint 2 (approval & bundle support) |
+| FR-15 | The system shall maintain Active Loan records (borrower, item, quantity, checkout date, due date, status) and support printing an approved loan slip as evidence. | Sprint 1 / Sprint 2 (print slip) |
+| FR-16 | The system shall allow a Borrower to view their own active loans and full loan history. | Sprint 1 (active) / Sprint 2 (full history) |
+| FR-17 | The system shall allow a Borrower to submit a return notice on an own active loan and allow a Custodian to confirm return, closing the Active Loan and restoring availability atomically. | Sprint 2 |
+| FR-18 | The system shall allow a Custodian to view all room loans (active, return-pending, overdue, and returned history). | Sprint 2 |
 
-### 4.5 Overdue and Reporting
+### 4.5 Overdue, Notifications, and Reporting
 
 | ID | Requirement | Priority / Sprint |
 |---|---|---|
-| FR-19 | The system shall compute Overdue status for active loans whose due date has passed and present an overdue list to Custodians. | Sprint 2 |
-| FR-20 | The system shall provide inventory reports/summaries: items with quantities and availability, loans by status, overdue items. | Sprint 3 |
+| FR-19 | The system shall compute Overdue status for active loans whose due date has passed, present an overdue list to Custodians, and show in-app notifications (request approval/rejection, due within 2 days, overdue) that users can mark read or clear. | Sprint 2 |
+| FR-20 | The system shall provide inventory reports/summaries: items with quantities and availability, loans by status, overdue items. | Sprint 3 (contracts & initial summary in D2) |
 | FR-21 | The system shall provide the Borrower's borrow/return history. | Sprint 2 |
 
 ---
@@ -134,18 +134,19 @@ Each rule is stated as testable behavior with its rejection/edge case.
 
 | ID | Rule | Testable expectation | Sprint |
 |---|---|---|---|
-| BR-01 | A borrowing request may only be created for an item whose **Available Quantity ≥ 1** at the time of the request. Under A-12, the requested quantity is a positive integer not exceeding current Available Quantity. | Unavailable or insufficient quantity is rejected without a request; malformed quantities are rejected by validation. | Sprint 1 |
-| BR-02 | Checkout of an unavailable item should be **rejected**. | Checkout when Available Quantity = 0 is rejected; no loan is created and availability is unchanged. | Sprint 1 |
+| BR-01 | A borrowing request may only be created for an `ACTIVE` item whose **Available Quantity ≥ 1** at the time of the request. Under A-12, the requested quantity is a positive integer not exceeding current Available Quantity. | Unavailable, retired, or insufficient quantity is rejected without creating a request; malformed quantities are rejected by validation. | Sprint 1 / Sprint 2 (`ACTIVE` check) |
+| BR-02 | Checkout of an unavailable or unapproved item/request should be **rejected**. | Checkout when Available Quantity = 0 or request is not `APPROVED` is rejected; no loan is created and availability is unchanged. | Sprint 1 / Sprint 2 (`APPROVED` gate) |
 | BR-03 | **Duplicate-active-loan prevention under Quantity Tracking:** Available Quantity must never fall below zero. For an item whose Total Quantity = 1 (a single exclusive unit), at most one Active Loan may exist at a time — the duplicate-loan rule is enforced as a special case of the quantity rule. | A second concurrent checkout of a single-unit item is rejected; competing attempts cannot oversell. | Sprint 1 |
-| BR-04 | Only a **Custodian** may perform checkout and return. | A Borrower calling checkout/return endpoints is rejected with a forbidden result, enforced server-side. | Sprint 1 |
-| BR-05 | A Borrower may view only their own requests and loans. | Requesting another borrower's request/loan is denied without returning private data. | Sprint 1 |
-| BR-06 | Only a **Custodian** may modify the catalog. | A Borrower calling catalog-write endpoints is rejected server-side. | Sprint 1 (enforcement) |
-| BR-07 | The **due date** of a loan is assigned automatically at checkout as **checkout date + 7 calendar days** (team decision). | A created loan's due date equals checkout date + 7 days. | Sprint 1 |
-| BR-08 | A loan is **Overdue** when the current date is later than its due date and no return has been recorded. | A loan past due date appears in the overdue list; a returned loan does not. | Sprint 2 |
-| BR-09 | Return closes exactly one Active Loan and restores all units it holds; **full-quantity return per loan** is selected in A-12 (partial returns are not selected). All held quantity must be accounted for at closure so held units cannot escape the BR-03 availability formula. | Full return restores availability; over/partial return is rejected under the selected policy; a loan cannot close while units remain held. | Sprint 2 |
+| BR-04 | Only a **Custodian** may perform checkout, approve/reject requests, and confirm return; a **Borrower** may only submit a return notice (`request-return`) on their own active loan (without restoring stock). | A Borrower calling checkout, approve/reject, or confirm-return endpoints is rejected with HTTP 403; a Borrower requesting return on another borrower's loan is rejected with 403. | Sprint 1 / Sprint 2 |
+| BR-05 | A Borrower may view only their own requests, loans, and notifications. | Requesting/acting on another borrower's request/loan/notification is denied without returning private data. | Sprint 1 / Sprint 2 |
+| BR-06 | Only a **Custodian** may modify the catalog. | A Borrower calling catalog-write endpoints is rejected server-side; reducing `quantity_total` below `held(item)` is rejected with 409. | Sprint 1 (enforcement) / Sprint 2 (writes) |
+| BR-07 | The **due date** of a loan is assigned automatically at checkout as **checkout date + requested duration (`1–14` calendar days, default `7`)** in `Asia/Bangkok` (A-03 rev). | A created loan's due date equals checkout date + approved/requested calendar days (`1–14`); invalid durations outside `1–14` are rejected. | Sprint 1 (7 days) / Sprint 2 (1–14 days) |
+| BR-08 | A loan is **Overdue** when the current date (`Asia/Bangkok`) is later than its due date and no return confirmation (`returned_at`) has been recorded. | A loan past due date appears in the overdue list; a loan due today or a returned loan does not. | Sprint 2 |
+| BR-09 | Return closes exactly one Active Loan (or bundle of loans) and restores all units it holds; **full-quantity return per loan** is selected in A-12 (partial returns are not selected). A Borrower return notice alone does not restore stock until Custodian confirms return. | Custodian confirm-return restores availability atomically; repeat return is rejected (`409`); return notice leaves availability unchanged until confirmed. | Sprint 2 |
 | BR-10 | Passwords shall be stored only as salted hashes; plaintext password storage is prohibited. | No plaintext password exists in database or seed data. | Sprint 1 |
-| BR-11 | All availability and loan state transitions shall be persisted and survive application restart **or redeployment**. Allocation by function: request/checkout persistence from Sprint 1; return persistence from Sprint 2 (FR-17). | After restart or redeployment, loans/availability read back identically. | Sprint 1 (request, checkout) / Sprint 2 (return) |
-| BR-12 | **Non-reservation:** a borrowing request — submitted or pending — does not reserve units and does not reduce Available Quantity; only a committed **Active Loan** reduces Available Quantity (BR-03). This rule binds every request state, including a pending request under the Sprint 2 approval workflow (A-11). | Creating one or more requests for an item leaves Available Quantity unchanged; the reduction occurs only when a checkout commits an Active Loan; a pending request does not reserve equipment. | Sprint 1 (rule; also binds the Sprint 2 approval workflow) |
+| BR-11 | All availability and loan state transitions shall be persisted and survive application restart **or redeployment**. Allocation by function: request/checkout persistence from Sprint 1; approval/return/catalog-write persistence from Sprint 2. | After restart or redeployment, loans/availability read back identically. | Sprint 1 / Sprint 2 |
+| BR-12 | **Non-reservation:** a borrowing request — submitted, pending, or approved — never reserves units or reduces Available Quantity; only a committed **Active Loan** reduces Available Quantity (BR-03). | Creating or approving requests leaves Available Quantity unchanged; the reduction occurs only when a checkout commits an Active Loan. | Sprint 1 / Sprint 2 |
+| BR-13 | **In-app notifications lifecycle:** the system notifies users of request approval/rejection and active loans due within 2 calendar days or overdue; read/cleared notifications remain dismissed across reloads without deleting domain loan/request records. | Dismissing (`read`) or clearing notifications hides them on subsequent fetches while leaving requests and loans intact. | Sprint 2 |
 
 ---
 
@@ -172,33 +173,33 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | ID | Type | Description | Resolution / Status |
 |---|---|---|---|
 | A-01 | Design Decision | **Inventory Tracking = Quantity Tracking** — items are tracked as aggregate quantities, not individual serial units. | **Confirmed** by team (2026-11-03) |
-| A-02 | Design Decision | **Borrowing Approval = Direct Checkout** — no separate approval step before checkout; a request proceeds to checkout directly. *(Sprint 1 scope: the Sprint 2 approval workflow is recorded in A-11.)* | **Confirmed** by team (2026-11-03; Sprint 1 scoping confirmed 2026-11-06, Direction A) |
-| A-03 | Design Decision | Due date is assigned automatically as **checkout date + 7 calendar days**; overdue is computed from this date. | **Confirmed** by team (2026-11-03) |
+| A-02 | Design Decision | **Sprint 1: Direct Checkout; Sprint 2: Approval Workflow (`A-11`)** — Sprint 1 had no approval step; Sprint 2 introduces Custodian `APPROVE` / `REJECT` prior to checkout (`PENDING → APPROVED → CHECKED_OUT`). | **Confirmed** by team (Sprint 1 A-02; Sprint 2 A-11 approved 2026-11-23) |
+| A-03 | Design Decision | **Loan Duration:** Sprint 1 fixed `checkout + 7 calendar days`; Sprint 2 allows Borrower-selected duration **`1–14` calendar days** (default `7`) calculated from checkout date in `Asia/Bangkok`. | **Confirmed** (Sprint 1: 7 days; Sprint 2 revision: 1–14 days, 2026-11-23) |
 | A-04 | Design Decision | Under Quantity Tracking, the theme's "duplicate active loan for the same exclusive item" rule is enforced as a quantity rule (BR-03): single-unit items allow at most one active loan; in general Available Quantity must not fall below zero. | **Confirmed** by team (2026-11-03) |
 | A-05 | Assumption | Seeded demo accounts (Borrower/Custodian) are sufficient; self-registration and password recovery are not required. | Per course spec §5.2 |
 | A-06 | Assumption | All data is synthetic; no real payment, messaging, or external services are integrated. | Per course spec §5.3 |
 | A-07 | Design Decision | Requirement and deliverable documents are written in **English**. | **Confirmed** by team (2026-11-03) |
-| A-11 | Design Decision | **Non-reservation + Direct Checkout (Direction A):** (1) Sprint 1 uses Non-reservation + Direct Checkout; (2) a Borrowing Request does not reserve units and does not reduce Available Quantity (BR-12); only a committed Active Loan does; (3) Sprint 1 has no approval step before checkout (A-02); (4) an approval workflow is added in **Sprint 2 only** — its specification is deferred to the Sprint 2 contracts — and a pending request under it still does not reserve equipment (BR-12). | **Confirmed** by team (2026-11-06, Direction A) |
-| A-12 | Design Decision | **Quantity/return policy:** multiple units per request are permitted up to current availability, with no additional per-borrower cap; each loan is returned in full. Requests remain non-reserving under BR-12, so repeated requests do not consume stock. Return implementation remains Sprint 2. | **User-confirmed implementation choice**, 2026-11-06; **team ratification pending** PR #36 and a verifiable teammate confirmation artifact |
+| A-11 | Design Decision | **Non-reservation + Sprint 2 Approval Workflow (Direction A):** (1) Sprint 1 used Non-reservation + Direct Checkout; (2) a Borrowing Request (`PENDING` or `APPROVED`) does not reserve units and does not reduce Available Quantity (`BR-12`); only a committed Active Loan does; (3) Sprint 2 adds Custodian `APPROVE`/`REJECT`, Borrower `CANCEL`, multi-item `request_bundles`, and purpose metadata. | **Confirmed** by team (2026-11-06, Direction A; Sprint 2 details approved 2026-11-23) |
+| A-12 | Design Decision | **Quantity/return policy:** multiple units per request are permitted up to current availability, with no additional per-borrower cap; each loan is returned in full (`Full-quantity return only`). Requests remain non-reserving under BR-12. In Sprint 2, Borrowers may submit a return notice (`request-return`) and Custodians confirm return (`return`) to restore stock atomically. | **Confirmed** (user choice 2026-11-06; Sprint 2 full-return & two-step notice/confirm approved 2026-11-23) |
 
 ### 7.2 Assumptions (working assumptions to be validated)
 
 | ID | Type | Description | Resolution / Status |
 |---|---|---|---|
 | A-08 | Assumption | The system serves a single D.I.Y. Room (one inventory namespace; no multi-branch/multi-room support). | Open to challenge |
-| A-09 | Assumption | Quantity Tracking applies uniformly to item types; larger quantities follow the recorded quantity/return policy. | Implementation choice recorded in A-12; team ratification pending; no additional category rule introduced |
-| A-10 | Assumption | "Availability" means lendable right now; repair/retired items are excluded from availability via catalog status. | Open to challenge |
+| A-09 | Assumption | Quantity Tracking applies uniformly to item types; larger quantities follow the recorded quantity/return policy. | Confirmed in A-12 |
+| A-10 | Assumption | "Availability" means `ACTIVE` and lendable right now; retired items (`catalog_status = 'RETIRED'`) are excluded from new borrowing while preserving historical records. | **Confirmed** for Sprint 2 (`FR-09`) |
 
-### 7.3 Open Questions (not yet decided — do not treat as requirements)
+### 7.3 Open Questions (resolved for Sprint 2 where noted)
 
-| ID | Question | Impact | Target |
+| ID | Question | Impact | Target / Status |
 |---|---|---|---|
-| OQ-01 | What is the actual initial equipment catalog? (Arduino Uno, ESP32, Breadboard, Jumper Wires, Sensors, Multimeter, Soldering Equipment are examples only, not confirmed) | Seed data content | Decide before Sprint 1 seed implementation |
-| OQ-02 | **Choice recorded 2026-11-06; team ratification pending:** multiple units up to current availability; no additional per-borrower cap; full return per loan (A-12). Original coupled quantity/return question was raised in PR #15 and remained open through rev 3. | Request validation + future checkout/BR-09 return semantics | User supplied the choice during Issue #11 implementation; shared-team baseline closure requires ratification evidence per PR #36; no return implementation here |
-| OQ-03 | Are there loan-period differences by item category (e.g., tools 7 days, consumables same-day)? | BR-07 generalization | Decide before Sprint 2 |
-| OQ-04 | What happens to overdue loans beyond listing (reminders, suspension of borrowing rights)? | Out of scope currently; may extend BR-08 | Decide before Sprint 2 |
-| OQ-05 | Should returned items record condition (ok/damaged)? | Excluded for now (§3.2) | Revisit after Sprint 2 |
-| OQ-06 | Search specifics (fields, filters) for FR-10. | Sprint 2 contract detail | Decide before Sprint 2 |
+| OQ-01 | What is the actual initial equipment catalog? | Seed data content | Synthetic fixtures (`E-ONE`, `E-MANY`, `E-ZERO`) retained for Sprint 1/2 verification; Custodian CRUD (`FR-09`) enables creating real/demo items in Sprint 2 |
+| OQ-02 | Multi-unit loans + return semantics (`A-12`) | Request/loan model and BR-09 return | **Resolved (Sprint 2, 2026-11-23):** multi-unit requests (single or bundle), **full-quantity return only** per loan, two-step Borrower return notice → Custodian confirm |
+| OQ-03 | Loan-period differences / borrower selection (`BR-07`) | Checkout due-date calculation | **Resolved (Sprint 2, 2026-11-23):** Borrower chooses `1–14` calendar days (default `7`) at request time; Custodian confirms at checkout (`Asia/Bangkok`) |
+| OQ-04 | What happens to overdue loans beyond listing? | BR-08 / notifications | **Resolved (Sprint 2, 2026-11-23):** Status-only + dismissible/clearable in-app alerts (`FR-19`, `BR-13`) for due ≤ 2 days and overdue; no fines or external email |
+| OQ-05 | Should returned items record condition (ok/damaged)? | Excluded (§3.2) | Remains excluded; optional return note only |
+| OQ-06 | Search specifics for FR-10 | Sprint 2 catalog search/filter/sort | **Resolved (Sprint 2, 2026-11-23):** Search `q` (name/description), filters (`category`, `availability`, `status`), and `sort` (name / available qty) |
 
 ---
 
@@ -207,3 +208,5 @@ Each rule is stated as testable behavior with its rejection/edge case.
 **Revision 4 — 2026-11-06 (Issue #11 work-session user decision):** resolved OQ-02 as A-12 (multi-unit up to available stock, no additional per-borrower cap, full return per loan); elaborated BR-01 and fixed future BR-09 return policy. Existing requirement IDs preserved; return implementation remains Sprint 2. This records an explicit new decision, not a claim that earlier PRs had already resolved it.
 
 **Revision 5 — 2026-11-06 (PR #36 provenance review):** distinguish the existing user-confirmed A-12 implementation choice from shared-team baseline ratification. Preserve the actual user decision and behavior; keep the team-confirmation evidence gate pending rather than inventing an Issue comment or peer approval.
+
+**Revision 6 — 2026-11-23 (Sprint 2 Baseline Update):** resolved OQ-02/03/04/06 for Sprint 2; added `FR-06/09` `image_url` and `catalog_status`, `FR-10` sorting, `FR-11/12/13` Sprint 2 approval workflow + multi-item bundles + cancellation + purpose + 1–14 day duration, `FR-15` printable loan slip, `FR-17` two-step return notice/confirm, `FR-19`/`BR-13` dismissible/clearable in-app notifications. Preserved `BORROWER`/`CUSTODIAN` 2-role model (`FR-04`, `A-05`).

@@ -4,7 +4,7 @@
 >
 > **Source:** `Lab_6_Sprint_1_UAT.pdf`, Parts A–D and submission checklist
 >
-> **Status:** Interim partner UAT results received on `pewdiy-uat` (`pewdiy-uat-00002-bnt` and restarted `pewdiy-uat-00003-8c5`, 2026-11-22); live `UAT-06`/`UAT-07` API corroboration logs attached, and Finding 05 is proposed/accepted by the Product Team as a Minor UX Limitation pending UAT Team agreement and final sign-off. Part B (testing the partner product) remains blocked.
+> **Status (Reconciled 2026-11-23):** Lab 6 completed and submitted (`TH-056_P2_lab6_sec131`); GitHub Issues `#80–#84` and `#90` were closed on `2026-11-23` and PR #96 promoted Lab 6 docs to `main` (`d079bc6`). Partner team **NutTiew** (`@Tanaboonnnnn`, `@Chxtamos`) executed `UAT-01–UAT-08` on `pewdiy-uat` (`pewdiy-uat-00002-bnt` → `pewdiy-uat-00003-8c5`, `b03c904`), and PEW-DIY executed independent UAT on NutTiew (`UAT-NT-01..06 PASS`). `Finding 05` (Minor UX) and `UAT-07 UX Note` are carried into the Sprint 2 / Deliverable 2 Defect Register for remediation. Historical interim logs below are preserved as submitted history.
 
 ## 1. Purpose, roles, and scope
 

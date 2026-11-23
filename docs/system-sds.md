@@ -380,8 +380,8 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 | SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + Vitest/Supertest (team decision D1; PR #22) | Closed — AC-C-01 now verifiable |
 | SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 now verifiable |
 | SDS-OQ-03 — calendar policy | **User-confirmed for implementation**: Asia/Bangkok calendar date +7, UTC event timestamps; 2026-11-07 session decision | Recorded in §3; shared-baseline peer review pending |
-| SDS-OQ-04 — hosting | Select GCP services/storage/secret delivery after actual Lab 5 guidance and access | Design candidate now; implementation in Lab 5 |
-| SRS OQ-03–OQ-06, A-08–A-10 | Keep later-sprint policy/assumptions visible; do not add category periods, penalties, damage workflow or new search requirements now | Per SRS targets |
+| SDS-OQ-04 — hosting | **Resolved (Lab 5, PR #57/#79):** GCP Cloud Run (`pewdiy`, `pewdiy-uat`) + Cloud SQL PostgreSQL (`pewdiy-pg`) + Artifact Registry + Secret Manager + WIF CI/CD | See `docs/labs/lab-05/deployment.md` |
+| SRS OQ-02..OQ-06, A-10..A-12 | **Resolved for Sprint 2 (`docs/srs.md` rev 6):** `request_bundles` multi-item support, `approval_status` (`PENDING/APPROVED/REJECTED/CANCELLED`), `1–14` day duration, full-return with two-step return notice (`return_requested_at`) + Custodian confirm (`returned_at`), `image_url`/`catalog_status`, search/filter/sort, and `notifications` table | Implemented under `docs/sprints/sprint-2/` contracts |
 
 | Issue criterion | Evidence in this draft | Honest status |
 |---|---|---|
@@ -404,3 +404,4 @@ This local document is not a claim that Issue #3 is Done. Resolve the decisions 
 | 4 — 2026-11-06 | Recorded the explicit Issue #11 user decision closing OQ-02 as SRS A-12; marked earlier return alternatives historical; no Loan/return implementation claimed | User work-session decision; SRS rev 4; F-04 request validation |
 | 5 — 2026-11-06 | Distinguished the recorded A-12 user choice from pending team-ratification evidence and repaired malformed ASCII separators; no behavioral change | PR #36 provenance review; SRS rev 5 |
 | 6 — 2026-11-07 | Recorded the explicit Asia/Bangkok calendar decision for #12 and fail-closed configuration; no return/overdue scope added | User implementation-session confirmation; F-05 tests/evidence |
+| 7 — 2026-11-23 | Reconciled Sprint 2 architecture decisions: resolved `SDS-OQ-04` (GCP Cloud Run + Cloud SQL deployed in Lab 5), added `request_bundles`, `approval_status`, `1–14` day duration, `return_requested_at`, `image_url`/`catalog_status`, `notifications`, and `F-09` reporting endpoint (`GET /api/reports/summary`) | `docs/srs.md` rev 6; `docs/labs/lab-05/deployment.md`; Sprint 2 plan approval |

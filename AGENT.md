@@ -19,14 +19,12 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 **ข้อตกลงทีมที่ยืนยันแล้ว (Confirmed decisions — อ้างอิง `docs/srs.md`):**
 - Theme 2: Inventory and Borrowing System — capabilities บังคับ: Inventory Availability, Borrowing Requests, Checkout, Active Loans, Return, Overdue Status, Inventory Reporting
 - **Inventory Tracking = Quantity Tracking** (ติดตามอุปกรณ์เป็นจำนวนรวม ไม่ใช่รายชิ้น) — SRS A-01
-- **Borrowing Approval = Direct Checkout** (ไม่มีขั้นตอนอนุมัติแยกก่อน Checkout) — SRS A-02
-- **ระยะเวลาการยืม = 7 วัน** กำหนดอัตโนมัติที่ checkout และ **Overdue = เลย due date โดยยังไม่คืน** (SRS A-03/BR-07/BR-08 — เดิมอยู่ใน Open Questions ด้านล่าง ตัดสินแล้วใน SRS rev 2)
-- **นิยาม "exclusive item / duplicate active loan" ภายใต้ Quantity Tracking = กฎจำนวน** (available quantity ห้ามต่ำกว่า 0; ของ quantity = 1 มี active loan ซ้ำไม่ได้) (SRS A-04/BR-03 — เดิมอยู่ใน Open Questions ด้านล่าง ตัดสินแล้วใน SRS rev 2)
+- **Borrowing Approval:** Sprint 1 ใช้ Direct Checkout (`A-02`); Sprint 2 เพิ่ม Approval Workflow (`PENDING → APPROVED/REJECTED → CHECKED_OUT`, `A-11`/`BR-12`) ตาม `docs/srs.md` rev 6
+- **ระยะเวลาการยืม:** Sprint 1 ตายตัว 7 วัน; Sprint 2 ผู้ยืมเลือกได้ `1–14` วันปฏิทิน (`BR-07` rev) และ **Overdue = เลย `due_on` โดยยังไม่ยืนยันคืน** (`BR-08`)
+- **นิยาม "exclusive item / duplicate active loan" ภายใต้ Quantity Tracking = กฎจำนวน** (available quantity ห้ามต่ำกว่า 0; ของ quantity = 1 มี active loan ซ้ำไม่ได้) (SRS A-04/BR-03)
 
-**ประเด็นที่ยังไม่ตัดสินใจ (Open Questions — ห้ามเดา/ห้ามตัดสินใจแทนทีม):**
-- รายการอุปกรณ์จริงใน catalog (ตัวอย่าง Arduino Uno, ESP32, Breadboard, Jumper Wires, Sensors ฯลฯ เป็นเพียงตัวอย่างบริบท) — SRS OQ-01
-- จำนวนที่ยืมต่อ request/loan (multi-unit) และ full/partial return ที่ต้องตัดสินคู่กัน — SRS OQ-02 (ผูกกับ BR-09)
-- Technology stack ที่แน่นอน (ดู §2) และรูปแบบ session/token
+**ประเด็นที่ปิดแล้วใน Sprint 2 (`docs/srs.md` rev 6 / `docs/system-sds.md` rev 7):**
+- `OQ-01` (synthetic fixtures + Custodian CRUD `FR-09`), `OQ-02` (`Full-return only` + return notice/confirm `A-12`), `OQ-03` (`1–14` วัน), `OQ-04` (in-app alerts `BR-13`), `OQ-06` (search/filter/sort `FR-10`), `SDS-OQ-01/02/03/04` (stack/auth/Asia/Bangkok/GCP)
 
 ## 2. Technology Stack and Repository Structure
 
@@ -43,13 +41,13 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 - `docs/` — เอกสารวิศวกรรม: `docs/srs.md`, `docs/features.md`, `docs/traceability.md`, `docs/system-sds.md`, `docs/sprints/`, `docs/labs/`
 - โครงสร้าง source code ตามที่กำหนดใน `docs/system-sds.md` เมื่อทีมเลือก stack แล้ว
 
-### 2.3 แหล่งอ้างอิงและสถานะจริง (snapshot ณ 2026-11-05 — verify ซ้ำก่อนใช้)
+### 2.3 แหล่งอ้างอิงและสถานะจริง (snapshot ณ 2026-11-23 — verify ซ้ำก่อนใช้)
 
-**โครงสร้างที่ยืนยันได้จาก repository (FIX-A):** `client/` (โครงสร้างเตรียมพร้อมสำหรับ frontend — ยังไม่มี framework), `server/src` (application code: config/db/routes/services), `server/tests` (tests — อยู่นอก build output), `docs/` (เอกสารวิศวกรรมทั้งหมด), root config (`package.json`, `tsconfig.json`, `vitest.config.ts`, `.env.example`)
+**โครงสร้างที่ยืนยันได้จาก repository:** `client/` (React 19 + Vite + TypeScript + Tailwind CSS v4 + Lucide Icons + Vitest/Testing Library), `e2e/` (Playwright 3 viewports), `server/src` (application code: config/db/routes/services), `server/tests` (Vitest + Supertest + PostgreSQL integration tests), `deploy/` (GCP Cloud Run / Cloud SQL / WIF scripts), `docs/` (เอกสารวิศวกรรมทั้งหมด), root config (`package.json`, `tsconfig.json`, `vitest.config.ts`, `Dockerfile`, `docker-compose.yml`, `.env.example`)
 
-**Technology Stack (เลือกแล้ว — ปิด SDS-OQ-01/02):** Node.js + TypeScript + Express + PostgreSQL + Vitest/Supertest; authentication = server session + HttpOnly cookie + trusted-origin anti-CSRF (ทีมตัดสินใจ D1/D2; implement แล้วใน PR #22; บันทึกใน `docs/system-sds.md` §2.1)
+**Technology Stack (เลือกแล้ว):** React + Vite + Tailwind v4 (Frontend) + Node.js 24 + TypeScript + Express 5 + PostgreSQL 17 (`pg` + parameterized SQL) + Argon2id + server session (`HttpOnly` cookie + trusted-origin anti-CSRF) + Cloud Run / Cloud SQL (`asia-southeast1`)
 
-**เอกสารที่มีใน repository แล้ว:** `docs/srs.md` (Part A), `docs/features.md` + `docs/traceability.md` (Part B), `docs/system-sds.md` (Part C), `docs/sprints/plan.md` (Part D), `docs/sprints/sprint-1/` (Part E contracts) — ดู §3 Source of Truth Documents
+**เอกสารที่มีใน repository แล้ว:** `docs/srs.md` (Part A), `docs/features.md` + `docs/traceability.md` (Part B), `docs/system-sds.md` (Part C), `docs/sprints/plan.md` (Part D), `docs/sprints/sprint-1/` และ `docs/sprints/sprint-2/` / `sprint-3/` (Contracts) — ดู §3 Source of Truth Documents
 
 ## 3. Source of Truth Documents
 
@@ -232,8 +230,8 @@ Commit · Push · Rebase · Reset · Cherry-pick · Force Push (ห้ามโ�
 - หากต้องทำนอกขอบเขตที่อนุมัติ → ขออนุมัติใหม่
 
 ### 11.3 Branch and Commit Conventions (ตาม workflow รายวิชา)
-- **Branch Strategy (ทีมยืนยัน):** ห้าม Push ขึ้น `main` โดยตรง — ทุก Branch ต้องสร้างจาก `sprint/1-staging` และรวมเข้า `main` ผ่าน `sprint/1-staging` เท่านั้น (ลำดับ: `feature/*`/`fix/*`/`docs/*` → `sprint/1-staging` → `main`)
-- Branch: `feature/<scope>`, `fix/<scope>` หรือ `docs/<issue#>-<scope>` จาก **`sprint/1-staging`** ของ sprint ปัจจุบัน
+- **Branch Strategy (ทีมยืนยัน):** ห้าม Push ขึ้น `main` โดยตรง — ทุก Branch ต้องสร้างจาก staging branch ของ sprint ปัจจุบัน (Sprint 1: `sprint/1-staging`, Sprint 2: `sprint/2-staging`) และรวมเข้า `main` ผ่าน staging branch เท่านั้น (ลำดับ: `feature/*`/`fix/*`/`docs/*` → `sprint/<n>-staging` → `main`)
+- Branch: `feature/<scope>`, `fix/<scope>` หรือ `docs/<issue#>-<scope>` จาก **`sprint/<n>-staging`** ของ sprint ปัจจุบัน
 - Commit message: ระบุงาน/Issue ที่เกี่ยวข้อง กระชับ อธิบาย "ทำไม" ไม่ใช่แค่ "อะไร"
 - ลำดับ: Issue → branch จาก sprint staging → PR เข้า sprint staging → review → integrate → release PR เข้า `main` (ผ่าน staging เท่านั้น) → tag release
 - เก็บหลักฐาน local test results ผูกกับ commit ที่ส่ง (CI บังคับใน Lab 5)

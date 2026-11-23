@@ -27,7 +27,7 @@
 | Sprint | Goal | Features | Completion outcome |
 |---|---|---|---|
 | **1** (→ 8 Nov) | Small deployable product: authentication/authorization foundation + one complete domain slice (request → checkout → active loan) with tested business rules and persistence | F-01, F-02, F-03, F-04, F-05, F-10 | Working increment released on `main` with tag; Parts A–F evidence for Deliverable 1 |
-| **2** (→ 29 Nov) | Core expansion under feature engineering contracts: return, overdue, catalog management, search, loan views/history | F-06, F-07, F-08 | All Sprint 2 features complete and integrated; Sprint 3 contracts drafted with working progress; deployed release candidate |
+| **2** (→ 29 Nov) | Core expansion under feature engineering contracts: return (request + confirm), overdue + notifications, catalog management (with images), search/filter/sort, approval workflow, multi-item bundles, 1–14d duration, loan views/history, printable slip, UI/UX fixes | F-06, F-07, F-08 (+ Sprint 2 extensions to F-04/F-05, Finding 05 fix) | All Sprint 2 features complete and integrated; Sprint 3 (`F-09`) contracts drafted with tested summary workflow; deployed release candidate |
 | **3** (→ 13 Dec) | Completion and hardening: inventory reporting, failure handling, usability, regression, defect correction | F-09 + hardening work | Complete verified release; final QA/traceability; demo video and release summary |
 
 Collectively the three sprints cover the entire product baseline (`docs/traceability.md`: 41/41 requirements mapped — see §7).
@@ -65,13 +65,14 @@ Collectively the three sprints cover the entire product baseline (`docs/traceabi
 
 | Feature | Requirements |
 |---|---|
-| F-06 Return | FR-17, BR-09 (close-accounting guard), NFR-04-S2, NFR-06-S2 |
-| F-07 Overdue Status | FR-19, BR-08 (derived: now > due date, no return) |
-| F-08 Catalog Management, Search, Loan Views | FR-09 (custodian item CRUD/quantities), FR-10 (search/filter), FR-18 (custodian all-loans), FR-21 (borrower full history) |
+| F-06 Return | FR-17, BR-04, BR-09 (full-return; two-step request-return notice + Custodian confirm), NFR-04-S2, NFR-06-S2 |
+| F-07 Overdue Status & Notifications | FR-19, BR-08 (derived: `now > due_on`, no return), BR-13 (dismissible/clearable in-app alerts) |
+| F-08 Catalog Management, Search, Loan Views | FR-06 (`image_url`/`catalog_status`), FR-09 (custodian item CRUD/quantities), FR-10 (search/filter/sort), FR-16 (history), FR-18 (custodian all-loans), FR-21 (borrower full history) |
+| Sprint 2 Request/Loan Extensions (`A-11`) | FR-11/12/13/14/15, BR-07 (1–14d), BR-12 (`A-11` approval workflow, `request_bundles` multi-item, cancellation, purpose, printable loan slip, Finding 05 & P4 cleanup) |
 
-**Dependencies:** F-06 and F-07 depend on F-05 (loan lifecycle, due dates); F-08 depends on F-02 and F-05. F-06 must resolve SRS OQ-02 return semantics (full vs partial) before its contract is baselined.
+**Dependencies:** F-06 and F-07 depend on F-05 (loan lifecycle, due dates); F-08 depends on F-02 and F-05. SRS OQ-02/03/04/06 are resolved in `docs/srs.md` rev 6 (`Full-return only`, `1–14` day duration, status-only + in-app alerts, search/filter/sort).
 
-**Expected outcomes:** all Sprint 2 features complete and integrated (mandatory per Deliverable 2); Sprint 3 contracts drafted with working progress; integrated release candidate with CI/deployment (Lab 5 pipeline) tied to a commit.
+**Expected outcomes:** all Sprint 2 features complete and integrated (mandatory per Deliverable 2); Sprint 3 (`F-09`) contracts drafted with tested summary workflow (`GET /api/reports/summary` + `/reports`); integrated release candidate with CI/deployment (Lab 5 pipeline) tied to a commit/tag on `main`.
 
 **Verification activities:** return/close-accounting tests (BR-09); return atomicity (NFR-06-S2); overdue boundary tests (due date equality is not overdue); catalog-write authorization (BR-06); search; borrower-history isolation (BR-05); full regression of Sprint 1 behavior.
 
@@ -112,10 +113,10 @@ Rule: every feature is implemented on a branch from `sprint/1-staging` under its
 | Sprint | Features | Requirement set covered |
 |---|---|---|
 | 1 | F-01–F-05, F-10 | FR-01–FR-08, FR-11–FR-16(active), BR-01–BR-07, BR-10, BR-11(S1), NFR-01–NFR-06(S1), NFR-08, NFR-09 |
-| 2 | F-06–F-08 | FR-09, FR-10, FR-17, FR-18, **FR-19**, FR-21, BR-06(writes), BR-08, BR-09, BR-11(S2), NFR-04(S2), NFR-06(S2) |
-| 3 | F-09 + hardening | FR-20, NFR-07 + regression/defect scope |
+| 2 | F-06–F-08 (+ S2 extensions) | FR-06(S2), FR-09, FR-10, FR-11–FR-16(S2), FR-17, FR-18, FR-19, FR-21, BR-06(writes), BR-07(S2), BR-08, BR-09, BR-11(S2), BR-12(A-11), BR-13, NFR-04(S2), NFR-06(S2) |
+| 3 | F-09 + hardening | FR-20 (contracts + summary progress in D2), NFR-07 + regression/defect scope |
 
-Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 NFR all mapped). Return/Overdue/Reporting are allocated across Sprint 2–3 per AC-D-02.
+Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 NFR all mapped). Return/Overdue/Reporting are allocated across Sprint 2–3 per AC-D-02.
 
 ## 8. Team Work Organization (Proposed — pending team confirmation)
 
@@ -138,7 +139,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 |---|---|---|
 | Theme 2 "later sprints" lists *inventory summaries* alongside Return/Overdue/search | Full inventory reporting (FR-20, F-09) is allocated to **Sprint 3**; Sprint 2 includes loan views/history (FR-18/FR-21) which cover operational "who holds what" summaries. AC-D-02 explicitly allows the Return/Overdue/Reporting span of **Sprint 2–3**. Moving summaries to Sprint 2 would require a baseline change (FR-20/F-09 re-allocation) — flag to team if desired | `docs/srs.md` FR-20, `docs/features.md` F-09, issue #4 AC-D-02 |
 | Due-date assignment (BR-07) | In **Sprint 1** (F-05); only overdue computation (BR-08) is Sprint 2 | SRS rev 2 split, PR #15 review |
-| Approval workflow | None in any sprint (Direct Checkout, A-02) | Team decision |
+| Approval workflow | Sprint 1: Direct Checkout (`A-02`); Sprint 2: Approval workflow (`A-11`, `PENDING → APPROVED/REJECTED → CHECKED_OUT`, non-reserving under `BR-12`) | Team decision (`docs/srs.md` rev 3/6; Sprint 2 approval 2026-11-23) |
 
 ## 10. Open Questions and Risks
 
@@ -157,6 +158,8 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 > Source: `01_SE_Lab_5_updated.pdf` (Lab 5 handout) §4.1, §4.3, §8, §11, §12. Status levels: **Completed** · **In Progress / Planned** · **External Dependency**. Owners/targets are **Pending Team Assignment** (no team agreement recorded yet — do not assume). This section tracks lab requirements only; it does **not** change Sprint allocation (see §11.4).
 
 ### 11.1 Lab 5 Requirements (R-01 – R-12) status map
+
+> **Post-Lab 5 & Lab 6 update (2026-11-23):** Lab 5 (`R-01`–`R-12`, `C-01`–`C-06`) was completed and deployed to Cloud Run + Cloud SQL (`main` `b03c904`, image `sha256:e636ea0c...`, revision `pewdiy-00008-mfk`; see `docs/labs/lab-05/deployment.md`). Lab 6 (`TH-056_P2_lab6_sec131`) completed against `pewdiy-uat-00002-bnt`/`00003-8c5`; `Finding 05` and `UAT-07 UX Note` are scheduled for remediation in Sprint 2. Historical rows below are preserved from rev 5.
 
 | ID | Requirement (summary) | Status | Owner / target | How verified |
 |---|---|---|---|---|
@@ -216,3 +219,4 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | 3 — 2026-11-04 | PR #20 peer review round 2: **corrected lab/deliverable schedule** to Lab 5 = 15 Nov, Lab 6 = 22 Nov, Lab 7 = 29 Nov, D1 = 8 Nov (verified by extracting the §4 table with row structure — table rows match §9/§10 headers); **withdrew the rev-2 "schedule conflict" claim as incorrect** (text-extraction row misalignment, not a document conflict); removed the D1-date OQ (resolved); added due dates to Sprint 2 lab references | PR #20 review round 2 by L0u1sss; `group_work_specs_v1.pdf` §4 table (extracted with cell coordinates), §9, §10 |
 | 4 — 2026-11-05 | Added §11 Lab 5 Readiness: R-01..R-12 status map (Completed / In Progress-Planned / External Dependency, owners Pending Team Assignment), Required Files checklist, C-01..C-06 verification methods, Lab 5 ↔ Deliverable 2 scope separation, and the C-04 UI readiness note; **no Sprint allocation change** | FIX-B #24; `01_SE_Lab_5_updated.pdf` §4.1/§4.3/§8/§11/§12 |
 | 5 — 2026-11-05 | PR #26 review: corrected R-09 from Completed to In Progress / Planned (no release PR staging→main exists; `main` at `7bf6c8d`) and corrected R-04 to claim only revocation persistence (TEST-F01-16 = new store instance on same DB) with application restart / domain-data read-back / redeploy marked untested per C-05; no other rows changed | PR #26 review by L0u1sss; GitHub PR/base state verified; `src/test/auth.test.ts` TEST-F01-16 source |
+| 6 — 2026-11-23 | Reconciled Sprint 2 scope (`A-11` approval workflow, multi-item `request_bundles`, cancellation, 1–14d duration, two-step return notice/confirm, item images, catalog sorting, `BR-13` notifications, print slip, Finding 05 + P4); updated `BR` count to 13 and added post-Lab 5/Lab 6 completion note in §11 | `docs/srs.md` rev 6, `docs/features.md` rev 2, `docs/traceability.md` rev 3, PR #96 merged |
