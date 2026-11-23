@@ -129,7 +129,7 @@ available(item) = Equipment.quantity_total - held(item)
 invariant      = 0 <= held(item) <= Equipment.quantity_total
 ```
 
-Under full returns, an active loan contributes all `quantity_borrowed`; a fully returned loan contributes zero. If partial returns are chosen, use the remaining-held accounting in §3.4. Do not hide corruption with `max(0, available)`; reject invalid writes and investigate inconsistent records. For a single-unit item, positive integer quantities and this invariant allow at most one active loan.
+Under the selected full-quantity return policy (`A-12`, `BR-09`), an active loan contributes all `quantity` (`quantity_borrowed`) until the Custodian confirms full return (`returned_at IS NOT NULL`), at which point held quantity drops to zero (partial return was rejected and is out of scope — see §3.4). Do not hide corruption with `max(0, available)`; reject invalid writes and investigate inconsistent records. For a single-unit item, positive integer quantities and this invariant allow at most one active loan.
 
 **Proposed transaction protocol** (BR-02/03/07/11, NFR-05/06):
 
@@ -352,7 +352,7 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 
 | Question | Impact / next evidence required | Target |
 |---|---|---|
-| SRS OQ-01 | Team supplies actual initial catalog; until then fixtures remain labelled synthetic/proposed | Before Sprint 1 seed implementation |
+| SRS OQ-01 — actual room catalog | Synthetic test/demo fixtures (`E-ONE`, `E-MANY`, `E-ZERO`) are implemented in `server/src/db/seed.ts` (Sprint 1); actual room catalog data remains pending staff population via Custodian catalog CRUD (`F-08` / `FR-09`, contracted for Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) | Operational catalog population (Sprint 2 `F-08` CRUD) |
 | SRS OQ-02 / A-12 | **Policy decision resolved for Sprint 1/2 (`docs/srs.md` rev 6); shared-team baseline peer ratification pending PR #98:** multi-unit up to availability, full-quantity return only, no additional per-borrower cap, plus Sprint 2 two-step return notice → Custodian confirm | F-04 validation implemented in S1; Sprint 2 return flow contracted in `f-06-return.md` (pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) |
 | SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + React 19 + Vitest/Supertest (team decision D1; PR #22 & PR #33) | Closed — AC-C-01 implemented & verified |
 | SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 implemented & verified |

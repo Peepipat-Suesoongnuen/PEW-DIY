@@ -23,8 +23,9 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 - **ระยะเวลาการยืม:** Sprint 1 ตายตัว 7 วัน; Sprint 2 ผู้ยืมเลือกได้ `1–14` วันปฏิทิน (`BR-07` rev) และ **Overdue = เลย `due_on` โดยยังไม่ยืนยันคืน** (`BR-08`)
 - **นิยาม "exclusive item / duplicate active loan" ภายใต้ Quantity Tracking = กฎจำนวน** (available quantity ห้ามต่ำกว่า 0; ของ quantity = 1 มี active loan ซ้ำไม่ได้) (SRS A-04/BR-03)
 
-**ประเด็นที่ปิดแล้วใน Sprint 2 (`docs/srs.md` rev 6 / `docs/system-sds.md` rev 7):**
-- `OQ-01` (synthetic fixtures + Custodian CRUD `FR-09`), `OQ-02` (`Full-return only` + return notice/confirm `A-12`), `OQ-03` (`1–14` วัน), `OQ-04` (in-app alerts `BR-13`), `OQ-06` (search/filter/sort `FR-10`), `SDS-OQ-01/02/03/04` (stack/auth/Asia/Bangkok/GCP)
+**ประเด็นที่ปิดแล้ว (`docs/srs.md` rev 6 / `docs/system-sds.md` rev 7):**
+- `OQ-02` (`Full-return only` + return notice/confirm `A-12`), `OQ-03` (`1–14` วัน), `OQ-04` (in-app alerts `BR-13`), `OQ-06` (search/filter/sort `FR-10`), `SDS-OQ-01/02/03/04` (stack/auth/Asia/Bangkok/GCP)
+- **`OQ-01` (Catalog Data — แยกส่วนทดสอบกับข้อมูลจริง):** Synthetic fixtures (`E-ONE`, `E-MANY`, `E-ZERO`) และ idempotent seed ถูกกำหนดและ implement แล้วตั้งแต่ Sprint 1 ส่วนข้อมูลอุปกรณ์จริงของห้อง D.I.Y. ยังรอ Staff เพิ่มผ่าน Custodian CRUD (`FR-09`, `F-08` ใน Issues #99/#100)
 
 ## 2. Technology Stack and Repository Structure
 
