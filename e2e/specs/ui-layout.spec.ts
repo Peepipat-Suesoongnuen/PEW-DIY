@@ -43,7 +43,9 @@ test("Issue39: stable navigation, separated loan actions, edge clicks and readab
       for (let i = 0; i < 8; i++) {
         const request = await context.request.post("/api/requests", { data: { equipment_id: equipmentId, quantity_requested: 1 }, headers: { Origin: origin } });
         expect(request.status()).toBe(201);
-        const checkout = await staff.request.post(`/api/requests/${(await request.json()).data.id}/checkout`, { data: {}, headers: { Origin: origin } });
+        const reqId = (await request.json()).data.id;
+        expect((await staff.request.post(`/api/requests/${reqId}/approve`, { data: {}, headers: { Origin: origin } })).status()).toBe(200);
+        const checkout = await staff.request.post(`/api/requests/${reqId}/checkout`, { data: {}, headers: { Origin: origin } });
         expect(checkout.status()).toBe(201); loanId = (await checkout.json()).data.id;
       }
     } finally { await staff.close(); }

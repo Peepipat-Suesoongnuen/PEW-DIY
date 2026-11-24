@@ -26,7 +26,6 @@ export const PROTECTED_ROUTE_INVENTORY: ReadonlyArray<{
   sampleBody?: Record<string, unknown>;
 }> = [
   { method: "GET", path: "/api/auth/me" },
-  { method: "POST", path: "/api/requests/fixture-r-one/checkout", sampleBody: {} },
   { method: "GET", path: "/api/loans" },
   { method: "GET", path: "/api/loans/fixture-loan" },
   { method: "POST", path: "/api/auth/logout", sampleBody: {} },
@@ -36,8 +35,17 @@ export const PROTECTED_ROUTE_INVENTORY: ReadonlyArray<{
   { method: "POST", path: "/api/equipment", sampleBody: { name: "Probe", description: "", category: "Synthetic", quantity_total: 1 } },
   { method: "PATCH", path: "/api/equipment/fixture-e-one", sampleBody: { name: "Probe" } },
   { method: "POST", path: "/api/requests", sampleBody: { equipment_id: "fixture-e-one", quantity_requested: 1 } },
+  { method: "POST", path: "/api/request-bundles", sampleBody: { items: [{ equipment_id: "fixture-e-one", quantity_requested: 1 }] } },
   { method: "GET", path: "/api/requests" },
   { method: "GET", path: "/api/requests/fixture-r-one" },
+  { method: "POST", path: "/api/requests/fixture-r-one/approve", sampleBody: {} },
+  { method: "POST", path: "/api/requests/fixture-r-one/reject", sampleBody: {} },
+  { method: "POST", path: "/api/requests/fixture-r-one/cancel", sampleBody: {} },
+  { method: "POST", path: "/api/request-bundles/fixture-bundle/approve", sampleBody: {} },
+  { method: "POST", path: "/api/request-bundles/fixture-bundle/reject", sampleBody: {} },
+  { method: "POST", path: "/api/request-bundles/fixture-bundle/cancel", sampleBody: {} },
+  { method: "POST", path: "/api/requests/fixture-r-one/checkout", sampleBody: {} },
+  { method: "POST", path: "/api/request-bundles/fixture-bundle/checkout", sampleBody: {} },
 ];
 
 export function requireTestDbUrl(): string {
@@ -56,8 +64,10 @@ export async function createTestContext(): Promise<TestContext> {
 }
 
 export async function resetTestDb(pool: Pool): Promise<void> {
+  await pool.query("DELETE FROM notifications");
   if (await loanRelationsExist(pool)) await pool.query("DELETE FROM loans");
   await pool.query("DELETE FROM borrowing_requests");
+  await pool.query("DELETE FROM request_bundles");
   // Order matters: sessions reference users.
   await pool.query("DELETE FROM sessions");
   await pool.query("DELETE FROM users");

@@ -31,17 +31,19 @@ const checkout = (id: string, cookie = cookies[2]!, body: unknown = {}, app = ap
 async function fixture(total = 1, qty = 1, owner = users[0]!.id) {
   const item = "f05-" + randomUUID(), id = "f05-" + randomUUID();
   await pool.query("INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,'F05 synthetic','Test','Synthetic',$2)", [item, total]);
-  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested) VALUES($1,$2,$3,$4)", [id, owner, item, qty]);
+  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested,approval_status) VALUES($1,$2,$3,$4,'APPROVED')", [id, owner, item, qty]);
   return { item, id };
 }
 async function second(item: string, qty = 1) {
   const id = "f05-" + randomUUID();
-  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested) VALUES($1,$2,$3,$4)", [id, users[1]!.id, item, qty]);
+  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested,approval_status) VALUES($1,$2,$3,$4,'APPROVED')", [id, users[1]!.id, item, qty]);
   return id;
 }
 async function cleanup() {
+  await pool.query("DELETE FROM notifications WHERE user_id IN ('f05-a','f05-b','f05-c')");
   await pool.query("DELETE FROM loans WHERE request_id IN (SELECT id FROM borrowing_requests WHERE borrower_id IN ('f05-a','f05-b'))");
   await pool.query("DELETE FROM borrowing_requests WHERE borrower_id IN ('f05-a','f05-b')");
+  await pool.query("DELETE FROM request_bundles WHERE borrower_id IN ('f05-a','f05-b')");
   await pool.query("DELETE FROM equipment WHERE id LIKE 'f05-%'");
 }
 beforeAll(async () => {
@@ -75,9 +77,12 @@ describe("F-05 real PostgreSQL/API", () => {
     }
     expect((await getEquipment(pool, item))!.quantity_available).toBe(1);
     expect((await pool.query("SELECT * FROM loans WHERE request_id=ANY($1::text[])", [submitted])).rowCount).toBe(0);
+    for (const reqId of submitted) {
+      expect((await request(app).post(`/api/requests/${reqId}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({})).status).toBe(200);
+    }
     expect((await checkout(submitted[0]!)).status).toBe(201);
     expect((await getEquipment(pool, item))!.quantity_available).toBe(0);
-    for (const [index, status] of ["CHECKED_OUT", "SUBMITTED"].entries()) {
+    for (const [index, status] of ["CHECKED_OUT", "APPROVED"].entries()) {
       expect((await request(app).get(`/api/requests/${submitted[index]}`).set("Cookie", cookies[index]!)).body.data.status).toBe(status);
     }
     expect((await request(app).get("/api/requests").set("Cookie", cookies[2]!)).body.data.map((r: { id: string }) => r.id)).toEqual([submitted[1]]);

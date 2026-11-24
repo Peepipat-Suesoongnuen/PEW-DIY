@@ -47,7 +47,7 @@ async function login(index: number) {
   return response.headers.get("set-cookie")!.split(";")[0]!;
 }
 const routePath = (path: string) => path.replace("fixture-e-one", encodeURIComponent(item))
-  .replace("fixture-r-one", requestId).replace("fixture-loan", loanId);
+  .replace("fixture-r-one", requestId).replace("fixture-loan", loanId).replace("fixture-bundle", "missing-bundle");
 const domain = async () => (await pool.query(`SELECT r.id,r.borrower_id,r.equipment_id,r.quantity_requested,
   r.created_at,l.id AS loan_id,l.quantity_borrowed,l.checked_out_by,l.checkout_at,l.due_on::text
   FROM borrowing_requests r LEFT JOIN loans l ON l.request_id=r.id WHERE r.equipment_id=$1 ORDER BY r.id`, [item])).rows;
@@ -60,6 +60,8 @@ beforeAll(async () => {
   await start(); cookies = await Promise.all(ids.map((_, i) => login(i)));
   const response = await call("POST", "/api/requests", cookies[0], { equipment_id: item, quantity_requested: 1 });
   expect(response.status).toBe(201); requestId = (await response.json()).data.id;
+  const approved = await call("POST", `/api/requests/${requestId}/approve`, cookies[2], {});
+  expect(approved.status).toBe(200);
   const checkout = await call("POST", `/api/requests/${requestId}/checkout`, cookies[2]);
   expect(checkout.status).toBe(201); loanId = (await checkout.json()).data.id;
   const sessions = new SessionStore(pool, 60, 480);
@@ -70,8 +72,10 @@ beforeAll(async () => {
 });
 afterAll(async () => {
   await stop(); if (!pool) return;
+  await pool.query("DELETE FROM notifications WHERE user_id=ANY($1::text[])", [ids]);
   await pool.query("DELETE FROM loans WHERE request_id IN (SELECT id FROM borrowing_requests WHERE equipment_id=$1)", [item]);
   await pool.query("DELETE FROM borrowing_requests WHERE equipment_id=$1", [item]);
+  await pool.query("DELETE FROM request_bundles WHERE borrower_id=ANY($1::text[])", [ids]);
   await pool.query("DELETE FROM equipment WHERE id=$1", [item]);
   await pool.query("DELETE FROM sessions WHERE user_id=ANY($1::text[])", [ids]);
   await pool.query("DELETE FROM users WHERE id=ANY($1::text[])", [ids]); await pool.end();
@@ -79,7 +83,11 @@ afterAll(async () => {
 
 describe("F10 complete protected-route inventory on production HTTP/real DB", () => {
   it("keeps the HTTP probe inventory complete against the protected role matrix", () => {
-    const normalized = PROTECTED_ROUTE_INVENTORY.map((r) => `${r.method} ${r.path.replace('fixture-e-one', '{equipmentId}').replace('fixture-r-one', '{requestId}').replace('fixture-loan', '{loanId}')}`).sort();
+    const normalized = PROTECTED_ROUTE_INVENTORY.map((r) => `${r.method} ${r.path
+      .replace("fixture-e-one", "{equipmentId}")
+      .replace("fixture-r-one", "{requestId}")
+      .replace("fixture-loan", "{loanId}")
+      .replace("fixture-bundle", "{bundleId}")}`).sort();
     expect(normalized).toEqual(PROTECTED_ROUTES.map((r) => `${r.method} ${r.path}`).sort());
   });
   it("configured HTTPS cookies have Secure/HttpOnly/SameSite attributes (TEST-F01-15)", async () => {
