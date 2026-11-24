@@ -258,13 +258,23 @@ describe("F-08 Catalog CRUD, Retire, Search/Filter/Sort & Security", () => {
     expect(borrowerRes.status).toBe(200);
     expect(borrowerRes.body.data.map((i: { id: string }) => i.id)).toEqual([a]);
 
-    // Borrower never sees RETIRED in list even if status=ALL
+    // Borrower never sees RETIRED in list even if status=ALL or status=RETIRED
     const borrowerAll = await request(app).get("/api/equipment?status=ALL").set("Cookie", cookies[0]!);
     expect(borrowerAll.body.data.map((i: { id: string }) => i.id)).not.toContain(c);
+    const borrowerRetired = await request(app).get("/api/equipment?status=RETIRED").set("Cookie", cookies[0]!);
+    expect(borrowerRetired.body.data.map((i: { id: string }) => i.id)).not.toContain(c);
 
-    // Custodian sees RETIRED when filtering status=RETIRED
+    // Custodian defaults to ACTIVE only when status query is omitted; sees RETIRED/ALL when requested
+    const custodianDefault = await request(app).get("/api/equipment").set("Cookie", cookies[2]!);
+    expect(custodianDefault.status).toBe(200);
+    expect(custodianDefault.body.data.map((i: { id: string }) => i.id)).toContain(a);
+    expect(custodianDefault.body.data.map((i: { id: string }) => i.id)).not.toContain(c);
+
     const custodianRetired = await request(app).get("/api/equipment?status=RETIRED").set("Cookie", cookies[2]!);
     expect(custodianRetired.body.data.map((i: { id: string }) => i.id)).toContain(c);
+
+    const custodianAll = await request(app).get("/api/equipment?status=ALL").set("Cookie", cookies[2]!);
+    expect(custodianAll.body.data.map((i: { id: string }) => i.id)).toContain(c);
 
     // Sort by available_asc puts 0-stock Beta first in Tools
     const sorted = await request(app).get("/api/equipment?category=Tools&sort=available_asc").set("Cookie", cookies[0]!);

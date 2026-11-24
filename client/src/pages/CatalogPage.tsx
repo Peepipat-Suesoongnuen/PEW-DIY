@@ -58,7 +58,7 @@ export function CatalogPage() {
         q: query.trim() || undefined,
         category: category || undefined,
         availability: availability || undefined,
-        status: isCustodian && statusFilter !== "ACTIVE" ? statusFilter : undefined,
+        status: isCustodian ? statusFilter : undefined,
         sort: sort !== "name_asc" ? sort : undefined,
       });
       if (seq !== fetchSeq.current) return;

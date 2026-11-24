@@ -358,6 +358,7 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     renderCatalog();
 
     await screen.findAllByText("Arduino Uno");
+    expect(fetchMock.mock.calls.some(([u]) => String(u) === "/api/equipment?status=ACTIVE")).toBe(true);
     await user.selectOptions(screen.getByLabelText("Sort by"), "available_desc");
     expect(fetchMock.mock.calls.some(([u]) => String(u).includes("sort=available_desc"))).toBe(true);
 
@@ -366,6 +367,11 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     expect(screen.getByRole("option", { name: "Instruments" })).toBeInTheDocument();
 
     // Filtering status=RETIRED with 0 matches shows filter empty state + Clear filters button
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "RETIRED");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("status=RETIRED"))).toBe(true);
+    expect(await screen.findByText("No equipment matched your filters.")).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "ALL");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("status=ALL"))).toBe(true);
     await user.selectOptions(screen.getByLabelText(/Catalog status/), "RETIRED");
     expect(await screen.findByText("No equipment matched your filters.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Clear filters" }));

@@ -58,6 +58,9 @@ function parseListFilter(req: AuthenticatedRequest): EquipmentFilter {
       throw new CatalogError(400, "VALIDATION_ERROR", "Invalid status filter.");
     }
     filter.status = req.query.status as CatalogStatus | "ALL";
+  } else {
+    // Default Custodian catalog view to ACTIVE items unless RETIRED or ALL is requested.
+    filter.status = "ACTIVE";
   }
 
   if (typeof req.query.sort === "string" && req.query.sort !== "") {
