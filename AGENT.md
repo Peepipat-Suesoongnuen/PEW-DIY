@@ -2,7 +2,7 @@
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Status:** Draft — pending peer review (created by AI agent, Issue [D1-07]; not yet approved by the team)
-> **Last updated:** 2026-11-05 (FIX-A #23: §2.3 snapshot ล้าหลัง — อัปเดตโครงสร้าง client/server + stack ที่เลือกแล้ว (ปิด SDS-OQ-01/02) ตาม AGENT.md §21)
+> **Last updated:** 2026-11-23 (Sprint 2 Contracts & Staging Reconciliation (#97): อัปเดตโครงสร้าง, Stack, `OQ-01`..`OQ-06` / `SDS-OQ-01`..`04`, และ Branch Strategy ให้รองรับ `sprint/<n>-staging`)
 > **Purpose:** คู่มือกลางสำหรับ AI Agent ทุกตัวที่เข้ามาทำงานใน Repository นี้ เพื่อให้การพัฒนาเป็นมาตรฐาน ตรวจสอบได้ ปลอดภัย และไม่ลดอำนาจการตัดสินใจของมนุษย์
 > **Maintenance:** เมื่อ stack/โครงสร้าง/กระบวนการทำงานเปลี่ยนแปลงอย่างมีนัยสำคัญ ต้องอัปเดตไฟล์นี้ผ่าน PR ที่ผ่าน Peer Review (ดู §21)
 
@@ -40,7 +40,7 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 ### 2.2 Layout Conventions (ถาวร)
 - Root: `AGENT.md` (กติกา Agent — ไฟล์นี้), `README.md` (ภาพรวม/โครงสร้าง/คำสั่ง setup), `.gitignore` (กัน `.env`/secrets, logs, editor files)
 - `docs/` — เอกสารวิศวกรรม: `docs/srs.md`, `docs/features.md`, `docs/traceability.md`, `docs/system-sds.md`, `docs/sprints/`, `docs/labs/`
-- โครงสร้าง source code ตามที่กำหนดใน `docs/system-sds.md` เมื่อทีมเลือก stack แล้ว
+- โครงสร้าง source code ตามที่กำหนดใน `docs/system-sds.md` (`client/`, `server/src/`, `server/tests/`, `e2e/`, `deploy/`)
 
 ### 2.3 แหล่งอ้างอิงและสถานะจริง (snapshot ณ 2026-11-23 — verify ซ้ำก่อนใช้)
 
@@ -57,7 +57,7 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 1. **ข้อกำหนดรายวิชา:** `group_work_specs_v1.pdf`, `project_deliverable_1_v1.pdf` (ที่ `.../group_project_spec_files/`) — ข้อกำหนดจากอาจารย์
 2. **SRS (baseline requirements):** `docs/srs.md` — FR/BR/NFR พร้อม Stable IDs
 3. **Design:** `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md`
-4. **Engineering Contracts:** `docs/sprints/sprint-1/` (Feature SDS, AC, STS, DoD)
+4. **Engineering Contracts:** `docs/sprints/sprint-1/`, `docs/sprints/sprint-2/`, `docs/sprints/sprint-3/` (Feature SDS, AC, STS, DoD)
 5. **Issue Requirements และ Acceptance Criteria** ของงานที่กำลังทำ
 6. `README.md` และไฟล์นี้ (`AGENT.md`)
 
@@ -303,7 +303,7 @@ Issue จะเป็น **Done** เมื่อ Reviewer Approve **และ**
 - ห้าม invent ข้อกำหนดใหม่เอง — ข้อเสนอแนะต้องติดป้ายเป็น Proposed และรอทีมอนุมัติ
 
 ### 15.2 Coding Conventions
-- **ยังไม่มี stack-specific conventions** (Repository ยังไม่มีโค้ด — §2) — เมื่อเลือก stack แล้วต้องเพิ่ม conventions ของภาษี/framework ที่เลือกใน §2 นี้
+- **Stack conventions ปัจจุบัน (§2.3 & `docs/system-sds.md` §2.1):** Backend = Node.js 24 + TypeScript + Express 5 + parameterized PostgreSQL (`pg` + SQL migrations ใน `server/src/db/migrations.ts`, fail-closed config ใน `server/src/config/config.ts`); Frontend = React 19 + Vite + TypeScript + Tailwind CSS v4 tokens (`client/src/styles/tokens.css`); Tests = Vitest + Supertest (`server/tests/`), Vitest + Testing Library (`client/src/test/`), Playwright Chromium 3 viewports (`e2e/`).
 - หลักการทั่วไป (ใช้ได้ทุก stack): ตั้งชื่อสื่อความหมาย · แยกชั้น UI/API/DB ตาม architecture ที่กำหนดใน `docs/system-sds.md` · business rules อยู่ฝั่ง server · โค้ดและ tests มาคู่กัน · ไม่ commit debug code/secret/comment ที่ไม่จำเป็น · ไม่เพิ่ม dependency โดยไม่จำเป็น
 
 ### 15.3 ID Conventions (ปัจจุบัน)

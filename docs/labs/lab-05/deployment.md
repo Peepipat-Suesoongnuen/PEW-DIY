@@ -38,7 +38,7 @@ All runtime configuration is validated fail-closed by `server/src/config/config.
 | `NODE_ENV` | Runtime mode (`development`, `test`, `production`) | No | `.env` (`development`) | Cloud Run env var (`production`) |
 | `PORT` | HTTP listen port (`0.0.0.0:$PORT`) | No | `.env` (`3000`) | Reserved & injected automatically by Cloud Run (`--port 3000` routes traffic; never set in `--set-env-vars`) |
 | `APP_ORIGIN` | Exact browser origin allowed by anti-CSRF `Origin`/`Referer` check | No | `.env` (`http://localhost:3000` or `http://localhost:5173` in Compose) | Cloud Run env var (`https://pewdiy-qtz73ahnlq-as.a.run.app`) |
-| `APP_TIMEZONE` | IANA calendar timezone for due-date calculation (`+7` days) | No | `.env` (`Asia/Bangkok`) | Cloud Run env var (`Asia/Bangkok`) |
+| `APP_TIMEZONE` | IANA calendar timezone for due-date calculation (`+7` days in Sprint 1; `1–14` calendar days in Sprint 2 contract) | No | `.env` (`Asia/Bangkok`) | Cloud Run env var (`Asia/Bangkok`) |
 | `SESSION_IDLE_MINUTES` | Sliding session idle timeout in minutes | No | `.env` (`60`) | Cloud Run env var (`60`) |
 | `SESSION_ABSOLUTE_MINUTES` | Hard maximum session lifetime in minutes | No | `.env` (`480`) | Cloud Run env var (`480`) |
 | `SESSION_COOKIE_NAME` | Name of the `HttpOnly` session cookie | No | `.env` (`pew_session`) | Cloud Run env var (`pew_session`) |

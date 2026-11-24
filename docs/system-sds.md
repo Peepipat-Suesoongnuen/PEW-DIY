@@ -77,7 +77,7 @@ flowchart LR
 | Data access | Parameterized access, atomic operations, FK/check/uniqueness constraints and ownership-scoped queries | BR-03/11, NFR-04/05/06 |
 | Database | Persist committed state independently of browser and application process; reject structural integrity violations | FR-08/11/14/15, BR-11, NFR-04 |
 
-Keep identity/access, catalog/availability, borrowing/loans, and later reporting as modules within the application. Do not add microservices, external messaging, real data, or an approval subsystem. Prefer one browser origin for UI and API; if separate origins are selected, explicitly allow only configured origins and document credential/CORS behavior in [D1-05].
+Keep identity/access, catalog/availability, borrowing/loans, and later reporting as modules within the application. Do not add microservices, external messaging, or real student/room data. Sprint 1 (`d079bc6`) uses Direct Checkout (`A-02`) with no approval step; Sprint 2 contracts add the non-reserving approval workflow (`A-11`, `BR-12`, `PENDING → APPROVED/REJECTED/CANCELLED → CHECKED_OUT`, pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) within the same modular monolith. Prefer one browser origin for UI and API; if separate origins are selected, explicitly allow only configured origins and document credential/CORS behavior in [D1-05].
 
 ## 3. Data Model and Consistency
 
@@ -87,11 +87,11 @@ With `SDS-OQ-01` resolved (§2.1), Sprint 1 SQL migrations (`001`–`003` in `se
 
 | Entity | Principal fields (Sprint 1 Implemented vs Sprint 2 Contracted `#99`) | Integrity, ownership, and use |
 |---|---|---|
-| **User** (`users` + `sessions`) | **Implemented (`001`):** `id` PK; `username` text; `password_hash` text; `role` constrained code (`BORROWER` / `CUSTODIAN`); `sessions` table (`id`, `user_id`, `token_hash`, `expires_at`, `absolute_expires_at`) | Unique username; exactly one role (`BORROWER` or `CUSTODIAN`); Argon2id `password_hash` never exposed in responses. Seeded accounts (`B-A`, `B-B`, `C-A`); no registration feature (FR-01–FR-05, BR-10). |
-| **Equipment** (`equipment`) | **Implemented (`002`):** `id` PK; `name`, `description`, `category` text; `quantity_total`, `quantity_available` integer<br>**Contracted (`004`, `#99`):** `image_url` (nullable text), `catalog_status` (`ACTIVE`/`RETIRED`, default `ACTIVE`) | Required catalog fields; `0 <= quantity_available <= quantity_total` (BR-03). Retirement/status semantics (`ACTIVE`/`RETIRED`, retire blocked when `quantity_available < quantity_total` under `BR-14`) and optional `image_url` are contracted for Sprint 2 (`F-08`, `A-10`/`FR-09`, pending Issue #99). |
-| **BorrowingRequest** (`borrowing_requests` + `request_bundles`) | **Implemented (`003`):** `id` PK; `borrower_id` FK User; `equipment_id` FK Equipment; `quantity_requested` integer; `status` (`SUBMITTED`/`CHECKED_OUT`); `submitted_at` timestamp<br>**Contracted (`004`, `#99`):** `request_bundles` table + `bundle_id`, `purpose_category`, `purpose_detail`, `requested_days` (`1..14`, default `7`), `approval_status` (`PENDING`/`APPROVED`/`REJECTED`/`CANCELLED`), `reviewed_by`, `reviewed_at`, `decision_note` | `quantity_requested >= 1` up to `quantity_available` at submission (`OQ-02` / `A-12` resolved: multi-unit up to current stock, no extra per-borrower cap). Owner is always the authenticated Borrower. Sprint 1 uses Direct Checkout (`A-02`, no approval state); Sprint 2 contracts add `A-11` non-reserving approval (`PENDING → APPROVED/REJECTED/CANCELLED → CHECKED_OUT`, `BR-12`, pending Issue #99). |
-| **Loan** (`loans`) | **Implemented (`003`):** `id` PK; `request_id` unique FK BorrowingRequest; `borrower_id`, `equipment_id`; `quantity` integer; `checked_out_by` FK User; `checked_out_at` timestamp; `due_on` date; `returned_at` optional timestamp; `returned_by` optional FK User<br>**Contracted (`004`, `#99`):** `return_requested_at` optional timestamp (`RETURN_PENDING` notice) | `quantity >= 1`. Borrower/equipment match the linked request. Service enforces that checkout actor is Custodian (`BR-04`). Full-quantity return policy (`OQ-02` / `A-12`) is resolved (§3.4); Sprint 2 two-step return (`request-return` → Custodian `return`) is contracted in `f-06-return.md` (pending Issue #99). |
-| **Notification** (`notifications`) | **Contracted (`004`, `#99`):** `id` PK; `user_id` FK User; `type` (`REQUEST_APPROVED`/`REQUEST_REJECTED`/`RETURN_CONFIRMED`/`LOAN_DUE_SOON`/`LOAN_OVERDUE`); `title`, `body`, `reference_id`, `read_at`, `created_at` | Contracted for Sprint 2 (`F-07` / `F-11`, `FR-19`, `BR-13`, pending Issue #99): stores persistent dismissible/clearable alerts per user without mutating request or loan records. |
+| **User** (`users` + `sessions`) | **Implemented (`MIGRATION_001_SQL`):** `id` PK; `username` text; `password_hash` text; `role` constrained code (`BORROWER` / `CUSTODIAN`); `sessions` table (`session_key`, `user_id`, `created_at`, `expires_at`, `absolute_expires_at`, `revoked_at`, `last_seen_at`) | Unique username; exactly one role (`BORROWER` or `CUSTODIAN`); Argon2id `password_hash` never exposed in responses. Seeded accounts (`B-A`, `B-B`, `C-A`); no registration feature (FR-01–FR-05, BR-10). |
+| **Equipment** (`equipment`) | **Implemented (`MIGRATION_001_SQL`):** `id` PK; `name`, `description`, `category` text; `quantity_total` integer (available quantity is derived from `loans` per §3.3, not stored)<br>**Contracted (`MIGRATION_004_SPRINT2_SQL`, `#99`):** `image_url` (`TEXT NOT NULL DEFAULT ''`), `catalog_status` (`ACTIVE`/`RETIRED`, default `ACTIVE`) | Required catalog fields; `quantity_total >= 0` (`BR-03` invariant `0 <= held <= quantity_total` enforced on derived reads and locked transactions). In Sprint 2 (`F-08`, `A-10`/`FR-09`, pending Issue #99), reducing `quantity_total < held` is rejected (`BR-06`, `409 HELD_QUANTITY_CONFLICT`), while retiring (`ACTIVE` → `RETIRED`) prevents new borrowing (`BR-01`, `409 EQUIPMENT_RETIRED`) without deleting active or historical loans. |
+| **BorrowingRequest** (`borrowing_requests` + `request_bundles`) | **Implemented (`MIGRATION_002_REQUESTS_SQL`):** `id` PK; `borrower_id` FK User; `equipment_id` FK Equipment; `quantity_requested` integer; `created_at` timestamp (status `SUBMITTED`/`CHECKED_OUT` derived from linked `loans`)<br>**Contracted (`MIGRATION_004_SPRINT2_SQL`, `#99`):** `request_bundles` (`id`, `borrower_id`, `purpose_category`, `purpose_detail`, `requested_days`, `created_at`) + columns on `borrowing_requests` (`bundle_id`, `purpose_category`, `purpose_detail`, `requested_days` `1..14` default `7`, `approval_status` `PENDING`/`APPROVED`/`REJECTED`/`CANCELLED`, `reviewed_by`, `reviewed_at`, `decision_note`) | `quantity_requested >= 1` up to derived `quantity_available` at submission (`OQ-02` / `A-12` resolved: multi-unit up to current stock, no extra per-borrower cap). Owner is always the authenticated Borrower. Sprint 1 uses Direct Checkout (`A-02`, no approval state); Sprint 2 contracts add `A-11` non-reserving approval (`PENDING → APPROVED/REJECTED/CANCELLED → CHECKED_OUT`, `BR-12`, pending Issue #99). |
+| **Loan** (`loans`) | **Implemented (`MIGRATION_003_LOANS_SQL`):** `id` PK; `request_id` unique FK BorrowingRequest; `quantity_borrowed` integer; `checked_out_by` FK User; `checkout_at` timestamp; `due_on` date; `returned_at` optional timestamp; `returned_by` optional FK User<br>**Contracted (`MIGRATION_004_SPRINT2_SQL`, `#99`):** `return_requested_at` optional timestamp, `return_requested_by` optional FK User, `return_note` (`TEXT NOT NULL DEFAULT ''`) | `quantity_borrowed >= 1`. Borrower/equipment are resolved through the linked request (`borrowing_requests`). Service enforces that checkout actor is Custodian (`BR-04`). Full-quantity return policy (`OQ-02` / `A-12`) is resolved (§3.4); Sprint 2 two-step return (`request-return` → Custodian `return`) is contracted in `f-06-return.md` (pending Issue #99). |
+| **Notification** (`notifications`) | **Contracted (`MIGRATION_004_SPRINT2_SQL`, `#99`):** `id` PK; `user_id` FK User; `kind` (`REQUEST_APPROVED`/`REQUEST_REJECTED`/`LOAN_DUE_SOON`/`LOAN_OVERDUE`); `reference_id`, `title`, `message`, `created_at`, `read_at`, `cleared_at` | Contracted for Sprint 2 (`F-07` / `F-11`, `FR-19`, `BR-13`, pending Issue #99): `UNIQUE (user_id, kind, reference_id)` stores persistent dismissible/clearable alerts per user without mutating request or loan records. |
 
 **Role representation:** the two role codes are a constrained field on User; no role-management API or multi-role account exists.
 
@@ -121,29 +121,25 @@ The diagram shows domain progression; request and loan remain distinct persisted
 
 ### 3.3 Availability Invariant and Checkout Transaction
 
-**Confirmed basis:** SRS A-01/A-04, BR-02/03. **Proposed representation:** derive availability from persisted loans rather than storing a second mutable `quantity_available` counter:
+**Confirmed & Implemented (`server/src/services/catalog.ts`, `borrowing-request.ts`, `loan.ts`):** Availability is **derived** at query/transaction time from `equipment.quantity_total` and active `loans` (`returned_at IS NULL`) rather than storing a separate mutable `quantity_available` column on `equipment`:
 
 ```text
-held(item)      = sum(quantity still held by each active loan for item)
-available(item) = Equipment.quantity_total - held(item)
-invariant      = 0 <= held(item) <= Equipment.quantity_total
+held(item)      = sum(loans.quantity_borrowed WHERE returned_at IS NULL for item)
+available(item) = equipment.quantity_total - held(item)
+invariant       = 0 <= held(item) <= equipment.quantity_total
 ```
 
-Under the selected full-quantity return policy (`A-12`, `BR-09`), an active loan contributes all `quantity` (`quantity_borrowed`) until the Custodian confirms full return (`returned_at IS NOT NULL`), at which point held quantity drops to zero (partial return was rejected and is out of scope — see §3.4). Do not hide corruption with `max(0, available)`; reject invalid writes and investigate inconsistent records. For a single-unit item, positive integer quantities and this invariant allow at most one active loan.
+Under the selected full-quantity return policy (`A-12`, `BR-09`), an active loan contributes all `quantity_borrowed` until the Custodian confirms full return (`returned_at IS NOT NULL`), at which point held quantity drops to zero (partial return was rejected and is out of scope — see §3.4). Invalid aggregates (`held < 0` or `held > quantity_total`) raise `AvailabilityIntegrityError` / `AVAILABILITY_INTEGRITY_ERROR` rather than clamping with `max(0, available)`. For a single-unit item, positive integer quantities and this invariant allow at most one active loan.
 
-**Proposed transaction protocol** (BR-02/03/07/11, NFR-05/06):
+**Implemented transaction protocol (`server/src/services/loan.ts` & `borrowing-request.ts`, `SDS-OQ-01` Resolved):**
 
-1. Authenticate and require Custodian. Load the request's immutable equipment reference; never accept borrower, due date, or actor identity from the checkout payload.
-2. Begin a transaction and lock the Equipment row, then the BorrowingRequest row in that consistent order. Re-read the request, its loan relation, the current total, and committed held quantities. Reject an already fulfilled request.
-3. Validate the requested quantity against the team-approved OQ-02 policy and current available quantity. Reject insufficient stock without a loan or state change.
-4. Insert exactly one Loan linked to that request, with server-assigned actor/time/due date. Availability changes through the committed loan; request status is derived from the relationship.
-5. Commit all writes together, then respond. Any failure rolls back the transaction. A uniqueness constraint on `Loan.request_id` also guards repeated checkout.
+1. Authenticate and authorize role (`CUSTODIAN` for checkout; `BORROWER` for request creation). Load the request's immutable `equipment_id`; never accept borrower, due date, or actor identity from the checkout payload.
+2. Begin a PostgreSQL `READ COMMITTED` transaction and acquire row-level locks in consistent order: `SELECT id FROM equipment WHERE id = $1 FOR UPDATE`, then `SELECT * FROM borrowing_requests WHERE id = $1 FOR UPDATE`. Reject an already fulfilled request (`409 ALREADY_CHECKED_OUT`).
+3. Re-read `quantity_total` and derived `quantity_available` (`quantity_total - held`) via `getEquipment(client, equipmentId)` **after** acquiring the lock so committed concurrent checkouts/returns are visible, and enforce `assertCheckoutAvailable` (`1..quantity_available`, `OQ-02` / `A-12`). Reject insufficient stock (`409 INSUFFICIENT_AVAILABILITY`) without creating a loan.
+4. Insert exactly one `loans` row linked to that request (`UNIQUE (request_id)`), with server-assigned `checked_out_by`, `checkout_at` (UTC), and `due_on` (`Asia/Bangkok` calendar date + `7` days in S1, or `requested_days` `1..14` contracted in S2). Availability changes automatically through the committed loan row.
+5. `COMMIT` all writes together, then respond. Any validation, conflict, or DB error runs `ROLLBACK` (`TEST-F05-04/05/08`; transient lock/serialization codes `40P01`/`40001`/`55P03` return `503 RETRY_LATER`).
 
-Every writer affecting held units or total quantity (checkout, later return, total adjustment) must use the same Equipment-first serialization protocol. The database must re-read held quantities **after** acquiring that lock with semantics that see preceding committed writers; a stale transaction snapshot is insufficient. Engine-specific implementation/isolation tests are a stack-selection gate. An in-process mutex cannot protect multiple API processes.
-
-**Implemented PostgreSQL 17 row-level locking (`SDS-OQ-01` Resolved):** In `server/src/services/loan.ts` and `server/src/services/borrowing-request.ts`, PostgreSQL `SELECT ... FROM equipment WHERE id = $1 FOR UPDATE` serializes concurrent writers targeting the same Equipment row inside an explicit `BEGIN ... COMMIT` transaction (`server/src/db/pool.ts`), re-reading post-lock `quantity_available` and rolling back completely on any validation, conflict (`409`), or DB error (`TEST-F05-04/05/08`). [PostgreSQL row-level locking documentation](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) describes the lock behavior.
-
-At request creation, the application validates availability from the DB before persisting the request (BR-01); use the same equipment lock to make that check and insert consistent with checkout. No inventory decrement occurs at this step under the confirmed non-reservation model (Direction A, 2026-11-06; SRS BR-12). Later quantity reductions must reject `new_total < held` under the lock. A repeated checkout returns a safe conflict and never creates a duplicate loan; after an uncertain network response the UI re-fetches request state before retrying.
+Every writer affecting held units or total quantity (checkout, Sprint 2 return, and Sprint 2 total adjustment) uses the same Equipment-first `FOR UPDATE` serialization protocol so multi-instance Cloud Run deployments cannot race. At request creation (`borrowing-request.ts`), the service validates derived availability from the DB under the same `equipment FOR UPDATE` lock without decrementing stock (`BR-01`, `BR-12`). Sprint 2 catalog total reductions (`F-08`, pending `#99`) reject `new_total < held` (`409 HELD_QUANTITY_CONFLICT`) under the same lock.
 
 ### 3.4 Return, Dates, and Later-Sprint Extensions
 
@@ -162,11 +158,11 @@ Sprint 2 contracts add return (`F-06`), overdue & persistent in-app notification
 
 ## 4. Database Setup, Migrations, and Synthetic Seed
 
-With `SDS-OQ-01` resolved (§2.1), runnable Sprint 1 setup, ordered SQL migrations (`001_identity_and_sessions.sql`, `002_equipment_catalog.sql`, `003_requests_and_loans.sql` in `server/src/db/migrations/`), idempotent synthetic seed (`server/src/db/seed.ts`), and verification commands are **implemented and active** on `d079bc6` (`README.md`, `package.json`, `NFR-08`). Sprint 2 schema migration `004_sprint2_domain_extensions.sql` is **contracted pending Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)**. The implemented procedure and invariants are:
+With `SDS-OQ-01` resolved (§2.1), runnable Sprint 1 setup, ordered SQL migrations (`MIGRATION_001_SQL`, `MIGRATION_002_REQUESTS_SQL`, `MIGRATION_003_LOANS_SQL` in `server/src/db/migrations.ts`), idempotent synthetic seed (`server/src/db/seed.ts`), and verification commands are **implemented and active** on `d079bc6` (`README.md`, `package.json`, `NFR-08`). Sprint 2 schema migration `004` is **contracted pending Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)**. The implemented procedure and invariants are:
 
 1. **Pinned runtime & isolated databases (Implemented):** Node.js 24 + PostgreSQL 17 (`package.json` scripts) use an isolated development database (`DATABASE_URL`) and disposable test databases/schemas (`TEST_DATABASE_URL` / `CI_TEST_DATABASE_URL`); neither uses real university data.
 2. **Tracked `.env.example` & fail-closed config (Implemented):** `.env.example` provides non-secret variable names and placeholders only. `server/src/config/config.ts` validates required DB/auth/timezone settings before accepting requests and fails closed when incomplete.
-3. **Ordered SQL migrations (Implemented `001`–`003`; Contracted `004` in `#99`):** `npm run migrate` (and `npm run migrate:test`) applies version-controlled SQL migrations recorded in `schema_migrations`: `001` (`users`, `sessions`) → `002` (`equipment`) → `003` (`borrowing_requests`, `loans` with FKs, checks, and unique `request_id`). Sprint 2 adds `004_sprint2_domain_extensions.sql` (`image_url`, `catalog_status`, `request_bundles`, `approval_status`, `requested_days`, `return_requested_at`, `notifications`) in Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99).
+3. **Ordered SQL migrations (Implemented `001`–`003`; Contracted `004` in `#99`):** `npm run migrate` (and `npm run migrate:test`) applies idempotent SQL migrations from `server/src/db/migrations.ts`: `MIGRATION_001_SQL` (`users`, `sessions`, `equipment`) → `MIGRATION_002_REQUESTS_SQL` (`borrowing_requests`) → `MIGRATION_003_LOANS_SQL` (`loans` with FKs, checks, and unique `request_id`). Sprint 2 adds `004` (`image_url`, `catalog_status`, `request_bundles`, `approval_status`, `requested_days`, `return_requested_at`, `notifications`) in Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99).
 4. **Idempotent synthetic seed (Implemented):** `npm run seed` (`server/src/db/seed.ts`) inserts deterministic synthetic fixtures (`docs/sprints/sprint-1/fixtures.md`) using `ON CONFLICT DO NOTHING` so existing loans, stock, passwords, and role assignments are preserved on re-runs. Destructive reset is never an application startup step.
 5. **Restart & redeployment durability (Implemented & Verified):** Verified by `server/tests/restart-e2e.test.ts`, `npm run verify:sprint1`, and Lab 5/6 Cloud Run + Cloud SQL (`pewdiy-pg`) restart/redeploy checks (`C-05`, `UAT-08`).
 
@@ -178,7 +174,7 @@ With `SDS-OQ-01` resolved (§2.1), runnable Sprint 1 setup, ordered SQL migratio
 
 Seed only salted Argon2id password hashes; generate hashes from transient local/CI input and protect logs from credential/hash output (`project_deliverable_1_v1.pdf` §4.4).
 
-**Implemented constraints & indexes (`001`–`003`, plus `004` contracted in `#99`):** FK-backed owner/item lookups; unique username and `loans.request_id`; positive request/loan quantities and `0 <= quantity_available <= quantity_total` checks; indexes on request borrower/submission timestamp and loan request/borrower/equipment keys. Cross-row stock limits are enforced by the `SELECT ... FOR UPDATE` transaction protocol (§3.3) in addition to row `CHECK` constraints.
+**Implemented constraints & indexes (`001`–`003`, plus `004` contracted in `#99`):** FK-backed owner/item lookups; unique `users.username` and `loans.request_id`; `quantity_total >= 0`, `quantity_requested > 0`, and `quantity_borrowed > 0` `CHECK` constraints; indexes on `borrowing_requests(borrower_id, created_at)`, `borrowing_requests(equipment_id)`, and `loans(request_id) WHERE returned_at IS NULL`. Cross-row stock limits (`0 <= held <= quantity_total`) are enforced by the derived-availability calculation and `SELECT ... FOR UPDATE` transaction protocol (§3.3) in addition to row `CHECK` constraints.
 
 ## 5. Main Screens and Shared UI Behavior
 
@@ -224,7 +220,7 @@ Success returns a documented `data` object/list (or an explicitly documented emp
 }
 ```
 
-| HTTP result | Proposed convention |
+| HTTP result | Implemented / Contracted convention |
 |---|---|
 | 200 / 201 / 204 | Successful read/action, newly created resource, or documented no-content action respectively |
 | 400 | Malformed JSON, wrong types, missing fields, or rejected input fields; optional safe field-error list |
@@ -238,23 +234,23 @@ Validate allow-listed fields and supported content types; do not bind incoming J
 
 ### 6.2 Role × Operation × Record-Scope Matrix
 
-**Confirmed role/ownership basis:** FR-04/05, BR-04/05/06. **Proposed mapping:** resource scopes/response limits below implement that basis without widening product scope. `Denied` means a backend denial even when the caller constructs an API request manually. For Sprint 2/3 rows, the permissions apply when those operations are implemented; this table does not create them in Sprint 1.
+**Confirmed role/ownership basis:** FR-04/05, BR-04/05/06. **Implemented Sprint 1 (`S1`) & Contracted Sprint 2/3 (`S2`/`S3`) access matrix:** `Denied` means a backend denial (`401`/`403`) enforced by server middleware/services even when the caller constructs an API request manually. Sprint 1 (`S1`) operations are active on `d079bc6`; Sprint 2/3 (`S2`/`S3`) operations are contracted pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100).
 
 | Operation | Unauthenticated | Borrower | Custodian | Feature / sprint |
 |---|---|---|---|---|
-| Login | Submit credentials; generic denial if invalid | Same | Same | F-01 / S1 |
-| Current-user / logout | No protected identity; no private data | Own identity/current session only | Own identity/current session only | F-01 / S1 |
-| Read equipment / availability | Denied | Catalog scope | Catalog scope | F-02/F-03 / S1 |
-| Create borrowing request | Denied | Own request; server assigns borrower | Denied; no on-behalf borrowing capability is in scope | F-04 / S1 |
-| List/read requests | Denied | Own records only | Submitted requests needed for checkout | F-04 / S1 |
-| Checkout | Denied | Denied for every request, including own | Submitted request, current stock/quantity rules; actor is current Custodian | F-05 / S1 |
-| Read own active loans | Denied | Own records only | Created loan in checkout response; general all-loans view allocated below | F-05 / S1 |
-| Read all active loans / record return | Denied | Denied | All room loans; return only a loan with held quantity | F-06/F-08 / S2 |
-| Own complete borrowing history | Denied | Own records only | No new history capability implied; use authorized staff loan views | F-08 / S2 |
-| Create/edit/retire equipment or adjust quantity | Denied | Denied | Room catalog; preserve existing held units/history | F-08 / S2 |
-| Search/filter catalog | Denied | Catalog scope | Catalog scope | F-08 / S2 |
-| Overdue list | Denied | Denied | Room overdue active loans | F-07 / S2 |
-| Inventory reports | Denied | Denied | Room inventory/loan summaries | F-09 / S3 |
+| Login | Submit credentials; generic denial if invalid | Same | Same | F-01 / S1 (Implemented) |
+| Current-user / logout | No protected identity; no private data | Own identity/current session only | Own identity/current session only | F-01 / S1 (Implemented) |
+| Read equipment / availability | Denied | Catalog scope (`ACTIVE` items) | Catalog scope (`ACTIVE` + `RETIRED` filter in S2) | F-02/F-03 / S1 (Implemented); F-08 / S2 |
+| Create / cancel borrowing request or bundle | Denied | Own request/bundle (`POST`); cancel own unfulfilled request (S2) | Denied; no on-behalf borrowing capability is in scope | F-04 / S1 (Implemented); F-11 / S2 |
+| List/read / approve / reject requests | Denied | Own records only; approve/reject denied (`403`) | Submitted/pending requests; `approve`/`reject` in S2 (`A-11`) | F-04 / S1 (Implemented); F-11 / S2 |
+| Checkout | Denied | Denied for every request, including own | Direct checkout (S1) / `APPROVED` request or bundle only (S2); actor is current Custodian | F-05 / S1 (Implemented); F-11 / S2 |
+| Read own active loans | Denied | Own records only | Created loan in checkout response; general all-loans view in S2 | F-05 / S1 (Implemented) |
+| Read all loans / return notice / confirm return | Denied | Own `request-return` notice only (`BR-04`); `/return` denied (`403`) | All room loans; confirm full return (`ACTIVE` / `RETURN_PENDING` → `RETURNED`) | F-06/F-08 / S2 (Contracted) |
+| Own complete borrowing history | Denied | Own records only | Uses authorized staff loan views (`FR-18`) | F-08 / S2 (Contracted) |
+| Create/edit/retire equipment or adjust quantity | Denied | Denied | Room catalog; preserve existing held units (`new_total >= held`) and history | F-08 / S2 (Contracted) |
+| Search/filter/sort catalog | Denied | Catalog scope (`ACTIVE` only) | Catalog scope (`ACTIVE`/`RETIRED`/`ALL`) | F-08 / S2 (Contracted) |
+| Overdue list & in-app notifications | Denied | Own notifications read/clear only; `/loans?scope=overdue` denied (`403`) | Room overdue active loans + own notifications | F-07 / S2 (Contracted) |
+| Inventory reports | Denied | Denied | Room inventory/loan summaries (`GET /api/reports/summary`) | F-09 / S3 (Contracted) |
 
 Borrower list queries always include the authenticated owner predicate. Detail/action lookups check ownership through BorrowingRequest (Loan → Request → Borrower), independent of URL/body IDs. A Borrower requesting another Borrower's ID receives 403 without the row. The exact denial envelope must be uniform and must not disclose names, request contents or loan contents. Never trust a UI-supplied role, `borrower_id`, or a guessed record identifier. The single-room staff scope follows SRS A-08 as a working assumption, not a multi-room authorization design.
 
@@ -285,36 +281,37 @@ Login accepts credentials over HTTPS when deployed and returns the same safe err
 
 ## 8. Configuration and Deployment Design
 
-### 8.1 Active Configuration Inventory (`.env.example` & `server/src/config/config.ts`)
+### 8.1 Active Configuration Inventory (`.env.example`, `config.ts`, & `deployment.md`)
 
-Names below map to the active configuration contract implemented in `server/src/config/config.ts` and documented in tracked `.env.example` (no secret values are committed).
+Names below map to the active configuration contract implemented in `server/src/config/config.ts`, documented in tracked `.env.example`, and inventoried in [Lab 5 Deployment Guide](labs/lab-05/deployment.md) §2 (no secret values are committed).
 
 | Configuration | Classification / purpose |
 |---|---|
-| `NODE_ENV`, `PORT`, `LOG_LEVEL` | Non-secret environment/HTTP/log settings; fail-closed validation |
-| `DATABASE_URL` / `TEST_DATABASE_URL` | Secret when credentialed; dev/test/deployed PostgreSQL store |
+| `NODE_ENV`, `PORT`, `TZ` | Non-secret runtime mode (`development`/`test`/`production`), HTTP listen port (`3000`, injected by Cloud Run), and container timezone (`Asia/Bangkok`) |
+| `DATABASE_URL` / `TEST_DATABASE_URL` / `CI_TEST_DATABASE_URL` / `MIGRATION_TEST_DATABASE_URL` | Secret when credentialed; dev/test/CI/deployed PostgreSQL connection strings |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Local Docker Compose PostgreSQL settings (`POSTGRES_PASSWORD` fails closed if empty) |
 | `APP_ORIGIN` | Non-secret trusted browser origin for anti-CSRF `Origin`/`Referer` validation |
-| `APP_TIMEZONE` | Non-secret business date zone; `Asia/Bangkok` (fail-closed if invalid/absent) |
+| `APP_TIMEZONE` | Non-secret business date zone; `Asia/Bangkok` (absent disables checkout with safe `503`; invalid fails startup) |
 | `SESSION_IDLE_MINUTES`, `SESSION_ABSOLUTE_MINUTES`, `SESSION_COOKIE_NAME`, `SESSION_COOKIE_SECURE` | Non-secret session policy inputs (`60`, `480`, `pew_session`, `true` over HTTPS; resolved in `SDS-OQ-02`) |
-| `SEED_BORROWER_A_PASSWORD`, `SEED_BORROWER_B_PASSWORD`, `SEED_CUSTODIAN_A_PASSWORD` | Secret local/private inputs used only during explicit `npm run seed`; never logged or stored as plaintext fixtures |
-| `GCP_PROJECT_ID`, `GCP_REGION`, `CLOUD_RUN_SERVICE`, `CLOUD_SQL_INSTANCE`, `ARTIFACT_REGISTRY_REPO` | Non-secret deployment identifiers documented in `docs/labs/lab-05/deployment.md` (`cpe334-2026-pew-diy`, `asia-southeast1`, `pewdiy` / `pewdiy-uat`, `pewdiy-pg`) |
+| `SEED_PASSWORD_BA`, `SEED_PASSWORD_BB`, `SEED_PASSWORD_CA`, `SEED_MODE` | Secret seed passwords + two-step `SEED_MODE` guard (`local-compose-demo` / `cloud-demo` + matching CLI flag); never set `SEED_MODE` on the API service |
+| `GCP_PROJECT_ID`, `GCP_REGION`, `WIF_PROVIDER`, `WIF_SERVICE_ACCOUNT`, `SMOKE_USERNAME`, `SMOKE_PASSWORD` | GitHub Environment `demo` WIF deployment identifiers and optional smoke-test credentials (`docs/labs/lab-05/deployment.md`) |
 
-Use ignored local `.env` and the tracked `.env.example` template with placeholders; inject deployed secrets through GCP Secret Manager (`docs/labs/lab-05/deployment.md`). Never bake credentials into an image, Git file, PDF, browser bundle, error or log. The app's database account uses only required data permissions; schema changes run through an explicit migration step (`npm run migrate` / Cloud Run migration job) rather than resetting data on startup.
+Use ignored local `.env` and the tracked `.env.example` template with placeholders; inject deployed secrets through GCP Secret Manager (`docs/labs/lab-05/deployment.md`). Never bake credentials into an image, Git file, PDF, browser bundle, error or log. The app's database account uses only required data permissions; schema changes run through an explicit migration step (`npm run migrate` / Cloud Run migration job `pewdiy-migrate`) rather than resetting data on startup.
 
 ### 8.2 Docker/GCP Topology — Implemented in Lab 5 (`SDS-OQ-04` Resolved)
 
 **Implemented baseline (`SDS-OQ-04` resolved in Lab 5, PR #57 / PR #79):** While Part C originally captured a pre-Lab 5 candidate topology at Revision 1, the team subsequently implemented and verified the full containerization, CI/CD, and GCP Cloud Run + Cloud SQL topology documented in [Lab 5 Deployment Guide](labs/lab-05/deployment.md):
 
 - **CI & Docker readiness (`C-01`–`C-03`):** `.github/workflows/ci-docker.yml` (`CI & Docker Build`, job `test-and-docker` + `Docker image readiness (C-03)`) runs TypeScript checks, build, server/API, client, and three-viewport Chromium E2E suites against Node 24 and disposable PostgreSQL 17, tests `deploy/` scripts offline, builds the multi-stage root `Dockerfile`, boots the container against PostgreSQL (`/api/ready` + SPA shell check), and verifies no `.env` is baked into the image.
-- **Automated GCP Release Pipeline (`C-04`–`C-06`):** `.github/workflows/deploy.yml` authenticates to GCP via keyless Workload Identity Federation (WIF), pushes immutable images tagged with the commit SHA to Artifact Registry (`asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/app`), runs database migrations against Cloud SQL PostgreSQL 17 (`pewdiy-pg`), and deploys to Cloud Run (`pewdiy` production and `pewdiy-uat` isolated UAT).
+- **Automated GCP Release Pipeline (`C-04`–`C-06`):** `.github/workflows/deploy.yml` (`Deploy demo`) authenticates to GCP via keyless Workload Identity Federation (WIF), pushes immutable images tagged with the 40-character commit SHA to Artifact Registry (`asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/pewdiy`), runs database migrations (`pewdiy-migrate`) against Cloud SQL PostgreSQL 16 (`pewdiy-pg`), and deploys to Cloud Run service `pewdiy` (with `pewdiy-uat` operated as a separate isolated UAT Cloud Run service for Lab 6).
 
 | Component | Implemented Lab 5 selection & evidence (`docs/labs/lab-05/deployment.md`) | Status (`SDS-OQ-04`) |
 |---|---|---|
 | Application packaging | Multi-stage root `Dockerfile` + `.dockerignore` building `dist/client` and `dist/server`, listening on `0.0.0.0:$PORT` as non-root `node` user | **Resolved & Implemented** (`C-03`, PR #57) |
-| Container image storage | GCP Artifact Registry (`asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/app`), immutable digest per release SHA | **Resolved & Implemented** (`C-06`, PR #57/#79) |
-| HTTP application hosting | GCP Cloud Run (`pewdiy` active revision `pewdiy-00008-mfk`; isolated UAT `pewdiy-uat` revision `pewdiy-uat-00003-8c5`) with managed HTTPS ingress | **Resolved & Implemented** (`C-04`/`C-06`) |
-| Persistent database | GCP Cloud SQL for PostgreSQL 17 (`pewdiy-pg`, Unix socket `/cloudsql/cpe334-2026-pew-diy:asia-southeast1:pewdiy-pg`) | **Resolved & Implemented** (`C-05`, `UAT-08`) |
-| Secret/configuration delivery | GCP Secret Manager (`DATABASE_URL`) + Cloud Run env vars (`APP_ORIGIN`, `APP_TIMEZONE=Asia/Bangkok`, session settings) + WIF CI/CD | **Resolved & Implemented** (`R-02`, `R-07`) |
+| Container image storage | GCP Artifact Registry (`asia-southeast1-docker.pkg.dev/cpe334-2026-pew-diy/pewdiy/pewdiy`), immutable digest per release SHA | **Resolved & Implemented** (`C-06`, PR #57/#79) |
+| HTTP application hosting | GCP Cloud Run (`pewdiy` active revision `pewdiy-00008-mfk`; separate isolated UAT `pewdiy-uat` revision `pewdiy-uat-00003-8c5`) with managed HTTPS ingress | **Resolved & Implemented** (`C-04`/`C-06`) |
+| Persistent database | GCP Cloud SQL for PostgreSQL (`pewdiy-pg`, `POSTGRES_16`, Unix socket `/cloudsql/cpe334-2026-pew-diy:asia-southeast1:pewdiy-pg`; CI/local runs PostgreSQL 17) | **Resolved & Implemented** (`C-05`, `UAT-08`) |
+| Secret/configuration delivery | GCP Secret Manager (`pewdiy-database-url`, `pewdiy-seed-password-*`) + Cloud Run env vars (`APP_ORIGIN`, `APP_TIMEZONE=Asia/Bangkok`, session settings) + WIF CI/CD | **Resolved & Implemented** (`R-02`, `R-07`) |
 
 Cloud Run's writable container filesystem is ephemeral, so all durable state lives in Cloud SQL PostgreSQL (`pewdiy-pg`). Replacing the application container revision preserves the durable catalog, requests, loans, and sessions (`BR-11`/`NFR-04`), verified across restart and redeployment (`C-05`, `UAT-08`). Migrations run as an explicit step and never reset or reseed existing records on startup.
 
@@ -335,14 +332,14 @@ Cloud Run's writable container filesystem is ephemeral, so all durable state liv
 
 Sprint 1 verification checks below are **implemented and passing** in `server/tests/`, `client/src/test/`, and `e2e/` (see [Part F evidence](verification/sprint-1/README.md)); Sprint 2/3 checks are **contracted** in `docs/sprints/sprint-2/` and `docs/sprints/sprint-3/` (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). [Part B traceability](traceability.md) remains authoritative for requirement-to-sprint allocation.
 
-| Design concern / basis | Future verification to capture |
+| Design concern / basis | Verification scope & evidence (`F-10` Sprint 1 Implemented; S2/S3 Contracted) |
 |---|---|
-| Identity/access — FR-01–FR-05, BR-04/05/06/10, NFR-01/02/03 | Valid/invalid login; current-user and logout/expiry/replay; missing credentials; forbidden role; two-borrower list/detail ownership; hash/seed inspection |
-| Catalog/request — FR-06–FR-08, FR-11–FR-13, BR-01 | Repeatable seed; list/detail availability; valid persisted request; unavailable/malformed/forged-owner request rejected without writes |
-| Checkout — FR-14–FR-16, BR-02/03/07 | Authorized checkout; unavailable/repeated checkout denial; +7 calendar-day boundary; competing attempts for a single-unit item yield at most one loan |
-| Persistence/atomicity — BR-11, NFR-04/05/06 | Real DB concurrency with defined repetitions; injected failure rolls back every checkout write; restart read-back; no hidden negative availability |
-| Reproducibility/automation — NFR-08/09 (F-10) | Fresh setup from README within target; migrations/seed repeat; all Sprint 1 AC mapped to real tests with failure exit status |
-| Later allocation | Return/close accounting and atomicity, overdue date boundaries, catalog writes/history in S2; report/performance target NFR-07 in S3; recreated-container/redeployment read-back in Lab 5 |
+| Identity/access — FR-01–FR-05, BR-04/05/06/10, NFR-01/02/03 | **Implemented (S1):** Valid/invalid login; current-user and logout/expiry/replay; missing credentials; forbidden role; two-borrower list/detail ownership; hash/seed inspection |
+| Catalog/request — FR-06–FR-08, FR-11–FR-13, BR-01 | **Implemented (S1):** Repeatable seed; list/detail availability; valid persisted request; unavailable/malformed/forged-owner request rejected without writes; **Contracted (S2):** CRUD, search/filter/sort, bundles, approval/cancel |
+| Checkout — FR-14–FR-16, BR-02/03/07 | **Implemented (S1):** Authorized checkout; unavailable/repeated checkout denial; +7 calendar-day boundary; competing attempts for a single-unit item yield at most one loan; **Contracted (S2):** `APPROVED` gate, `1–14` day duration |
+| Persistence/atomicity — BR-11, NFR-04/05/06 | **Implemented (S1) & Verified (Lab 5):** Real DB concurrency with 51 races; injected failure rolls back every checkout write; restart + Cloud SQL redeploy read-back; **Contracted (S2):** return atomicity (`F-06`) |
+| Reproducibility/automation — NFR-08/09 (F-10) | **Implemented (S1):** Fresh setup from README within 15-minute target; migrations/seed repeat; CI (`ci-docker.yml`) + verification suites |
+| Later allocation | **Contracted (`#99`/`#100`):** Two-step return/close accounting and atomicity (`F-06`), overdue/notification boundaries (`F-07`), catalog CRUD/history (`F-08`), report/NFR-07 benchmark (`F-09`) |
 
 F-10 (Sprint 1 Integration and Verification, named system responsibility per [Part B](features.md)) coordinates the Sprint 1 checks above; the [traceability matrix](traceability.md) remains authoritative for requirement-to-feature-to-sprint allocation.
 
@@ -357,7 +354,7 @@ Existing SRS questions retain their original IDs; this SDS does not resolve or r
 | SDS-OQ-01 — stack | **Resolved (rev 3):** Node.js 24 + TypeScript 7 + Express 5 + PostgreSQL 17 + React 19 + Vitest/Supertest (team decision D1; PR #22 & PR #33) | Closed — AC-C-01 implemented & verified |
 | SDS-OQ-02 — authentication | **Resolved (rev 3):** server session + HttpOnly cookie + trusted-origin anti-CSRF, idle 60 min / absolute 480 min (team decision D2; PR #22) | Closed — AC-C-04 implemented & verified |
 | SDS-OQ-03 — calendar policy | **User-confirmed for implementation**: Asia/Bangkok calendar date +7, UTC event timestamps; 2026-11-07 session decision | Recorded in §3; shared-baseline peer review pending PR #98 |
-| SDS-OQ-04 — hosting | **Resolved (Lab 5, PR #57/#79):** GCP Cloud Run (`pewdiy`, `pewdiy-uat`) + Cloud SQL PostgreSQL (`pewdiy-pg`) + Artifact Registry + Secret Manager + WIF CI/CD | See `docs/labs/lab-05/deployment.md` |
+| SDS-OQ-04 — hosting | **Resolved (Lab 5, PR #57/#79):** GCP Cloud Run (`pewdiy`, plus isolated `pewdiy-uat`) + Cloud SQL PostgreSQL 16 (`pewdiy-pg`) + Artifact Registry (`pewdiy/pewdiy`) + Secret Manager + WIF CI/CD | See `docs/labs/lab-05/deployment.md` |
 | SRS OQ-03..OQ-06, A-10..A-11 | **Policy decisions resolved for Sprint 2 contracts (`docs/srs.md` rev 6); shared-team baseline peer ratification pending PR #98:** `request_bundles`, `approval_status` (`PENDING/APPROVED/REJECTED/CANCELLED`), `1–14` day duration, `image_url`/`catalog_status`, search/filter/sort, and `notifications` table | Specified and contracted under `docs/sprints/sprint-2/` (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) |
 
 | Issue criterion | Evidence in this specification | Reconciled status |

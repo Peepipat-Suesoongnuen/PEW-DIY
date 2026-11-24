@@ -23,8 +23,8 @@
    - Multi-item Bundle API (`POST /api/request-bundles`): accepts `{ items: [{ equipment_id, quantity_requested }], purpose_category, purpose_detail, requested_days }`. Locks all referenced `equipment` rows in sorted `id` order (`FOR UPDATE`) to prevent deadlocks, validates `ACTIVE` + `BR-01` for every item, and inserts `1 request_bundles + N borrowing_requests` with `approval_status = 'PENDING'`. **Zero stock reservation (`BR-12`).**
 2. **Approval, Rejection & Cancellation (`A-11`):**
    - **Borrower Cancel (`POST /api/requests/:id/cancel`, `POST /api/request-bundles/:bundleId/cancel`):** allowed only by owning Borrower while `approval_status IN ('PENDING', 'APPROVED')` and no linked `loans` row exists → sets `approval_status = 'CANCELLED'`.
-   - **Custodian Approve (`POST /api/requests/:id/approve`, `/api/request-bundles/:bundleId/approve`):** `CUSTODIAN` only while `PENDING` → sets `approval_status = 'APPROVED'`, `reviewed_by`, `reviewed_at`, `decision_note`, and creates `REQUEST_APPROVED` notification. Still reserves zero stock (`BR-12`).
-   - **Custodian Reject (`POST /api/requests/:id/reject`, `/api/request-bundles/:bundleId/reject`):** `CUSTODIAN` only while `PENDING` → sets `approval_status = 'REJECTED'`, `reviewed_by`, `reviewed_at`, `decision_note`, and creates `REQUEST_REJECTED` notification.
+   - **Custodian Approve (`POST /api/requests/:id/approve`, `/api/request-bundles/:bundleId/approve`):** `CUSTODIAN` only while `PENDING` → sets `approval_status = 'APPROVED'`, `reviewed_by`, `reviewed_at`, `decision_note`, and creates `REQUEST_APPROVED` notification in `notifications` (see `f-07-overdue-status.md` §3 schema). Still reserves zero stock (`BR-12`).
+   - **Custodian Reject (`POST /api/requests/:id/reject`, `/api/request-bundles/:bundleId/reject`):** `CUSTODIAN` only while `PENDING` → sets `approval_status = 'REJECTED'`, `reviewed_by`, `reviewed_at`, `decision_note`, and creates `REQUEST_REJECTED` notification in `notifications` (`f-07-overdue-status.md` §3).
 3. **Checkout (`POST /api/requests/:id/checkout` & `/api/request-bundles/:bundleId/checkout`):**
    - Requires `approval_status === 'APPROVED'` (rejects `PENDING` / `REJECTED` / `CANCELLED` with `409 NOT_APPROVED`).
    - Computes `due_on` = checkout date (`Asia/Bangkok`) + `requested_days` (`1..14`).
@@ -57,7 +57,7 @@
 | **TEST-F11-02** | AC-F11-02 | API/DB integration | `PENDING` bundle; `C-A`, `B-A` | `B-A` approve → `403`; `C-A` approve → `200 APPROVED`, notification created, stock unchanged |
 | **TEST-F11-03** | AC-F11-03 | API/DB + Unit | `PENDING` vs `APPROVED` (`requested_days=3`, `14`) | Checkout `PENDING` → `409 NOT_APPROVED`; checkout `APPROVED` → `201`, `due_on = bangkok_date + requested_days` |
 | **TEST-F11-04** | AC-F11-04 | API/DB integration | `B-A` `PENDING` and `CHECKED_OUT` requests; `B-B` | `B-A` cancels `PENDING` → `200 CANCELLED`; `B-B` cancel → `403`; cancel `CHECKED_OUT` → `409` |
-| **TEST-F11-05** | AC-F11-05 | UI/Component + E2E | `CheckoutRequest` 409 responses; Loan Detail print button | Distinct Finding 05 error copy rendered; print slip renders loan metadata; legacy `.html` returns SPA/404 as configured |
+| **TEST-F11-05** | AC-F11-05 | UI/Component + E2E | `CheckoutRequest` 409 responses; Loan Detail print button | Distinct Finding 05 error copy rendered; print slip renders loan metadata; legacy `*.html` (except `/index.html`) returns `404` while SPA routes render React |
 
 ---
 
