@@ -211,6 +211,6 @@ describe("ItemDetailPage (ui-spec §3, minus F-04 request panel)", () => {
     expect(
       screen.getByText("This equipment has been retired and is no longer available to borrow."),
     ).toBeInTheDocument();
-    expect(screen.queryByText("Request to borrow")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Request this item" })).not.toBeInTheDocument();
   });
 });

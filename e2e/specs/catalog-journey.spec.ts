@@ -40,8 +40,7 @@ test.describe("catalog journey", () => {
     await catalog.itemLink(ITEMS.zero.name).click();
     await detail.expectInfo(ITEMS.zero.name);
     await expect(detail.badge("UNAVAILABLE")).toBeVisible();
-    // F-04 request panel belongs to #11 — UI-02 renders no request affordance.
-    await expect(page.getByText("Request to borrow")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Request this item" })).toHaveCount(0);
   });
 
   test("responsive surfaces match the viewport (AC-7 matrix)", async ({ page }) => {

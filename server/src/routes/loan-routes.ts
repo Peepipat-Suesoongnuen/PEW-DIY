@@ -15,6 +15,10 @@ export function createLoanRouter(auth: AuthService, cookieName: string, service:
     try { res.status(201).json({ data: await service.checkout(req.user!, String(req.params.requestId), req.body) }); }
     catch (error) { failure(error, req, res, next); }
   });
+  router.post("/request-bundles/:bundleId/checkout", requireAuth, requireRole("CUSTODIAN"), async (req: AuthenticatedRequest, res, next) => {
+    try { res.status(201).json({ data: await service.checkoutBundle(req.user!, String(req.params.bundleId), req.body) }); }
+    catch (error) { failure(error, req, res, next); }
+  });
   router.use("/loans", requireAuth, requireRole("BORROWER"));
   router.get("/loans", async (req: AuthenticatedRequest, res, next) => {
     try { res.json({ data: await service.list(req.user!) }); }

@@ -94,6 +94,29 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await cPage.getByLabel("Preview image URL").fill("/images/fluke.png");
     await cPage.getByRole("button", { name: "Save changes" }).click();
     await expect(cPage.getByAltText("Fluke 87V")).toHaveAttribute("src", "/images/fluke.png");
+
+    // 4. Borrower creates a 2-item bundle request for 10 days (A-11 / BR-07)
+    await bPage.goto("/requests/new");
+    await bPage.getByRole("button", { name: "Add item" }).click();
+    await bPage.getByRole("button", { name: "Add item" }).click();
+    await bPage.getByLabel("Borrowing duration (days)").fill("10");
+    await bPage.getByLabel(/Purpose details/).fill("Senior design lab");
+    await bPage.getByRole("button", { name: /Submit bundle request/ }).click();
+    await expect(bPage).toHaveURL(/\/requests$/);
+    await expect(bPage.getByText(/waiting for custodian approval/)).toBeVisible();
+
+    // 5. Custodian approves & checks out entire bundle
+    await cPage.goto("/requests");
+    await cPage.getByText("Fluke 87V").filter({ visible: true }).first().click();
+    await cPage.getByLabel("Decision note (optional)").fill("Approved for Senior lab");
+    await cPage.getByRole("button", { name: "Approve entire bundle" }).click();
+    await expect(cPage.getByRole("button", { name: /Check out entire bundle/ })).toBeVisible();
+    await cPage.getByRole("button", { name: /Check out entire bundle/ }).click();
+    await expect(cPage.getByText("Checkout completed.")).toBeVisible();
+
+    // Stock decremented after bundle checkout (Fluke 87V: 3 -> 2)
+    const eqRes = await bPage.request.get("/api/equipment?q=Fluke");
+    expect((await eqRes.json()).data[0].quantity_available).toBe(2);
   } finally {
     await Promise.all([borrowerCtx?.close(), staffCtx?.close()]);
     if (proc && proc.exitCode === null) {

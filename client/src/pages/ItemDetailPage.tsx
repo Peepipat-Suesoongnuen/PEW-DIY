@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { api, ApiError, type CatalogStatus, type Equipment } from "../lib/api";
-import { useItemRouteId } from "../lib/paths";
+import { newRequestPath, useItemRouteId } from "../lib/paths";
 import { useSession, useUnauthorizedRedirect } from "../lib/session";
 import { Alert } from "../components/Alert";
 import { AvailabilityBadge, QuantityDisplay } from "../components/AvailabilityBadge";
@@ -12,7 +12,6 @@ import { EmptyState } from "../components/EmptyState";
 import { EquipmentImage } from "../components/EquipmentImage";
 import { Field } from "../components/Field";
 import { Loading } from "../components/Loading";
-import { RequestToBorrow } from "../components/RequestToBorrow";
 import { CatalogStatusBadge } from "../components/StatusBadge";
 
 function LabeledBox({ label, children }: { label: string; children: React.ReactNode }) {
@@ -185,25 +184,34 @@ export function ItemDetailPage() {
                       {item.description || <span className="text-text-muted">No description</span>}
                     </LabeledBox>
                   </div>
+                  <LabeledBox label="Borrowing window">1 to 14 calendar days (selected on request form)</LabeledBox>
                   <LabeledBox label="Catalog status">
                     {catalogStatus === "ACTIVE" ? "Active (open for requests)" : "Retired"}
                   </LabeledBox>
                 </div>
 
                 {user?.role === "BORROWER" ? (
-                  catalogStatus === "RETIRED" ? (
-                    <div className="border-t border-border pt-4">
+                  <div className="border-t border-border pt-4">
+                    {catalogStatus === "RETIRED" ? (
                       <Alert tone="info">This equipment has been retired and is no longer available to borrow.</Alert>
-                    </div>
-                  ) : (
-                    <RequestToBorrow
-                      item={item}
-                      refresh={(updated) => {
-                        setItem(updated);
-                        syncForm(updated);
-                      }}
-                    />
-                  )
+                    ) : item.quantity_available < 1 ? (
+                      <Alert tone="warning">
+                        Currently out of stock. Check back once an active loan is returned.
+                      </Alert>
+                    ) : (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Link
+                          to={newRequestPath(item.id)}
+                          className="inline-flex items-center justify-center rounded-control bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover"
+                        >
+                          Request this item
+                        </Link>
+                        <p className="text-xs text-text-muted">
+                          Requests do not reserve equipment. You can combine multiple items and choose 1–14 days on the request form.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 ) : null}
 
                 {isCustodian ? (

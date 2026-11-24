@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Plus, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   api,
@@ -7,7 +7,7 @@ import {
   type CatalogSort,
   type Equipment,
 } from "../lib/api";
-import { itemPath } from "../lib/paths";
+import { itemPath, newRequestPath } from "../lib/paths";
 import { useSession, useUnauthorizedRedirect } from "../lib/session";
 import { Alert } from "../components/Alert";
 import { AvailabilityBadge, QuantityDisplay } from "../components/AvailabilityBadge";
@@ -154,6 +154,15 @@ export function CatalogPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {user?.role === "BORROWER" ? (
+            <Link
+              to={newRequestPath()}
+              className="inline-flex items-center gap-2 rounded-control bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+            >
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              <span>Create request</span>
+            </Link>
+          ) : null}
           {isCustodian ? (
             <Button
               variant={showCreate ? "secondary" : "primary"}

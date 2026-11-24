@@ -6,7 +6,22 @@ import { RequestsPage } from "../pages/RequestsPage";
 import { LoansPage } from "../pages/LoansPage";
 import { loanIdFromPathname, loanPath } from "../lib/paths";
 
-const record = { id: "request/opaque%2F#", borrower_id: "B-A", equipment_id: "item-one", quantity_requested: 2, created_at: "2026-11-06T12:00:00Z", status: "SUBMITTED" };
+const record = {
+  id: "request/opaque%2F#",
+  bundle_id: null,
+  borrower_id: "B-A",
+  equipment_id: "item-one",
+  quantity_requested: 2,
+  purpose_category: "OTHER",
+  purpose_detail: "",
+  requested_days: 7,
+  approval_status: "APPROVED",
+  decision_note: "",
+  reviewed_by: null,
+  reviewed_at: null,
+  created_at: "2026-11-06T12:00:00Z",
+  status: "APPROVED",
+};
 const loan = { id: "loan/opaque%2F#", request_id: record.id, borrower_id: "B-A", equipment_id: record.equipment_id,
   quantity_borrowed: 2, checked_out_by: "C-A", checkout_at: "2026-12-27T17:00:00Z", due_on: "2027-01-04", status: "ACTIVE" };
 const response = (status: number, data: unknown) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json" } });
@@ -37,22 +52,19 @@ function mockApi(options: { role?: string; post?: () => Promise<Response>; loans
 afterEach(() => vi.unstubAllGlobals());
 
 describe("F-05 checkout and active-loan UI", () => {
-  it("shows committed loan and refreshes the submitted queue", async () => {
-    const fetcher = mockApi({ username: "Staff Casey" }); mount();
+  it("commits checkout on approved request detail and sends POST /checkout", async () => {
+    const fetcher = mockApi({ username: "Staff Casey" }); mount(`/requests/${encodeURIComponent(record.id)}`);
     fireEvent.click(await screen.findByRole("button", { name: "Check out" }));
-    expect(await screen.findByText("Checkout completed.")).toBeInTheDocument();
-    expect(screen.getByText("2027-01-04")).toBeInTheDocument();
-    expect(await screen.findByText("No submitted requests.")).toBeInTheDocument();
-    const details = screen.getByText("Equipment", { exact: true }).closest("dl")!;
-    expect(within(details).getByText("Fixture")).toBeInTheDocument();
-    expect(within(details).getByText(loan.borrower_id, { exact: true })).toBeInTheDocument();
-    expect(within(details).queryByText("Staff Casey")).not.toBeInTheDocument();
-    expect(within(details).queryByText("Borrower details unavailable")).not.toBeInTheDocument();
-    expect(fetcher).toHaveBeenCalledWith(`/api/requests/${encodeURIComponent(record.id)}/checkout`, expect.objectContaining({ body: "{}", method: "POST" }));
+    await waitFor(() =>
+      expect(fetcher).toHaveBeenCalledWith(
+        `/api/requests/${encodeURIComponent(record.id)}/checkout`,
+        expect.objectContaining({ body: "{}", method: "POST" }),
+      ),
+    );
   });
   it("prevents duplicate clicks and success before the response", async () => {
     let release!: (r: Response) => void;
-    const fetcher = mockApi({ post: () => new Promise((r) => { release = r; }) }); mount();
+    const fetcher = mockApi({ post: () => new Promise((r) => { release = r; }) }); mount(`/requests/${encodeURIComponent(record.id)}`);
     const button = await screen.findByRole("button", { name: "Check out" });
     fireEvent.click(button); fireEvent.click(button);
     expect(screen.getByRole("button", { name: "Checking out…" })).toBeDisabled();
@@ -62,7 +74,7 @@ describe("F-05 checkout and active-loan UI", () => {
     expect(await screen.findByText("Checkout completed.")).toBeInTheDocument();
   });
   it.each([409, 500, 0])("reconciles failure %s without blind retry or false success", async (status) => {
-    mockApi({ post: async () => { if (!status) throw new Error("network"); return response(status, { error: { code: "FAILED", requestId: "safe-id" } }); } }); mount();
+    mockApi({ post: async () => { if (!status) throw new Error("network"); return response(status, { error: { code: "FAILED", requestId: "safe-id" } }); } }); mount(`/requests/${encodeURIComponent(record.id)}`);
     fireEvent.click(await screen.findByRole("button", { name: "Check out" }));
     const refresh = await screen.findByRole("button", { name: "Refresh requests" });
     expect(screen.getByRole("button", { name: "Check out" })).toBeDisabled();
@@ -70,14 +82,25 @@ describe("F-05 checkout and active-loan UI", () => {
     fireEvent.click(refresh);
     await waitFor(() => expect(screen.getByRole("button", { name: "Check out" })).toBeEnabled());
   });
+  it.each([
+    ["INSUFFICIENT_AVAILABILITY", /Insufficient equipment stock available for checkout/],
+    ["ALREADY_CHECKED_OUT", /already been checked out/],
+    ["NOT_APPROVED", /Approve this request before checking it out/],
+  ])("distinguishes 409 %s conflict error copy (Finding 05)", async (code, expectedCopy) => {
+    mockApi({ post: async () => response(409, { error: { code, requestId: "safe-id" } }) });
+    mount(`/requests/${encodeURIComponent(record.id)}`);
+    fireEvent.click(await screen.findByRole("button", { name: "Check out" }));
+    expect(await screen.findByText(expectedCopy)).toBeInTheDocument();
+  });
   it("expires the session on checkout401", async () => {
-    mockApi({ post: async () => response(401, { error: { code: "UNAUTHENTICATED" } }) }); mount();
+    mockApi({ post: async () => response(401, { error: { code: "UNAUTHENTICATED" } }) }); mount(`/requests/${encodeURIComponent(record.id)}`);
     fireEvent.click(await screen.findByRole("button", { name: "Check out" }));
     expect(await screen.findByText("LOGIN_PAGE")).toBeInTheDocument();
   });
   it("does not render checkout for Borrower", async () => {
-    mockApi({ role: "BORROWER" }); mount();
-    await screen.findByRole("link", { name: "View request" }); expect(screen.queryByRole("button", { name: "Check out" })).not.toBeInTheDocument();
+    mockApi({ role: "BORROWER" }); mount(`/requests/${encodeURIComponent(record.id)}`);
+    expect(await screen.findByText(record.equipment_id)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Check out" })).not.toBeInTheDocument();
   });
   it("reads own active loans and an opaque-ID detail", async () => {
     const fetcher = mockApi({ role: "BORROWER" }); mount(loanPath(loan.id));

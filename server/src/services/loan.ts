@@ -11,11 +11,19 @@ export function assertCheckoutAvailable(total: number, held: number, quantity: n
   if (quantity > total - held) throw new RequestError(409, "INSUFFICIENT_AVAILABILITY", "Requested quantity exceeds current availability.");
 }
 
-/** A calendar date in an explicit IANA zone, independent of the host timezone. */
-export function checkoutDueOn(instant: Date, timeZone: string): string {
+/** Business calendar date YYYY-MM-DD in an explicit IANA zone, independent of host OS zone. */
+export function businessDateInZone(instant: Date, timeZone: string): string {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(instant);
   const value = (type: string) => Number(parts.find((p) => p.type === type)!.value);
-  const date = new Date(Date.UTC(value("year"), value("month") - 1, value("day") + 7));
+  const date = new Date(Date.UTC(value("year"), value("month") - 1, value("day")));
+  return date.toISOString().slice(0, 10);
+}
+
+/** Due date = checkout business calendar date + requestedDays (1..14, default 7). */
+export function checkoutDueOn(instant: Date, timeZone: string, requestedDays = 7): string {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(instant);
+  const value = (type: string) => Number(parts.find((p) => p.type === type)!.value);
+  const date = new Date(Date.UTC(value("year"), value("month") - 1, value("day") + requestedDays));
   return date.toISOString().slice(0, 10);
 }
 
@@ -64,12 +72,16 @@ export class LoanService {
       if ((await client.query("SELECT id FROM loans WHERE request_id=$1", [requestId])).rowCount) {
         throw new RequestError(409, "ALREADY_CHECKED_OUT", "Request has already been checked out.");
       }
+      if (record.approval_status !== "APPROVED") {
+        throw new RequestError(409, "NOT_APPROVED", "Request must be approved before checkout.");
+      }
       const stock = await getEquipment(client, equipmentId);
       if (!stock) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
       assertCheckoutAvailable(stock.quantity_total, stock.quantity_total - stock.quantity_available, record.quantity_requested);
       if (!this.options.timeZone) throw new RequestError(503, "CALENDAR_POLICY_UNCONFIGURED", "Checkout is temporarily unavailable.");
       const now = (this.options.now ?? (() => new Date()))();
-      const dueOn = checkoutDueOn(now, this.options.timeZone);
+      const days = Number(record.requested_days ?? 7);
+      const dueOn = checkoutDueOn(now, this.options.timeZone, days);
       const id = randomUUID();
       await client.query(`INSERT INTO loans(id,request_id,quantity_borrowed,checked_out_by,checkout_at,due_on)
         VALUES($1,$2,$3,$4,$5,$6)`, [id, requestId, record.quantity_requested, user.id, now, dueOn]);
@@ -87,6 +99,69 @@ export class LoanService {
       }
       throw error;
     } finally { client.release(); }
+  }
+
+  async checkoutBundle(user: SessionUser, bundleId: string, input: unknown): Promise<LoanView[]> {
+    if (user.role !== "CUSTODIAN") throw new RequestError(403, "FORBIDDEN", "Access denied.");
+    validId(bundleId);
+    if (!input || typeof input !== "object" || Array.isArray(input) || Object.keys(input).length) {
+      throw new RequestError(400, "VALIDATION_ERROR", "Invalid request.");
+    }
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      const refs = await client.query(
+        `SELECT id, equipment_id FROM borrowing_requests WHERE bundle_id=$1 ORDER BY equipment_id`,
+        [bundleId],
+      );
+      if (!refs.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+      const equipmentIds = [...new Set(refs.rows.map((r) => String(r.equipment_id)))].sort((a, b) => a.localeCompare(b));
+      await client.query(`SELECT id FROM equipment WHERE id = ANY($1::text[]) ORDER BY id FOR UPDATE`, [equipmentIds]);
+      const lockedReqs = await client.query(
+        `SELECT * FROM borrowing_requests WHERE bundle_id=$1 ORDER BY id FOR UPDATE`,
+        [bundleId],
+      );
+      if (!this.options.timeZone) {
+        throw new RequestError(503, "CALENDAR_POLICY_UNCONFIGURED", "Checkout is temporarily unavailable.");
+      }
+      const now = (this.options.now ?? (() => new Date()))();
+      const createdIds: string[] = [];
+      for (const record of lockedReqs.rows) {
+        if ((await client.query("SELECT id FROM loans WHERE request_id=$1", [record.id])).rowCount) {
+          throw new RequestError(409, "ALREADY_CHECKED_OUT", "Request has already been checked out.");
+        }
+        if (record.approval_status !== "APPROVED") {
+          throw new RequestError(409, "NOT_APPROVED", "Bundle must be approved before checkout.");
+        }
+        const stock = await getEquipment(client, String(record.equipment_id));
+        if (!stock) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+        assertCheckoutAvailable(stock.quantity_total, stock.quantity_total - stock.quantity_available, record.quantity_requested);
+        const days = Number(record.requested_days ?? 7);
+        const dueOn = checkoutDueOn(now, this.options.timeZone, days);
+        const id = randomUUID();
+        await client.query(
+          `INSERT INTO loans(id, request_id, quantity_borrowed, checked_out_by, checkout_at, due_on)
+           VALUES($1, $2, $3, $4, $5, $6)`,
+          [id, record.id, record.quantity_requested, user.id, now, dueOn],
+        );
+        createdIds.push(id);
+      }
+      await this.options.afterInsert?.(client);
+      const result = await client.query(`${projection} WHERE l.id = ANY($1::text[]) ORDER BY l.id`, [createdIds]);
+      const loans = result.rows.map(view);
+      await client.query("COMMIT");
+      return loans;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      const code = (error as { code?: string }).code;
+      if (code === "23505") throw new RequestError(409, "ALREADY_CHECKED_OUT", "Request has already been checked out.");
+      if (["40P01", "40001", "55P03"].includes(code ?? "")) {
+        throw new RequestError(503, "RETRY_LATER", "Checkout is temporarily unavailable. Refresh requests before retrying.");
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async list(user: SessionUser): Promise<LoanView[]> {
