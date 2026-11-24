@@ -58,7 +58,7 @@ async function startAppProcess(): Promise<ChildProcess> {
   const deadline = Date.now() + START_TIMEOUT_MS;
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(`${ORIGIN}/login.html`);
+      const res = await fetch(`${ORIGIN}/api/ready`);
       if (res.ok) return proc;
     } catch {
       /* not up yet */

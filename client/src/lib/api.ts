@@ -10,6 +10,9 @@
  */
 
 export type Role = "BORROWER" | "CUSTODIAN";
+export type CatalogStatus = "ACTIVE" | "RETIRED";
+export type RequestStatus = "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "CHECKED_OUT";
+export type LoanStatus = "ACTIVE" | "RETURN_PENDING" | "RETURNED";
 
 export interface User {
   id: string;

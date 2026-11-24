@@ -294,4 +294,32 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
 
     expect(await screen.findByText("LOGIN_PAGE")).toBeInTheDocument();
   });
+
+  it("renders HTML-bearing item fields as literal text — no element creation or script execution (ARCH-01 P4 / C-3)", async () => {
+    const xssItem: Equipment = {
+      id: "E-XSS",
+      name: "<img src=x onerror=alert(1)>",
+      description: "<script>window.__pwned = true</script>",
+      category: "<b>Sensors</b>",
+      quantity_total: 2,
+      quantity_available: 2,
+      availability: "AVAILABLE",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "u1", username: "B-A", role: "BORROWER" } } });
+        }
+        return jsonResponse(200, { data: [xssItem] });
+      }),
+    );
+    const { container } = renderCatalog();
+
+    expect((await screen.findAllByText("<img src=x onerror=alert(1)>")).length).toBe(2);
+    expect(screen.getAllByText("<b>Sensors</b>")).toHaveLength(2);
+    expect(container.querySelector("img[src='x']")).toBeNull();
+    expect(container.querySelector("script")).toBeNull();
+  });
 });

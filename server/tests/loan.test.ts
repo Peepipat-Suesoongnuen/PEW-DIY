@@ -236,7 +236,7 @@ async function startWorker(mode = "normal") {
   const ready = production ? await (async () => {
     const deadline = Date.now() + 15000;
     while (Date.now() < deadline && proc.exitCode === null) {
-      try { if ((await fetch("http://127.0.0.1:3158/login.html")).ok) return 3158; } catch { /* starting */ }
+      try { if ((await fetch("http://127.0.0.1:3158/api/ready")).ok) return 3158; } catch { /* starting */ }
       await new Promise((r) => setTimeout(r, 100));
     }
     proc.kill(); throw new Error("Production app startup timed out");
