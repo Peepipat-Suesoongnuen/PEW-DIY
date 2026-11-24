@@ -1,7 +1,7 @@
 # PEW-DIY UI Requirement Traceability — UI-01
 
 > **Issue:** [#30 — UI-01](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/30) · **Companion of:** [ui-spec.md](ui-spec.md) · [design-decisions.md](design-decisions.md)
-> **Chain:** Stakeholder Need (SN, Part B) → FR/BR (SRS rev 2) → UI Component / Interaction (this spec) → AC (Sprint 1 contracts)
+> **Chain:** Stakeholder Need (SN, Part B) → FR/BR (SRS rev 6 reconciled; initial UI-01 drafted at rev 2) → UI Component / Interaction (this spec) → AC (Sprint 1/2 contracts)
 > **Rule (task §6.E):** UI without requirement or requirement without UI is recorded as a **Gap** — no requirement is invented to make the table look complete.
 
 ---
@@ -19,7 +19,7 @@
 | SN-01 | FR-07 availability display | Availability Badge + Available quantity (§2.2, §3.2) | AC-F02-01 | Partial (UI + tests) |
 | SN-01 | FR-06/07 detail display | Item Detail info block (§3.2) | AC-F02-01, AC-F02-02 | Partial (UI + tests) |
 | SN-01 | FR-06 empty/missing states | Empty + "Item not found" states (§2.3, §3.4) | AC-F02-02 | UI contribution (404/200 semantics = API tests) |
-| SN-02 borrow equipment | FR-11 submit request | Item Detail "Request to borrow" panel + Quantity input (§3.2) | AC-F04-01 | Partial (UI + tests) — 201/persistence = API/DB tests; bounds gated by OQ-02 |
+| SN-02 borrow equipment | FR-11 submit request | Item Detail "Request to borrow" panel + Quantity input (§3.2) | AC-F04-01 | Partial (UI + tests) — 201/persistence = API/DB tests; `OQ-02`/`A-12` policy resolved (`1..quantity_available`, ratification pending PR #98) |
 | SN-02 | BR-01 request only when available | Unavailable state → no request form (§3.2/§3.4) | AC-F04-02 (negative) | Partial (UI + tests) — 409 semantics = server |
 | SN-02 | FR-11 validation | Quantity `FieldError` feedback (§3.2) | AC-F04-03 | UI contribution (forged-field/400 enforcement = server) |
 | SN-02 | FR-11 post-submit flow | Redirect → My Requests + confirmation there (§3.2 Success row) | AC-F04-08 | **Partial across screens** — submit UI here; own-request display + reload = My Requests screen (F-04 UI, outside 3 pages) |
@@ -36,8 +36,8 @@
 | — | NFR-01 no private data on denial | 401/403 states clear private data (§0.3) | AC-F01-05 | Partial (UI + tests) |
 | — | NFR-02 server-side authz | UI notes: UI hiding ≠ authorization (§2.2, §3.2) | AC-F01-08 | UI contribution (UI side only) |
 | — | SRS A-01 Quantity Tracking | Quantity Information block (§3.2) | AC-F02-01 | UI contribution |
-| — | SRS A-02 Direct Checkout | No approval step anywhere; submit → My Requests (§3.2) | AC-F04-01, AC-F04-08 | Partial (UI + tests) |
-| — | FR-10 search/filter (Sprint 2) | Catalog search/filter row — **deliberately not rendered in Sprint 1** (§2.2) | AC-F02-06 ("no search controls added") | UI contribution (negative: absence is the design) + Sprint 2 (F-08) |
+| — | SRS A-02 Direct Checkout (S1) / A-11 Approval (S2) | Sprint 1: Direct Checkout (submit → My Requests); Sprint 2 adds `A-11` approval & `CreateRequestPage` (`f-11`) | AC-F04-01, AC-F04-08 | Partial (UI + tests) |
+| — | FR-10 search/filter/sort (Sprint 2) | Catalog search/filter/sort row — omitted in Sprint 1 (`AC-F02-06`), contracted in Sprint 2 (`F-08`) | AC-F02-06 ("no search controls added"), AC-F08-04 | UI contribution (S1 absence) + Sprint 2 (`F-08`, Issue #100) |
 | — | FR-06/07 loading/error states | Loading + safe server failure states (§2.3, §3.3) | AC-F02-06, AC-F02-07 | UI contribution (safe envelope = server) |
 | — | NFR-05/06 concurrency/atomicity | **Not UI-provable** — backend behavior | AC-F02-04, AC-F02-05, AC-F02-08 (seed/schema/restart), AC-F04-06/07/09 | **Outside UI-01 scope** — verified by API/DB tests (see §2) |
 
@@ -73,8 +73,8 @@ Note: AC-F04-06/07/09 (stock effects, restart, OQ-02 limits) are backend behavio
 
 | UI element (task brief listed) | Finding | Decision |
 |---|---|---|
-| **Item image** on Item Detail | FR-06 fields = name/description/category/quantity/availability — **no image** | **Gap** — not designed; needs SRS change first (OQ-UI-3) |
-| **Sorting** on Catalog | No FR for sorting exists | **Gap** — out of scope (OQ-UI-4) |
+| **Item image** on Item Detail | Sprint 1: FR-06 had no image (**Gap**); Sprint 2 (`docs/srs.md` rev 6): optional `image_url` + category SVG fallback | **Resolved for Sprint 2** (`F-08` contract, Issue #100; OQ-UI-3) |
+| **Sorting** on Catalog | Sprint 1: no sorting FR (**Gap**); Sprint 2 (`docs/srs.md` rev 6, `FR-10`): catalog sorting added | **Resolved for Sprint 2** (`F-08` contract, Issue #100; OQ-UI-4) |
 | **Password visibility toggle** | No FR requires/forbids it | **Proposed UX addition** (C-3) — security-neutral; team may drop |
 | **"Checkout Action" wording** | Approved contracts define the item action as "Request to borrow" (FR-11); checkout is the custodian operation (FR-14) | Spec follows approved SRS (OQ-UI-5 — team confirm) |
 
@@ -92,5 +92,5 @@ These are **not gaps** — they are allocated to features outside UI-01's 3-page
 ## 5. Consistency Checks
 
 - No contradiction with [Architecture Change Proposal](../architecture/frontend-change-proposal.md): tokens (§8), breakpoints (§10), custom components (§8.4), Lucide (§9) — all reused, none changed.
-- No contradiction with SRS/contracts: behavior states copied from f-01 §2.3 / f-02 §3; Direct Checkout and Quantity Tracking respected (no approval step, no serial tracking).
+- No contradiction with SRS/contracts: behavior states follow `f-01` §2.3 / `f-02` §3; Sprint 1 UI-01 followed `A-02` Direct Checkout and `A-01` Quantity Tracking (`Sprint 2` extends this with `A-11` approval and `F-06`–`F-08` / `F-11`, pending Issue #100).
 - **No requirements or business rules were created** in this document.

@@ -3,7 +3,7 @@
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
 > **Deliverable:** D1-04 Part D — Three-Sprint Plan | **Issue:** [#4](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/4)
 > **Status:** Draft for team review | **Language:** English (SRS A-07)
-> **Baseline:** [SRS](../srs.md) rev 2 · [Feature Inventory](../features.md) rev 1 · [Traceability](../traceability.md) rev 1 · [System SDS](../system-sds.md) rev 2
+> **Baseline:** [SRS](../srs.md) rev 6 · [Feature Inventory](../features.md) rev 2 · [Traceability](../traceability.md) rev 3 · [System SDS](../system-sds.md) rev 7
 > **Reference:** `project_deliverable_1_v1.pdf` §3.4 · `group_work_specs_v1.pdf` §4, §7
 > Status vocabulary: **Confirmed** (baseline/course backed) · **Proposed** (awaiting team confirmation) · **Open** (decision still required)
 
@@ -27,7 +27,7 @@
 | Sprint | Goal | Features | Completion outcome |
 |---|---|---|---|
 | **1** (→ 8 Nov) | Small deployable product: authentication/authorization foundation + one complete domain slice (request → checkout → active loan) with tested business rules and persistence | F-01, F-02, F-03, F-04, F-05, F-10 | Working increment released on `main` with tag; Parts A–F evidence for Deliverable 1 |
-| **2** (→ 29 Nov) | Core expansion under feature engineering contracts: return, overdue, catalog management, search, loan views/history | F-06, F-07, F-08 | All Sprint 2 features complete and integrated; Sprint 3 contracts drafted with working progress; deployed release candidate |
+| **2** (→ 29 Nov) | Core expansion under feature engineering contracts: return (request + confirm), overdue + notifications, catalog management (with images), search/filter/sort, approval workflow, multi-item bundles, 1–14d duration, loan views/history, printable slip, UI/UX fixes | F-06, F-07, F-08 (+ Sprint 2 extensions to F-04/F-05, Finding 05 fix) | All Sprint 2 features complete and integrated; Sprint 3 (`F-09`) contracts drafted (with summary workflow `AC-F09-01..03` contracted/planned for Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)); deployed release candidate |
 | **3** (→ 13 Dec) | Completion and hardening: inventory reporting, failure handling, usability, regression, defect correction | F-09 + hardening work | Complete verified release; final QA/traceability; demo video and release summary |
 
 Collectively the three sprints cover the entire product baseline (`docs/traceability.md`: 41/41 requirements mapped — see §7).
@@ -49,7 +49,7 @@ Collectively the three sprints cover the entire product baseline (`docs/traceabi
 
 **Domain journey (Confirmed — Theme 2 Sprint 1 example):** seeded catalog → Borrower login → request available item → view own request → Custodian login → record checkout → Active Loan created + availability updated; system rejects checkout of unavailable items and duplicate active loans for a single-unit item.
 
-**Dependencies:** F-01 → F-02 → F-03 → F-04 → F-05 → F-10 (per `docs/features.md`). Engineering contracts ([D1-05]) precede implementation of each feature. Decision gates **before implementation**: SDS-OQ-01 (stack), SDS-OQ-02 (session/token), SRS OQ-01 (seed catalog), SRS OQ-02 (quantity contract).
+**Dependencies:** F-01 → F-02 → F-03 → F-04 → F-05 → F-10 (per `docs/features.md`). Engineering contracts ([D1-05]) preceded implementation of each feature. **Sprint 1 decision gates status:** `SDS-OQ-01` (stack — resolved and implemented in PR #22/#33), `SDS-OQ-02` (session/cookie auth — resolved and implemented in PR #22), `SDS-OQ-03` (`Asia/Bangkok` calendar date — user-confirmed and implemented in Issue #12; shared-team ratification pending PR #98), and `SRS OQ-02 / A-12` (policy decision resolved in `docs/srs.md` rev 6 with shared-team ratification pending PR #98; `F-04` multi-unit validation implemented in Sprint 1, while `F-06` full-quantity return workflow remains **contract-only pending Issues #99/#100**). Synthetic seed catalog fixtures (`E-ONE`, `E-MANY`, `E-ZERO`) remain explicitly labeled under `SRS OQ-01` until room staff populate real items via `F-08` (`FR-09`).
 
 **Expected outcomes:** working increment on `main` + release tag; README setup instructions; Part F evidence (domain journey + persisted retrieval, rule rejection, access restriction, AC→test results).
 
@@ -65,13 +65,14 @@ Collectively the three sprints cover the entire product baseline (`docs/traceabi
 
 | Feature | Requirements |
 |---|---|
-| F-06 Return | FR-17, BR-09 (close-accounting guard), NFR-04-S2, NFR-06-S2 |
-| F-07 Overdue Status | FR-19, BR-08 (derived: now > due date, no return) |
-| F-08 Catalog Management, Search, Loan Views | FR-09 (custodian item CRUD/quantities), FR-10 (search/filter), FR-18 (custodian all-loans), FR-21 (borrower full history) |
+| F-06 Return | FR-17, BR-04, BR-09 (full-return; two-step request-return notice + Custodian confirm), NFR-04-S2, NFR-06-S2 |
+| F-07 Overdue Status & Notifications | FR-19, BR-08 (derived: `now > due_on`, no return), BR-13 (dismissible/clearable in-app alerts) |
+| F-08 Catalog Management, Search, Loan Views | FR-06 (`image_url`/`catalog_status`), FR-09 (custodian item CRUD/quantities), FR-10 (search/filter/sort), FR-16 (history), FR-18 (custodian all-loans), FR-21 (borrower full history) |
+| Sprint 2 Request/Loan Extensions (`A-11`) | FR-11/12/13/14/15, BR-07 (1–14d), BR-12 (`A-11` approval workflow, `request_bundles` multi-item, cancellation, purpose, printable loan slip, Finding 05 & P4 cleanup) |
 
-**Dependencies:** F-06 and F-07 depend on F-05 (loan lifecycle, due dates); F-08 depends on F-02 and F-05. F-06 must resolve SRS OQ-02 return semantics (full vs partial) before its contract is baselined.
+**Dependencies:** F-06 and F-07 depend on F-05 (loan lifecycle, due dates); F-08 depends on F-02 and F-05. `SRS OQ-03/04/06` are resolved in `docs/srs.md` rev 6 (`1–14` day duration, status-only + in-app alerts, search/filter/sort); `SRS OQ-02 / A-12` policy decision (`Full-return only`) is resolved in `docs/srs.md` rev 6 with shared-team ratification pending PR #98 and `F-06` implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100).
 
-**Expected outcomes:** all Sprint 2 features complete and integrated (mandatory per Deliverable 2); Sprint 3 contracts drafted with working progress; integrated release candidate with CI/deployment (Lab 5 pipeline) tied to a commit.
+**Expected outcomes:** all Sprint 2 features complete and integrated (mandatory per Deliverable 2); Sprint 3 (`F-09`) contract drafted (`docs/sprints/sprint-3/f-09-inventory-reporting.md`) with summary workflow (`GET /api/reports/summary` + `/reports`, `AC-F09-01..03`) contracted/planned for implementation and verification in Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100); integrated release candidate with CI/deployment (Lab 5 pipeline) tied to a commit/tag on `main`.
 
 **Verification activities:** return/close-accounting tests (BR-09); return atomicity (NFR-06-S2); overdue boundary tests (due date equality is not overdue); catalog-write authorization (BR-06); search; borrower-history isolation (BR-05); full regression of Sprint 1 behavior.
 
@@ -102,20 +103,20 @@ Sprint 1:   F-01 → F-02 → F-03 → F-04 → F-05 → F-10 (integration) → 
 Sprint 2:   F-05 ─┬→ F-06 (Return) → F-07 (Overdue) ─┐
             F-02 ─┴→ F-08 (Catalog mgmt/search/views) ┴→ integration → RC
 Sprint 3:   F-06/F-07/F-08 data → F-09 (Reporting) + hardening → final release
-Decision gates before implementation: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (calendar/timezone policy — tied to F-05 checkout contract/tests per SDS §10), OQ-01 (seed catalog), OQ-02 (quantity/return semantics)
+Decision gates status: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (Asia/Bangkok calendar policy), SDS-OQ-04 (Cloud Run/Cloud SQL), and SRS OQ-03..OQ-06 are resolved in SRS rev 6 / SDS rev 7; SRS OQ-02 / A-12 policy decision is resolved in SRS rev 6 with shared-team baseline ratification pending PR #98 (§10); synthetic seed fixtures under OQ-01 remain explicitly documented.
 ```
 
-Rule: every feature is implemented on a branch from `sprint/1-staging` under its engineering contract, peer-reviewed, and integrated before release (AGENTS/AGENT.md §11.3).
+Rule: every feature is implemented on a branch from the current sprint staging branch (`sprint/1-staging` for Sprint 1; `sprint/2-staging` for Sprint 2) under its engineering contract, peer-reviewed, and integrated before release (`AGENT.md` §11.3).
 
 ## 7. Baseline Coverage Check (AC-D-02)
 
 | Sprint | Features | Requirement set covered |
 |---|---|---|
 | 1 | F-01–F-05, F-10 | FR-01–FR-08, FR-11–FR-16(active), BR-01–BR-07, BR-10, BR-11(S1), NFR-01–NFR-06(S1), NFR-08, NFR-09 |
-| 2 | F-06–F-08 | FR-09, FR-10, FR-17, FR-18, **FR-19**, FR-21, BR-06(writes), BR-08, BR-09, BR-11(S2), NFR-04(S2), NFR-06(S2) |
-| 3 | F-09 + hardening | FR-20, NFR-07 + regression/defect scope |
+| 2 | F-06–F-08 (+ S2 extensions) | FR-06(S2), FR-09, FR-10, FR-11–FR-16(S2), FR-17, FR-18, FR-19, FR-21, BR-06(writes), BR-07(S2), BR-08, BR-09, BR-11(S2), BR-12(A-11), BR-13, NFR-04(S2), NFR-06(S2) |
+| 3 | F-09 + hardening | FR-20 (contracts + summary progress in D2), NFR-07 + regression/defect scope |
 
-Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 NFR all mapped). Return/Overdue/Reporting are allocated across Sprint 2–3 per AC-D-02.
+Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 NFR all mapped). Return/Overdue/Reporting are allocated across Sprint 2–3 per AC-D-02.
 
 ## 8. Team Work Organization (Proposed — pending team confirmation)
 
@@ -138,17 +139,17 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 |---|---|---|
 | Theme 2 "later sprints" lists *inventory summaries* alongside Return/Overdue/search | Full inventory reporting (FR-20, F-09) is allocated to **Sprint 3**; Sprint 2 includes loan views/history (FR-18/FR-21) which cover operational "who holds what" summaries. AC-D-02 explicitly allows the Return/Overdue/Reporting span of **Sprint 2–3**. Moving summaries to Sprint 2 would require a baseline change (FR-20/F-09 re-allocation) — flag to team if desired | `docs/srs.md` FR-20, `docs/features.md` F-09, issue #4 AC-D-02 |
 | Due-date assignment (BR-07) | In **Sprint 1** (F-05); only overdue computation (BR-08) is Sprint 2 | SRS rev 2 split, PR #15 review |
-| Approval workflow | None in any sprint (Direct Checkout, A-02) | Team decision |
+| Approval workflow | Sprint 1: Direct Checkout (`A-02`); Sprint 2: Approval workflow (`A-11`: `PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`, non-reserving under `BR-12`) | Team decision (`docs/srs.md` rev 3/6; Sprint 2 approval 2026-11-23) |
 
 ## 10. Open Questions and Risks
 
 | Item | Impact | Target |
 |---|---|---|
-| SDS-OQ-01 (stack), SDS-OQ-02 (session/token) | Block Sprint 1 implementation and AC-C-01/04 closure | Immediately — before [D1-05] baseline |
-| SDS-OQ-03 (calendar/timezone policy) | User-confirmed Asia/Bangkok calendar date +7, UTC timestamps during #12 (2026-11-07); SDS rev6 and F-05 evidence | Implementation choice recorded; shared-baseline review pending |
+| SDS-OQ-01 (stack), SDS-OQ-02 (session/token) | Stack & auth foundation (`AC-C-01/04`) | **Resolved (SDS rev 3 / PR #22 / UI-02 PR #33)** — Node.js 24 + Express 5 + PostgreSQL 17 + React/Vite + server sessions |
+| SDS-OQ-03 (calendar/timezone policy) | Due-date and overdue date boundaries | **Resolved (`Asia/Bangkok` + UTC timestamps)** — confirmed in Sprint 1 F-05 and carried to Sprint 2 |
 | **Demo video length conflict** — master spec §9 + `project_final_delivery_v1.pdf` §2 say ≤ 10 min; `project_final_delivery_v1.pdf` §3.5 says ≤ 4 min | Final Delivery rubric compliance | Confirm with instructor/TA; **plan ≤ 4 min meanwhile** (stricter limit satisfies both readings) — recorded per PR #20 review |
-| SRS OQ-01 (actual catalog) | Seed fixtures | Before Sprint 1 seed |
-| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | Before [D1-05] baseline |
+| SRS OQ-01 (actual catalog) | Seed fixtures vs real room catalog | Synthetic fixtures (`E-ONE`/`E-MANY`/`E-ZERO`) active for Sprint 1/2; real catalog management contracted via `FR-09` (`F-08`) |
+| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | **Policy decision resolved (`A-12`, SRS rev 6); shared-team baseline ratification pending PR #98** — multi-unit up to stock, full-return only with two-step notice/confirm (`F-06`) |
 | Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | **Resolved — 8 Nov confirmed** by §4 table row and §9 (removed as OQ per PR #20 review rev 3) |
 | Team capacity split (§8) | Task assignment | Team confirmation |
 
@@ -158,29 +159,31 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 
 ### 11.1 Lab 5 Requirements (R-01 – R-12) status map
 
-| ID | Requirement (summary) | Status | Owner / target | How verified |
+> **Reconciled Post-Lab 5 & Lab 6 Status (2026-11-23):** Lab 5 (`R-01`–`R-12`, `C-01`–`C-06`) was **Completed and Verified** on GCP Cloud Run + Cloud SQL (`main` `b03c904`, image `sha256:e636ea0c...`, revision `pewdiy-00008-mfk`; see [Lab 5 Deployment Guide](../labs/lab-05/deployment.md)). Lab 6 (`TH-056_P2_lab6_sec131`) was executed against isolated UAT revision `pewdiy-uat-00002-bnt`/`00003-8c5` (`docs/labs/lab-06/README.md`); `Finding 05` and `UAT-07 UX Note` are contracted for remediation in Sprint 2 (`f-11-approval-bundles-notifications.md`, pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)).
+
+| ID | Requirement (summary) | Current Status (`d079bc6`) | Owner / target | How verified |
 |---|---|---|---|---|
-| R-01 | Docker packaging; fresh build from clean clone produces a working container | In Progress / Planned | Pending Team Assignment | C-03 |
-| R-02 | Read every setting from environment; document each variable (`.env.example` or `deployment.md`); no real secret committed | In Progress / Planned (`.env.example` + fail-closed config exist since PR #22; must stay current as the app grows) | Pending Team Assignment | C-03 + repository inspection |
-| R-03 | Deploy on GCP at a public URL; domain workflow works through UI, API, database | External Dependency (GCP Free Trial access per handout §4.4) / Planned (deploy work) | Pending Team Assignment | C-04 |
-| R-04 | Persistent database; data survives restart **and** redeploy; nothing needed is kept only in the container | In Progress / Planned (**verified แล้ว:** revocation persistence — TEST-F01-16 สร้าง SessionStore/AuthService instance ใหม่บนฐานข้อมูลเดิม และ revoked session ยังถูกปฏิเสธ; **ยังไม่ได้ทดสอบ:** application process restart, domain-data read-back หลัง restart และ redeploy verification ตาม C-05) | Pending Team Assignment | TEST-F01-16 (revocation persistence เท่านั้น) + C-05 (before/after — ยังรอดำเนินการ) |
-| R-05 | Build + automated tests run on every relevant PR with meaningful results | Planned | Pending Team Assignment | C-01 |
-| R-06 | Passing check is required; failed check blocks the release path (failing PR demo from a temporary branch) | Planned | Pending Team Assignment | C-02 |
-| R-07 | Accepted releases deploy from main through a repeatable pipeline (reviewed change → CI → merge → deployment) | Planned (staging→main release-PR convention already in use) | Pending Team Assignment | C-06 |
-| R-08 | Identify the commit of each release (tag or SHA); document the release procedure | Planned (tag convention in use) | Pending Team Assignment | C-06 |
-| R-09 | Issues/project board/feature branches/PRs into staging reviewed by teammate; release PR staging→main; authors do not approve own PRs; reviews state a specific check | In Progress / Planned (**ใช้งานแล้ว:** Issue/feature-PR workflow และ peer review — PR #14–#26 ทั้งหมดเข้า `sprint/1-staging` พร้อม review จากเพื่อน; **รอดำเนินการ:** release PR จาก `sprint/1-staging` → `main` — ยังไม่มี PR ที่ base เป็น `main` และ `main` ยังอยู่ที่ bootstrap commit `7bf6c8d`) | Both members (ongoing) | PR history evidence (Issues/PRs/reviews ที่มีแล้ว) + release PR staging→main (ยังไม่เกิด) |
-| R-10 | Label Lab 5 Issues and PRs (e.g. `lab5`) so evidence is separate from unrelated feature work | In Progress / Planned (label `lab5` created with this change) | Pending Team Assignment | Label existence + usage on Lab 5 Issues/PRs |
-| R-11 | Both members take part in requirements, testing, AI-agent supervision, implementation, review, deployment; record contributions | In Progress / Planned (team practice per §8) | Both members | Contribution records (Issues/PRs) |
-| R-12 | Repository public until grading ends | **Completed** (repository is public) | Both members | Repository visibility |
+| R-01 | Docker packaging; fresh build from clean clone produces a working container | **Completed (PR #57)** | Both members | `C-03` (`Dockerfile`, `.github/workflows/ci-docker.yml`) |
+| R-02 | Read every setting from environment; document each variable (`.env.example` or `deployment.md`); no real secret committed | **Completed (PR #22 / PR #57)** | Both members | `C-03` + `.env.example` + `docs/labs/lab-05/deployment.md` |
+| R-03 | Deploy on GCP at a public URL; domain workflow works through UI, API, database | **Completed (PR #57 / PR #79)** | Both members | `C-04` (`https://pewdiy-qtz73ahnlq-as.a.run.app`, revision `pewdiy-00008-mfk`) |
+| R-04 | Persistent database; data survives restart **and** redeploy; nothing needed is kept only in the container | **Completed (PR #57 / PR #79)** | Both members | `TEST-F01-16`, `restart-e2e.test.ts`, `C-05` & `UAT-08` on Cloud SQL `pewdiy-pg` |
+| R-05 | Build + automated tests run on every relevant PR with meaningful results | **Completed (PR #43 / PR #57)** | Both members | `C-01` (`.github/workflows/ci-docker.yml`, job `test-and-docker`) |
+| R-06 | Passing check is required; failed check blocks the release path (failing PR demo from a temporary branch) | **Completed (Lab 5)** | Both members | `C-02` (branch protection + failing PR verification recorded in `deployment.md`) |
+| R-07 | Accepted releases deploy from main through a repeatable pipeline (reviewed change → CI → merge → deployment) | **Completed (PR #57 / PR #79)** | Both members | `C-06` (`.github/workflows/deploy.yml` WIF pipeline) |
+| R-08 | Identify the commit of each release (tag or SHA); document the release procedure | **Completed (PR #42 / PR #79)** | Both members | `C-06` (`docs/labs/lab-05/deployment.md`) |
+| R-09 | Issues/project board/feature branches/PRs into staging reviewed by teammate; release PR staging→main; authors do not approve own PRs; reviews state a specific check | **Completed for Sprint 1 / Ongoing for Sprint 2** | Both members (ongoing) | Sprint 1 release PR #42 (`sprint/1-staging` → `main`) & Lab 5 release PR #79 merged with peer review |
+| R-10 | Label Lab 5 Issues and PRs (e.g. `lab5`) so evidence is separate from unrelated feature work | **Completed** | Both members | `lab5` label used on Lab 5 Issues/PRs |
+| R-11 | Both members take part in requirements, testing, AI-agent supervision, implementation, review, deployment; record contributions | **Completed (S1/Lab 5) / Ongoing (S2)** | Both members | Contribution records across Issues/PRs |
+| R-12 | Repository public until grading ends | **Completed** | Both members | Repository visibility |
 
 ### 11.2 Lab 5 Required Files checklist
 
-| File | Status | Note |
+| File | Current Status (`d079bc6`) | Note |
 |---|---|---|
-| `Dockerfile`, `.dockerignore` | Planned | Lab 5 execution work (not Sprint 1 doc work) |
-| `.env.example` | In Progress | Exists since PR #22 — must document **every** env var the app reads |
-| CI + deploy workflows (e.g. `.github/workflows/ci-docker.yml`, `deploy.yml`) | Planned | Lab 5 execution work |
-| `docs/labs/lab-05/deployment.md` | Planned | Stack + env var table + build/test/run/migrate/seed commands + GCP names + release procedure incl. how to find the running commit |
+| `Dockerfile`, `.dockerignore` | **Completed (PR #57)** | Multi-stage Node 24 production image verified by `C-03` |
+| `.env.example` | **Completed (PR #22 / PR #57)** | Documents all runtime, session, seed, and CI database variables |
+| CI + deploy workflows (`.github/workflows/ci-docker.yml`, `deploy.yml`) | **Completed (PR #43 / PR #57)** | Automated PR CI (`test-and-docker`, `C-03`) and WIF Cloud Run deployment (`deploy.yml`) |
+| `docs/labs/lab-05/deployment.md` | **Completed (PR #57 / PR #79)** | Complete stack, env var inventory, GCP resource names, WIF pipeline, and `C-01`–`C-06` verification record |
 
 ### 11.3 Required Checks (C-01 – C-06) — verification method
 
@@ -205,7 +208,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 
 **Rule:** Lab 5 requirements are **not** Sprint 2/3 features — they add no `F-xx` and do not change Sprint allocation (the allocation in §2–§5 stands unchanged). The dependency direction is one-way: Deliverable 2 §3.5 requires the candidate to deploy **through the delivery process established in Lab 5** — i.e. Deliverable 2 *uses* Lab 5 infrastructure; it does not absorb Lab 5 requirements.
 
-**UI readiness note (C-04 dependency):** C-04 requires a working UI domain journey (sign in → main business action → one rejection/restriction) on the deployed URL by **15 Nov**. The F-01 implementation is currently backend-only; the remaining F-01 scope (AC-F01-11 UI, TEST-F01-13 browser/E2E — tracked in Issue #8) and the F-02..F-05 UI work must therefore land **within Sprint 1**. This is a readiness note for Lab 5 — it does not change Sprint allocation.
+**UI readiness note (C-04 dependency — Completed in Sprint 1 PR #33/#41):** C-04 required a working UI domain journey (sign in → main business action → one rejection/restriction) on the deployed URL by **15 Nov**. The React 19 UI (`client/src/`) for `F-01`–`F-05` was completed and merged in Sprint 1 (`PR #33`, `PR #41`) and verified on Cloud Run (`pewdiy-00008-mfk`).
 
 ## 12. Revision History
 
@@ -216,3 +219,4 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 11 BR + 9 
 | 3 — 2026-11-04 | PR #20 peer review round 2: **corrected lab/deliverable schedule** to Lab 5 = 15 Nov, Lab 6 = 22 Nov, Lab 7 = 29 Nov, D1 = 8 Nov (verified by extracting the §4 table with row structure — table rows match §9/§10 headers); **withdrew the rev-2 "schedule conflict" claim as incorrect** (text-extraction row misalignment, not a document conflict); removed the D1-date OQ (resolved); added due dates to Sprint 2 lab references | PR #20 review round 2 by L0u1sss; `group_work_specs_v1.pdf` §4 table (extracted with cell coordinates), §9, §10 |
 | 4 — 2026-11-05 | Added §11 Lab 5 Readiness: R-01..R-12 status map (Completed / In Progress-Planned / External Dependency, owners Pending Team Assignment), Required Files checklist, C-01..C-06 verification methods, Lab 5 ↔ Deliverable 2 scope separation, and the C-04 UI readiness note; **no Sprint allocation change** | FIX-B #24; `01_SE_Lab_5_updated.pdf` §4.1/§4.3/§8/§11/§12 |
 | 5 — 2026-11-05 | PR #26 review: corrected R-09 from Completed to In Progress / Planned (no release PR staging→main exists; `main` at `7bf6c8d`) and corrected R-04 to claim only revocation persistence (TEST-F01-16 = new store instance on same DB) with application restart / domain-data read-back / redeploy marked untested per C-05; no other rows changed | PR #26 review by L0u1sss; GitHub PR/base state verified; `src/test/auth.test.ts` TEST-F01-16 source |
+| 6 — 2026-11-23 | Reconciled Sprint 2 scope (`A-11` approval workflow, multi-item `request_bundles`, cancellation, 1–14d duration, two-step return notice/confirm, item images, catalog sorting, `BR-13` notifications, print slip, Finding 05 + P4); updated `BR` count to 13 and added post-Lab 5/Lab 6 completion note in §11 | `docs/srs.md` rev 6, `docs/features.md` rev 2, `docs/traceability.md` rev 3, PR #96 merged |

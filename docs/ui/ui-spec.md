@@ -4,7 +4,7 @@
 > **Issue:** [#30 — UI-01](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/30) · **Status:** Proposed — pending independent teammate review
 > **Type:** Documentation & Design Specification only — no application code, no dependencies, no migration
 > **Design baseline:** [Frontend Architecture Change Proposal](../architecture/frontend-change-proposal.md) (§7 Tailwind v4, §8 tokens, §9 Lucide, §10 breakpoints, §11 Playwright) — merged (PR #29)
-> **Behavior sources:** [SRS](../srs.md) rev 2 · [SDS](../system-sds.md) §5 · contracts `f-01`–`f-05` (`../sprints/sprint-1/`)
+> **Behavior sources:** [SRS](../srs.md) rev 6 (initial UI-01 baseline drafted at rev 2) · [SDS](../system-sds.md) §5 · Sprint 1 contracts `f-01`–`f-05` (`../sprints/sprint-1/`) · Sprint 2 contracts `f-06`–`f-08`, `f-11` (`../sprints/sprint-2/`, pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100))
 > **Companion documents:** [wireframes.md](wireframes.md) · [mockups.html](mockups.html) · [design-decisions.md](design-decisions.md) · [traceability.md](traceability.md)
 > **Status vocabulary:** **Confirmed** (team decision / approved requirement) · **Proposed** (needs team confirmation) · **Gap** (no requirement backs it — recorded, not invented)
 
@@ -135,11 +135,11 @@ Component hierarchy: `AppShell` → `Nav` (logo, role-aware links, `AccountMenu`
 
 | Element | Spec |
 |---|---|
-| **Application navigation** | `Nav`: Logo/wordmark (link → catalog), links per role — Borrower: Catalog, My Requests, My Loans; Custodian: Catalog, Submitted Requests (checkout queue). Links for later-sprint screens appear **only when their features land** (no dead links) |
+| **Application navigation** | `Nav`: Logo/wordmark (link → catalog), links per role — Borrower: Catalog, My Requests, My Loans (+ Create Request in Sprint 2); Custodian: Catalog, Submitted Requests (+ Loans, Reports in Sprint 2/3, plus NotificationMenu). Links for later-sprint screens appear **only when their features land** (no dead links) |
 | **User info / Account menu** | `AccountMenu` (right): current username + role label; menu contains "Sign out" (logout). On mobile: avatar-initials button + dropdown |
 | **Catalog header** | Page title "Equipment Catalog"; optional status summary chip (e.g., "3 items · 2 available") — **Proposed** |
 | **Search** | **Sprint 2 (FR-10, F-08)** — not rendered in Sprint 1 (contract f-02: "no search controls added"). When F-08 lands: search input in header row (name/category) |
-| **Filtering / Sorting** | Filtering = FR-10 (Sprint 2, same treatment). **Sorting = Gap** — no FR supports it (see traceability.md) |
+| **Filtering / Sorting** | Filtering & Sorting = FR-10 (Sprint 2 `F-08` contract, pending Issues #99/#100; sorting was a Sprint 1 gap and was added in `docs/srs.md` rev 6) |
 | **Item list** | Desktop ≥1024px: `Table` (dense data compare). Tablet: Table with reduced columns. Mobile: `ItemCard` list (stacked rows). *Reason:* quantity/availability comparison is the core catalog task (academic data clarity) — table wins on desktop; cards prevent horizontal overflow on mobile (ARCH §10) |
 | **Availability status** | `Badge`: AVAILABLE → `color-success` text on tinted bg; UNAVAILABLE → `color-danger`. Always **text + color** (never color alone) |
 | **Navigation to Item Detail** | Row/card click (whole row is the target) → `/items/:id`; keyboard: row is focusable link |
@@ -198,17 +198,17 @@ Component hierarchy: `AppShell` → `Nav` → `BackLink` → `Card`(`DetailList`
 | Element | Spec | Requirement basis |
 |---|---|---|
 | **Item information** | `DetailList`: Name (heading), Description (body), Category, Quantity Information (Total / Available with label "of N total") | FR-06/07, API object fields |
-| **Item image** | **Gap — not specified.** SRS FR-06 fields contain no image; **no image is designed and no requirement is invented for it** (recorded in traceability.md §4). If the team later approves catalog images, add via SRS change first | — |
+| **Item image** | **Sprint 1:** Gap — not specified (`FR-06` had no image in Sprint 1). **Sprint 2 (`docs/srs.md` rev 6, `F-08` contract, pending Issues #99/#100):** optional `image_url` with category preset SVG illustration fallback | `FR-06` (rev 6) |
 | **Description** | Full text, wraps; empty string shows muted "No description" (description may be empty per contract) | FR-06 |
 | **Availability** | `Badge` same as catalog (AVAILABLE/UNAVAILABLE) + explicit available quantity | FR-07 |
 | **Quantity Information** | `quantity_available` (bold) "available of {quantity_total} total" — Quantity Tracking display (SRS A-01) | FR-06/07 |
-| **Checkout Action** | **Terminology note:** the approved SRS/contracts define the item-detail action as **"Request to borrow" (FR-11/F-04)** within the **Direct Checkout** flow (SRS A-02: no approval stage — request proceeds directly to custodian checkout). There is no separate "checkout" button for Borrowers on this page (custodian checkout lives on the Submitted Requests screen, F-05). UI label: **"Request to borrow"** (button, primary) — visible only to Borrower on AVAILABLE items (f-02 §2: "Borrower sees navigation to the F-04 request form when the selected item is available. Custodian sees the same catalog data without a Borrower request action") | FR-11, A-02, f-02/§f-04 |
-| **Quantity input** | `Input` number, default 1, min 1. **Conditional (Proposed, gated by OQ-02):** max bound and multi-unit eligibility await the OQ-02 decision (f-04 contract: "exact permitted maximum, multi-unit eligibility... must be settled by OQ-02"). Until decided: render the input with min=1 and a note that limits are pending team policy | FR-11, OQ-02 |
+| **Checkout Action** | **Terminology note:** In Sprint 1 (`A-02` Direct Checkout, `d079bc6`), **"Request to borrow" (FR-11/F-04)** proceeded directly to custodian checkout with no approval stage. In Sprint 2 (`A-11`, `docs/sprints/sprint-2/f-11-approval-bundles-notifications.md`, pending Issues #99/#100), requests enter `PENDING` for Custodian `approve`/`reject` prior to checkout (`CreateRequestPage` `/requests/new`). Custodian checkout lives on Submitted Requests (F-05). UI label: **"Request to borrow"** / **"Request this item"** (button, primary) — visible only to Borrower on AVAILABLE items | FR-11, A-02 / A-11, f-02/f-04/f-11 |
+| **Quantity input** | `Input` number, default 1, min 1, max `quantity_available` (`OQ-02` / `A-12` policy resolved, ratification pending PR #98: multi-unit borrowing allowed up to current `quantity_available`, no additional per-borrower cap; Sprint 2 `UAT-07 UX Note` adds explicit `1–N` range hint in Issue #100) | FR-11, OQ-02 / A-12 |
 | **Validation** | Inline `FieldError`: quantity must be a positive integer; fractional/negative/zero rejected client-side (server enforces too) | f-04 |
 | **Unavailable state** | Badge UNAVAILABLE + no request form (action hidden/disabled with explanation "This item is currently unavailable."); server remains authoritative (hidden ≠ authorization) | f-02 §2 |
 | **Checkout error (request failure)** | `Alert` per error code: 409 INSUFFICIENT_AVAILABILITY → "This item is no longer available." + re-fetch stock; 401 → login; 500/503 → generic retry + requestId; preserve safe input | f-04 §API, shared-conventions |
 | **Loading** | Page-level loading while detail loads; submit button loading+disabled while request in flight | f-02 §3 |
-| **Success / Confirmation** | After 201: **navigate to My Requests** (f-04 §2: "UI opens My Requests"; AC-F04-08: submit → own-request display → reload) and display the confirmation there (e.g., success `Alert`: "Request submitted." at top of My Requests list). Per the approved contract this is a redirect, not stay-on-page + manual link. The My Requests screen itself belongs to F-04 UI (outside UI-01's 3 pages) — this spec defines the redirect behavior and where the confirmation appears. **No approval step shown anywhere** (Direct Checkout). If the team prefers stay-on-page + link instead, that would be a contract change and must be reviewed as a f-04 revision (recorded in design-decisions.md OQ-UI-6) | f-04 §2, AC-F04-08, SRS A-02 |
+| **Success / Confirmation** | After 201: **navigate to My Requests** (f-04 §2: "UI opens My Requests"; AC-F04-08: submit → own-request display → reload) and display the confirmation there (e.g., success `Alert`: "Request submitted." at top of My Requests list). Per the approved contract this is a redirect, not stay-on-page + manual link. In Sprint 1 (`A-02`) no approval step is shown; in Sprint 2 (`A-11`, pending Issue #100) the new request displays `PENDING` approval status. If the team prefers stay-on-page + link instead, that would be a contract change and must be reviewed as a f-04 revision (recorded in design-decisions.md OQ-UI-6) | f-04 §2, AC-F04-08, SRS A-02 / A-11 |
 
 ### 3.3 Interaction and UI States (summary)
 
@@ -234,14 +234,14 @@ Heading hierarchy (h1 = item name); `DetailList` uses `<dl>/<dt>/<dd>`; quantity
 - Buttons/inputs follow ARCH §8.4 tokens everywhere; one visual language (Academic/Minimal).
 - Error language: reuse the shared safe-error wording (never raw server text).
 - Logout behavior (shared): success → Login; failure → safe message + retry (f-01 §2.3).
-- No approval step, no individual-copy/serial tracking anywhere (team decisions: Direct Checkout + Quantity Tracking).
+- No individual-copy/serial tracking anywhere (Quantity Tracking `A-01`). Sprint 1 uses Direct Checkout (`A-02`, no approval step); Sprint 2 contracts add the non-reserving `A-11` approval workflow (`PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`, pending Issues #99/#100).
 
 ## 5. Open Questions / Items Needing Team Confirmation
 
 | # | Item | Why | Proposal |
 |---|---|---|---|
 | OQ-UI-1 | Typography: Inter-only vs Inter + serif headings | ARCH §8.2 left it open | Inter-only (most minimal) — team picks |
-| OQ-UI-2 | Quantity input bounds on Item Detail | SRS **OQ-02** (multi-unit loans + limits) unresolved | Render min=1 now; finalize bounds when OQ-02 decided (before F-04 contract baseline) |
-| OQ-UI-3 | Item images | No FR supports images (Gap) | Keep out; requires SRS change if wanted |
-| OQ-UI-4 | Sorting on Catalog | No FR supports sorting (Gap) | Keep out of scope |
+| OQ-UI-2 | Quantity input bounds on Item Detail | **Policy resolved (`OQ-02` / `A-12`, `docs/srs.md` rev 6; shared-team ratification pending PR #98):** multi-unit allowed from `1` up to `quantity_available` | `F-04` validation implemented in Sprint 1; explicit `1–N` range hint contracted for Sprint 2 (`UAT-07 UX Note`, Issue #100) |
+| OQ-UI-3 | Item images | Sprint 1 gap (`FR-06` had no image); **Sprint 2 (`docs/srs.md` rev 6) adds optional `image_url` + category preset fallback** | Resolved for Sprint 2 (`F-08` contract; implementation pending Issue #100) |
+| OQ-UI-4 | Sorting on Catalog | Sprint 1 gap; **Sprint 2 (`docs/srs.md` rev 6, `FR-10`) adds catalog sorting** | Resolved for Sprint 2 (`F-08` contract; implementation pending Issue #100) |
 | OQ-UI-5 | "Checkout Action" terminology on Item Detail | Task brief says "Checkout Action"; approved contracts define "Request to borrow" (FR-11) + custodian checkout (FR-14) | Spec follows approved SRS/contracts; **team confirm** the label wording |

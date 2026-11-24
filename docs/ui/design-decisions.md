@@ -62,9 +62,9 @@
 | # | Item | Why open | Proposal |
 |---|---|---|---|
 | OQ-UI-1 | Typography: Inter-only vs Inter + serif headings | Not in the confirmed decisions | Inter-only (most minimal) |
-| OQ-UI-2 | Item Detail quantity input bounds | SRS **OQ-02** (multi-unit loans/limits) unresolved — f-04 contract explicitly defers to it | Render min=1 now; finalize bounds with OQ-02 |
-| OQ-UI-3 | Item images | **Gap** — FR-06 has no image field; inventing one would create a requirement | Keep out until SRS change approved |
-| OQ-UI-4 | Catalog sorting | **Gap** — no FR supports sorting | Out of scope |
+| OQ-UI-2 | Item Detail quantity input bounds | **Policy resolved (`OQ-02` / `A-12`, `docs/srs.md` rev 6; shared-team ratification pending PR #98):** multi-unit allowed from `1` up to `quantity_available` | `F-04` validation implemented in Sprint 1; explicit `1–N` range hint contracted for Sprint 2 (`UAT-07 UX Note`, Issue #100) |
+| OQ-UI-3 | Item images | Sprint 1 gap — **Resolved in Sprint 2 (`docs/srs.md` rev 6):** optional `image_url` + category SVG fallback | Contracted for Sprint 2 (`F-08`; implementation pending Issue #100) |
+| OQ-UI-4 | Catalog sorting | Sprint 1 gap — **Resolved in Sprint 2 (`docs/srs.md` rev 6, `FR-10`):** sorting supported | Contracted for Sprint 2 (`F-08`; implementation pending Issue #100) |
 | OQ-UI-5 | "Checkout Action" wording on Item Detail | Task brief says "Checkout Action"; approved SRS/contracts define the Borrower action as "Request to borrow" (FR-11) with custodian checkout (FR-14) on a different screen | Spec follows approved contracts; team to confirm label wording |
 | OQ-UI-6 | Post-submit success flow variant: stay on Item Detail + manual "My Requests" link (instead of the contract's redirect) | Would require a f-04 contract revision (AC-F04-08 assumes redirect to own-request display) | **Not adopted** — spec follows the approved contract (N-5); if the team prefers the variant, raise a f-04 contract revision first |
 

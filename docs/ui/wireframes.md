@@ -178,7 +178,7 @@
 │ │ Description                               │ │ ┌────────────────┐ │ │
 │ │ Microcontroller board based on ATmega...  │ │ │    Submit      │ │ │
 │ │                                           │ │ └────────────────┘ │ │
-│ │ Category       Boards                     │ │ Limits pending     │ │ ← OQ-02 note
+│ │ Category       Boards                     │ │ Min 1..Avail       │ │ ← OQ-02 / A-12 (1–N hint S2)
 │ │ Total          5                          │ │ (team policy)      │ │
 │ │ Available      3 of 5 total               │ │                    │ │
 │ └───────────────────────────────────────────┘ └────────────────────┘ │
