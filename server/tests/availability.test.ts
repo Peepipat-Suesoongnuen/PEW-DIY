@@ -254,7 +254,7 @@ describe.skipIf(!HAS_LOAN_RELATIONS)(
 
       // No request/loan/user/borrower data leaks into the equipment object.
       for (const key of Object.keys(detail.body.data)) {
-        expect(["id", "name", "description", "category", "quantity_total", "quantity_available", "availability"]).toContain(key);
+        expect(["id", "name", "description", "category", "quantity_total", "quantity_available", "availability", "image_url", "catalog_status"]).toContain(key);
       }
     });
 

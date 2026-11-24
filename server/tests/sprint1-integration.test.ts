@@ -56,7 +56,7 @@ beforeAll(async () => {
   ({ pool } = await createTestContext());
   for (const [index, id] of ids.entries()) await pool.query("INSERT INTO users(id,username,password_hash,role) VALUES($1,$1,$2,$3)",
     [id, await hashPassword(password), index === 2 ? "CUSTODIAN" : "BORROWER"]);
-  await pool.query("INSERT INTO equipment VALUES($1,'Integration exclusive fixture','Synthetic','Synthetic',1)", [item]);
+  await pool.query("INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,'Integration exclusive fixture','Synthetic','Synthetic',1)", [item]);
   await start(); cookies = await Promise.all(ids.map((_, i) => login(i)));
   const response = await call("POST", "/api/requests", cookies[0], { equipment_id: item, quantity_requested: 1 });
   expect(response.status).toBe(201); requestId = (await response.json()).data.id;

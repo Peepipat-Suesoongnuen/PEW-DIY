@@ -66,6 +66,9 @@ export class BorrowingRequestService {
       const equipment = await client.query("SELECT id FROM equipment WHERE id = $1 FOR UPDATE", [body.equipment_id]);
       if (!equipment.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
       const stock = await getEquipment(client, body.equipment_id);
+      if (stock!.catalog_status === "RETIRED") {
+        throw new RequestError(409, "EQUIPMENT_RETIRED", "Equipment is retired and cannot be requested.");
+      }
       assertRequestAvailable(stock!.quantity_available);
       if (body.quantity_requested > stock!.quantity_available) {
         throw new RequestError(409, "INSUFFICIENT_AVAILABILITY", "Requested quantity exceeds current availability.");

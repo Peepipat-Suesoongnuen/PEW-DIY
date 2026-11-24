@@ -41,7 +41,7 @@ for (const mode of ["hold", "fail", "normal"] as const) {
       const origin = `http://127.0.0.1:${port}`;
       for (const [i, account] of accounts.entries()) await pool.query("INSERT INTO users(id,username,password_hash,role) VALUES($1,$1,$2,$3)",
         [account.username, await hashPassword(password), i === 2 ? "CUSTODIAN" : "BORROWER"]);
-      await pool.query("INSERT INTO equipment VALUES($1,'Checkout synthetic','Fixture','Synthetic',3)", [item]);
+      await pool.query("INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,'Checkout synthetic','Fixture','Synthetic',3)", [item]);
       const contextOptions = { baseURL: origin, viewport: testInfo.project.use.viewport };
       borrower = await browser.newContext(contextOptions); staff = await browser.newContext(contextOptions);
       const bPage = await borrower.newPage(), cPage = await staff.newPage();

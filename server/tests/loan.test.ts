@@ -30,7 +30,7 @@ const checkout = (id: string, cookie = cookies[2]!, body: unknown = {}, app = ap
   .post(`/api/requests/${encodeURIComponent(id)}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookie).send(body);
 async function fixture(total = 1, qty = 1, owner = users[0]!.id) {
   const item = "f05-" + randomUUID(), id = "f05-" + randomUUID();
-  await pool.query("INSERT INTO equipment VALUES($1,'F05 synthetic','Test','Synthetic',$2)", [item, total]);
+  await pool.query("INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,'F05 synthetic','Test','Synthetic',$2)", [item, total]);
   await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested) VALUES($1,$2,$3,$4)", [id, owner, item, qty]);
   return { item, id };
 }
