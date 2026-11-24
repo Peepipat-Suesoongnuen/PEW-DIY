@@ -11,6 +11,7 @@
 
 export type Role = "BORROWER" | "CUSTODIAN";
 export type CatalogStatus = "ACTIVE" | "RETIRED";
+export type CatalogSort = "name_asc" | "name_desc" | "available_desc" | "available_asc";
 export type RequestStatus = "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "CHECKED_OUT";
 export type LoanStatus = "ACTIVE" | "RETURN_PENDING" | "RETURNED";
 
@@ -28,6 +29,16 @@ export interface Equipment {
   quantity_total: number;
   quantity_available: number;
   availability: "AVAILABLE" | "UNAVAILABLE";
+  image_url?: string;
+  catalog_status?: CatalogStatus;
+}
+
+export interface CatalogQuery {
+  q?: string;
+  category?: string;
+  availability?: "AVAILABLE" | "UNAVAILABLE";
+  status?: CatalogStatus | "ALL";
+  sort?: CatalogSort;
 }
 
 export interface BorrowingRequest {
@@ -115,11 +126,46 @@ export const api = {
   logout() {
     return apiFetch<void>("/api/auth/logout", { method: "POST" });
   },
-  listEquipment() {
-    return apiFetch<{ data: Equipment[] }>("/api/equipment");
+  listEquipment(query?: CatalogQuery) {
+    const params = new URLSearchParams();
+    if (query?.q) params.set("q", query.q);
+    if (query?.category) params.set("category", query.category);
+    if (query?.availability) params.set("availability", query.availability);
+    if (query?.status) params.set("status", query.status);
+    if (query?.sort) params.set("sort", query.sort);
+    const qs = params.toString();
+    return apiFetch<{ data: Equipment[] }>(qs ? `/api/equipment?${qs}` : "/api/equipment");
   },
   getEquipment(id: string) {
     return apiFetch<{ data: Equipment }>(`/api/equipment/${encodeURIComponent(id)}`);
+  },
+  createEquipment(input: {
+    name: string;
+    description: string;
+    category: string;
+    quantity_total: number;
+    image_url?: string;
+  }) {
+    return apiFetch<{ data: Equipment }>("/api/equipment", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+  updateEquipment(
+    id: string,
+    input: {
+      name?: string;
+      description?: string;
+      category?: string;
+      quantity_total?: number;
+      image_url?: string;
+      catalog_status?: CatalogStatus;
+    },
+  ) {
+    return apiFetch<{ data: Equipment }>(`/api/equipment/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    });
   },
   createRequest(equipment_id: string, quantity_requested: number) {
     return apiFetch<{ data: BorrowingRequest }>("/api/requests", {

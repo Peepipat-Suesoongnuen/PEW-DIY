@@ -23,7 +23,7 @@ test("TEST-F10-01/02: complete UI/API/DB journey, exclusive rejection, ownership
     await screen.screenshot({ path: path.join(artifactDir, "screenshots", `${testInfo.project.name}-${label}.png`), fullPage: true });
   };
   try {
-    await pool.query("INSERT INTO equipment VALUES($1,$2,'Synthetic integrated journey','Synthetic',1)", [item, name]);
+    await pool.query("INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,$2,'Synthetic integrated journey','Synthetic',1)", [item, name]);
     const login = new LoginPage(page); await login.goto(); await login.signIn(ACCOUNTS.borrower());
     await page.goto("/catalog");
     await expect(page.locator(`a[aria-label="View ${name}"]:visible`).first()).toBeVisible();

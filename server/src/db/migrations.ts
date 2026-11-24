@@ -102,7 +102,27 @@ export async function migrate(client: Pick<PoolClient, "query">): Promise<void> 
   await client.query(MIGRATION_001_SQL);
   await client.query(MIGRATION_002_REQUESTS_SQL);
   await client.query(MIGRATION_003_LOANS_SQL);
+  await client.query(MIGRATION_004_SPRINT2_SQL);
 }
+
+/**
+ * F-08 Sprint 2 equipment catalog extensions (Slice 2 #102):
+ * - equipment: optional image_url and catalog_status (ACTIVE/RETIRED)
+ */
+export const MIGRATION_004_SPRINT2_SQL = `
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS image_url TEXT NOT NULL DEFAULT '';
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS catalog_status TEXT NOT NULL DEFAULT 'ACTIVE';
+DO $migration$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'equipment_catalog_status_check' AND conrelid = 'equipment'::regclass
+  ) THEN
+    ALTER TABLE equipment
+      ADD CONSTRAINT equipment_catalog_status_check CHECK (catalog_status IN ('ACTIVE', 'RETIRED'));
+  END IF;
+END
+$migration$;
+`;
 
 /** F-05: stock and request status derive from this durable relation. */
 export const MIGRATION_003_LOANS_SQL = `

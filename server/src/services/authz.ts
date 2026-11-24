@@ -22,16 +22,17 @@ export type Role = "BORROWER" | "CUSTODIAN";
  * route-parameterized tests whenever a protected route is added").
  */
 export const PROTECTED_ROUTES: ReadonlyArray<{
-  method: "GET" | "POST";
+  method: "GET" | "POST" | "PATCH" | "DELETE";
   path: string;
   allowedRoles: ReadonlyArray<Role>;
 }> = [
   { method: "GET", path: "/api/auth/me", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "POST", path: "/api/auth/logout", allowedRoles: ["BORROWER", "CUSTODIAN"] },
-  // F-02 (contract f-02 §4): shared room catalog — both roles may read;
-  // no ownership predicate on the catalog itself.
+  // F-02 / F-08 catalog routes: both roles read; Custodian creates/updates.
   { method: "GET", path: "/api/equipment", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/equipment/{equipmentId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "POST", path: "/api/equipment", allowedRoles: ["CUSTODIAN"] },
+  { method: "PATCH", path: "/api/equipment/{equipmentId}", allowedRoles: ["CUSTODIAN"] },
   { method: "POST", path: "/api/requests", allowedRoles: ["BORROWER"] },
   { method: "POST", path: "/api/requests/{requestId}/checkout", allowedRoles: ["CUSTODIAN"] },
   { method: "GET", path: "/api/loans", allowedRoles: ["BORROWER"] },

@@ -33,6 +33,8 @@ export const PROTECTED_ROUTE_INVENTORY: ReadonlyArray<{
   // F-02 catalog routes (registered so TEST-F01-05/06/09 expand automatically).
   { method: "GET", path: "/api/equipment" },
   { method: "GET", path: "/api/equipment/fixture-e-one" },
+  { method: "POST", path: "/api/equipment", sampleBody: { name: "Probe", description: "", category: "Synthetic", quantity_total: 1 } },
+  { method: "PATCH", path: "/api/equipment/fixture-e-one", sampleBody: { name: "Probe" } },
   { method: "POST", path: "/api/requests", sampleBody: { equipment_id: "fixture-e-one", quantity_requested: 1 } },
   { method: "GET", path: "/api/requests" },
   { method: "GET", path: "/api/requests/fixture-r-one" },

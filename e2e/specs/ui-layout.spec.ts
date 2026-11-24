@@ -23,7 +23,7 @@ test("Issue39: stable navigation, separated loan actions, edge clicks and readab
     const password = randomBytes(24).toString("hex"), passwordHash = await hashPassword(password);
     const borrowerId = "internal-borrower-" + randomUUID(), equipmentId = "internal-equipment-" + randomUUID();
     await pool.query("INSERT INTO users(id,username,password_hash,role) VALUES($1,'Student A',$2,'BORROWER'),('internal-staff','Layout staff',$2,'CUSTODIAN')", [borrowerId, passwordHash]);
-    await pool.query("INSERT INTO equipment VALUES($1,'Synthetic Tool Set','Layout fixture','Synthetic',20)", [equipmentId]);
+    await pool.query("INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,'Synthetic Tool Set','Layout fixture','Synthetic',20)", [equipmentId]);
     worker = spawn(process.execPath, ["--import", "tsx", "server/tests/fixtures/loan-worker.ts"], {
       cwd: process.cwd(), env: { ...process.env, TEST_DATABASE_URL: url.toString(), F05_TEST_MODE: "normal" },
       windowsHide: true, stdio: ["ignore", "ignore", "ignore", "ipc"],

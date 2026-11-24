@@ -318,8 +318,79 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     const { container } = renderCatalog();
 
     expect((await screen.findAllByText("<img src=x onerror=alert(1)>")).length).toBe(2);
-    expect(screen.getAllByText("<b>Sensors</b>")).toHaveLength(2);
+    expect(screen.getAllByText("<b>Sensors</b>").length).toBeGreaterThanOrEqual(2);
+    expect(container.querySelector("b")).toBeNull();
     expect(container.querySelector("img[src='x']")).toBeNull();
     expect(container.querySelector("script")).toBeNull();
+  });
+
+  it("applies search, category, status & sort filters, preserves category options, and allows Custodian to add equipment (FR-09/FR-10)", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/auth/me")) {
+        return jsonResponse(200, { data: { user: { id: "c1", username: "C-A", role: "CUSTODIAN" } } });
+      }
+      if (url === "/api/equipment" && init?.method === "POST") {
+        return jsonResponse(201, {
+          data: {
+            id: "new-eq",
+            name: "Servo Arm",
+            description: "",
+            category: "Robotics",
+            quantity_total: 4,
+            quantity_available: 4,
+            availability: "AVAILABLE",
+            image_url: "/images/analyzer.png",
+            catalog_status: "ACTIVE",
+          },
+        });
+      }
+      if (url.includes("status=RETIRED")) {
+        return jsonResponse(200, { data: [] });
+      }
+      if (url.includes("category=Electronics")) {
+        return jsonResponse(200, { data: [items[0]] });
+      }
+      return jsonResponse(200, { data: items });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    renderCatalog();
+
+    await screen.findAllByText("Arduino Uno");
+    expect(fetchMock.mock.calls.some(([u]) => String(u) === "/api/equipment?status=ACTIVE")).toBe(true);
+    await user.selectOptions(screen.getByLabelText("Sort by"), "available_desc");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("sort=available_desc"))).toBe(true);
+
+    // Selecting category=Electronics still keeps Instruments in the Category dropdown
+    await user.selectOptions(screen.getByLabelText("Category"), "Electronics");
+    expect(screen.getByRole("option", { name: "Instruments" })).toBeInTheDocument();
+
+    // Filtering status=RETIRED with 0 matches shows filter empty state + Clear filters button
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "RETIRED");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("status=RETIRED"))).toBe(true);
+    expect(await screen.findByText("No equipment matched your filters.")).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "ALL");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("status=ALL"))).toBe(true);
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "RETIRED");
+    expect(await screen.findByText("No equipment matched your filters.")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Clear filters" }));
+    await screen.findAllByText("Arduino Uno");
+
+    // Custodian creates equipment with relative image path and empty description
+    await user.click(screen.getByRole("button", { name: "Add equipment" }));
+    await user.type(screen.getByLabelText("Equipment name"), "Draft Item");
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "Add equipment" }));
+    expect(screen.getByLabelText("Equipment name")).toHaveValue("");
+
+    await user.selectOptions(screen.getByLabelText("Category"), "Electronics");
+    await user.type(screen.getByLabelText("Equipment name"), "Servo Arm");
+    await user.type(screen.getByLabelText("Equipment category"), "Robotics");
+    await user.type(screen.getByLabelText(/Preview image URL/), "/images/analyzer.png");
+    await user.click(screen.getByRole("button", { name: "Save equipment" }));
+
+    expect(fetchMock.mock.calls.some(([u, i]) => String(u) === "/api/equipment" && i?.method === "POST")).toBe(true);
+    expect(screen.getByRole("option", { name: "Robotics" })).toBeInTheDocument();
   });
 });
