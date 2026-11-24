@@ -27,21 +27,79 @@ export function checkoutDueOn(instant: Date, timeZone: string, requestedDays = 7
   return date.toISOString().slice(0, 10);
 }
 
+export type LoanStatus = "ACTIVE" | "RETURN_PENDING" | "RETURNED";
+export type LoanScope = "active" | "history" | "all";
+
 export interface LoanView {
-  id: string; request_id: string; borrower_id: string; equipment_id: string;
-  quantity_borrowed: number; checked_out_by: string; checkout_at: string; due_on: string; status: "ACTIVE";
+  id: string;
+  request_id: string;
+  bundle_id: string | null;
+  borrower_id: string;
+  borrower_username: string;
+  equipment_id: string;
+  equipment_name: string;
+  quantity_borrowed: number;
+  requested_days: number;
+  checked_out_by: string;
+  checkout_at: string;
+  due_on: string;
+  return_requested_at: string | null;
+  return_requested_by: string | null;
+  return_note: string;
+  returned_at: string | null;
+  returned_by: string | null;
+  status: LoanStatus;
 }
-const projection = `SELECT l.id,l.request_id,r.borrower_id,r.equipment_id,l.quantity_borrowed,
-  l.checked_out_by,l.checkout_at,l.due_on::text AS due_on FROM loans l
-  JOIN borrowing_requests r ON r.id=l.request_id`;
+const projection = `SELECT l.id,l.request_id,r.bundle_id,r.borrower_id,u.username AS borrower_username,
+  r.equipment_id,e.name AS equipment_name,l.quantity_borrowed,r.requested_days,
+  l.checked_out_by,l.checkout_at,l.due_on::text AS due_on,
+  l.return_requested_at,l.return_requested_by,l.return_note,l.returned_at,l.returned_by
+  FROM loans l
+  JOIN borrowing_requests r ON r.id=l.request_id
+  JOIN users u ON u.id=r.borrower_id
+  JOIN equipment e ON e.id=r.equipment_id`;
 function view(row: Record<string, unknown>): LoanView {
-  return { id: String(row.id), request_id: String(row.request_id), borrower_id: String(row.borrower_id),
-    equipment_id: String(row.equipment_id), quantity_borrowed: Number(row.quantity_borrowed),
-    checked_out_by: String(row.checked_out_by), checkout_at: new Date(row.checkout_at as Date).toISOString(),
-    due_on: String(row.due_on), status: "ACTIVE" };
+  const returnedAt = row.returned_at ? new Date(row.returned_at as Date).toISOString() : null;
+  const returnRequestedAt = row.return_requested_at ? new Date(row.return_requested_at as Date).toISOString() : null;
+  const status: LoanStatus = returnedAt ? "RETURNED" : returnRequestedAt ? "RETURN_PENDING" : "ACTIVE";
+  return {
+    id: String(row.id),
+    request_id: String(row.request_id),
+    bundle_id: row.bundle_id ? String(row.bundle_id) : null,
+    borrower_id: String(row.borrower_id),
+    borrower_username: String(row.borrower_username ?? row.borrower_id),
+    equipment_id: String(row.equipment_id),
+    equipment_name: String(row.equipment_name ?? row.equipment_id),
+    quantity_borrowed: Number(row.quantity_borrowed),
+    requested_days: Number(row.requested_days ?? 7),
+    checked_out_by: String(row.checked_out_by),
+    checkout_at: new Date(row.checkout_at as Date).toISOString(),
+    due_on: String(row.due_on),
+    return_requested_at: returnRequestedAt,
+    return_requested_by: row.return_requested_by ? String(row.return_requested_by) : null,
+    return_note: String(row.return_note ?? ""),
+    returned_at: returnedAt,
+    returned_by: row.returned_by ? String(row.returned_by) : null,
+    status,
+  };
 }
 function validId(id: string) {
   if (!id || id.includes("\0")) throw new RequestError(400, "VALIDATION_ERROR", "Invalid request.");
+}
+function parseReturnNote(input: unknown): string {
+  if (input === undefined || input === null) return "";
+  if (typeof input !== "object" || Array.isArray(input)) {
+    throw new RequestError(400, "VALIDATION_ERROR", "Invalid request.");
+  }
+  const obj = input as Record<string, unknown>;
+  for (const key of Object.keys(obj)) {
+    if (key !== "return_note") throw new RequestError(400, "VALIDATION_ERROR", "Invalid request.");
+  }
+  if (obj.return_note === undefined || obj.return_note === null) return "";
+  if (typeof obj.return_note !== "string" || obj.return_note.includes("\0") || obj.return_note.length > 500) {
+    throw new RequestError(400, "VALIDATION_ERROR", "Invalid return note.");
+  }
+  return obj.return_note.trim();
 }
 export interface LoanServiceOptions {
   timeZone?: string;
@@ -164,17 +222,165 @@ export class LoanService {
     }
   }
 
-  async list(user: SessionUser): Promise<LoanView[]> {
-    if (user.role !== "BORROWER") throw new RequestError(403, "FORBIDDEN", "Access denied.");
-    const result = await this.pool.query(`${projection} WHERE r.borrower_id=$1 AND l.returned_at IS NULL ORDER BY l.checkout_at DESC,l.id`, [user.id]);
+  async list(user: SessionUser, scope: LoanScope = "active"): Promise<LoanView[]> {
+    if (!["active", "history", "all"].includes(scope)) {
+      throw new RequestError(400, "VALIDATION_ERROR", "Invalid loan scope.");
+    }
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+    if (user.role === "BORROWER") {
+      params.push(user.id);
+      conditions.push(`r.borrower_id = $${params.length}`);
+    }
+    if (scope === "active") {
+      conditions.push("l.returned_at IS NULL");
+    } else if (scope === "history") {
+      conditions.push("l.returned_at IS NOT NULL");
+    }
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    const result = await this.pool.query(
+      `${projection} ${whereClause} ORDER BY l.checkout_at DESC, l.id`,
+      params,
+    );
     return result.rows.map(view);
   }
+
   async get(user: SessionUser, id: string): Promise<LoanView> {
+    validId(id);
+    const result = await this.pool.query(`${projection} WHERE l.id=$1`, [id]);
+    if (!result.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+    const row = result.rows[0];
+    if (user.role === "BORROWER" && row.borrower_id !== user.id) {
+      throw new RequestError(403, "FORBIDDEN", "Access denied.");
+    }
+    return view(row);
+  }
+
+  async requestReturn(user: SessionUser, id: string, input: unknown): Promise<LoanView> {
     if (user.role !== "BORROWER") throw new RequestError(403, "FORBIDDEN", "Access denied.");
     validId(id);
-    const result = await this.pool.query(`${projection} WHERE l.id=$1 AND l.returned_at IS NULL`, [id]);
-    if (!result.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
-    if (result.rows[0].borrower_id !== user.id) throw new RequestError(403, "FORBIDDEN", "Access denied.");
-    return view(result.rows[0]);
+    const note = parseReturnNote(input);
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      const existing = await client.query(
+        `SELECT l.id, l.returned_at, r.borrower_id
+         FROM loans l JOIN borrowing_requests r ON r.id = l.request_id
+         WHERE l.id = $1 FOR UPDATE`,
+        [id],
+      );
+      if (!existing.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+      const row = existing.rows[0];
+      if (row.borrower_id !== user.id) throw new RequestError(403, "FORBIDDEN", "Access denied.");
+      if (row.returned_at !== null) {
+        throw new RequestError(409, "ALREADY_RETURNED", "This loan has already been returned.");
+      }
+      const now = (this.options.now ?? (() => new Date()))();
+      await client.query(
+        `UPDATE loans
+         SET return_requested_at = COALESCE(return_requested_at, $2),
+             return_requested_by = COALESCE(return_requested_by, $3),
+             return_note = CASE WHEN $4 <> '' THEN $4 ELSE return_note END
+         WHERE id = $1`,
+        [id, now, user.id, note],
+      );
+      const result = await client.query(`${projection} WHERE l.id = $1`, [id]);
+      const loan = view(result.rows[0]);
+      await client.query("COMMIT");
+      return loan;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async confirmReturn(user: SessionUser, id: string, input: unknown): Promise<LoanView> {
+    if (user.role !== "CUSTODIAN") throw new RequestError(403, "FORBIDDEN", "Access denied.");
+    validId(id);
+    const note = parseReturnNote(input);
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      const ref = await client.query(
+        `SELECT r.equipment_id FROM loans l JOIN borrowing_requests r ON r.id = l.request_id WHERE l.id = $1`,
+        [id],
+      );
+      if (!ref.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+      await client.query(`SELECT id FROM equipment WHERE id = $1 FOR UPDATE`, [String(ref.rows[0].equipment_id)]);
+      const locked = await client.query(`SELECT id, returned_at FROM loans WHERE id = $1 FOR UPDATE`, [id]);
+      if (!locked.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+      if (locked.rows[0].returned_at !== null) {
+        throw new RequestError(409, "ALREADY_RETURNED", "This loan has already been returned.");
+      }
+      const now = (this.options.now ?? (() => new Date()))();
+      await client.query(
+        `UPDATE loans
+         SET returned_at = $2,
+             returned_by = $3,
+             return_note = CASE WHEN $4 <> '' THEN $4 ELSE return_note END
+         WHERE id = $1`,
+        [id, now, user.id, note],
+      );
+      await this.options.afterInsert?.(client);
+      const result = await client.query(`${projection} WHERE l.id = $1`, [id]);
+      const loan = view(result.rows[0]);
+      await client.query("COMMIT");
+      return loan;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async confirmBundleReturn(user: SessionUser, bundleId: string, input: unknown): Promise<LoanView[]> {
+    if (user.role !== "CUSTODIAN") throw new RequestError(403, "FORBIDDEN", "Access denied.");
+    validId(bundleId);
+    const note = parseReturnNote(input);
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      const refs = await client.query(
+        `SELECT l.id, r.equipment_id
+         FROM loans l JOIN borrowing_requests r ON r.id = l.request_id
+         WHERE r.bundle_id = $1
+         ORDER BY r.equipment_id`,
+        [bundleId],
+      );
+      if (!refs.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+      const equipmentIds = [...new Set(refs.rows.map((r) => String(r.equipment_id)))].sort((a, b) => a.localeCompare(b));
+      await client.query(`SELECT id FROM equipment WHERE id = ANY($1::text[]) ORDER BY id FOR UPDATE`, [equipmentIds]);
+      const loanIds = refs.rows.map((r) => String(r.id)).sort((a, b) => a.localeCompare(b));
+      const locked = await client.query(
+        `SELECT id, returned_at FROM loans WHERE id = ANY($1::text[]) ORDER BY id FOR UPDATE`,
+        [loanIds],
+      );
+      const activeIds = locked.rows.filter((r) => r.returned_at === null).map((r) => String(r.id));
+      if (!activeIds.length) {
+        throw new RequestError(409, "ALREADY_RETURNED", "All loans in this bundle have already been returned.");
+      }
+      const now = (this.options.now ?? (() => new Date()))();
+      await client.query(
+        `UPDATE loans
+         SET returned_at = $2,
+             returned_by = $3,
+             return_note = CASE WHEN $4 <> '' THEN $4 ELSE return_note END
+         WHERE id = ANY($1::text[])`,
+        [activeIds, now, user.id, note],
+      );
+      await this.options.afterInsert?.(client);
+      const result = await client.query(`${projection} WHERE l.id = ANY($1::text[]) ORDER BY l.id`, [activeIds]);
+      const loans = result.rows.map(view);
+      await client.query("COMMIT");
+      return loans;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 }

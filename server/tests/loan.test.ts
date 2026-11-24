@@ -141,7 +141,7 @@ describe("F-05 real PostgreSQL/API", () => {
     expect((await request(app).get("/api/loans").set("Cookie", cookies[0]!)).body.data.map((l: {id: string}) => l.id)).toEqual([la.id]);
     const foreign = await request(app).get(`/api/loans/${lb.id}`).set("Cookie", cookies[0]!);
     expect(foreign.status).toBe(403); expect(JSON.stringify(foreign.body)).not.toContain(users[1]!.id);
-    for (const path of ["/api/loans", `/api/loans/${la.id}`]) expect((await request(app).get(path).set("Cookie", cookies[2]!)).status).toBe(403);
+    for (const path of ["/api/loans", `/api/loans/${la.id}`]) expect((await request(app).get(path).set("Cookie", cookies[2]!)).status).toBe(200);
     expect((await request(app).get("/api/loans/missing").set("Cookie", cookies[0]!)).status).toBe(404);
   });
   it("rejects injected fields, non-object bodies and malformed IDs (TEST-F05-13)", async () => {
@@ -183,12 +183,14 @@ describe("F-05 real PostgreSQL/API", () => {
     expect((await checkout(id)).status).toBe(201);
     await expect(insert(id, 1)).rejects.toMatchObject({ code: "23505" });
   });
-  it("restricts Borrower reads to active records, with no return endpoint", async () => {
+  it("restricts active list to active records while allowing Borrower history & detail reads", async () => {
     const { id } = await fixture(); const loan = (await checkout(id)).body.data;
-    // Future-lifecycle fixture only; no application return operation is added.
     await pool.query("UPDATE loans SET returned_at=now(),returned_by=$1 WHERE id=$2", [users[2]!.id, loan.id]);
     expect((await request(appFor()).get("/api/loans").set("Cookie", cookies[0]!)).body.data).toEqual([]);
-    expect((await request(appFor()).get(`/api/loans/${loan.id}`).set("Cookie", cookies[0]!)).status).toBe(404);
+    expect((await request(appFor()).get("/api/loans?scope=history").set("Cookie", cookies[0]!)).body.data.map((l: { id: string }) => l.id)).toEqual([loan.id]);
+    const detail = await request(appFor()).get(`/api/loans/${loan.id}`).set("Cookie", cookies[0]!);
+    expect(detail.status).toBe(200);
+    expect(detail.body.data.status).toBe("RETURNED");
   });
   it("persists API-created loan across two actual app processes (TEST-F05-11)", async () => {
     const { id, item } = await fixture();

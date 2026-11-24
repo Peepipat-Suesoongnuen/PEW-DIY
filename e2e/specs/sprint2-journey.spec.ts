@@ -112,11 +112,36 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await cPage.getByRole("button", { name: "Approve entire bundle" }).click();
     await expect(cPage.getByRole("button", { name: /Check out entire bundle/ })).toBeVisible();
     await cPage.getByRole("button", { name: /Check out entire bundle/ }).click();
-    await expect(cPage.getByText("Checkout completed.")).toBeVisible();
+    await expect(cPage).toHaveURL(/\/loans$/);
 
     // Stock decremented after bundle checkout (Fluke 87V: 3 -> 2)
     const eqRes = await bPage.request.get("/api/equipment?q=Fluke");
     expect((await eqRes.json()).data[0].quantity_available).toBe(2);
+
+    // 6. TEST-F06-06 & TEST-F11-05: Borrower requests return + Printable Loan Slip -> Custodian confirms entire bundle return
+    await bPage.goto("/loans");
+    await bPage.getByText("Fluke 87V").filter({ visible: true }).first().click();
+    await expect(bPage.getByRole("button", { name: /Print loan slip/i })).toBeVisible();
+    await bPage.getByLabel("Return note (optional)").fill("Dropped off at Desk A");
+    await bPage.getByRole("button", { name: "Notify return" }).click();
+    await expect(bPage.getByText(/Return requested\. Waiting for custodian confirmation/)).toBeVisible();
+
+    await cPage.goto("/loans");
+    await cPage.getByRole("link", { name: "Fluke 87V" }).first().click();
+    await expect(cPage).toHaveURL(/\/loans\/.+/);
+    await expect(cPage.getByRole("heading", { name: "Loan details" })).toBeVisible();
+    await expect(cPage.getByText("Return pending")).toBeVisible();
+    await cPage.getByRole("button", { name: /Confirm entire bundle return/ }).click();
+    await expect(cPage.getByText("Returned", { exact: true }).first()).toBeVisible();
+
+    // Stock restored after bundle return (Fluke 87V: 2 -> 3)
+    const eqRestored = await bPage.request.get("/api/equipment?q=Fluke");
+    expect((await eqRestored.json()).data[0].quantity_available).toBe(3);
+
+    // Borrower sees returned loan in History tab
+    await bPage.goto("/loans");
+    await bPage.getByRole("tab", { name: "History" }).click();
+    await expect(bPage.getByText("Fluke 87V").filter({ visible: true }).first()).toBeVisible();
   } finally {
     await Promise.all([borrowerCtx?.close(), staffCtx?.close()]);
     if (proc && proc.exitCode === null) {

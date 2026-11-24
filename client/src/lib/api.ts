@@ -30,6 +30,7 @@ export const PURPOSE_CATEGORIES: ReadonlyArray<{ value: PurposeCategory; label: 
 export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 export type RequestStatus = "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "CHECKED_OUT";
 export type LoanStatus = "ACTIVE" | "RETURN_PENDING" | "RETURNED";
+export type LoanScope = "active" | "history" | "all";
 
 export interface User {
   id: string;
@@ -77,8 +78,25 @@ export interface BorrowingRequest {
 }
 
 export interface Loan {
-  id: string; request_id: string; borrower_id: string; equipment_id: string;
-  quantity_borrowed: number; checked_out_by: string; checkout_at: string; due_on: string; status: "ACTIVE";
+  id: string;
+  request_id: string;
+  bundle_id?: string | null;
+  borrower_id: string;
+  borrower_username?: string;
+  equipment_id: string;
+  equipment_name?: string;
+  quantity_borrowed: number;
+  requested_days?: number;
+  checked_out_by: string;
+  checkout_at: string;
+  due_on: string;
+  return_requested_at?: string | null;
+  return_requested_by?: string | null;
+  return_note?: string;
+  returned_at?: string | null;
+  returned_by?: string | null;
+  status: LoanStatus;
+  overdue?: boolean;
 }
 
 export class ApiError extends Error {
@@ -144,8 +162,30 @@ export const api = {
       body: "{}",
     });
   },
-  listLoans() { return apiFetch<{ data: Loan[] }>("/api/loans"); },
-  getLoan(id: string) { return apiFetch<{ data: Loan }>(`/api/loans/${encodeURIComponent(id)}`); },
+  listLoans(scope: LoanScope = "active") {
+    return apiFetch<{ data: Loan[] }>(`/api/loans?scope=${encodeURIComponent(scope)}`);
+  },
+  getLoan(id: string) {
+    return apiFetch<{ data: Loan }>(`/api/loans/${encodeURIComponent(id)}`);
+  },
+  requestReturn(loanId: string, return_note = "") {
+    return apiFetch<{ data: Loan }>(`/api/loans/${encodeURIComponent(loanId)}/request-return`, {
+      method: "POST",
+      body: JSON.stringify(return_note ? { return_note } : {}),
+    });
+  },
+  confirmReturn(loanId: string, return_note = "") {
+    return apiFetch<{ data: Loan }>(`/api/loans/${encodeURIComponent(loanId)}/return`, {
+      method: "POST",
+      body: JSON.stringify(return_note ? { return_note } : {}),
+    });
+  },
+  confirmBundleReturn(bundleId: string, return_note = "") {
+    return apiFetch<{ data: Loan[] }>(`/api/loan-bundles/${encodeURIComponent(bundleId)}/return`, {
+      method: "POST",
+      body: JSON.stringify(return_note ? { return_note } : {}),
+    });
+  },
   login(username: string, password: string) {
     return apiFetch<{ data: { user: User } }>("/api/auth/login", {
       method: "POST",
