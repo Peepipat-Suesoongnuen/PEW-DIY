@@ -172,18 +172,10 @@ export function createApp({ auth, config, requests, loans }: AppDeps): express.A
   // Mounted before the unknown-route 404 handler; shares the auth guard.
   app.use("/api", createEquipmentRouter({ auth, cookieName: config.session.cookieName }));
 
-  // Static UI (UI-02, ARCH-01 §12.1 coexistence plan):
-  // - The React application build is served from client/dist (index.html at
-  //   "/", hashed assets under /assets) — `vite build` output.
-  // - The legacy framework-free pages (client/*.html, F-02) keep being served
-  //   at their .html paths until they are retired at migration phase P4.
-  // - `index: false` on client/ keeps its Vite source entry (client/index.html)
-  //   from shadowing the built app shell at "/".
-  // Real files always win over the SPA fallback below.
+  // Static UI (ARCH-01 Phase P4 complete): serve React SPA build from client/dist;
+  // legacy .html static files retired.
   const clientDistDir = path.resolve(process.cwd(), "client", "dist");
   app.use(express.static(clientDistDir));
-  const clientDir = path.resolve(process.cwd(), "client");
-  app.use(express.static(clientDir, { index: false }));
 
   // Unknown /api routes: safe 404 without leaking implementation details.
   app.use("/api", (_req: Request, res: Response) => {
@@ -204,6 +196,10 @@ export function createApp({ auth, config, requests, loans }: AppDeps): express.A
       return;
     }
     if (req.path.startsWith("/api/")) {
+      next();
+      return;
+    }
+    if (req.path.endsWith(".html") && req.path !== "/index.html") {
       next();
       return;
     }

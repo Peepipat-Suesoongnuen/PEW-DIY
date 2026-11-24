@@ -33,13 +33,14 @@ from one container (`docs/system-sds.md` §2.1 record, Lab 5 R-01).
 E2E tests (Playwright) live at the repository root: `e2e/` — run `npm run test:e2e`
 from the root (starts the full app; see `e2e/playwright.config.ts`).
 
-## Legacy pages (migration coexistence — ARCH-01 §12.1)
+## Legacy pages retired (ARCH-01 §12.1 Phase P4)
 
-The framework-free pages `login.html`, `catalog.html`, `item.html` are **still
-served** at their `.html` paths and keep their tests green (`server/tests/
-catalog-ui.test.ts` etc.) until migration phase P4 replaces those assertions.
-Real files always win over the SPA fallback. **Do not retire them until the P4
-conditions in ARCH-01 §12.1 are met.**
+The Sprint 1 framework-free pages (`login.html`, `catalog.html`, `item.html`) and
+their jsdom harness (`server/tests/catalog-ui.test.ts`) have been **retired in
+ARCH-01 Phase P4 (#101)**. Express now serves only the built React SPA from
+`client/dist` and returns `404` for non-index `*.html` paths (`server/tests/catalog.test.ts`,
+`e2e/specs/ui-states.spec.ts`), while the C-3 XSS and logout-failure assertions
+live in `src/test/catalog-page.test.tsx` and `src/test/account-menu.test.tsx`.
 
 See `README.md` (root) for setup, `docs/ui/ui-spec.md` for the UI specification,
 and `docs/sprints/sprint-1/` for the feature contracts.

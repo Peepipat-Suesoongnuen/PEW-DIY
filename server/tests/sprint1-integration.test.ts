@@ -28,7 +28,7 @@ async function start() {
   });
   const deadline = Date.now() + 15000;
   while (Date.now() < deadline && child.exitCode === null) {
-    try { if ((await fetch(origin + "/login.html")).ok) return; } catch { /* startup */ }
+    try { if ((await fetch(origin + "/api/ready")).ok) return; } catch { /* startup */ }
     await new Promise((r) => setTimeout(r, 100));
   }
   throw new Error("F10 production application startup timed out");

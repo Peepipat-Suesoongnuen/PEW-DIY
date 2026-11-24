@@ -110,4 +110,26 @@ describe("AccountMenu (ui-spec §2.2 + shared logout behavior §4)", () => {
     // No retry offered for a confirmed-dead session.
     expect(screen.queryByText("Could not sign out. Please try again.")).not.toBeInTheDocument();
   });
+
+  it("keeps the session page with a safe retry message on network-error logout — no redirect (ARCH-01 P4 / C-3)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user } });
+        }
+        throw new TypeError("Failed to fetch");
+      }),
+    );
+    const userInteractions = userEvent.setup();
+    renderMenu();
+
+    await userInteractions.click(screen.getByRole("button", { name: /B-A/ }));
+    await userInteractions.click(await screen.findByRole("menuitem", { name: "Sign out" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Could not sign out. Please try again.");
+    expect(screen.queryByText("LOGIN_PAGE")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("menuitem", { name: "Sign out" })).toBeEnabled());
+  });
 });
