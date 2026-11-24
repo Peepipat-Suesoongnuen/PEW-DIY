@@ -143,7 +143,7 @@ The active source code at base commit `d079bc6` implements **Sprint 1 (`F-01`–
 
 - **Catalog CRUD & Search/Filter/Sort (`F-08`):** `POST /api/equipment`, `PATCH /api/equipment/:id` (`409 HELD_QUANTITY_CONFLICT`), `image_url`, `catalog_status`, and `q`/`category`/`availability`/`status`/`sort` query filters.
 - **Create Request, Bundles & Duration (`F-04`, `A-11`, `BR-07`):** `/requests/new`, `POST /api/request-bundles`, purpose category/detail, and `1–14` calendar day duration (`Asia/Bangkok`).
-- **Approval Workflow (`A-11`):** Custodian `approve`/`reject` and Borrower `cancel` before checkout (`PENDING → APPROVED/REJECTED → CHECKED_OUT`).
+- **Approval Workflow (`A-11`):** Custodian `approve`/`reject` and Borrower `cancel` before checkout (`PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`).
 - **Two-Step Return & Print Slip (`F-06`, `FR-15`):** Borrower `request-return` notice (`RETURN_PENDING`), Custodian `return` / bundle `return` (`RETURNED`), and printable Loan Slip.
 - **Overdue, Notifications & Reports (`F-07`, `F-09`):** Derived overdue status (`scope=overdue|history|all`), persistent notifications (`GET/DELETE /api/notifications`, `POST /api/notifications/:id/read`), Custodian `GET /api/reports/summary` (`/reports`), Migration `004`, and `ARCH-01 Phase P4` legacy `.html` retirement.
 

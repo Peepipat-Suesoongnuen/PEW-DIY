@@ -103,7 +103,7 @@ Sprint 1:   F-01 → F-02 → F-03 → F-04 → F-05 → F-10 (integration) → 
 Sprint 2:   F-05 ─┬→ F-06 (Return) → F-07 (Overdue) ─┐
             F-02 ─┴→ F-08 (Catalog mgmt/search/views) ┴→ integration → RC
 Sprint 3:   F-06/F-07/F-08 data → F-09 (Reporting) + hardening → final release
-Decision gates status: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (Asia/Bangkok calendar policy), SDS-OQ-04 (Cloud Run/Cloud SQL), and SRS OQ-02..OQ-06 are resolved in SRS rev 6 / SDS rev 7; synthetic seed fixtures under OQ-01 remain explicitly documented.
+Decision gates status: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (Asia/Bangkok calendar policy), SDS-OQ-04 (Cloud Run/Cloud SQL), and SRS OQ-03..OQ-06 are resolved in SRS rev 6 / SDS rev 7; SRS OQ-02 / A-12 policy decision is resolved in SRS rev 6 with shared-team baseline ratification pending PR #98 (§10); synthetic seed fixtures under OQ-01 remain explicitly documented.
 ```
 
 Rule: every feature is implemented on a branch from the current sprint staging branch (`sprint/1-staging` for Sprint 1; `sprint/2-staging` for Sprint 2) under its engineering contract, peer-reviewed, and integrated before release (`AGENT.md` §11.3).
@@ -139,7 +139,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 
 |---|---|---|
 | Theme 2 "later sprints" lists *inventory summaries* alongside Return/Overdue/search | Full inventory reporting (FR-20, F-09) is allocated to **Sprint 3**; Sprint 2 includes loan views/history (FR-18/FR-21) which cover operational "who holds what" summaries. AC-D-02 explicitly allows the Return/Overdue/Reporting span of **Sprint 2–3**. Moving summaries to Sprint 2 would require a baseline change (FR-20/F-09 re-allocation) — flag to team if desired | `docs/srs.md` FR-20, `docs/features.md` F-09, issue #4 AC-D-02 |
 | Due-date assignment (BR-07) | In **Sprint 1** (F-05); only overdue computation (BR-08) is Sprint 2 | SRS rev 2 split, PR #15 review |
-| Approval workflow | Sprint 1: Direct Checkout (`A-02`); Sprint 2: Approval workflow (`A-11`, `PENDING → APPROVED/REJECTED → CHECKED_OUT`, non-reserving under `BR-12`) | Team decision (`docs/srs.md` rev 3/6; Sprint 2 approval 2026-11-23) |
+| Approval workflow | Sprint 1: Direct Checkout (`A-02`); Sprint 2: Approval workflow (`A-11`: `PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`, non-reserving under `BR-12`) | Team decision (`docs/srs.md` rev 3/6; Sprint 2 approval 2026-11-23) |
 
 ## 10. Open Questions and Risks
 

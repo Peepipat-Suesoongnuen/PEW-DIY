@@ -90,7 +90,7 @@
 | Change | Source | Effect on matrix |
 |---|---|---|
 | Quantity Tracking (A-01) | Team 2026-11-03 | BR-03 quantity-rule form; F-03 availability as quantity math |
-| Direct Checkout (S1, A-02) → Approval Workflow (S2, A-11) | Team 2026-11-03 / 2026-11-06 / 2026-11-23 | S1: direct request→checkout; S2: `PENDING → APPROVED/REJECTED/CANCELLED → CHECKED_OUT` + `request_bundles` |
+| Direct Checkout (S1, A-02) → Approval Workflow (S2, A-11) | Team 2026-11-03 / 2026-11-06 / 2026-11-23 | S1: direct request→checkout; S2: `PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED` + `request_bundles` |
 | Due date = checkout + 1–14 days (A-03 rev) | Team 2026-11-03 / 2026-11-23 | BR-07 7d in S1 (F-05); 1–14d in S2; overdue (BR-08) in S2 (F-07) |
 | English documents (A-07) | Team 2026-11-03 | All Part B artifacts in English |
 | SRS rev 2 (PR #15 review) | L0u1sss review | BR-11/NFR-04 redeployment wording; persistence/atomicity split S1/S2; BR-09 close-accounting guard |

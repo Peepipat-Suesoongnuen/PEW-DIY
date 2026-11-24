@@ -19,7 +19,7 @@ PEW-DIY คือระบบยืม-คืนอุปกรณ์ของ D
 **ข้อตกลงทีมที่ยืนยันแล้ว (Confirmed decisions — อ้างอิง `docs/srs.md`):**
 - Theme 2: Inventory and Borrowing System — capabilities บังคับ: Inventory Availability, Borrowing Requests, Checkout, Active Loans, Return, Overdue Status, Inventory Reporting
 - **Inventory Tracking = Quantity Tracking** (ติดตามอุปกรณ์เป็นจำนวนรวม ไม่ใช่รายชิ้น) — SRS A-01
-- **Borrowing Approval:** Sprint 1 ใช้ Direct Checkout (`A-02`); Sprint 2 เพิ่ม Approval Workflow (`PENDING → APPROVED/REJECTED → CHECKED_OUT`, `A-11`/`BR-12`) ตาม `docs/srs.md` rev 6
+- **Borrowing Approval:** Sprint 1 ใช้ Direct Checkout (`A-02`); Sprint 2 เพิ่ม Approval Workflow (`PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`, `A-11`/`BR-12`) ตาม `docs/srs.md` rev 6
 - **ระยะเวลาการยืม:** Sprint 1 ตายตัว 7 วัน; Sprint 2 ผู้ยืมเลือกได้ `1–14` วันปฏิทิน (`BR-07` rev) และ **Overdue = เลย `due_on` โดยยังไม่ยืนยันคืน** (`BR-08`)
 - **นิยาม "exclusive item / duplicate active loan" ภายใต้ Quantity Tracking = กฎจำนวน** (available quantity ห้ามต่ำกว่า 0; ของ quantity = 1 มี active loan ซ้ำไม่ได้) (SRS A-04/BR-03)
 

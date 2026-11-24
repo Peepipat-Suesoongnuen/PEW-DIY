@@ -234,7 +234,7 @@ Heading hierarchy (h1 = item name); `DetailList` uses `<dl>/<dt>/<dd>`; quantity
 - Buttons/inputs follow ARCH §8.4 tokens everywhere; one visual language (Academic/Minimal).
 - Error language: reuse the shared safe-error wording (never raw server text).
 - Logout behavior (shared): success → Login; failure → safe message + retry (f-01 §2.3).
-- No individual-copy/serial tracking anywhere (Quantity Tracking `A-01`). Sprint 1 uses Direct Checkout (`A-02`, no approval step); Sprint 2 contracts add the non-reserving `A-11` approval workflow (`PENDING → APPROVED/REJECTED/CANCELLED → CHECKED_OUT`, pending Issues #99/#100).
+- No individual-copy/serial tracking anywhere (Quantity Tracking `A-01`). Sprint 1 uses Direct Checkout (`A-02`, no approval step); Sprint 2 contracts add the non-reserving `A-11` approval workflow (`PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`, pending Issues #99/#100).
 
 ## 5. Open Questions / Items Needing Team Confirmation
 
