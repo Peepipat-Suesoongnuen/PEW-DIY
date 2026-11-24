@@ -101,7 +101,8 @@
 | OQ | Impact on traceability | Target / Status |
 |---|---|---|
 | OQ-01 Initial catalog content | Seed fixtures + Custodian CRUD (`FR-09`) | Synthetic fixtures retained; CRUD open in Sprint 2 |
-| OQ-02..OQ-06 | Resolved for Sprint 2 (`docs/srs.md` §7.3 rev 6) | Covered in `docs/sprints/sprint-2/` contracts |
+| OQ-02 / A-12 | Policy decision resolved (`docs/srs.md` rev 6: multi-unit up to stock, full-return only); **shared-team ratification pending PR #98** | `F-04` validation implemented in S1; `F-06` two-step return contracted (`f-06-return.md`), implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100) |
+| OQ-03, OQ-04, OQ-06 | Resolved for Sprint 2 (`docs/srs.md` §7.3 rev 6) | Covered in `docs/sprints/sprint-2/` contracts (implementation pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) |
 
 ---
 

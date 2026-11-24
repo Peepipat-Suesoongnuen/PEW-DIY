@@ -74,7 +74,7 @@ The complete product covers the seven Theme 2 capabilities plus identity and acc
 | Native mobile application | Web UI access only |
 | Equipment reservation for future dates | Requests are for current borrowing only |
 
-> Note on sprint allocation: Return, Overdue Status, Inventory Reporting, and full catalog management are **in product scope** but planned for later sprints (see Part D). Sprint 1 delivers the vertical slice defined in §7.
+> Note on sprint allocation: Return, Overdue Status, Inventory Reporting, and full catalog management are **in product scope** but planned for later sprints (see Part D). Sprint 1 delivers the vertical slice defined in §4–§6 and `docs/sprints/plan.md` §3.
 
 ---
 

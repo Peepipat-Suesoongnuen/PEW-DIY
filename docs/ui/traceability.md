@@ -19,7 +19,7 @@
 | SN-01 | FR-07 availability display | Availability Badge + Available quantity (§2.2, §3.2) | AC-F02-01 | Partial (UI + tests) |
 | SN-01 | FR-06/07 detail display | Item Detail info block (§3.2) | AC-F02-01, AC-F02-02 | Partial (UI + tests) |
 | SN-01 | FR-06 empty/missing states | Empty + "Item not found" states (§2.3, §3.4) | AC-F02-02 | UI contribution (404/200 semantics = API tests) |
-| SN-02 borrow equipment | FR-11 submit request | Item Detail "Request to borrow" panel + Quantity input (§3.2) | AC-F04-01 | Partial (UI + tests) — 201/persistence = API/DB tests; `OQ-02`/`A-12` resolved (`1..quantity_available`) |
+| SN-02 borrow equipment | FR-11 submit request | Item Detail "Request to borrow" panel + Quantity input (§3.2) | AC-F04-01 | Partial (UI + tests) — 201/persistence = API/DB tests; `OQ-02`/`A-12` policy resolved (`1..quantity_available`, ratification pending PR #98) |
 | SN-02 | BR-01 request only when available | Unavailable state → no request form (§3.2/§3.4) | AC-F04-02 (negative) | Partial (UI + tests) — 409 semantics = server |
 | SN-02 | FR-11 validation | Quantity `FieldError` feedback (§3.2) | AC-F04-03 | UI contribution (forged-field/400 enforcement = server) |
 | SN-02 | FR-11 post-submit flow | Redirect → My Requests + confirmation there (§3.2 Success row) | AC-F04-08 | **Partial across screens** — submit UI here; own-request display + reload = My Requests screen (F-04 UI, outside 3 pages) |
