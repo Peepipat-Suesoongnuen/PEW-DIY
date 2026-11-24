@@ -81,6 +81,13 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await expect(bPage.getByText("Soldering Iron")).toHaveCount(0);
 
     // 3. Custodian edits item details on ItemDetailPage and verifies BackButton (UAT-07 / FR-09)
+    await cPage.route("**/images/fluke.png", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "image/svg+xml",
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"></svg>',
+      }),
+    );
     await cPage.getByRole("link", { name: "View Fluke 87V" }).filter({ visible: true }).first().click();
     await expect(cPage.getByRole("link", { name: "Back to catalog" })).toBeVisible();
     await cPage.getByRole("button", { name: "Edit equipment" }).click();
