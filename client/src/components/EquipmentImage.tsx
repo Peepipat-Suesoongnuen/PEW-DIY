@@ -11,7 +11,7 @@ interface EquipmentImageProps {
 function isSafeImageUrl(raw: string): boolean {
   const trimmed = raw.trim();
   if (!trimmed) return false;
-  if (trimmed.startsWith("/")) return true;
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return true;
   try {
     const parsed = new URL(trimmed);
     return parsed.protocol === "https:" || parsed.protocol === "http:";
@@ -51,9 +51,9 @@ const sizeClasses: Record<"sm" | "md" | "lg", { box: string; icon: string }> = {
  * is empty or fails to load.
  */
 export function EquipmentImage({ imageUrl, name, category, size = "sm" }: EquipmentImageProps) {
-  const [failed, setFailed] = useState(false);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const validUrl = imageUrl && isSafeImageUrl(imageUrl) ? imageUrl.trim() : "";
-  const showImg = validUrl.length > 0 && !failed;
+  const showImg = validUrl.length > 0 && failedUrl !== validUrl;
   const dims = sizeClasses[size];
 
   return (
@@ -64,7 +64,7 @@ export function EquipmentImage({ imageUrl, name, category, size = "sm" }: Equipm
         <img
           src={validUrl}
           alt={name}
-          onError={() => setFailed(true)}
+          onError={() => setFailedUrl(validUrl)}
           className="h-full w-full object-cover"
         />
       ) : (

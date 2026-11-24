@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom";
@@ -179,6 +179,7 @@ describe("BackButton / EquipmentImage / StatusBadges", () => {
       <div>
         <EquipmentImage imageUrl="https://example.com/item.png" name="Scope" category="Instruments" />
         <EquipmentImage imageUrl="javascript:alert(1)" name="Unsafe" category="Tools" />
+        <EquipmentImage imageUrl="//evil.com/x.png" name="ProtocolRelative" category="Tools" />
         <RequestStatusBadge status="APPROVED" />
         <LoanStatusBadge status="ACTIVE" overdue />
         <CatalogStatusBadge status="RETIRED" />
@@ -186,8 +187,22 @@ describe("BackButton / EquipmentImage / StatusBadges", () => {
     );
     expect(screen.getByAltText("Scope")).toHaveAttribute("src", "https://example.com/item.png");
     expect(screen.queryByAltText("Unsafe")).not.toBeInTheDocument();
+    expect(screen.queryByAltText("ProtocolRelative")).not.toBeInTheDocument();
     expect(screen.getByText("Approved")).toBeInTheDocument();
     expect(screen.getByText("Overdue")).toBeInTheDocument();
     expect(screen.getByText("Retired")).toBeInTheDocument();
+  });
+
+  it("falls back to category icon on image load error and recovers when imageUrl changes to a new valid URL", () => {
+    const { rerender } = render(
+      <EquipmentImage imageUrl="https://example.com/broken.png" name="Scope" category="Instruments" />,
+    );
+    const brokenImg = screen.getByAltText("Scope");
+    fireEvent.error(brokenImg);
+    expect(screen.queryByAltText("Scope")).not.toBeInTheDocument();
+
+    rerender(<EquipmentImage imageUrl="https://example.com/fixed.png" name="Scope" category="Instruments" />);
+    const fixedImg = screen.getByAltText("Scope");
+    expect(fixedImg).toHaveAttribute("src", "https://example.com/fixed.png");
   });
 });
