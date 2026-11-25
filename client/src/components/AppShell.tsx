@@ -3,6 +3,7 @@ import { Cpu, Menu, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { AccountMenu } from "./AccountMenu";
+import { NotificationMenu } from "./NotificationMenu";
 
 /**
  * AppShell: top navigation + centered content (ui-spec §2.1/§2.2, decision N-1).
@@ -37,6 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {user ? <NotificationMenu /> : null}
             {user ? <AccountMenu user={user} /> : null}
             <button
               type="button"

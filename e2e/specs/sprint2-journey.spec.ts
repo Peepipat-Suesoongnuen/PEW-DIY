@@ -145,6 +145,16 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await bPage.goto("/loans");
     await bPage.getByRole("tab", { name: "History" }).click();
     await expect(bPage.getByText("Fluke 87V").filter({ visible: true }).first()).toBeVisible();
+
+    // 7. TEST-F07-05: Persistent in-app notifications (REQUEST_APPROVED from bundle approval) -> mark read / clear all across reload
+    const bell = bPage.getByRole("button", { name: /Notifications \(\d+ unread\)/ });
+    await expect(bell).toBeVisible();
+    await bell.click();
+    await expect(bPage.getByRole("dialog", { name: "Notifications" })).toBeVisible();
+    await bPage.getByRole("button", { name: /Clear all/i }).click();
+    await expect(bPage.getByText("No unread notifications.")).toBeVisible();
+    await bPage.reload();
+    await expect(bPage.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
   } finally {
     await Promise.all([borrowerCtx?.close(), staffCtx?.close()]);
     if (proc && proc.exitCode === null) {

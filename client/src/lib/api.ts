@@ -30,7 +30,16 @@ export const PURPOSE_CATEGORIES: ReadonlyArray<{ value: PurposeCategory; label: 
 export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 export type RequestStatus = "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "CHECKED_OUT";
 export type LoanStatus = "ACTIVE" | "RETURN_PENDING" | "RETURNED";
-export type LoanScope = "active" | "history" | "all";
+export type LoanScope = "active" | "overdue" | "history" | "all";
+
+export interface NotificationView {
+  id: string;
+  kind: string;
+  reference_id: string;
+  title: string;
+  message: string;
+  created_at: string;
+}
 
 export interface User {
   id: string;
@@ -316,5 +325,17 @@ export const api = {
       method: "POST",
       body: "{}",
     });
+  },
+  listNotifications() {
+    return apiFetch<{ data: NotificationView[] }>("/api/notifications");
+  },
+  markNotificationRead(id: string) {
+    return apiFetch<{ data: { id: string; read_at: string } }>(`/api/notifications/${encodeURIComponent(id)}/read`, {
+      method: "POST",
+      body: "{}",
+    });
+  },
+  clearNotifications() {
+    return apiFetch<void>("/api/notifications", { method: "DELETE" });
   },
 };

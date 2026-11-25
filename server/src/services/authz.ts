@@ -50,6 +50,9 @@ export const PROTECTED_ROUTES: ReadonlyArray<{
   { method: "POST", path: "/api/loan-bundles/{bundleId}/return", allowedRoles: ["CUSTODIAN"] },
   { method: "GET", path: "/api/requests", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/requests/{requestId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "GET", path: "/api/notifications", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "POST", path: "/api/notifications/{notificationId}/read", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "DELETE", path: "/api/notifications", allowedRoles: ["BORROWER", "CUSTODIAN"] },
 ];
 
 export function createAuthMiddleware(auth: AuthService, cookieName: string) {

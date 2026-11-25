@@ -27,8 +27,14 @@ export function checkoutDueOn(instant: Date, timeZone: string, requestedDays = 7
   return date.toISOString().slice(0, 10);
 }
 
+/** Derived overdue status (BR-08): unreturned AND business_today > due_on in Asia/Bangkok. */
+export function isLoanOverdue(dueOn: string, returnedAt: string | null, businessToday: string): boolean {
+  if (returnedAt !== null) return false;
+  return businessToday > dueOn;
+}
+
 export type LoanStatus = "ACTIVE" | "RETURN_PENDING" | "RETURNED";
-export type LoanScope = "active" | "history" | "all";
+export type LoanScope = "active" | "overdue" | "history" | "all";
 
 export interface LoanView {
   id: string;
@@ -50,6 +56,7 @@ export interface LoanView {
   returned_at: string | null;
   returned_by: string | null;
   status: LoanStatus;
+  overdue: boolean;
 }
 const projection = `SELECT l.id,l.request_id,r.bundle_id,r.borrower_id,u.username AS borrower_username,
   r.equipment_id,e.name AS equipment_name,l.quantity_borrowed,r.requested_days,
@@ -60,10 +67,11 @@ const projection = `SELECT l.id,l.request_id,r.bundle_id,r.borrower_id,u.usernam
   JOIN users u ON u.id=r.borrower_id
   LEFT JOIN users cu ON cu.id=l.checked_out_by
   JOIN equipment e ON e.id=r.equipment_id`;
-function view(row: Record<string, unknown>): LoanView {
+function view(row: Record<string, unknown>, businessToday: string): LoanView {
   const returnedAt = row.returned_at ? new Date(row.returned_at as Date).toISOString() : null;
   const returnRequestedAt = row.return_requested_at ? new Date(row.return_requested_at as Date).toISOString() : null;
   const status: LoanStatus = returnedAt ? "RETURNED" : returnRequestedAt ? "RETURN_PENDING" : "ACTIVE";
+  const dueOn = String(row.due_on);
   return {
     id: String(row.id),
     request_id: String(row.request_id),
@@ -77,13 +85,14 @@ function view(row: Record<string, unknown>): LoanView {
     checked_out_by: String(row.checked_out_by),
     checked_out_by_username: String(row.checked_out_by_username ?? row.checked_out_by),
     checkout_at: new Date(row.checkout_at as Date).toISOString(),
-    due_on: String(row.due_on),
+    due_on: dueOn,
     return_requested_at: returnRequestedAt,
     return_requested_by: row.return_requested_by ? String(row.return_requested_by) : null,
     return_note: String(row.return_note ?? ""),
     returned_at: returnedAt,
     returned_by: row.returned_by ? String(row.returned_by) : null,
     status,
+    overdue: isLoanOverdue(dueOn, returnedAt, businessToday),
   };
 }
 function validId(id: string) {
@@ -112,6 +121,16 @@ export interface LoanServiceOptions {
 }
 export class LoanService {
   constructor(private readonly pool: Pool, private readonly options: LoanServiceOptions = {}) {}
+
+  getClockOptions(): { timeZone?: string; now?: () => Date } {
+    return { timeZone: this.options.timeZone, now: this.options.now };
+  }
+
+  private businessToday(): string {
+    const tz = this.options.timeZone || "Asia/Bangkok";
+    const now = (this.options.now ?? (() => new Date()))();
+    return businessDateInZone(now, tz);
+  }
 
   async checkout(user: SessionUser, requestId: string, input: unknown): Promise<LoanView> {
     if (user.role !== "CUSTODIAN") throw new RequestError(403, "FORBIDDEN", "Access denied.");
@@ -148,7 +167,7 @@ export class LoanService {
         VALUES($1,$2,$3,$4,$5,$6)`, [id, requestId, record.quantity_requested, user.id, now, dueOn]);
       await this.options.afterInsert?.(client);
       const result = await client.query(`${projection} WHERE l.id=$1`, [id]);
-      const loan = view(result.rows[0]);
+      const loan = view(result.rows[0], this.businessToday());
       await client.query("COMMIT");
       return loan;
     } catch (error) {
@@ -209,7 +228,8 @@ export class LoanService {
       }
       await this.options.afterInsert?.(client);
       const result = await client.query(`${projection} WHERE l.id = ANY($1::text[]) ORDER BY l.id`, [createdIds]);
-      const loans = result.rows.map(view);
+      const today = this.businessToday();
+      const loans = result.rows.map((r) => view(r, today));
       await client.query("COMMIT");
       return loans;
     } catch (error) {
@@ -226,26 +246,32 @@ export class LoanService {
   }
 
   async list(user: SessionUser, scope: LoanScope = "active"): Promise<LoanView[]> {
-    if (!["active", "history", "all"].includes(scope)) {
+    if (!["active", "overdue", "history", "all"].includes(scope)) {
       throw new RequestError(400, "VALIDATION_ERROR", "Invalid loan scope.");
     }
+    if (scope === "overdue" && user.role !== "CUSTODIAN") {
+      throw new RequestError(403, "FORBIDDEN", "Access denied.");
+    }
+    const today = this.businessToday();
     const conditions: string[] = [];
     const params: unknown[] = [];
     if (user.role === "BORROWER") {
       params.push(user.id);
       conditions.push(`r.borrower_id = $${params.length}`);
     }
-    if (scope === "active") {
+    if (scope === "active" || scope === "overdue") {
       conditions.push("l.returned_at IS NULL");
     } else if (scope === "history") {
       conditions.push("l.returned_at IS NOT NULL");
     }
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    const orderBy = scope === "overdue" ? "ORDER BY l.due_on ASC, l.id" : "ORDER BY l.checkout_at DESC, l.id";
     const result = await this.pool.query(
-      `${projection} ${whereClause} ORDER BY l.checkout_at DESC, l.id`,
+      `${projection} ${whereClause} ${orderBy}`,
       params,
     );
-    return result.rows.map(view);
+    const mapped = result.rows.map((r) => view(r, today));
+    return scope === "overdue" ? mapped.filter((l) => l.overdue) : mapped;
   }
 
   async get(user: SessionUser, id: string): Promise<LoanView> {
@@ -256,7 +282,7 @@ export class LoanService {
     if (user.role === "BORROWER" && row.borrower_id !== user.id) {
       throw new RequestError(403, "FORBIDDEN", "Access denied.");
     }
-    return view(row);
+    return view(row, this.businessToday());
   }
 
   async requestReturn(user: SessionUser, id: string, input: unknown): Promise<LoanView> {
@@ -288,7 +314,7 @@ export class LoanService {
         [id, now, user.id, note],
       );
       const result = await client.query(`${projection} WHERE l.id = $1`, [id]);
-      const loan = view(result.rows[0]);
+      const loan = view(result.rows[0], this.businessToday());
       await client.query("COMMIT");
       return loan;
     } catch (error) {
@@ -328,7 +354,7 @@ export class LoanService {
       );
       await this.options.afterInsert?.(client);
       const result = await client.query(`${projection} WHERE l.id = $1`, [id]);
-      const loan = view(result.rows[0]);
+      const loan = view(result.rows[0], this.businessToday());
       await client.query("COMMIT");
       return loan;
     } catch (error) {
@@ -376,7 +402,8 @@ export class LoanService {
       );
       await this.options.afterInsert?.(client);
       const result = await client.query(`${projection} WHERE l.id = ANY($1::text[]) ORDER BY l.id`, [activeIds]);
-      const loans = result.rows.map(view);
+      const today = this.businessToday();
+      const loans = result.rows.map((r) => view(r, today));
       await client.query("COMMIT");
       return loans;
     } catch (error) {

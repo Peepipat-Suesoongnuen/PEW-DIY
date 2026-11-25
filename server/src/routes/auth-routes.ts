@@ -17,9 +17,11 @@ import { createAuthMiddleware, AuthenticatedRequest } from "../services/authz";
 import { createEquipmentRouter } from "./equipment-routes";
 import { createRequestRouter } from "./request-routes";
 import { createLoanRouter } from "./loan-routes";
+import { createNotificationRouter } from "./notification-routes";
 import { createHealthRouter } from "./health-routes";
 import { LoanService } from "../services/loan";
 import type { BorrowingRequestService } from "../services/borrowing-request";
+import { NotificationService } from "../services/notification";
 import { AppConfig } from "../config/config";
 
 export interface AppDeps {
@@ -27,9 +29,10 @@ export interface AppDeps {
   config: AppConfig;
   requests?: BorrowingRequestService;
   loans?: LoanService;
+  notifications?: NotificationService;
 }
 
-export function createApp({ auth, config, requests, loans }: AppDeps): express.Application {
+export function createApp({ auth, config, requests, loans, notifications }: AppDeps): express.Application {
   const app = express();
 
   // Request ID first so parser/guard failures also carry a correlation id
@@ -167,6 +170,14 @@ export function createApp({ auth, config, requests, loans }: AppDeps): express.A
   app.use("/api", router);
   app.use("/api", createLoanRouter(auth, config.session.cookieName, loans ?? new LoanService(auth.pool, { timeZone: config.appTimezone })));
   app.use("/api", createRequestRouter(auth, config.session.cookieName, requests));
+  app.use(
+    "/api",
+    createNotificationRouter(
+      auth,
+      config.session.cookieName,
+      notifications ?? new NotificationService(auth.pool, loans?.getClockOptions() ?? { timeZone: config.appTimezone }),
+    ),
+  );
 
   // F-02 Equipment Catalog routes (GET /api/equipment, GET /api/equipment/:id).
   // Mounted before the unknown-route 404 handler; shares the auth guard.

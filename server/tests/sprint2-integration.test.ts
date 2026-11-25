@@ -589,3 +589,90 @@ describe("F-06 Two-Step Return & F-08 Full Loan Views/History (TEST-F06-01..05, 
     expect((await request(app).get(`/api/equipment/${e2}`).set("Cookie", cookies[0]!)).body.data.quantity_available).toBe(2);
   });
 });
+
+describe("F-07 Overdue Derivation & Persistent In-App Notifications (TEST-F07-01..04)", () => {
+  it("derives overdue across Asia/Bangkok midnight, enforces Custodian-only scope=overdue, syncs alerts, and isolates markRead/clearAll", async () => {
+    const e1 = await seedItem("ov1", `${PREFIX}Signal Generator`, "Lab", 3);
+    // Checkout at 2026-11-23T10:00:00Z (17:00+07) for 7 days -> due_on = 2026-11-30
+    const appCheckout = appWithNow("2026-11-23T10:00:00Z");
+    const reqA = await request(appCheckout)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: e1, quantity_requested: 1, requested_days: 7 });
+    const reqAId = reqA.body.data.id as string;
+    await request(appCheckout).post(`/api/requests/${reqAId}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const loanARes = await request(appCheckout).post(`/api/requests/${reqAId}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const loanAId = loanARes.body.data.id as string;
+    expect(loanARes.body.data.due_on).toBe("2026-11-30");
+
+    // Create a second request for B-B so B-B also has a notification that must remain untouched by B-A
+    const reqB = await request(appCheckout)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[1]!)
+      .send({ equipment_id: e1, quantity_requested: 1, requested_days: 7 });
+    await request(appCheckout).post(`/api/requests/${reqB.body.data.id}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+
+    // TEST-F07-01: At 2026-11-30T16:59:00Z (23:59+07) -> NOT overdue, but LOAN_DUE_SOON
+    const appDueDay = appWithNow("2026-11-30T16:59:00Z");
+    const detailDueDay = await request(appDueDay).get(`/api/loans/${loanAId}`).set("Cookie", cookies[0]!);
+    expect(detailDueDay.status).toBe(200);
+    expect(detailDueDay.body.data.overdue).toBe(false);
+
+    // At 2026-11-30T17:01:00Z (2026-12-01T00:01+07) -> overdue=true
+    const appPastDue = appWithNow("2026-11-30T17:01:00Z");
+    const detailPastDue = await request(appPastDue).get(`/api/loans/${loanAId}`).set("Cookie", cookies[0]!);
+    expect(detailPastDue.status).toBe(200);
+    expect(detailPastDue.body.data.overdue).toBe(true);
+
+    // TEST-F07-02: Custodian GET /api/loans?scope=overdue -> returns loanAId; Borrower -> 403
+    const custOverdue = await request(appPastDue).get("/api/loans?scope=overdue").set("Cookie", cookies[2]!);
+    expect(custOverdue.status).toBe(200);
+    expect(custOverdue.body.data.map((l: { id: string }) => l.id)).toContain(loanAId);
+    const borrowerOverdue = await request(appPastDue).get("/api/loans?scope=overdue").set("Cookie", cookies[0]!);
+    expect(borrowerOverdue.status).toBe(403);
+
+    // TEST-F07-03 & TEST-F07-04: Notifications auth, sync (REQUEST_APPROVED, LOAN_DUE_SOON, LOAN_OVERDUE), cross-owner 403, markRead, clearAll
+    expect((await request(appPastDue).get("/api/notifications")).status).toBe(401);
+    const bANotifs = await request(appPastDue).get("/api/notifications").set("Cookie", cookies[0]!);
+    expect(bANotifs.status).toBe(200);
+    const kinds = bANotifs.body.data.map((n: { kind: string }) => n.kind);
+    expect(kinds).toContain("REQUEST_APPROVED");
+    expect(kinds).toContain("LOAN_OVERDUE");
+
+    const firstId = bANotifs.body.data[0].id as string;
+    // Cross-owner B-B marking B-A's notification read -> 403
+    const crossRead = await request(appPastDue)
+      .post(`/api/notifications/${firstId}/read`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[1]!)
+      .send({});
+    expect(crossRead.status).toBe(403);
+
+    // B-A marks 1 notification read -> 200, removed from active list
+    const ownRead = await request(appPastDue)
+      .post(`/api/notifications/${firstId}/read`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({});
+    expect(ownRead.status).toBe(200);
+    const afterRead = await request(appPastDue).get("/api/notifications").set("Cookie", cookies[0]!);
+    expect(afterRead.body.data.map((n: { id: string }) => n.id)).not.toContain(firstId);
+
+    // B-A clears all -> 204, active list empty, B-B's notification untouched
+    const cleared = await request(appPastDue)
+      .delete("/api/notifications")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!);
+    expect(cleared.status).toBe(204);
+    expect((await request(appPastDue).get("/api/notifications").set("Cookie", cookies[0]!)).body.data).toEqual([]);
+    const bBNotifs = await request(appPastDue).get("/api/notifications").set("Cookie", cookies[1]!);
+    expect(bBNotifs.body.data.length).toBeGreaterThan(0);
+
+    // Returning the loan clears overdue=false
+    await request(appPastDue).post(`/api/loans/${loanAId}/return`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const returnedDetail = await request(appPastDue).get(`/api/loans/${loanAId}`).set("Cookie", cookies[0]!);
+    expect(returnedDetail.body.data.overdue).toBe(false);
+  });
+});
