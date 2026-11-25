@@ -87,7 +87,8 @@ describe("F10 complete protected-route inventory on production HTTP/real DB", ()
       .replace("fixture-e-one", "{equipmentId}")
       .replace("fixture-r-one", "{requestId}")
       .replace("fixture-loan", "{loanId}")
-      .replace("fixture-bundle", "{bundleId}")}`).sort();
+      .replace("fixture-bundle", "{bundleId}")
+      .replace("fixture-notif", "{notificationId}")}`).sort();
     expect(normalized).toEqual(PROTECTED_ROUTES.map((r) => `${r.method} ${r.path}`).sort());
   });
   it("configured HTTPS cookies have Secure/HttpOnly/SameSite attributes (TEST-F01-15)", async () => {

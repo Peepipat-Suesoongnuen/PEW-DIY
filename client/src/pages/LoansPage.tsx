@@ -161,6 +161,14 @@ export function LoansPage() {
               </div>
             ) : null}
 
+            {detail.overdue && detail.status !== "RETURNED" ? (
+              <div className="mb-4">
+                <Alert tone="danger">
+                  This loan passed its due date ({detail.due_on}) and is overdue.
+                </Alert>
+              </div>
+            ) : null}
+
             {actionError ? (
               <div className="no-print mb-4">
                 <Alert tone="danger">{actionError}</Alert>
@@ -262,6 +270,7 @@ export function LoansPage() {
   const scopeOptions: Array<{ value: LoanScope; label: string }> = isCustodian
     ? [
         { value: "active", label: "Active" },
+        { value: "overdue", label: "Overdue" },
         { value: "history", label: "History" },
         { value: "all", label: "All loans" },
       ]
@@ -328,9 +337,11 @@ export function LoansPage() {
           message={
             search
               ? "No loans matched your search."
-              : scope === "active"
-                ? "No active loans."
-                : "No loans found in this view."
+              : scope === "overdue"
+                ? "No overdue loans right now."
+                : scope === "active"
+                  ? "No active loans."
+                  : "No loans found in this view."
           }
         />
       ) : (

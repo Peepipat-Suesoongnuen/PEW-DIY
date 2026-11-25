@@ -49,6 +49,9 @@ export const PROTECTED_ROUTE_INVENTORY: ReadonlyArray<{
   { method: "POST", path: "/api/loans/fixture-loan/request-return", sampleBody: {} },
   { method: "POST", path: "/api/loans/fixture-loan/return", sampleBody: {} },
   { method: "POST", path: "/api/loan-bundles/fixture-bundle/return", sampleBody: {} },
+  { method: "GET", path: "/api/notifications" },
+  { method: "POST", path: "/api/notifications/fixture-notif/read", sampleBody: {} },
+  { method: "DELETE", path: "/api/notifications", sampleBody: {} },
 ];
 
 export function requireTestDbUrl(): string {
