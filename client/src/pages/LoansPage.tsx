@@ -44,7 +44,7 @@ export function LoansPage() {
         try {
           const single = await api.getLoan(detailId);
           setDetail(single.data);
-          const listRes = await api.listLoans(isCustodian ? "all" : "history");
+          const listRes = await api.listLoans("all");
           setItems(Array.isArray(listRes.data) ? listRes.data : []);
         } catch (cause) {
           if (onUnauthorized(cause)) return;
@@ -92,10 +92,15 @@ export function LoansPage() {
     );
   }, [items, search]);
 
-  const unreturnedBundleCount = useMemo(() => {
-    if (!detail?.bundle_id || !items) return 0;
-    return items.filter((l) => l.bundle_id === detail.bundle_id && l.status !== "RETURNED").length;
+  const bundleLoans = useMemo(() => {
+    if (!detail?.bundle_id || !items) return [];
+    return items.filter((l) => l.bundle_id === detail.bundle_id);
   }, [detail, items]);
+
+  const unreturnedBundleCount = useMemo(
+    () => bundleLoans.filter((l) => l.status !== "RETURNED").length,
+    [bundleLoans],
+  );
 
   async function runReturnAction(fn: () => Promise<unknown>) {
     setActionBusy(true);
@@ -166,6 +171,7 @@ export function LoansPage() {
               loan={detail}
               borrowerName={detail.borrower_username ?? detail.borrower_id}
               equipmentName={detail.equipment_name ?? detail.equipment_id}
+              bundleLoans={bundleLoans}
             />
 
             {!isCustodian && detail.status === "ACTIVE" ? (

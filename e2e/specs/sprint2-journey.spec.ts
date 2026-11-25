@@ -122,6 +122,9 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await bPage.goto("/loans");
     await bPage.getByText("Fluke 87V").filter({ visible: true }).first().click();
     await expect(bPage.getByRole("button", { name: /Print loan slip/i })).toBeVisible();
+    await expect(bPage.getByText("Custodian S2", { exact: true }).first()).toBeVisible();
+    await expect(bPage.getByText("Bundle items")).toBeVisible();
+    expect(await bPage.locator("tbody tr").count()).toBe(2);
     await bPage.getByLabel("Return note (optional)").fill("Dropped off at Desk A");
     await bPage.getByRole("button", { name: "Notify return" }).click();
     await expect(bPage.getByText(/Return requested\. Waiting for custodian confirmation/)).toBeVisible();
@@ -130,7 +133,7 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await cPage.getByRole("link", { name: "Fluke 87V" }).first().click();
     await expect(cPage).toHaveURL(/\/loans\/.+/);
     await expect(cPage.getByRole("heading", { name: "Loan details" })).toBeVisible();
-    await expect(cPage.getByText("Return pending")).toBeVisible();
+    await expect(cPage.getByText("Return pending").first()).toBeVisible();
     await cPage.getByRole("button", { name: /Confirm entire bundle return/ }).click();
     await expect(cPage.getByText("Returned", { exact: true }).first()).toBeVisible();
 

@@ -88,6 +88,7 @@ export interface Loan {
   quantity_borrowed: number;
   requested_days?: number;
   checked_out_by: string;
+  checked_out_by_username?: string;
   checkout_at: string;
   due_on: string;
   return_requested_at?: string | null;

@@ -24,7 +24,7 @@ const record = {
 };
 const loan = { id: "loan/opaque%2F#", request_id: record.id, bundle_id: null, borrower_id: "B-A", borrower_username: "Student Alice",
   equipment_id: record.equipment_id, equipment_name: "Fixture", quantity_borrowed: 2, requested_days: 7,
-  checked_out_by: "C-A", checkout_at: "2026-12-27T17:00:00Z", due_on: "2027-01-04",
+  checked_out_by: "C-A", checked_out_by_username: "Staff Casey", checkout_at: "2026-12-27T17:00:00Z", due_on: "2027-01-04",
   return_requested_at: null, return_requested_by: null, return_note: "", returned_at: null, returned_by: null,
   status: "ACTIVE" as const };
 const response = (status: number, data: unknown) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json" } });
@@ -117,17 +117,38 @@ describe("F-05 checkout and active-loan UI", () => {
     expect(fetcher).toHaveBeenCalledWith(`/api/loans/${encodeURIComponent(loan.id)}`, expect.anything());
     expect(loanIdFromPathname(loanPath(loan.id))).toBe(loan.id);
   });
-  it("shows catalog names and borrower username rather than internal IDs, plus Printable Loan Slip (TEST-F11-05)", async () => {
+  it("shows catalog names, borrower username, and checkout custodian rather than internal IDs, plus Printable Loan Slip (TEST-F11-05)", async () => {
     const printSpy = vi.spyOn(window, "print").mockImplementation(() => {});
     mockApi({ role: "BORROWER", username: "Student Alice" }); mount(loanPath(loan.id));
     await screen.findByText("2027-01-04");
     expect(screen.getByText("Fixture")).toBeInTheDocument();
     expect(screen.getByText("Student Alice")).toBeInTheDocument();
+    expect(screen.getByText("Staff Casey")).toBeInTheDocument();
     expect(screen.queryByText(record.equipment_id)).not.toBeInTheDocument();
     expect(screen.queryByText(loan.borrower_id)).not.toBeInTheDocument();
+    expect(screen.queryByText(loan.checked_out_by)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Print loan slip/i }));
     expect(printSpy).toHaveBeenCalledTimes(1);
     printSpy.mockRestore();
+  });
+  it("loads scope=all for Borrower on bundle loan detail and renders all bundle items on the slip (TEST-F11-05)", async () => {
+    const bundleLoan1 = { ...loan, id: "loan-b1", bundle_id: "bundle-1", equipment_id: "eq-1", equipment_name: "Multimeter", quantity_borrowed: 1 };
+    const bundleLoan2 = { ...loan, id: "loan-b2", bundle_id: "bundle-1", equipment_id: "eq-2", equipment_name: "Oscilloscope", quantity_borrowed: 3 };
+    const fetcher = vi.fn(async (input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path === "/api/auth/me") return response(200, { data: { user: { id: "B-A", username: "Student Alice", role: "BORROWER" } } });
+      if (path === "/api/loans/loan-b1") return response(200, { data: bundleLoan1 });
+      if (path === "/api/loans?scope=all") return response(200, { data: [bundleLoan1, bundleLoan2] });
+      throw new Error(`Unexpected API call: ${path}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+    mount(loanPath("loan-b1"));
+    await screen.findByText("Bundle items");
+    expect(fetcher).toHaveBeenCalledWith("/api/loans?scope=all", expect.anything());
+    expect(screen.getByText("Multimeter")).toBeInTheDocument();
+    expect(screen.getByText("Oscilloscope")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
+    expect(screen.getByText("Staff Casey")).toBeInTheDocument();
   });
   it("supports Borrower Notify return and Custodian Confirm return (F-06)", async () => {
     const bFetcher = mockApi({ role: "BORROWER" }); mount(loanPath(loan.id));

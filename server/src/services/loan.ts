@@ -41,6 +41,7 @@ export interface LoanView {
   quantity_borrowed: number;
   requested_days: number;
   checked_out_by: string;
+  checked_out_by_username: string;
   checkout_at: string;
   due_on: string;
   return_requested_at: string | null;
@@ -52,11 +53,12 @@ export interface LoanView {
 }
 const projection = `SELECT l.id,l.request_id,r.bundle_id,r.borrower_id,u.username AS borrower_username,
   r.equipment_id,e.name AS equipment_name,l.quantity_borrowed,r.requested_days,
-  l.checked_out_by,l.checkout_at,l.due_on::text AS due_on,
+  l.checked_out_by,cu.username AS checked_out_by_username,l.checkout_at,l.due_on::text AS due_on,
   l.return_requested_at,l.return_requested_by,l.return_note,l.returned_at,l.returned_by
   FROM loans l
   JOIN borrowing_requests r ON r.id=l.request_id
   JOIN users u ON u.id=r.borrower_id
+  LEFT JOIN users cu ON cu.id=l.checked_out_by
   JOIN equipment e ON e.id=r.equipment_id`;
 function view(row: Record<string, unknown>): LoanView {
   const returnedAt = row.returned_at ? new Date(row.returned_at as Date).toISOString() : null;
@@ -73,6 +75,7 @@ function view(row: Record<string, unknown>): LoanView {
     quantity_borrowed: Number(row.quantity_borrowed),
     requested_days: Number(row.requested_days ?? 7),
     checked_out_by: String(row.checked_out_by),
+    checked_out_by_username: String(row.checked_out_by_username ?? row.checked_out_by),
     checkout_at: new Date(row.checkout_at as Date).toISOString(),
     due_on: String(row.due_on),
     return_requested_at: returnRequestedAt,

@@ -114,7 +114,7 @@ for (const mode of ["hold", "fail", "normal"] as const) {
         await expect(cPage.getByText("Checkout completed.")).toBeVisible();
         const committed = cPage.getByRole("main");
         await expect(committed.getByText(accounts[0]!.username, { exact: true }).first()).toBeVisible();
-        await expect(committed.getByText(accounts[2]!.username, { exact: true })).toHaveCount(0);
+        await expect(committed.getByText(accounts[2]!.username, { exact: true })).toBeVisible();
         const stored = (
           await pool.query("SELECT *,due_on::text AS due_date FROM loans WHERE request_id=$1", [requestId])
         ).rows[0];

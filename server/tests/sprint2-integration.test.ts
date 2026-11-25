@@ -470,6 +470,7 @@ describe("F-06 Two-Step Return & F-08 Full Loan Views/History (TEST-F06-01..05, 
       .set("Cookie", cookies[2]!)
       .send({});
     expect(checkoutA.status).toBe(201);
+    expect(checkoutA.body.data.checked_out_by_username).toBe("s2-c-a");
     const loanAId = checkoutA.body.data.id as string;
 
     // TEST-F06-04: Anonymous -> 401; Borrower /return -> 403; cross-owner /request-return -> 403
