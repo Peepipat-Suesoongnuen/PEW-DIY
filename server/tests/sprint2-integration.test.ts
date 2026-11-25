@@ -14,6 +14,7 @@ import { AuthService } from "../src/services/auth";
 import { SessionStore, type SessionUser } from "../src/services/session";
 import { hashPassword } from "../src/services/password";
 import { LoanService } from "../src/services/loan";
+import { ReportingService } from "../src/services/reporting";
 import { configForTests, createTestContext } from "./harness";
 
 let pool: Pool;
@@ -683,7 +684,7 @@ describe("F-09 Inventory Reporting Summary (TEST-F09-01..02)", () => {
     const e2 = await seedItem("rep2", `${PREFIX}Legacy Scope`, "Lab", 2, "RETIRED");
     const appCheckout = appWithNow("2026-11-23T10:00:00Z");
 
-    // Seed 1 overdue loan (due 2026-11-24, checked out 1 day) and 1 pending request
+    // Seed 1 ACTIVE overdue loan (qty 2) and 1 RETURN_PENDING overdue loan (qty 1), plus 1 pending request
     const r1 = await request(appCheckout)
       .post("/api/requests")
       .set("Origin", config.appOrigin)
@@ -692,6 +693,15 @@ describe("F-09 Inventory Reporting Summary (TEST-F09-01..02)", () => {
     await request(appCheckout).post(`/api/requests/${r1.body.data.id}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
     const loanRes = await request(appCheckout).post(`/api/requests/${r1.body.data.id}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
     const loanId = loanRes.body.data.id as string;
+
+    const rRet = await request(appCheckout)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[1]!)
+      .send({ equipment_id: e1, quantity_requested: 1, requested_days: 1 });
+    await request(appCheckout).post(`/api/requests/${rRet.body.data.id}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const loanRetRes = await request(appCheckout).post(`/api/requests/${rRet.body.data.id}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    await request(appCheckout).post(`/api/loans/${loanRetRes.body.data.id}/request-return`).set("Origin", config.appOrigin).set("Cookie", cookies[1]!).send({});
 
     await request(appCheckout)
       .post("/api/requests")
@@ -708,22 +718,25 @@ describe("F-09 Inventory Reporting Summary (TEST-F09-01..02)", () => {
     expect(borrowerReport.status).toBe(403);
     expect(borrowerReport.body.data).toBeUndefined();
 
-    // TEST-F09-01: Custodian -> 200 with accurate live aggregates
+    // TEST-F09-01: Custodian -> 200 with accurate live aggregates, mutually exclusive loan counters & held_units
     const custReport = await request(appReport).get("/api/reports/summary").set("Cookie", cookies[2]!);
     expect(custReport.status).toBe(200);
     const summary = custReport.body.data;
     expect(summary.business_date).toBe("2026-11-26");
     expect(summary.inventory.active_items).toBeGreaterThanOrEqual(1);
     expect(summary.inventory.retired_items).toBeGreaterThanOrEqual(1);
-    expect(summary.inventory.held_units).toBeGreaterThanOrEqual(2);
+    expect(summary.inventory.held_units).toBeGreaterThanOrEqual(3);
     expect(summary.requests.pending_count).toBeGreaterThanOrEqual(1);
-    expect(summary.requests.checked_out_count).toBeGreaterThanOrEqual(1);
-    expect(summary.loans.active_count).toBeGreaterThanOrEqual(1);
-    expect(summary.loans.overdue_count).toBeGreaterThanOrEqual(1);
+    expect(summary.requests.checked_out_count).toBeGreaterThanOrEqual(2);
+    expect(summary.loans.active_count).toBe(1);
+    expect(summary.loans.return_pending_count).toBe(1);
+    expect(summary.loans.overdue_count).toBe(2);
     const rep1Item = summary.items.find((i: { id: string }) => i.id === e1);
-    expect(rep1Item?.quantity_available).toBe(2);
+    expect(rep1Item?.quantity_available).toBe(1);
+    expect(rep1Item?.held_units).toBe(3);
     const rep2Item = summary.items.find((i: { id: string }) => i.id === e2);
     expect(rep2Item?.catalog_status).toBe("RETIRED");
+    expect(rep2Item?.held_units).toBe(0);
     const ovEntry = summary.overdue_loans.find((o: { loan_id: string }) => o.loan_id === loanId);
     expect(ovEntry).toMatchObject({
       loan_id: loanId,
@@ -733,5 +746,32 @@ describe("F-09 Inventory Reporting Summary (TEST-F09-01..02)", () => {
       due_on: "2026-11-24",
       days_overdue: 2,
     });
+  });
+
+  it("executes all getSummary() reads inside a single REPEATABLE READ READ ONLY transaction", async () => {
+    const queries: string[] = [];
+    let connectCount = 0;
+    const wrappedPool = {
+      async connect() {
+        connectCount++;
+        const client = await pool.connect();
+        const origQuery = client.query.bind(client);
+        return Object.assign(client, {
+          query: ((...args: Parameters<typeof origQuery>) => {
+            if (typeof args[0] === "string") queries.push(args[0]);
+            return origQuery(...args);
+          }) as typeof client.query,
+        });
+      },
+      query() {
+        throw new Error("ReportingService.getSummary() must not query pool directly outside the snapshot client");
+      },
+    } as unknown as Pool;
+
+    const svc = new ReportingService(wrappedPool, { timeZone: "Asia/Bangkok", now: () => new Date("2026-11-26T10:00:00Z") });
+    await svc.getSummary();
+    expect(connectCount).toBe(1);
+    expect(queries[0]).toMatch(/BEGIN\s+ISOLATION\s+LEVEL\s+REPEATABLE\s+READ\s+READ\s+ONLY/i);
+    expect(queries[queries.length - 1]).toMatch(/COMMIT/i);
   });
 });

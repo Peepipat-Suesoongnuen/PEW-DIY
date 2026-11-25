@@ -41,6 +41,10 @@ export interface NotificationView {
   created_at: string;
 }
 
+export interface ReportItemSummary extends Equipment {
+  held_units: number;
+}
+
 export interface OverdueLoanSummary {
   loan_id: string;
   equipment_id: string;
@@ -76,7 +80,7 @@ export interface InventoryReportSummary {
     returned_count: number;
     overdue_count: number;
   };
-  items: Equipment[];
+  items: ReportItemSummary[];
   overdue_loans: OverdueLoanSummary[];
 }
 

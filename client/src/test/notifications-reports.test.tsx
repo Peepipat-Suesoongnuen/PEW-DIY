@@ -170,6 +170,7 @@ describe("Sprint 3 F-09 ReportsPage (TEST-F09-02/03)", () => {
                 description: "",
                 category: "Meters",
                 quantity_total: 4,
+                held_units: 2,
                 quantity_available: 2,
                 availability: "AVAILABLE",
                 catalog_status: "ACTIVE",
