@@ -69,3 +69,5 @@ export function requestIdFromPathname(pathname: string): string | null {
 export function newRequestPath(equipmentId?: string): string {
   return equipmentId ? `/requests/new?equipmentId=${encodeURIComponent(equipmentId)}` : "/requests/new";
 }
+
+export const REPORTS_PATH = "/reports";

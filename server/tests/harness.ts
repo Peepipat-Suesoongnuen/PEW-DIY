@@ -52,6 +52,7 @@ export const PROTECTED_ROUTE_INVENTORY: ReadonlyArray<{
   { method: "GET", path: "/api/notifications" },
   { method: "POST", path: "/api/notifications/fixture-notif/read", sampleBody: {} },
   { method: "DELETE", path: "/api/notifications", sampleBody: {} },
+  { method: "GET", path: "/api/reports/summary" },
 ];
 
 export function requireTestDbUrl(): string {

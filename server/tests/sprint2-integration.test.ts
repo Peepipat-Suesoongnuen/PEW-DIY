@@ -676,3 +676,62 @@ describe("F-07 Overdue Derivation & Persistent In-App Notifications (TEST-F07-01
     expect(returnedDetail.body.data.overdue).toBe(false);
   });
 });
+
+describe("F-09 Inventory Reporting Summary (TEST-F09-01..02)", () => {
+  it("enforces Custodian-only RBAC on GET /api/reports/summary and returns live inventory, request, loan & overdue aggregates", async () => {
+    const e1 = await seedItem("rep1", `${PREFIX}Function Gen`, "Lab", 4);
+    const e2 = await seedItem("rep2", `${PREFIX}Legacy Scope`, "Lab", 2, "RETIRED");
+    const appCheckout = appWithNow("2026-11-23T10:00:00Z");
+
+    // Seed 1 overdue loan (due 2026-11-24, checked out 1 day) and 1 pending request
+    const r1 = await request(appCheckout)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: e1, quantity_requested: 2, requested_days: 1 });
+    await request(appCheckout).post(`/api/requests/${r1.body.data.id}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const loanRes = await request(appCheckout).post(`/api/requests/${r1.body.data.id}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const loanId = loanRes.body.data.id as string;
+
+    await request(appCheckout)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[1]!)
+      .send({ equipment_id: e1, quantity_requested: 1 });
+
+    // Evaluate report at 2026-11-26 (2 days past due_on=2026-11-24)
+    const appReport = appWithNow("2026-11-26T10:00:00Z");
+
+    // TEST-F09-02: Anonymous -> 401; Borrower -> 403
+    expect((await request(appReport).get("/api/reports/summary")).status).toBe(401);
+    const borrowerReport = await request(appReport).get("/api/reports/summary").set("Cookie", cookies[0]!);
+    expect(borrowerReport.status).toBe(403);
+    expect(borrowerReport.body.data).toBeUndefined();
+
+    // TEST-F09-01: Custodian -> 200 with accurate live aggregates
+    const custReport = await request(appReport).get("/api/reports/summary").set("Cookie", cookies[2]!);
+    expect(custReport.status).toBe(200);
+    const summary = custReport.body.data;
+    expect(summary.business_date).toBe("2026-11-26");
+    expect(summary.inventory.active_items).toBeGreaterThanOrEqual(1);
+    expect(summary.inventory.retired_items).toBeGreaterThanOrEqual(1);
+    expect(summary.inventory.held_units).toBeGreaterThanOrEqual(2);
+    expect(summary.requests.pending_count).toBeGreaterThanOrEqual(1);
+    expect(summary.requests.checked_out_count).toBeGreaterThanOrEqual(1);
+    expect(summary.loans.active_count).toBeGreaterThanOrEqual(1);
+    expect(summary.loans.overdue_count).toBeGreaterThanOrEqual(1);
+    const rep1Item = summary.items.find((i: { id: string }) => i.id === e1);
+    expect(rep1Item?.quantity_available).toBe(2);
+    const rep2Item = summary.items.find((i: { id: string }) => i.id === e2);
+    expect(rep2Item?.catalog_status).toBe("RETIRED");
+    const ovEntry = summary.overdue_loans.find((o: { loan_id: string }) => o.loan_id === loanId);
+    expect(ovEntry).toMatchObject({
+      loan_id: loanId,
+      equipment_id: e1,
+      borrower_username: "s2-b-a",
+      quantity_borrowed: 2,
+      due_on: "2026-11-24",
+      days_overdue: 2,
+    });
+  });
+});

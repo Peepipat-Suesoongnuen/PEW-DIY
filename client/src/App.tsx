@@ -7,6 +7,7 @@ import { ItemDetailPage } from "./pages/ItemDetailPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RequestsPage } from "./pages/RequestsPage";
 import { LoansPage } from "./pages/LoansPage";
+import { ReportsPage } from "./pages/ReportsPage";
 
 function ProtectedLayout() {
   const { user, status } = useSession();
@@ -49,6 +50,7 @@ export function App() {
           <Route path="/loans" element={<LoansPage />} />
           <Route path="/loans/:id" element={<LoansPage />} />
           <Route path="/requests/:id" element={<RequestsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
         </Route>
         <Route path="/" element={<Navigate to="/catalog" replace />} />
         <Route path="*" element={<NotFoundPage />} />
