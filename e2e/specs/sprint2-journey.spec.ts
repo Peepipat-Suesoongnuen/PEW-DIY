@@ -107,7 +107,15 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
 
     // 5. Custodian approves & checks out entire bundle
     await cPage.goto("/requests");
-    await cPage.getByText("Fluke 87V").filter({ visible: true }).first().click();
+    const cReqBundleLink = cPage.getByText("Fluke 87V").filter({ visible: true }).first();
+    await expect(cReqBundleLink).toBeVisible();
+    if ((testInfo.project.use.viewport?.width ?? 1280) >= 768) {
+      const overflows = await cPage
+        .locator("table")
+        .evaluate((el) => el.scrollWidth > (el.parentElement?.clientWidth ?? el.clientWidth));
+      expect(overflows).toBe(false);
+    }
+    await cReqBundleLink.click();
     await cPage.getByLabel("Decision note (optional)").fill("Approved for Senior lab");
     await cPage.getByRole("button", { name: "Approve entire bundle" }).click();
     await expect(cPage.getByRole("button", { name: /Check out entire bundle/ })).toBeVisible();
@@ -126,11 +134,19 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await expect(bPage.getByText("Bundle items")).toBeVisible();
     expect(await bPage.locator("tbody tr").count()).toBe(2);
     await bPage.getByLabel("Return note (optional)").fill("Dropped off at Desk A");
-    await bPage.getByRole("button", { name: "Notify return" }).click();
+    await bPage.getByRole("button", { name: "Notify return", exact: true }).click();
     await expect(bPage.getByText(/Return requested\. Waiting for custodian confirmation/)).toBeVisible();
 
     await cPage.goto("/loans");
-    await cPage.getByRole("link", { name: "Fluke 87V" }).first().click();
+    const cLoanLink = cPage.getByRole("link", { name: /Fluke 87V/ }).filter({ visible: true }).first();
+    await expect(cLoanLink).toBeVisible();
+    if ((testInfo.project.use.viewport?.width ?? 1280) >= 768) {
+      const overflows = await cPage
+        .locator("table")
+        .evaluate((el) => el.scrollWidth > (el.parentElement?.clientWidth ?? el.clientWidth));
+      expect(overflows).toBe(false);
+    }
+    await cLoanLink.click();
     await expect(cPage).toHaveURL(/\/loans\/.+/);
     await expect(cPage.getByRole("heading", { name: "Loan details" })).toBeVisible();
     await expect(cPage.getByText("Return pending").first()).toBeVisible();

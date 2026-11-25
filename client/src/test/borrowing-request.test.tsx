@@ -244,4 +244,118 @@ describe("F-04 / F-11 request creation & management UI", () => {
     }
     expect(requestIdFromPathname("/requests/new")).toBeNull();
   });
+
+  it("displays 1,000-character Purpose details counter on CreateRequestPage", async () => {
+    mockApi();
+    mount(`/requests/new?equipmentId=${encodeURIComponent(equipment.id)}`);
+    expect(await screen.findByText("0 / 1,000 characters")).toBeInTheDocument();
+    const textarea = screen.getByLabelText(/Purpose details/);
+    expect(textarea).toHaveAttribute("maxLength", "1000");
+    fireEvent.change(textarea, { target: { value: "Robotics" } });
+    expect(screen.getByText("8 / 1,000 characters")).toBeInTheDocument();
+  });
+
+  it("supports short reference search, sortable columns, collapsible bundles, and Custodian quick bundle approve", async () => {
+    const bundleItem1: BorrowingRequest = {
+      ...record,
+      id: "aaaa1111-0000-4000-8000-000000000001",
+      bundle_id: "bbbb2222-0000-4000-8000-000000000002",
+      equipment_name: "Oscilloscope",
+      quantity_requested: 2,
+      requested_days: 5,
+    };
+    const bundleItem2: BorrowingRequest = {
+      ...record,
+      id: "aaaa1111-0000-4000-8000-000000000003",
+      bundle_id: "bbbb2222-0000-4000-8000-000000000002",
+      equipment_id: "eq-2",
+      equipment_name: "Logic Probe",
+      quantity_requested: 3,
+      requested_days: 5,
+    };
+    const singleItem: BorrowingRequest = {
+      ...record,
+      id: "cccc3333-0000-4000-8000-000000000004",
+      bundle_id: null,
+      equipment_name: "Arduino Uno",
+      quantity_requested: 1,
+      requested_days: 10,
+      purpose_category: "CAPSTONE",
+      created_at: "2026-11-05T12:00:00Z",
+    };
+
+    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const path = String(input);
+      if (path === "/api/auth/me") return response(200, { data: { user: { id: "C-A", username: "C-A", role: "CUSTODIAN" } } });
+      if (path === "/api/requests") return response(200, { data: [bundleItem1, bundleItem2, singleItem] });
+      if (path === "/api/request-bundles/bbbb2222-0000-4000-8000-000000000002/approve" && init?.method === "POST") {
+        return response(200, { data: [bundleItem1, bundleItem2] });
+      }
+      throw new Error(`Unexpected fetch: ${path}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+
+    mount("/requests");
+    expect(await screen.findByText("Bundle (2)")).toBeInTheDocument();
+    expect(screen.getByRole("table")).toHaveClass("table-fixed");
+
+    // Sort by Qty toggling ascending/descending
+    const qtyBtn = screen.getByRole("button", { name: "Qty" });
+    fireEvent.click(qtyBtn);
+    expect(qtyBtn.closest("th")).toHaveAttribute("aria-sort", "ascending");
+    fireEvent.click(qtyBtn);
+    expect(qtyBtn.closest("th")).toHaveAttribute("aria-sort", "descending");
+
+    // Expand bundle sub-rows into clean full-width nested drawer and use Custodian Quick Bundle Approve
+    fireEvent.click(screen.getByRole("button", { name: "Toggle bundle #BBBB2222" }));
+    expect(screen.getByText(/Bundle items \(2\)/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Approve bundle (2)" }));
+    await waitFor(() =>
+      expect(fetcher).toHaveBeenCalledWith(
+        "/api/request-bundles/bbbb2222-0000-4000-8000-000000000002/approve",
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
+
+    // Search by short reference code (#CCCC3333)
+    fireEvent.change(screen.getByLabelText("Search requests"), { target: { value: "#CCCC3333" } });
+    expect(screen.queryByText("Bundle (2)")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Arduino Uno").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("paginates RequestsPage by groups (default 10) without splitting a bundle across pages", async () => {
+    const bundleItems: BorrowingRequest[] = [
+      { ...record, id: "bnd-1", bundle_id: "bnd-grp", equipment_name: "Bundle Item A", created_at: "2026-11-20T12:00:00Z" },
+      { ...record, id: "bnd-2", bundle_id: "bnd-grp", equipment_id: "eq-2", equipment_name: "Bundle Item B", created_at: "2026-11-20T12:00:00Z" },
+    ];
+    const singles: BorrowingRequest[] = Array.from({ length: 11 }, (_, idx) => ({
+      ...record,
+      id: `req-pg-${idx + 1}`,
+      bundle_id: null,
+      equipment_name: `Single Gear ${idx + 1}`,
+      created_at: new Date(Date.UTC(2026, 10, 19 - idx)).toISOString(),
+    }));
+
+    const fetcher = vi.fn(async (input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path === "/api/auth/me") return response(200, { data: { user: { id: "B-A", username: "B-A", role: "BORROWER" } } });
+      if (path === "/api/requests") return response(200, { data: [...bundleItems, ...singles] });
+      throw new Error(`Unexpected fetch: ${path}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+
+    mount("/requests");
+    expect(await screen.findByText("Showing 1–10 of 12")).toBeInTheDocument();
+    expect(screen.getAllByText(/Bundle Item A/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText("Single Gear 10")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    expect(screen.getByText("Showing 11–12 of 12")).toBeInTheDocument();
+    expect(screen.getAllByText("Single Gear 10").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Single Gear 11").length).toBeGreaterThanOrEqual(1);
+
+    // Search resets pagination back to page 1 cleanly
+    fireEvent.change(screen.getByLabelText("Search requests"), { target: { value: "Single Gear 1" } });
+    expect(screen.getByText(/Showing 1–/)).toBeInTheDocument();
+  });
 });

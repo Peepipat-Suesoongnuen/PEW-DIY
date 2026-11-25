@@ -114,4 +114,34 @@ describe.skipIf(!databaseUrl)("database migration repair", () => {
     );
     expect(afterRepeat.rows[0]?.constraint_count).toBe("1");
   });
+
+  it("backfills expires_at for pre-existing unfulfilled PENDING (7d) and APPROVED (3d) requests idempotently", async () => {
+    await pool.query(
+      `INSERT INTO borrowing_requests (id, borrower_id, equipment_id, quantity_requested, approval_status, created_at, reviewed_at, expires_at)
+       VALUES
+         ('legacy-pending', 'repair-borrower', 'repair-equipment', 1, 'PENDING', '2026-11-01T10:00:00Z', NULL, NULL),
+         ('legacy-approved', 'repair-borrower', 'repair-equipment', 1, 'APPROVED', '2026-11-01T10:00:00Z', '2026-11-02T12:00:00Z', NULL),
+         ('legacy-rejected', 'repair-borrower', 'repair-equipment', 1, 'REJECTED', '2026-11-01T10:00:00Z', '2026-11-02T12:00:00Z', NULL)`,
+    );
+
+    await migrate(pool);
+
+    const rows = await pool.query<{ id: string; expires_at: Date | null }>(
+      `SELECT id, expires_at FROM borrowing_requests WHERE id IN ('legacy-pending', 'legacy-approved', 'legacy-rejected', 'repair-request')`,
+    );
+    const byId = new Map(rows.rows.map((r) => [r.id, r.expires_at?.toISOString() ?? null]));
+    expect(byId.get("legacy-pending")).toBe("2026-11-08T10:00:00.000Z");
+    expect(byId.get("legacy-approved")).toBe("2026-11-05T12:00:00.000Z");
+    expect(byId.get("legacy-rejected")).toBeNull();
+    expect(byId.get("repair-request")).toBeNull();
+
+    // Re-running migration preserves backfilled values without altering timestamps.
+    await migrate(pool);
+    const rerun = await pool.query<{ id: string; expires_at: Date | null }>(
+      `SELECT id, expires_at FROM borrowing_requests WHERE id IN ('legacy-pending', 'legacy-approved')`,
+    );
+    const rerunById = new Map(rerun.rows.map((r) => [r.id, r.expires_at?.toISOString() ?? null]));
+    expect(rerunById.get("legacy-pending")).toBe("2026-11-08T10:00:00.000Z");
+    expect(rerunById.get("legacy-approved")).toBe("2026-11-05T12:00:00.000Z");
+  });
 });

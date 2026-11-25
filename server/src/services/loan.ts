@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import type { Pool, PoolClient } from "pg";
-import { RequestError } from "./borrowing-request";
+import { isRequestExpired, RequestError } from "./borrowing-request";
 import { getEquipment } from "./catalog";
 import type { SessionUser } from "./session";
 
@@ -155,11 +155,14 @@ export class LoanService {
       if (record.approval_status !== "APPROVED") {
         throw new RequestError(409, "NOT_APPROVED", "Request must be approved before checkout.");
       }
+      if (!this.options.timeZone) throw new RequestError(503, "CALENDAR_POLICY_UNCONFIGURED", "Checkout is temporarily unavailable.");
+      const now = (this.options.now ?? (() => new Date()))();
+      if (isRequestExpired(record.expires_at, now)) {
+        throw new RequestError(409, "REQUEST_EXPIRED", "Approved request has expired and cannot be checked out.");
+      }
       const stock = await getEquipment(client, equipmentId);
       if (!stock) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
       assertCheckoutAvailable(stock.quantity_total, stock.quantity_total - stock.quantity_available, record.quantity_requested);
-      if (!this.options.timeZone) throw new RequestError(503, "CALENDAR_POLICY_UNCONFIGURED", "Checkout is temporarily unavailable.");
-      const now = (this.options.now ?? (() => new Date()))();
       const days = Number(record.requested_days ?? 7);
       const dueOn = checkoutDueOn(now, this.options.timeZone, days);
       const id = randomUUID();
@@ -212,6 +215,9 @@ export class LoanService {
         }
         if (record.approval_status !== "APPROVED") {
           throw new RequestError(409, "NOT_APPROVED", "Bundle must be approved before checkout.");
+        }
+        if (isRequestExpired(record.expires_at, now)) {
+          throw new RequestError(409, "REQUEST_EXPIRED", "Approved bundle request has expired and cannot be checked out.");
         }
         const stock = await getEquipment(client, String(record.equipment_id));
         if (!stock) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
@@ -317,6 +323,49 @@ export class LoanService {
       const loan = view(result.rows[0], this.businessToday());
       await client.query("COMMIT");
       return loan;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async requestBundleReturn(user: SessionUser, bundleId: string, input: unknown): Promise<LoanView[]> {
+    if (user.role !== "BORROWER") throw new RequestError(403, "FORBIDDEN", "Access denied.");
+    validId(bundleId);
+    const note = parseReturnNote(input);
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      const locked = await client.query(
+        `SELECT l.id, l.returned_at, r.borrower_id
+         FROM loans l JOIN borrowing_requests r ON r.id = l.request_id
+         WHERE r.bundle_id = $1 ORDER BY l.id FOR UPDATE OF l`,
+        [bundleId],
+      );
+      if (!locked.rowCount) throw new RequestError(404, "NOT_FOUND", "Resource not found.");
+      if (locked.rows.some((r) => r.borrower_id !== user.id)) {
+        throw new RequestError(403, "FORBIDDEN", "Access denied.");
+      }
+      const activeIds = locked.rows.filter((r) => r.returned_at === null).map((r) => String(r.id));
+      if (!activeIds.length) {
+        throw new RequestError(409, "ALREADY_RETURNED", "All loans in this bundle have already been returned.");
+      }
+      const now = (this.options.now ?? (() => new Date()))();
+      await client.query(
+        `UPDATE loans
+         SET return_requested_at = COALESCE(return_requested_at, $2),
+             return_requested_by = COALESCE(return_requested_by, $3),
+             return_note = CASE WHEN $4 <> '' THEN $4 ELSE return_note END
+         WHERE id = ANY($1::text[])`,
+        [activeIds, now, user.id, note],
+      );
+      const result = await client.query(`${projection} WHERE l.id = ANY($1::text[]) ORDER BY l.id`, [activeIds]);
+      const today = this.businessToday();
+      const loans = result.rows.map((r) => view(r, today));
+      await client.query("COMMIT");
+      return loans;
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;

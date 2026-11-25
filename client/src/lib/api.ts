@@ -28,7 +28,7 @@ export const PURPOSE_CATEGORIES: ReadonlyArray<{ value: PurposeCategory; label: 
 ];
 
 export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
-export type RequestStatus = "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "CHECKED_OUT";
+export type RequestStatus = "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "CHECKED_OUT" | "EXPIRED";
 export type LoanStatus = "ACTIVE" | "RETURN_PENDING" | "RETURNED";
 export type LoanScope = "active" | "overdue" | "history" | "all";
 
@@ -125,6 +125,7 @@ export interface BorrowingRequest {
   decision_note?: string;
   reviewed_by?: string | null;
   reviewed_at?: string | null;
+  expires_at?: string | null;
   created_at: string;
   status: RequestStatus;
 }
@@ -223,6 +224,12 @@ export const api = {
   },
   requestReturn(loanId: string, return_note = "") {
     return apiFetch<{ data: Loan }>(`/api/loans/${encodeURIComponent(loanId)}/request-return`, {
+      method: "POST",
+      body: JSON.stringify(return_note ? { return_note } : {}),
+    });
+  },
+  requestBundleReturn(bundleId: string, return_note = "") {
+    return apiFetch<{ data: Loan[] }>(`/api/loan-bundles/${encodeURIComponent(bundleId)}/request-return`, {
       method: "POST",
       body: JSON.stringify(return_note ? { return_note } : {}),
     });

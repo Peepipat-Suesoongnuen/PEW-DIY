@@ -105,6 +105,8 @@ export function CreateRequestPage() {
     const errors: Record<string, string> = {};
     if (lines.length === 0) {
       errors.items = "Select at least one available equipment item.";
+    } else if (lines.length > 10) {
+      errors.items = "You can request at most 10 distinct items in a single bundle.";
     }
     const parsedItems: Array<{ equipment_id: string; quantity_requested: number }> = [];
     for (const line of lines) {
@@ -125,6 +127,8 @@ export function CreateRequestPage() {
 
     if (purposeCategory === "OTHER" && !purposeDetail.trim()) {
       errors.purposeDetail = "Please specify details when selecting Other.";
+    } else if (purposeDetail.length > 1000) {
+      errors.purposeDetail = "Purpose details must be at most 1,000 characters.";
     }
 
     if (Object.keys(errors).length > 0) {
@@ -156,7 +160,10 @@ export function CreateRequestPage() {
       if (onUnauthorized(cause)) return;
       if (cause instanceof ApiError && cause.status === 409) {
         setSubmitError({
-          message: "Requested quantity is no longer available. Availability has been refreshed.",
+          message:
+            cause.code === "REQUEST_LIMIT_EXCEEDED"
+              ? cause.message
+              : "Requested quantity is no longer available. Availability has been refreshed.",
           requestId: cause.requestId,
         });
         await loadCatalog();
@@ -300,13 +307,16 @@ export function CreateRequestPage() {
                     ))}
                   </select>
                 </div>
-                <Button type="button" variant="secondary" onClick={addLine} disabled={submitting}>
+                <Button type="button" variant="secondary" onClick={addLine} disabled={submitting || lines.length >= 10}>
                   <Plus aria-hidden="true" className="h-4 w-4" />
                   <span>Add item</span>
                 </Button>
               </div>
             ) : catalog.length === 0 ? (
               <Alert tone="warning">No equipment items are currently available to borrow.</Alert>
+            ) : null}
+            {lines.length >= 10 ? (
+              <p className="mt-2 text-xs text-text-muted">Maximum of 10 distinct items per bundle reached.</p>
             ) : null}
           </Card>
 
@@ -366,7 +376,7 @@ export function CreateRequestPage() {
                 <textarea
                   id="purpose-detail"
                   rows={3}
-                  maxLength={500}
+                  maxLength={1000}
                   value={purposeDetail}
                   onChange={(e) => {
                     setPurposeDetail(e.target.value);
@@ -380,6 +390,20 @@ export function CreateRequestPage() {
                   disabled={submitting}
                   className="w-full rounded-control border border-border bg-white px-3 py-2 text-sm text-text focus-visible:outline-2 focus-visible:outline-primary"
                 />
+                <div className="mt-1 flex items-center justify-between gap-2 text-xs">
+                  <span className="text-text-muted">Up to 1,000 characters.</span>
+                  <span
+                    className={
+                      purposeDetail.length >= 1000
+                        ? "font-medium text-danger"
+                        : purposeDetail.length >= 900
+                          ? "font-medium text-warning"
+                          : "text-text-muted"
+                    }
+                  >
+                    {purposeDetail.length} / 1,000 characters
+                  </span>
+                </div>
                 {fieldErrors.purposeDetail ? (
                   <p className="mt-1 text-xs text-danger">{fieldErrors.purposeDetail}</p>
                 ) : null}

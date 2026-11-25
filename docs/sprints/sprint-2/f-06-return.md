@@ -1,7 +1,8 @@
 # F-06 — Equipment Return (Return Notice & Custodian Confirmation)
 
-> **Contract:** Sprint 2 · Feature `F-06`  
-> **Revision:** 1 — 2026-11-23 · **Status:** Baselines contract before implementation
+> **Contract:** Sprint 2 · Feature `F-06`
+>
+> **Revision:** 2 — 2026-11-25 · **Status:** Implemented & verified (`Slice 4` + bundle return-notice extension)
 
 ---
 
@@ -20,7 +21,7 @@
 
 ## 2. Feature SDS & Workflow
 
-1. **Optional Borrower Return Notice:** On own `ACTIVE` loan detail, Borrower may submit `"Request Return"` (`POST /api/loans/:loanId/request-return` with optional `return_note`). Server sets `return_requested_at = now()`, `return_requested_by = user.id`, `return_note`. Loan status becomes `RETURN_PENDING`. Available quantity remains **unchanged**.
+1. **Optional Borrower Return Notice:** On own `ACTIVE` loan detail (or per-item row / bundle group on `LoansPage`), Borrower may submit a return notice for either a single loan (`POST /api/loans/:loanId/request-return`) or all unreturned loans in an entire bundle (`POST /api/loan-bundles/:bundleId/request-return`) with optional `return_note`, without restricting per-item returns when only part of a bundle is ready. Server sets `return_requested_at = now()`, `return_requested_by = user.id`, `return_note`. Affected loan statuses become `RETURN_PENDING`. Available quantity remains **unchanged**.
 2. **Custodian Return Confirmation:** Custodian opens room loans / loan detail and clicks `"Confirm Return"` (`POST /api/loans/:loanId/return` or bundle return `POST /api/loan-bundles/:bundleId/return`).
    - Transaction protocol (`BEGIN ISOLATION LEVEL READ COMMITTED`):
      1. Require `CUSTODIAN` (`403` for Borrower).
@@ -42,12 +43,13 @@
 | Method & Path | Role & Scope | Request Body | Success | Errors |
 |---|---|---|---|---|
 | `POST /api/loans/:loanId/request-return` | `BORROWER` (own active loan) | `{ "return_note"?: string }` | `200 { data: LoanView }` (`status: "RETURN_PENDING"`) | `400`, `401`, `403`, `404`, `409 ALREADY_RETURNED` |
+| `POST /api/loan-bundles/:bundleId/request-return` | `BORROWER` (own bundle loans) | `{ "return_note"?: string }` | `200 { data: LoanView[] }` (`status: "RETURN_PENDING"` on active loans in bundle) | `400`, `401`, `403`, `404`, `409 ALREADY_RETURNED` |
 | `POST /api/loans/:loanId/return` | `CUSTODIAN` only | `{ "return_note"?: string }` | `200 { data: LoanView }` (`status: "RETURNED"`) | `400`, `401`, `403`, `404`, `409 ALREADY_RETURNED`, `500/503` |
 | `POST /api/loan-bundles/:bundleId/return` | `CUSTODIAN` only | `{ "return_note"?: string }` | `200 { data: LoanView[] }` | `400`, `401`, `403`, `404`, `409 ALREADY_RETURNED`, `500/503` |
 
 ### UI (`LoansPage` / `LoanDetails`)
-- Borrower sees `"Request Return"` button on `ACTIVE` loans (disabled/replaced by `"Return requested — awaiting Custodian confirmation"` once `RETURN_PENDING`); no `"Confirm Return"` button.
-- Custodian sees `"Confirm Return"` button on `ACTIVE` and `RETURN_PENDING` loans (and bundle return button when applicable).
+- Borrower sees `"Notify return"` / `"Request Return"` on individual `ACTIVE` loans AND `"Notify return for entire bundle (N)"` inside collapsible full-width bundle drawers (`LoansPage`) while keeping per-item return notices independent; replaced by `"Return requested — awaiting Custodian confirmation"` once `RETURN_PENDING`; no `"Confirm Return"` button.
+- Custodian sees `"Confirm return"` / `"Confirm Return"` per loan AND `"Confirm bundle return (N)"` inside collapsible bundle drawers (`LoansPage`), using `100%`-budget `table-fixed` columns (zero horizontal scroll), unified 2-line cells with `#XXXXXXXX` short-ref, and universal `Pagination` (`10` rows/page default).
 
 ---
 
@@ -80,3 +82,4 @@
 ## 6. Definition of Done & Revision History
 - Satisfies all `AC-F06-01`..`06`, TDD RED→GREEN logs retained, peer-reviewed PR into `sprint/2-staging`, and full regression pass.
 - **Rev 1 (2026-11-23):** Initial Sprint 2 contract authored before implementation.
+- **Rev 2 (2026-11-25):** Added `POST /api/loan-bundles/:bundleId/request-return` for one-click whole-bundle Borrower return notices while preserving per-item partial bundle return flexibility, plus collapsible bundle rows & `#XXXXXXXX` short-ref search on `LoansPage`.

@@ -184,4 +184,59 @@ describe("F-05 checkout and active-loan UI", () => {
     expect(await screen.findByText(error === 403 ? /You do not have access/ : error === 404 ? /Loan not found/ : /We could not load loans/)).toBeInTheDocument();
     expect(screen.queryByText("2027-01-04")).not.toBeInTheDocument();
   });
+  it("groups bundle loans into collapsible rows on LoansPage and supports flexible one-click bundle return notice", async () => {
+    const bLoan1 = { ...loan, id: "1111aaaa-0000-4000-8000-000000000001", bundle_id: "9999bbbb-0000-4000-8000-000000000002", equipment_name: "Fluke 87V", quantity_borrowed: 1 };
+    const bLoan2 = { ...loan, id: "1111aaaa-0000-4000-8000-000000000003", bundle_id: "9999bbbb-0000-4000-8000-000000000002", equipment_id: "eq-2", equipment_name: "Solder Station", quantity_borrowed: 2 };
+    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const path = String(input);
+      if (path === "/api/auth/me") return response(200, { data: { user: { id: "B-A", username: "Student Alice", role: "BORROWER" } } });
+      if (path.startsWith("/api/loans?")) return response(200, { data: [bLoan1, bLoan2] });
+      if (path === "/api/loans/1111aaaa-0000-4000-8000-000000000001") return response(200, { data: bLoan1 });
+      if (path === "/api/loan-bundles/9999bbbb-0000-4000-8000-000000000002/request-return" && init?.method === "POST") {
+        return response(200, { data: [bLoan1, bLoan2] });
+      }
+      throw new Error(`Unexpected fetch: ${path}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+
+    mount("/loans");
+    expect(await screen.findByText("Bundle (2)")).toBeInTheDocument();
+    expect(screen.getByRole("table")).toHaveClass("table-fixed");
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle loan bundle #9999BBBB" }));
+    expect(screen.getByText(/Bundle items \(2\)/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Notify return for entire bundle (2)" }));
+    await waitFor(() =>
+      expect(fetcher).toHaveBeenCalledWith(
+        "/api/loan-bundles/9999bbbb-0000-4000-8000-000000000002/request-return",
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
+  });
+
+  it("paginates LoansPage grouped rows (default 10) and navigates between pages", async () => {
+    const manyLoans = Array.from({ length: 12 }, (_, idx) => ({
+      ...loan,
+      id: `loan-pg-${idx + 1}`,
+      request_id: `req-pg-${idx + 1}`,
+      bundle_id: null,
+      equipment_name: `Loan Gear ${idx + 1}`,
+    }));
+    const fetcher = vi.fn(async (input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path === "/api/auth/me") return response(200, { data: { user: { id: "B-A", username: "Student Alice", role: "BORROWER" } } });
+      if (path.startsWith("/api/loans?")) return response(200, { data: manyLoans });
+      throw new Error(`Unexpected fetch: ${path}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+
+    mount("/loans");
+    expect(await screen.findByText("Showing 1–10 of 12")).toBeInTheDocument();
+    expect(screen.queryByText("Loan Gear 11")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    expect(screen.getByText("Showing 11–12 of 12")).toBeInTheDocument();
+    expect(screen.getAllByText("Loan Gear 11").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Loan Gear 12").length).toBeGreaterThanOrEqual(1);
+  });
 });

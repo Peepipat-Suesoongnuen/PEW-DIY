@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronRight, Printer, Search } from "lucide-react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, ChevronRight, Printer, Search } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { api, ApiError, type Loan, type LoanScope } from "../lib/api";
+import { groupByBundle, matchesRefOrText, shortRef } from "../lib/format";
 import { loanIdFromPathname, loanPath } from "../lib/paths";
 import { useSession, useUnauthorizedRedirect } from "../lib/session";
 import { Alert } from "../components/Alert";
@@ -11,6 +12,7 @@ import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { Loading } from "../components/Loading";
 import { LoanDetails } from "../components/LoanDetails";
+import { Pagination, usePagination } from "../components/Pagination";
 import { LoanStatusBadge } from "../components/StatusBadge";
 import { Table, Th } from "../components/Table";
 
@@ -31,22 +33,31 @@ export function LoansPage() {
   const [detail, setDetail] = useState<Loan | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<{ message: string; requestId?: string } | null>(null);
+  const [expandedBundles, setExpandedBundles] = useState<Record<string, boolean>>({});
 
   const [returnNote, setReturnNote] = useState("");
   const [actionBusy, setActionBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const loadSeqRef = useRef(0);
 
   const load = useCallback(async () => {
+    const seq = ++loadSeqRef.current;
     setError(null);
     setNotFound(false);
+    if (!detailId) {
+      setDetail(null);
+    }
     try {
       if (detailId) {
         try {
           const single = await api.getLoan(detailId);
+          if (seq !== loadSeqRef.current) return;
           setDetail(single.data);
           const listRes = await api.listLoans("all");
+          if (seq !== loadSeqRef.current) return;
           setItems(Array.isArray(listRes.data) ? listRes.data : []);
         } catch (cause) {
+          if (seq !== loadSeqRef.current) return;
           if (onUnauthorized(cause)) return;
           if (cause instanceof ApiError && cause.status === 404) {
             setNotFound(true);
@@ -61,18 +72,19 @@ export function LoansPage() {
           throw cause;
         }
       } else {
-        setDetail(null);
         const listRes = await api.listLoans(scope);
+        if (seq !== loadSeqRef.current) return;
         setItems(Array.isArray(listRes.data) ? listRes.data : []);
       }
     } catch (cause) {
+      if (seq !== loadSeqRef.current) return;
       if (onUnauthorized(cause)) return;
       setError({
         message: "We could not load loans right now. Please try again.",
         requestId: cause instanceof ApiError ? cause.requestId : undefined,
       });
     }
-  }, [detailId, isCustodian, onUnauthorized, scope]);
+  }, [detailId, onUnauthorized, scope]);
 
   useEffect(() => {
     setReturnNote("");
@@ -80,17 +92,16 @@ export function LoansPage() {
     void load();
   }, [load]);
 
-  const filteredItems = useMemo(() => {
+  const filteredGroups = useMemo(() => {
     if (!items) return [];
-    const q = search.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter(
-      (l) =>
-        l.id.toLowerCase().includes(q) ||
-        (l.equipment_name ?? "").toLowerCase().includes(q) ||
-        (l.borrower_username ?? "").toLowerCase().includes(q),
+    const filtered = items.filter((l) =>
+      matchesRefOrText(search, l.id, l.bundle_id, l.equipment_name, l.borrower_username),
     );
+    return groupByBundle(filtered);
   }, [items, search]);
+
+  const pagination = usePagination(filteredGroups, 10);
+  const { setPage: setLoanPage } = pagination;
 
   const bundleLoans = useMemo(() => {
     if (!detail?.bundle_id || !items) return [];
@@ -101,6 +112,15 @@ export function LoansPage() {
     () => bundleLoans.filter((l) => l.status !== "RETURNED").length,
     [bundleLoans],
   );
+
+  const activeBundleCount = useMemo(
+    () => bundleLoans.filter((l) => l.status === "ACTIVE").length,
+    [bundleLoans],
+  );
+
+  function toggleBundle(bundleId: string) {
+    setExpandedBundles((prev) => ({ ...prev, [bundleId]: !prev[bundleId] }));
+  }
 
   async function runReturnAction(fn: () => Promise<unknown>) {
     setActionBusy(true);
@@ -185,7 +205,7 @@ export function LoansPage() {
             {!isCustodian && detail.status === "ACTIVE" ? (
               <div className="no-print mt-6 space-y-3 border-t border-border pt-4">
                 <p className="text-sm text-text-muted">
-                  Returning equipment at the lab counter? Notify the custodian so they can verify physical receipt and restore stock.
+                  Returning equipment at the lab counter? Notify the custodian for this item or the entire bundle.
                 </p>
                 <div>
                   <label htmlFor="borrower-return-note" className="mb-1 block text-sm font-medium text-text">
@@ -202,13 +222,28 @@ export function LoansPage() {
                     className="h-10 w-full max-w-lg rounded-control border border-border bg-white px-3 text-sm text-text"
                   />
                 </div>
-                <Button
-                  disabled={actionBusy}
-                  loading={actionBusy}
-                  onClick={() => void runReturnAction(() => api.requestReturn(detail.id, returnNote.trim()))}
-                >
-                  Notify return
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    disabled={actionBusy}
+                    loading={actionBusy}
+                    onClick={() => void runReturnAction(() => api.requestReturn(detail.id, returnNote.trim()))}
+                  >
+                    Notify return
+                  </Button>
+                  {detail.bundle_id && activeBundleCount > 1 ? (
+                    <Button
+                      variant="secondary"
+                      disabled={actionBusy}
+                      onClick={() =>
+                        void runReturnAction(() =>
+                          api.requestBundleReturn(detail.bundle_id!, returnNote.trim()),
+                        )
+                      }
+                    >
+                      Notify return for entire bundle ({activeBundleCount})
+                    </Button>
+                  ) : null}
+                </div>
               </div>
             ) : null}
 
@@ -284,9 +319,11 @@ export function LoansPage() {
       <div>
         <h1 className="text-xl font-semibold text-text">{pageTitle}</h1>
         <p className="mt-0.5 text-sm text-text-muted">
-          Select any loan row to view full details, notify or confirm returns, or print a loan slip.
+          Select any loan row to view full details, expand bundle sets, notify/confirm returns, or print a loan slip.
         </p>
       </div>
+
+      {actionError ? <Alert tone="danger">{actionError}</Alert> : null}
 
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-border bg-white p-4">
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Loan scope">
@@ -296,7 +333,10 @@ export function LoansPage() {
               type="button"
               role="tab"
               aria-selected={scope === opt.value}
-              onClick={() => setScope(opt.value)}
+              onClick={() => {
+                setScope(opt.value);
+                setLoanPage(1);
+              }}
               className={`rounded-control px-3.5 py-2 text-sm font-medium transition-colors ${
                 scope === opt.value
                   ? "bg-primary text-white"
@@ -314,8 +354,11 @@ export function LoansPage() {
             type="search"
             aria-label="Search loans"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by equipment, borrower, or ID…"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setLoanPage(1);
+            }}
+            placeholder="Search by equipment, borrower, or #ref code…"
             className="h-10 w-full rounded-control border border-border bg-white pl-9 pr-3 text-sm text-text"
           />
         </div>
@@ -332,7 +375,7 @@ export function LoansPage() {
         </div>
       ) : items === null ? (
         <Loading label={`Loading ${pageTitle.toLowerCase()}…`} />
-      ) : filteredItems.length === 0 ? (
+      ) : filteredGroups.length === 0 ? (
         <EmptyState
           message={
             search
@@ -350,76 +393,242 @@ export function LoansPage() {
             <Table
               header={
                 <tr>
-                  <Th>Equipment</Th>
-                  <Th>Qty</Th>
-                  {isCustodian ? <Th>Borrower</Th> : null}
-                  <Th>Due date</Th>
-                  <Th>Status</Th>
-                  <Th className="w-10">
-                    <span className="sr-only">Open</span>
-                  </Th>
+                  <Th className={isCustodian ? "w-[38%]" : "w-[52%]"}>Loan / Equipment</Th>
+                  <Th className={isCustodian ? "w-[10%] px-3" : "w-[12%] px-3"}>Qty</Th>
+                  {isCustodian ? <Th className="w-[16%]">Borrower</Th> : null}
+                  <Th className="w-[16%]">Due date</Th>
+                  <Th className="w-[20%]">Status</Th>
                 </tr>
               }
             >
-              {filteredItems.map((loan) => (
-                <tr
-                  key={loan.id}
-                  onClick={() => navigate(loanPath(loan.id))}
-                  title="Click row to open loan details"
-                  className="cursor-pointer transition-colors hover:bg-primary/5"
-                >
-                  <td className="px-4 py-3 font-medium text-text">
-                    <Link
-                      to={loanPath(loan.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-primary hover:underline"
+              {pagination.pageItems.map((group) => {
+                const isMultiBundle = Boolean(group.bundleId && group.items.length > 1);
+                const first = group.items[0]!;
+                if (!isMultiBundle) {
+                  return (
+                    <tr
+                      key={first.id}
+                      onClick={() => navigate(loanPath(first.id))}
+                      title="Click row to open loan details"
+                      className="cursor-pointer transition-colors hover:bg-primary/5"
                     >
-                      {loan.equipment_name ?? loan.equipment_id}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-text">{loan.quantity_borrowed}</td>
-                  {isCustodian ? (
-                    <td className="px-4 py-3 text-text">
-                      {loan.borrower_username ?? loan.borrower_id}
-                    </td>
-                  ) : null}
-                  <td className="px-4 py-3 text-text">{loan.due_on}</td>
-                  <td className="px-4 py-3">
-                    <LoanStatusBadge status={loan.status} overdue={loan.overdue} />
-                  </td>
-                  <td className="px-4 py-3 text-right text-text-muted">
-                    <ChevronRight aria-hidden="true" className="ml-auto h-4 w-4" />
-                  </td>
-                </tr>
-              ))}
+                      <td className="px-4 py-2.5 align-top font-medium text-text">
+                        <div className="flex items-start gap-2.5 overflow-hidden">
+                          <span
+                            aria-hidden="true"
+                            className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center text-xs text-text-muted/40"
+                          >
+                            •
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <Link
+                              to={loanPath(first.id)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="block truncate text-primary hover:underline"
+                            >
+                              {first.equipment_name ?? first.equipment_id}
+                            </Link>
+                            <p className="mt-0.5 truncate font-mono text-[11px] font-normal text-text-muted">
+                              {shortRef(first.id)}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5 align-top tabular-nums text-text">{first.quantity_borrowed}</td>
+                      {isCustodian ? (
+                        <td className="truncate px-4 py-2.5 align-top text-text">
+                          {first.borrower_username ?? first.borrower_id}
+                        </td>
+                      ) : null}
+                      <td className="px-4 py-2.5 align-top tabular-nums text-text">{first.due_on}</td>
+                      <td className="px-4 py-2.5 align-top">
+                        <LoanStatusBadge status={first.status} overdue={first.overdue} />
+                      </td>
+                    </tr>
+                  );
+                }
+
+                const bundleId = group.bundleId!;
+                const expanded = Boolean(expandedBundles[bundleId]);
+                const totalQty = group.items.reduce((sum, l) => sum + l.quantity_borrowed, 0);
+                const unreturned = group.items.filter((l) => l.status !== "RETURNED").length;
+                const activeUnnotified = group.items.filter((l) => l.status === "ACTIVE").length;
+                const summaryNames = group.items.map((l) => l.equipment_name ?? l.equipment_id).join(", ");
+                const colSpan = isCustodian ? 5 : 4;
+
+                return (
+                  <Fragment key={group.key}>
+                    <tr
+                      onClick={() => toggleBundle(bundleId)}
+                      className={`cursor-pointer transition-colors hover:bg-primary/5 ${
+                        expanded ? "bg-primary/[0.03]" : ""
+                      }`}
+                    >
+                      <td className="px-4 py-2.5 align-top font-medium text-text">
+                        <div className="flex items-start gap-2.5 overflow-hidden">
+                          <button
+                            type="button"
+                            aria-expanded={expanded}
+                            aria-label={`Toggle loan bundle ${shortRef(bundleId)}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleBundle(bundleId);
+                            }}
+                            className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-border bg-white text-text-muted hover:border-primary/40 hover:text-primary"
+                          >
+                            {expanded ? (
+                              <ChevronDown aria-hidden="true" className="h-3.5 w-3.5" />
+                            ) : (
+                              <ChevronRight aria-hidden="true" className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                          <div className="min-w-0 flex-1">
+                            <Link
+                              to={loanPath(first.id)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="block truncate text-primary hover:underline"
+                            >
+                              {summaryNames}
+                            </Link>
+                            <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] font-normal text-text-muted">
+                              <span className="font-mono">{shortRef(bundleId)}</span>
+                              <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 font-medium text-primary">
+                                Bundle ({group.items.length})
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5 align-top tabular-nums text-text">{totalQty}</td>
+                      {isCustodian ? (
+                        <td className="truncate px-4 py-2.5 align-top text-text">
+                          {first.borrower_username ?? first.borrower_id}
+                        </td>
+                      ) : null}
+                      <td className="px-4 py-2.5 align-top tabular-nums text-text">{first.due_on}</td>
+                      <td className="px-4 py-2.5 align-top">
+                        <LoanStatusBadge
+                          status={first.status}
+                          overdue={group.items.some((l) => l.overdue && l.status !== "RETURNED")}
+                        />
+                      </td>
+                    </tr>
+
+                    {expanded ? (
+                      <tr className="bg-primary/[0.02]">
+                        <td colSpan={colSpan} className="px-4 py-3 pl-11">
+                          <div className="space-y-2.5 rounded-control border border-border bg-white p-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2">
+                              <span className="text-xs font-medium text-text-muted">
+                                Bundle items ({group.items.length}) ·{" "}
+                                <span className="font-mono">{shortRef(bundleId)}</span>
+                              </span>
+                              {(!isCustodian && activeUnnotified > 1) || (isCustodian && unreturned > 0) ? (
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {!isCustodian && activeUnnotified > 1 ? (
+                                    <Button
+                                      variant="secondary"
+                                      disabled={actionBusy}
+                                      onClick={() => void runReturnAction(() => api.requestBundleReturn(bundleId))}
+                                    >
+                                      Notify return for entire bundle ({activeUnnotified})
+                                    </Button>
+                                  ) : null}
+                                  {isCustodian && unreturned > 0 ? (
+                                    <Button
+                                      disabled={actionBusy}
+                                      onClick={() => void runReturnAction(() => api.confirmBundleReturn(bundleId))}
+                                    >
+                                      Confirm bundle return ({unreturned})
+                                    </Button>
+                                  ) : null}
+                                </div>
+                              ) : null}
+                            </div>
+
+                            <div className="divide-y divide-border/60">
+                              {group.items.map((sub) => (
+                                <div
+                                  key={sub.id}
+                                  className="flex flex-wrap items-center justify-between gap-2 py-1.5 text-xs"
+                                >
+                                  <div className="flex min-w-0 items-center gap-2">
+                                    <Link
+                                      to={loanPath(sub.id)}
+                                      className="truncate font-medium text-primary hover:underline"
+                                    >
+                                      {sub.equipment_name ?? sub.equipment_id}
+                                    </Link>
+                                    <span className="shrink-0 font-mono text-[11px] text-text-muted">
+                                      {shortRef(sub.id)}
+                                    </span>
+                                  </div>
+                                  <div className="flex shrink-0 items-center gap-3">
+                                    <span className="tabular-nums text-text-muted">Qty {sub.quantity_borrowed}</span>
+                                    <LoanStatusBadge status={sub.status} overdue={sub.overdue} />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
+                );
+              })}
             </Table>
           </div>
 
           <ul className="space-y-3 md:hidden">
-            {filteredItems.map((loan) => (
-              <li key={loan.id}>
-                <Link
-                  to={loanPath(loan.id)}
-                  className="block rounded-card border border-border bg-white p-4 hover:border-primary/40"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="font-medium text-text">
-                      {loan.equipment_name ?? loan.equipment_id}
-                    </span>
-                    <LoanStatusBadge status={loan.status} overdue={loan.overdue} />
-                  </div>
-                  <p className="mt-1 text-sm text-text-muted">
-                    Qty {loan.quantity_borrowed} · Due {loan.due_on}
-                  </p>
-                  {isCustodian ? (
-                    <p className="mt-1 text-xs text-text-muted">
-                      Borrower: {loan.borrower_username ?? loan.borrower_id}
+            {pagination.pageItems.map((group) => {
+              const isMulti = Boolean(group.bundleId && group.items.length > 1);
+              const first = group.items[0]!;
+              return (
+                <li key={group.key}>
+                  <Link
+                    to={loanPath(first.id)}
+                    className={`block rounded-card border border-border bg-white p-4 hover:border-primary/40 ${
+                      isMulti ? "border-l-4 border-l-primary" : ""
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-medium text-text">
+                        {isMulti
+                          ? group.items.map((i) => i.equipment_name ?? i.equipment_id).join(", ")
+                          : first.equipment_name ?? first.equipment_id}
+                      </span>
+                      <LoanStatusBadge
+                        status={first.status}
+                        overdue={group.items.some((l) => l.overdue && l.status !== "RETURNED")}
+                      />
+                    </div>
+                    <p className="mt-1 text-xs font-mono text-text-muted">
+                      {shortRef(group.bundleId ?? first.id)}
+                      {isMulti ? ` · Bundle (${group.items.length} items)` : ""}
                     </p>
-                  ) : null}
-                </Link>
-              </li>
-            ))}
+                    <p className="mt-1 text-sm text-text-muted">
+                      Qty {group.items.reduce((s, i) => s + i.quantity_borrowed, 0)} · Due {first.due_on}
+                    </p>
+                    {isCustodian ? (
+                      <p className="mt-1 text-xs text-text-muted">
+                        Borrower: {first.borrower_username ?? first.borrower_id}
+                      </p>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
+
+          <Pagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            totalPages={pagination.totalPages}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+          />
         </>
       )}
     </div>

@@ -141,6 +141,17 @@ ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS approval_status TEXT NOT
 ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS reviewed_by TEXT REFERENCES users(id);
 ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ;
 ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS decision_note TEXT NOT NULL DEFAULT '';
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+
+UPDATE borrowing_requests
+SET expires_at = CASE
+  WHEN approval_status = 'PENDING' THEN created_at + INTERVAL '7 days'
+  WHEN approval_status = 'APPROVED' THEN COALESCE(reviewed_at, created_at) + INTERVAL '3 days'
+  ELSE expires_at
+END
+WHERE expires_at IS NULL
+  AND approval_status IN ('PENDING', 'APPROVED')
+  AND NOT EXISTS (SELECT 1 FROM loans l WHERE l.request_id = borrowing_requests.id);
 
 DO $migration$
 BEGIN

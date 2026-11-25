@@ -393,4 +393,38 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     expect(fetchMock.mock.calls.some(([u, i]) => String(u) === "/api/equipment" && i?.method === "POST")).toBe(true);
     expect(screen.getByRole("option", { name: "Robotics" })).toBeInTheDocument();
   });
+
+  it("paginates CatalogPage items (default 10) and resets to page 1 when filters change", async () => {
+    const manyItems: Equipment[] = Array.from({ length: 12 }, (_, idx) => ({
+      id: `eq-pg-${idx + 1}`,
+      name: `Catalog Gear ${idx + 1}`,
+      description: "Test gear",
+      category: "Tools",
+      quantity_total: 2,
+      quantity_available: 2,
+      availability: "AVAILABLE",
+    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "u1", username: "B-A", role: "BORROWER" } } });
+        }
+        return jsonResponse(200, { data: manyItems });
+      }),
+    );
+    const user = userEvent.setup();
+    renderCatalog();
+
+    expect(await screen.findByText("Showing 1–10 of 12")).toBeInTheDocument();
+    expect(screen.queryByText("Catalog Gear 11")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+    expect(screen.getByText("Showing 11–12 of 12")).toBeInTheDocument();
+    expect(screen.getAllByText("Catalog Gear 11").length).toBeGreaterThanOrEqual(1);
+
+    await user.selectOptions(screen.getByLabelText("Sort by"), "name_desc");
+    expect(await screen.findByText("Showing 1–10 of 12")).toBeInTheDocument();
+  });
 });

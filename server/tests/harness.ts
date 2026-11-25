@@ -47,6 +47,7 @@ export const PROTECTED_ROUTE_INVENTORY: ReadonlyArray<{
   { method: "POST", path: "/api/requests/fixture-r-one/checkout", sampleBody: {} },
   { method: "POST", path: "/api/request-bundles/fixture-bundle/checkout", sampleBody: {} },
   { method: "POST", path: "/api/loans/fixture-loan/request-return", sampleBody: {} },
+  { method: "POST", path: "/api/loan-bundles/fixture-bundle/request-return", sampleBody: {} },
   { method: "POST", path: "/api/loans/fixture-loan/return", sampleBody: {} },
   { method: "POST", path: "/api/loan-bundles/fixture-bundle/return", sampleBody: {} },
   { method: "GET", path: "/api/notifications" },

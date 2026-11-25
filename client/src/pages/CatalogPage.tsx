@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { ChevronRight, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   api,
@@ -18,6 +18,7 @@ import { EquipmentImage } from "../components/EquipmentImage";
 import { Field } from "../components/Field";
 import { ItemCard } from "../components/ItemCard";
 import { Loading } from "../components/Loading";
+import { Pagination, usePagination } from "../components/Pagination";
 import { CatalogStatusBadge } from "../components/StatusBadge";
 import { Table, Th } from "../components/Table";
 
@@ -37,6 +38,12 @@ export function CatalogPage() {
   const [availability, setAvailability] = useState<"" | "AVAILABLE" | "UNAVAILABLE">("");
   const [statusFilter, setStatusFilter] = useState<"ACTIVE" | "RETIRED" | "ALL">("ACTIVE");
   const [sort, setSort] = useState<CatalogSort>("name_asc");
+  const pagination = usePagination(items ?? [], 10);
+  const { setPage: setCatalogPage } = pagination;
+
+  useEffect(() => {
+    setCatalogPage(1);
+  }, [query, category, availability, statusFilter, sort, setCatalogPage]);
 
   // Custodian Add Equipment form state (FR-09)
   const [showCreate, setShowCreate] = useState(false);
@@ -379,18 +386,15 @@ export function CatalogPage() {
             <Table
               header={
                 <tr>
-                  <Th className="w-16">Item</Th>
-                  <Th>Name</Th>
-                  <Th className="hidden lg:table-cell">Category</Th>
-                  <Th>Availability</Th>
-                  <Th>Quantity</Th>
-                  <Th className="w-10">
-                    <span className="sr-only">Open</span>
-                  </Th>
+                  <Th className="w-[10%]">Item</Th>
+                  <Th className="w-[50%] lg:w-[34%]">Name</Th>
+                  <Th className="hidden w-[16%] lg:table-cell">Category</Th>
+                  <Th className="w-[22%]">Availability</Th>
+                  <Th className="w-[18%]">Quantity</Th>
                 </tr>
               }
             >
-              {items.map((item) => (
+              {pagination.pageItems.map((item) => (
                 <tr
                   key={item.id}
                   onClick={() => navigate(itemPath(item.id))}
@@ -406,29 +410,26 @@ export function CatalogPage() {
                     />
                   </td>
                   <td className="px-4 py-3 font-medium text-text">
-                    <Link
-                      to={itemPath(item.id)}
-                      aria-label={`View ${item.name}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-primary hover:underline"
-                    >
-                      {item.name}
-                    </Link>
-                    {item.catalog_status === "RETIRED" ? (
-                      <span className="ml-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        to={itemPath(item.id)}
+                        aria-label={`View ${item.name}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="truncate text-primary hover:underline"
+                      >
+                        {item.name}
+                      </Link>
+                      {item.catalog_status === "RETIRED" ? (
                         <CatalogStatusBadge status={item.catalog_status} />
-                      </span>
-                    ) : null}
+                      ) : null}
+                    </div>
                   </td>
-                  <td className="hidden px-4 py-3 text-text-muted lg:table-cell">{item.category}</td>
+                  <td className="hidden truncate px-4 py-3 text-text-muted lg:table-cell">{item.category}</td>
                   <td className="px-4 py-3">
                     <AvailabilityBadge availability={item.availability} />
                   </td>
                   <td className="px-4 py-3 text-text">
                     <QuantityDisplay available={item.quantity_available} total={item.quantity_total} />
-                  </td>
-                  <td className="px-4 py-3 text-right text-text-muted">
-                    <ChevronRight aria-hidden="true" className="ml-auto h-4 w-4" />
                   </td>
                 </tr>
               ))}
@@ -436,10 +437,19 @@ export function CatalogPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 md:hidden">
-            {items.map((item) => (
+            {pagination.pageItems.map((item) => (
               <ItemCard key={item.id} item={item} />
             ))}
           </div>
+
+          <Pagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            totalPages={pagination.totalPages}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+          />
         </>
       )}
     </div>

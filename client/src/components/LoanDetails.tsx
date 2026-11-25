@@ -1,4 +1,5 @@
 import type { Loan } from "../lib/api";
+import { shortRef } from "../lib/format";
 import { LoanStatusBadge } from "./StatusBadge";
 
 interface LoanDetailsProps {
@@ -31,7 +32,15 @@ export function LoanDetails({ loan, borrowerName, equipmentName, bundleLoans }: 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <DetailBox label="Loan ID" value={<span className="font-mono text-xs">{loan.id}</span>} />
+        <DetailBox
+          label="Loan ID"
+          value={
+            <span className="inline-flex flex-wrap items-center gap-2 font-mono text-xs">
+              <span className="rounded bg-primary/10 px-1.5 py-0.5 font-semibold text-primary">{shortRef(loan.id)}</span>
+              <span>{loan.id}</span>
+            </span>
+          }
+        />
         <DetailBox label="Status" value={<LoanStatusBadge status={loan.status} overdue={loan.overdue} />} />
         {!showBundle ? (
           <>
@@ -44,7 +53,17 @@ export function LoanDetails({ loan, borrowerName, equipmentName, bundleLoans }: 
         <DetailBox label="Due date" value={loan.due_on} />
         <DetailBox label="Checked out" value={formatBangkok(loan.checkout_at)} />
         {loan.bundle_id ? (
-          <DetailBox label="Bundle ID" value={<span className="font-mono text-xs">{loan.bundle_id}</span>} />
+          <DetailBox
+            label="Bundle ID"
+            value={
+              <span className="inline-flex flex-wrap items-center gap-2 font-mono text-xs">
+                <span className="rounded bg-primary/10 px-1.5 py-0.5 font-semibold text-primary">
+                  {shortRef(loan.bundle_id)}
+                </span>
+                <span>{loan.bundle_id}</span>
+              </span>
+            }
+          />
         ) : null}
         {loan.return_requested_at ? (
           <DetailBox label="Return requested" value={formatBangkok(loan.return_requested_at)} />
@@ -55,12 +74,12 @@ export function LoanDetails({ loan, borrowerName, equipmentName, bundleLoans }: 
       {showBundle && bundleLoans ? (
         <div className="rounded-control border border-border bg-white p-3">
           <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-muted">Bundle items</p>
-          <table className="w-full text-left text-sm">
+          <table className="w-full table-fixed text-left text-sm">
             <thead>
               <tr className="border-b border-border text-xs text-text-muted">
-                <th className="py-1.5 pr-3 font-medium">Equipment</th>
-                <th className="py-1.5 pr-3 font-medium">Qty</th>
-                <th className="py-1.5 font-medium">Status</th>
+                <th className="w-[52%] py-1.5 pr-3 font-medium">Equipment</th>
+                <th className="w-[18%] py-1.5 pr-3 font-medium">Qty</th>
+                <th className="w-[30%] py-1.5 font-medium">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">

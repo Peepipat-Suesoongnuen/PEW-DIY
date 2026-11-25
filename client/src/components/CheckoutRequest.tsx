@@ -24,6 +24,8 @@ function conflictMessage(code: string): string {
       return "Approve this request before checking it out.";
     case "EQUIPMENT_RETIRED":
       return "Retired equipment cannot be checked out.";
+    case "REQUEST_EXPIRED":
+      return "This approved request has expired and cannot be checked out.";
     default:
       return "This request cannot be checked out. Refresh requests and availability.";
   }

@@ -7,6 +7,7 @@ const requestTone: Record<RequestStatus, { label: string; style: string }> = {
   REJECTED: { label: "Rejected", style: "bg-danger/10 text-danger" },
   CANCELLED: { label: "Cancelled", style: "bg-border/60 text-text-muted" },
   CHECKED_OUT: { label: "Checked out", style: "bg-success/10 text-success" },
+  EXPIRED: { label: "Expired", style: "bg-border/60 text-text-muted" },
 };
 
 export function RequestStatusBadge({ status }: { status: RequestStatus }) {
