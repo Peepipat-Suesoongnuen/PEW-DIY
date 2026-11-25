@@ -1,7 +1,8 @@
 # Sprint 2 Extensions — Approval Workflow, Multi-Item Bundles, Flexible Duration, Print Slip & Lab 6 Fixes
 
-> **Contract:** Sprint 2 · Extensions to `F-04`/`F-05` + Lab 6 Remediation (`Finding 05`, `UAT-07`, `Phase P4`)  
-> **Revision:** 1 — 2026-11-23 · **Status:** Baselines contract before implementation
+> **Contract:** Sprint 2 · Extensions to `F-04`/`F-05` + Lab 6 Remediation (`Finding 05`, `UAT-07`, `Phase P4`) + UI/UX & Lifecycle Polish
+>
+> **Revision:** 2 — 2026-11-25 · **Status:** Implemented & verified (`Slice 1/3/4` + `UX/Expiry/Limit Polish`)
 
 ---
 
@@ -19,8 +20,12 @@
 
 1. **Create Borrowing Request (`CreateRequestPage` + Backward-Compatible API):**
    - Borrower clicks **`Create Request`** (from Catalog/Requests nav) or `"Request this item"` on Item Detail.
+   - `purpose_detail` supports up to **`1,000` characters** (`MAX_PURPOSE_DETAIL_LENGTH = 1000`) with a live `N / 1,000 characters` counter in `CreateRequestPage`.
+   - **Submission & Bundle Limits:** At most **`10` distinct items** per bundle (`MAX_BUNDLE_ITEMS = 10`), and at most **`5` active non-expired `PENDING` requests/bundles** per Borrower (`MAX_ACTIVE_PENDING_REQUESTS = 5`, serialized on `users` row `FOR UPDATE`; breach returns `409 REQUEST_LIMIT_EXCEEDED`).
+   - **Automatic Expiration Lifecycle (`expires_at`):** New `PENDING` requests expire **`7` calendar days** after creation (`PENDING_EXPIRY_DAYS = 7`); approving resets `expires_at` to **`3` calendar days** after approval (`APPROVED_EXPIRY_DAYS = 3`); rejecting, cancelling, or checking out clears/fulfills the active window. Expired requests compute derived status **`EXPIRED`** and reject approve/reject/cancel/checkout with **`409 REQUEST_EXPIRED`**.
    - Single-item API (`POST /api/requests`): keeps Sprint 1 `{ equipment_id, quantity_requested }` working (defaulting `requested_days = 7`, `purpose_category = "OTHER"`, `purpose_detail = ""`) while accepting optional `purpose_category`, `purpose_detail`, `requested_days` (`1..14`).
-   - Multi-item Bundle API (`POST /api/request-bundles`): accepts `{ items: [{ equipment_id, quantity_requested }], purpose_category, purpose_detail, requested_days }`. Locks all referenced `equipment` rows in sorted `id` order (`FOR UPDATE`) to prevent deadlocks, validates `ACTIVE` + `BR-01` for every item, and inserts `1 request_bundles + N borrowing_requests` with `approval_status = 'PENDING'`. **Zero stock reservation (`BR-12`).**
+   - Multi-item Bundle API (`POST /api/request-bundles`): accepts `{ items: [{ equipment_id, quantity_requested }], purpose_category, purpose_detail, requested_days }`. Locks `users` (`FOR UPDATE`) then all referenced `equipment` rows in sorted `id` order (`FOR UPDATE`) to prevent deadlocks, validates `ACTIVE` + `BR-01` for every item, and inserts `1 request_bundles + N borrowing_requests` with `approval_status = 'PENDING'`. **Zero stock reservation (`BR-12`).**
+   - **Requests & Custodian Queue UX (`RequestsPage` & shared `Table` / `Pagination`):** Uses `table-fixed` with exact `100%` column budgets (zero horizontal scroll across `CatalogPage`, `RequestsPage`, `LoansPage`, and `ReportsPage`), unified 2-line primary cells (`Equipment` / `First + ...` on line 1, `#REF · Purpose` + `Bundle (N)` pill on line 2), sortable `Qty`, `Duration`, `Purpose`, and `Submitted` controls (`aria-sort` + `Sort by` select), full-width nested bundle drawer cards with Custodian quick actions (`Approve bundle`, `Reject bundle`, `Check out bundle`), and universal client-side `Pagination` (`10` rows/page default, `5/10/20/50` selector, bundle-group safe slicing).
 2. **Approval, Rejection & Cancellation (`A-11`):**
    - **Borrower Cancel (`POST /api/requests/:id/cancel`, `POST /api/request-bundles/:bundleId/cancel`):** allowed only by owning Borrower while `approval_status IN ('PENDING', 'APPROVED')` and no linked `loans` row exists → sets `approval_status = 'CANCELLED'`.
    - **Custodian Approve (`POST /api/requests/:id/approve`, `/api/request-bundles/:bundleId/approve`):** `CUSTODIAN` only while `PENDING` → sets `approval_status = 'APPROVED'`, `reviewed_by`, `reviewed_at`, `decision_note`, and creates `REQUEST_APPROVED` notification in `notifications` (see `f-07-overdue-status.md` §3 schema). Still reserves zero stock (`BR-12`).
@@ -64,3 +69,4 @@
 ## 5. Definition of Done & Revision History
 - Satisfies `AC-F11-01`..`05`, TDD RED→GREEN evidence (`NOT_APPROVED` checkout & bundle non-reservation), peer-reviewed PR, and full regression.
 - **Rev 1 (2026-11-23):** Initial Sprint 2 contract.
+- **Rev 2 (2026-11-25):** Added `1,000`-character `purpose_detail` validation & live counter, `MAX_BUNDLE_ITEMS = 10`, `MAX_ACTIVE_PENDING_REQUESTS = 5` (`409 REQUEST_LIMIT_EXCEEDED`), `PENDING` (`7d`) / `APPROVED` (`3d`) expiration (`EXPIRED`, `409 REQUEST_EXPIRED`), fixed proportional table columns, `#XXXXXXXX` short-ref search/copy, sortable `RequestsPage` columns, and collapsible bundle groups with Custodian quick actions.

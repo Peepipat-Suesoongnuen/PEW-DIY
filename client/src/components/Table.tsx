@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, ThHTMLAttributes } from "react";
 
 /**
  * Dense data table (ui-spec §2.2). Column visibility per viewport is handled by
@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 export function Table({ header, children }: { header: ReactNode; children: ReactNode }) {
   return (
     <div className="overflow-x-auto rounded-card border border-border bg-white">
-      <table className="w-full text-sm">
+      <table className="w-full table-fixed text-sm">
         <thead className="border-b border-border bg-white">
           {header}
         </thead>
@@ -21,14 +21,16 @@ export function Table({ header, children }: { header: ReactNode; children: React
 export function Th({
   children,
   className = "",
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
-}) {
+} & Omit<ThHTMLAttributes<HTMLTableCellElement>, "children" | "className">) {
   return (
     <th
       scope="col"
       className={`px-4 py-3 text-left font-medium text-text-muted ${className}`}
+      {...rest}
     >
       {children}
     </th>

@@ -21,7 +21,7 @@ import { createNotificationRouter } from "./notification-routes";
 import { createReportRouter } from "./report-routes";
 import { createHealthRouter } from "./health-routes";
 import { LoanService } from "../services/loan";
-import type { BorrowingRequestService } from "../services/borrowing-request";
+import { BorrowingRequestService } from "../services/borrowing-request";
 import { NotificationService } from "../services/notification";
 import { ReportingService } from "../services/reporting";
 import { AppConfig } from "../config/config";
@@ -172,7 +172,7 @@ export function createApp({ auth, config, requests, loans, notifications, report
 
   app.use("/api", router);
   app.use("/api", createLoanRouter(auth, config.session.cookieName, loans ?? new LoanService(auth.pool, { timeZone: config.appTimezone })));
-  app.use("/api", createRequestRouter(auth, config.session.cookieName, requests));
+  app.use("/api", createRequestRouter(auth, config.session.cookieName, requests ?? new BorrowingRequestService(auth.pool, { now: loans?.getClockOptions()?.now })));
   app.use(
     "/api",
     createNotificationRouter(

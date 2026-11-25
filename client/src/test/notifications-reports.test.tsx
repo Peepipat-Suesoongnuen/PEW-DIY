@@ -232,4 +232,80 @@ describe("Sprint 3 F-09 ReportsPage (TEST-F09-02/03)", () => {
     expect(await screen.findByText("Only Custodian accounts can view inventory reports.")).toBeInTheDocument();
     expect(fetcher.mock.calls.some(([url]) => String(url).includes("/api/reports"))).toBe(false);
   });
+
+  it("paginates Overdue loans and Catalog stock breakdown independently on ReportsPage", async () => {
+    const manyItems = Array.from({ length: 12 }, (_, idx) => ({
+      id: `rep-eq-${idx + 1}`,
+      name: `Report Item ${idx + 1}`,
+      description: "",
+      category: "Tools",
+      quantity_total: 4,
+      held_units: 1,
+      quantity_available: 3,
+      availability: "AVAILABLE",
+      catalog_status: "ACTIVE",
+    }));
+    const manyOverdue = Array.from({ length: 11 }, (_, idx) => ({
+      loan_id: `rep-loan-${idx + 1}`,
+      equipment_id: `rep-eq-${idx + 1}`,
+      equipment_name: `Overdue Gear ${idx + 1}`,
+      borrower_username: "Alice",
+      quantity_borrowed: 1,
+      due_on: "2026-11-20",
+      days_overdue: 2,
+    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const path = String(input);
+        if (path === "/api/auth/me") {
+          return response(200, { data: { user: { id: "c1", username: "Staff", role: "CUSTODIAN" } } });
+        }
+        if (path === "/api/reports/summary") {
+          return response(200, {
+            data: {
+              generated_at: "2026-11-26T10:00:00Z",
+              business_date: "2026-11-26",
+              inventory: {
+                total_items: 12,
+                active_items: 12,
+                retired_items: 0,
+                total_units: 48,
+                held_units: 12,
+                available_units: 36,
+                unavailable_active_items: 0,
+              },
+              requests: { pending_count: 0, approved_count: 0, rejected_count: 0, cancelled_count: 0, checked_out_count: 11 },
+              loans: { active_count: 11, return_pending_count: 0, returned_count: 0, overdue_count: 11 },
+              items: manyItems,
+              overdue_loans: manyOverdue,
+            },
+          });
+        }
+        throw new Error(`Unexpected fetch: ${path}`);
+      }),
+    );
+
+    render(
+      <MemoryRouter initialEntries={["/reports"]}>
+        <SessionProvider>
+          <Routes>
+            <Route path="/reports" element={<ReportsPage />} />
+          </Routes>
+        </SessionProvider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Showing 1–10 of 11")).toBeInTheDocument();
+    expect(screen.getByText("Showing 1–10 of 12")).toBeInTheDocument();
+    const nextButtons = screen.getAllByRole("button", { name: "Next page" });
+    expect(nextButtons).toHaveLength(2);
+
+    // Paging Overdue loans leaves Catalog stock breakdown on page 1
+    fireEvent.click(nextButtons[0]!);
+    expect(screen.getByText("Showing 11–11 of 11")).toBeInTheDocument();
+    expect(screen.getByText("Overdue Gear 11")).toBeInTheDocument();
+    expect(screen.getByText("Showing 1–10 of 12")).toBeInTheDocument();
+    expect(screen.queryByText("Report Item 11")).not.toBeInTheDocument();
+  });
 });

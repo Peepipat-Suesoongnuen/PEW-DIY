@@ -775,3 +775,173 @@ describe("F-09 Inventory Reporting Summary (TEST-F09-01..02)", () => {
     expect(queries[queries.length - 1]).toMatch(/COMMIT/i);
   });
 });
+
+describe("UI/UX Polish & Request Lifecycle Rules (1000-char purpose, bundle request-return, expiry & limits)", () => {
+  it("accepts up to 1000 characters in purpose_detail and rejects 1001", async () => {
+    const e1 = await seedItem("pd1", `${PREFIX}Bench PSU`, "Power", 3);
+    const app = appWithNow("2026-11-23T10:00:00Z");
+
+    const okRes = await request(app)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: e1, quantity_requested: 1, purpose_category: "OTHER", purpose_detail: "a".repeat(1000) });
+    expect(okRes.status).toBe(201);
+    expect(okRes.body.data.purpose_detail).toHaveLength(1000);
+
+    const tooLong = await request(app)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: e1, quantity_requested: 1, purpose_category: "OTHER", purpose_detail: "a".repeat(1001) });
+    expect(tooLong.status).toBe(400);
+    expect(tooLong.body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("supports Borrower one-click bundle return notice (POST /api/loan-bundles/:bundleId/request-return) while keeping stock held", async () => {
+    const e1 = await seedItem("br1", `${PREFIX}Bundle Probe 1`, "Lab", 3);
+    const e2 = await seedItem("br2", `${PREFIX}Bundle Probe 2`, "Lab", 3);
+    const app = appWithNow("2026-11-23T10:00:00Z");
+
+    const bRes = await request(app)
+      .post("/api/request-bundles")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({
+        items: [
+          { equipment_id: e1, quantity_requested: 1 },
+          { equipment_id: e2, quantity_requested: 1 },
+        ],
+      });
+    const bundleId = bRes.body.data.bundle_id as string;
+    await request(app).post(`/api/request-bundles/${bundleId}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    await request(app).post(`/api/request-bundles/${bundleId}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+
+    // Cross-owner B-B and Custodian C-A forbidden -> 403
+    expect(
+      (await request(app).post(`/api/loan-bundles/${bundleId}/request-return`).set("Origin", config.appOrigin).set("Cookie", cookies[1]!).send({})).status,
+    ).toBe(403);
+    expect(
+      (await request(app).post(`/api/loan-bundles/${bundleId}/request-return`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({})).status,
+    ).toBe(403);
+
+    // Owner B-A requests bundle return -> 200 RETURN_PENDING on all items, stock still 2
+    const retNotice = await request(app)
+      .post(`/api/loan-bundles/${bundleId}/request-return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ return_note: "All items in Locker C" });
+    expect(retNotice.status).toBe(200);
+    expect(retNotice.body.data).toHaveLength(2);
+    expect(retNotice.body.data.every((l: { status: string; return_note: string }) => l.status === "RETURN_PENDING" && l.return_note === "All items in Locker C")).toBe(true);
+    expect((await request(app).get(`/api/equipment/${e1}`).set("Cookie", cookies[0]!)).body.data.quantity_available).toBe(2);
+
+    // After Custodian confirms return, repeat bundle request-return -> 409 ALREADY_RETURNED
+    await request(app).post(`/api/loan-bundles/${bundleId}/return`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const afterReturned = await request(app)
+      .post(`/api/loan-bundles/${bundleId}/request-return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({});
+    expect(afterReturned.status).toBe(409);
+    expect(afterReturned.body.error.code).toBe("ALREADY_RETURNED");
+  });
+
+  it("enforces PENDING (7d) and APPROVED (3d) lazy request expiration across read, approve, and checkout", async () => {
+    const e1 = await seedItem("ex1", `${PREFIX}Timer Meter`, "Lab", 4);
+    const appDay0 = appWithNow("2026-11-01T10:00:00Z");
+
+    const rPending = await request(appDay0)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: e1, quantity_requested: 1 });
+    const pendingId = rPending.body.data.id as string;
+    expect(rPending.body.data.expires_at).toBeTruthy();
+
+    const rToApprove = await request(appDay0)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: e1, quantity_requested: 1 });
+    const approvedId = rToApprove.body.data.id as string;
+    const approvedRes = await request(appDay0)
+      .post(`/api/requests/${approvedId}/approve`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(approvedRes.status).toBe(200);
+    expect(approvedRes.body.data.expires_at).toBeTruthy();
+
+    // At +4 days (Nov 5): APPROVED request (3d window) is EXPIRED, PENDING request (7d window) is still PENDING
+    const appDay4 = appWithNow("2026-11-05T10:01:00Z");
+    const readApprovedDay4 = await request(appDay4).get(`/api/requests/${approvedId}`).set("Cookie", cookies[0]!);
+    expect(readApprovedDay4.body.data.status).toBe("EXPIRED");
+    const checkoutExpired = await request(appDay4)
+      .post(`/api/requests/${approvedId}/checkout`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(checkoutExpired.status).toBe(409);
+    expect(checkoutExpired.body.error.code).toBe("REQUEST_EXPIRED");
+
+    // At +8 days (Nov 9): PENDING request (7d window) is EXPIRED -> hidden from Custodian queue & cannot be approved
+    const appDay8 = appWithNow("2026-11-09T10:01:00Z");
+    const readPendingDay8 = await request(appDay8).get(`/api/requests/${pendingId}`).set("Cookie", cookies[0]!);
+    expect(readPendingDay8.body.data.status).toBe("EXPIRED");
+    const queueDay8 = await request(appDay8).get("/api/requests").set("Cookie", cookies[2]!);
+    expect(queueDay8.body.data.map((r: { id: string }) => r.id)).not.toContain(pendingId);
+    const approveExpired = await request(appDay8)
+      .post(`/api/requests/${pendingId}/approve`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(approveExpired.status).toBe(409);
+    expect(approveExpired.body.error.code).toBe("REQUEST_EXPIRED");
+  });
+
+  it("enforces MAX_BUNDLE_ITEMS=10 and MAX_PENDING_REQUESTS_PER_BORROWER=5", async () => {
+    const items: string[] = [];
+    for (let i = 0; i < 11; i++) {
+      items.push(await seedItem(`lim${i}`, `${PREFIX}Limit Item ${i}`, "Lab", 10));
+    }
+    const app = appWithNow("2026-11-23T10:00:00Z");
+
+    // 11-item bundle -> 400 VALIDATION_ERROR
+    const oversized = await request(app)
+      .post("/api/request-bundles")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ items: items.map((id) => ({ equipment_id: id, quantity_requested: 1 })) });
+    expect(oversized.status).toBe(400);
+
+    // 5 active pending submissions succeed (4 single + 1 2-item bundle = 5), 6th -> 409 REQUEST_LIMIT_EXCEEDED
+    for (let i = 0; i < 4; i++) {
+      const ok = await request(app)
+        .post("/api/requests")
+        .set("Origin", config.appOrigin)
+        .set("Cookie", cookies[0]!)
+        .send({ equipment_id: items[0]!, quantity_requested: 1 });
+      expect(ok.status).toBe(201);
+    }
+    const fifthBundle = await request(app)
+      .post("/api/request-bundles")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({
+        items: [
+          { equipment_id: items[1]!, quantity_requested: 1 },
+          { equipment_id: items[2]!, quantity_requested: 1 },
+        ],
+      });
+    expect(fifthBundle.status).toBe(201);
+
+    const sixth = await request(app)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: items[0]!, quantity_requested: 1 });
+    expect(sixth.status).toBe(409);
+    expect(sixth.body.error.code).toBe("REQUEST_LIMIT_EXCEEDED");
+  });
+});

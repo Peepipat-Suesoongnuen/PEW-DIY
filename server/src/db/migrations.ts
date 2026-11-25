@@ -141,6 +141,7 @@ ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS approval_status TEXT NOT
 ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS reviewed_by TEXT REFERENCES users(id);
 ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ;
 ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS decision_note TEXT NOT NULL DEFAULT '';
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
 
 DO $migration$
 BEGIN

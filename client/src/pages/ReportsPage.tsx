@@ -10,6 +10,7 @@ import { BackButton } from "../components/BackButton";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Loading } from "../components/Loading";
+import { Pagination, usePagination } from "../components/Pagination";
 import { CatalogStatusBadge } from "../components/StatusBadge";
 import { Table, Th } from "../components/Table";
 
@@ -32,6 +33,8 @@ export function ReportsPage() {
 
   const [report, setReport] = useState<InventoryReportSummary | null>(null);
   const [error, setError] = useState<{ message: string; requestId?: string } | null>(null);
+  const overduePagination = usePagination(report?.overdue_loans ?? [], 10);
+  const itemsPagination = usePagination(report?.items ?? [], 10);
 
   const load = useCallback(async () => {
     setError(null);
@@ -124,62 +127,82 @@ export function ReportsPage() {
             {report.overdue_loans.length === 0 ? (
               <p className="text-sm text-text-muted">No overdue loans as of {report.business_date}.</p>
             ) : (
-              <Table
-                header={
-                  <tr>
-                    <Th>Borrower</Th>
-                    <Th>Equipment</Th>
-                    <Th>Qty</Th>
-                    <Th>Due date</Th>
-                    <Th>Days overdue</Th>
-                  </tr>
-                }
-              >
-                {report.overdue_loans.map((ov) => (
-                  <tr key={ov.loan_id}>
-                    <td className="px-4 py-3 font-medium text-text">{ov.borrower_username}</td>
-                    <td className="px-4 py-3">
-                      <Link to={loanPath(ov.loan_id)} className="text-primary hover:underline">
-                        {ov.equipment_name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-text">{ov.quantity_borrowed}</td>
-                    <td className="px-4 py-3 text-text">{ov.due_on}</td>
-                    <td className="px-4 py-3 font-semibold text-danger">{ov.days_overdue}</td>
-                  </tr>
-                ))}
-              </Table>
+              <div className="space-y-3">
+                <Table
+                  header={
+                    <tr>
+                      <Th className="w-[22%]">Borrower</Th>
+                      <Th className="w-[34%]">Equipment</Th>
+                      <Th className="w-[10%]">Qty</Th>
+                      <Th className="w-[18%]">Due date</Th>
+                      <Th className="w-[16%]">Days overdue</Th>
+                    </tr>
+                  }
+                >
+                  {overduePagination.pageItems.map((ov) => (
+                    <tr key={ov.loan_id}>
+                      <td className="truncate px-4 py-3 font-medium text-text">{ov.borrower_username}</td>
+                      <td className="truncate px-4 py-3">
+                        <Link to={loanPath(ov.loan_id)} className="text-primary hover:underline">
+                          {ov.equipment_name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 tabular-nums text-text">{ov.quantity_borrowed}</td>
+                      <td className="px-4 py-3 tabular-nums text-text">{ov.due_on}</td>
+                      <td className="px-4 py-3 font-semibold tabular-nums text-danger">{ov.days_overdue}</td>
+                    </tr>
+                  ))}
+                </Table>
+                <Pagination
+                  page={overduePagination.page}
+                  pageSize={overduePagination.pageSize}
+                  totalItems={overduePagination.totalItems}
+                  totalPages={overduePagination.totalPages}
+                  onPageChange={overduePagination.setPage}
+                  onPageSizeChange={overduePagination.setPageSize}
+                />
+              </div>
             )}
           </Card>
 
           <Card title="Catalog stock breakdown">
-            <Table
-              header={
-                <tr>
-                  <Th>Equipment</Th>
-                  <Th>Category</Th>
-                  <Th>Status</Th>
-                  <Th>Available / Total</Th>
-                  <Th>Availability</Th>
-                </tr>
-              }
-            >
-              {report.items.map((eq) => (
-                <tr key={eq.id}>
-                  <td className="px-4 py-3 font-medium text-text">{eq.name}</td>
-                  <td className="px-4 py-3 text-text-muted">{eq.category}</td>
-                  <td className="px-4 py-3">
-                    <CatalogStatusBadge status={eq.catalog_status ?? "ACTIVE"} />
-                  </td>
-                  <td className="px-4 py-3 text-text">
-                    {eq.quantity_available} / {eq.quantity_total}
-                  </td>
-                  <td className="px-4 py-3">
-                    <AvailabilityBadge availability={eq.availability} />
-                  </td>
-                </tr>
-              ))}
-            </Table>
+            <div className="space-y-3">
+              <Table
+                header={
+                  <tr>
+                    <Th className="w-[32%]">Equipment</Th>
+                    <Th className="w-[20%]">Category</Th>
+                    <Th className="w-[14%]">Status</Th>
+                    <Th className="w-[16%]">Available / Total</Th>
+                    <Th className="w-[18%]">Availability</Th>
+                  </tr>
+                }
+              >
+                {itemsPagination.pageItems.map((eq) => (
+                  <tr key={eq.id}>
+                    <td className="truncate px-4 py-3 font-medium text-text">{eq.name}</td>
+                    <td className="truncate px-4 py-3 text-text-muted">{eq.category}</td>
+                    <td className="px-4 py-3">
+                      <CatalogStatusBadge status={eq.catalog_status ?? "ACTIVE"} />
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-text">
+                      {eq.quantity_available} / {eq.quantity_total}
+                    </td>
+                    <td className="px-4 py-3">
+                      <AvailabilityBadge availability={eq.availability} />
+                    </td>
+                  </tr>
+                ))}
+              </Table>
+              <Pagination
+                page={itemsPagination.page}
+                pageSize={itemsPagination.pageSize}
+                totalItems={itemsPagination.totalItems}
+                totalPages={itemsPagination.totalPages}
+                onPageChange={itemsPagination.setPage}
+                onPageSizeChange={itemsPagination.setPageSize}
+              />
+            </div>
           </Card>
         </div>
       )}

@@ -105,7 +105,7 @@ The complete product covers the seven Theme 2 capabilities plus identity and acc
 | ID | Requirement | Priority / Sprint |
 |---|---|---|
 | FR-11 | The system shall allow a Borrower to submit a borrowing request (single item or multi-item bundle from Sprint 2) for available items with borrowing purpose and requested duration (1–14 days), persist the request, and cancel own unfulfilled requests. | Sprint 1 (single) / Sprint 2 (bundle, purpose, duration, approval, cancel) |
-| FR-12 | The system shall allow a Borrower to view their own requests with status (`PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`, `CHECKED_OUT` in Sprint 2). | Sprint 1 / Sprint 2 (approval states) |
+| FR-12 | The system shall allow a Borrower to view their own requests with status (`PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`, `CHECKED_OUT`, `EXPIRED` in Sprint 2). | Sprint 1 / Sprint 2 (approval & expiry states) |
 | FR-13 | The system shall allow a Custodian to view submitted requests, and (from Sprint 2) approve or reject pending requests before checkout. | Sprint 1 (view) / Sprint 2 (approve/reject) |
 
 ### 4.4 Checkout, Active Loans, Return
@@ -115,7 +115,7 @@ The complete product covers the seven Theme 2 capabilities plus identity and acc
 | FR-14 | The system shall allow a Custodian to record checkout for an approved request/bundle, creating persistent **Active Loan(s)** and updating availability atomically. | Sprint 1 / Sprint 2 (approval & bundle support) |
 | FR-15 | The system shall maintain Active Loan records (borrower, item, quantity, checkout date, due date, status) and support printing an approved loan slip as evidence. | Sprint 1 / Sprint 2 (print slip) |
 | FR-16 | The system shall allow a Borrower to view their own active loans and full loan history. | Sprint 1 (active) / Sprint 2 (full history) |
-| FR-17 | The system shall allow a Borrower to submit a return notice on an own active loan and allow a Custodian to confirm return, closing the Active Loan and restoring availability atomically. | Sprint 2 |
+| FR-17 | The system shall allow a Borrower to submit a return notice on an own active loan (single loan or whole bundle, while keeping per-item returns flexible) and allow a Custodian to confirm return, closing the Active Loan and restoring availability atomically. | Sprint 2 |
 | FR-18 | The system shall allow a Custodian to view all room loans (active, return-pending, overdue, and returned history). | Sprint 2 |
 
 ### 4.5 Overdue, Notifications, and Reporting
@@ -210,3 +210,5 @@ Each rule is stated as testable behavior with its rejection/edge case.
 **Revision 5 — 2026-11-06 (PR #36 provenance review):** distinguish the existing user-confirmed A-12 implementation choice from shared-team baseline ratification. Preserve the actual user decision and behavior; keep the team-confirmation evidence gate pending rather than inventing an Issue comment or peer approval.
 
 **Revision 6 — 2026-11-23 (Sprint 2 Baseline Update):** resolved OQ-02/03/04/06 for Sprint 2; added `FR-06/09` `image_url` and `catalog_status`, `FR-10` sorting, `FR-11/12/13` Sprint 2 approval workflow + multi-item bundles + cancellation + purpose + 1–14 day duration, `FR-15` printable loan slip, `FR-17` two-step return notice/confirm, `FR-19`/`BR-13` dismissible/clearable in-app notifications. Preserved `BORROWER`/`CUSTODIAN` 2-role model (`FR-04`, `A-05`).
+
+**Revision 7 — 2026-11-25 (Sprint 2 UX & Request Lifecycle Refinement):** added `EXPIRED` status to `FR-12` (`7d` pending / `3d` approved expiration windows), bounded active pending queue (`5` requests/bundles) and bundle size (`10` items) with `1,000`-character `purpose_detail`, and extended `FR-17` with optional whole-bundle Borrower return notices alongside per-item returns.
