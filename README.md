@@ -137,9 +137,9 @@ The active source code at base commit `d079bc6` implements **Sprint 1 (`F-01`–
 - Single-item borrowing requests (`POST /api/requests`, `GET /api/requests`, `GET /api/requests/:id`)
 - Direct Custodian checkout & active loan reads (`POST /api/requests/:id/checkout`, `GET /api/loans`, `GET /api/loans/:id`)
 
-## Planned / Contracted Sprint 2 & Sprint 3 Scope (Pending Issues #99 & #100)
+## Implemented Sprint 2 & Sprint 3 Progress (`sprint/2-staging` — Slices #101–#106)
 
-> **Status:** **Contract-only / Planned in this Docs PR** — the routes, migration `004`, and UI flows below are specified in [Sprint 2 Engineering Contracts](docs/sprints/sprint-2/README.md) and will become active once Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) (Backend) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100) (Frontend & E2E) are reviewed and merged into `sprint/2-staging`:
+> **Status:** Slices `#101`–`#105` are merged into `sprint/2-staging` (`50a6b9d`) and Slice `#106` completes `F-09` Inventory Reporting summary & verification evidence sync (parent trackers [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). Remaining Sprint 3 items (CSV export `AC-F09-04` and formal `NFR-07` 100-item benchmark `AC-F09-05`) are scheduled for Final Delivery by 13 Dec 2026.
 
 - **Catalog CRUD & Search/Filter/Sort (`F-08`):** `POST /api/equipment`, `PATCH /api/equipment/:id` (`409 HELD_QUANTITY_CONFLICT`), `image_url`, `catalog_status`, and `q`/`category`/`availability`/`status`/`sort` query filters.
 - **Create Request, Bundles & Duration (`F-04`, `A-11`, `BR-07`):** `/requests/new`, `POST /api/request-bundles`, purpose category/detail, and `1–14` calendar day duration (`Asia/Bangkok`).

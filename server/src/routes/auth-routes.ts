@@ -18,10 +18,12 @@ import { createEquipmentRouter } from "./equipment-routes";
 import { createRequestRouter } from "./request-routes";
 import { createLoanRouter } from "./loan-routes";
 import { createNotificationRouter } from "./notification-routes";
+import { createReportRouter } from "./report-routes";
 import { createHealthRouter } from "./health-routes";
 import { LoanService } from "../services/loan";
 import type { BorrowingRequestService } from "../services/borrowing-request";
 import { NotificationService } from "../services/notification";
+import { ReportingService } from "../services/reporting";
 import { AppConfig } from "../config/config";
 
 export interface AppDeps {
@@ -30,9 +32,10 @@ export interface AppDeps {
   requests?: BorrowingRequestService;
   loans?: LoanService;
   notifications?: NotificationService;
+  reports?: ReportingService;
 }
 
-export function createApp({ auth, config, requests, loans, notifications }: AppDeps): express.Application {
+export function createApp({ auth, config, requests, loans, notifications, reports }: AppDeps): express.Application {
   const app = express();
 
   // Request ID first so parser/guard failures also carry a correlation id
@@ -176,6 +179,14 @@ export function createApp({ auth, config, requests, loans, notifications }: AppD
       auth,
       config.session.cookieName,
       notifications ?? new NotificationService(auth.pool, loans?.getClockOptions() ?? { timeZone: config.appTimezone }),
+    ),
+  );
+  app.use(
+    "/api",
+    createReportRouter(
+      auth,
+      config.session.cookieName,
+      reports ?? new ReportingService(auth.pool, loans?.getClockOptions() ?? { timeZone: config.appTimezone }),
     ),
   );
 

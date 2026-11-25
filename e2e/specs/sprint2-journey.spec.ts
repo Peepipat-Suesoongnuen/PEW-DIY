@@ -155,6 +155,11 @@ test("Sprint 2 F-08 E2E: Custodian catalog CRUD/retire and Borrower search/filte
     await expect(bPage.getByText("No unread notifications.")).toBeVisible();
     await bPage.reload();
     await expect(bPage.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
+
+    // 8. TEST-F09-03: Custodian views Inventory & Loan Report (/reports)
+    await cPage.goto("/reports");
+    await expect(cPage.getByRole("heading", { name: "Inventory & Loan Report" })).toBeVisible();
+    await expect(cPage.getByText("Fluke 87V").first()).toBeVisible();
   } finally {
     await Promise.all([borrowerCtx?.close(), staffCtx?.close()]);
     if (proc && proc.exitCode === null) {

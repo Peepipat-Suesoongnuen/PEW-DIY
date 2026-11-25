@@ -41,6 +41,49 @@ export interface NotificationView {
   created_at: string;
 }
 
+export interface ReportItemSummary extends Equipment {
+  held_units: number;
+}
+
+export interface OverdueLoanSummary {
+  loan_id: string;
+  equipment_id: string;
+  equipment_name: string;
+  borrower_username: string;
+  quantity_borrowed: number;
+  due_on: string;
+  days_overdue: number;
+}
+
+export interface InventoryReportSummary {
+  generated_at: string;
+  business_date: string;
+  inventory: {
+    total_items: number;
+    active_items: number;
+    retired_items: number;
+    total_units: number;
+    held_units: number;
+    available_units: number;
+    unavailable_active_items: number;
+  };
+  requests: {
+    pending_count: number;
+    approved_count: number;
+    rejected_count: number;
+    cancelled_count: number;
+    checked_out_count: number;
+  };
+  loans: {
+    active_count: number;
+    return_pending_count: number;
+    returned_count: number;
+    overdue_count: number;
+  };
+  items: ReportItemSummary[];
+  overdue_loans: OverdueLoanSummary[];
+}
+
 export interface User {
   id: string;
   username: string;
@@ -337,5 +380,8 @@ export const api = {
   },
   clearNotifications() {
     return apiFetch<void>("/api/notifications", { method: "DELETE" });
+  },
+  getReportSummary() {
+    return apiFetch<{ data: InventoryReportSummary }>("/api/reports/summary");
   },
 };

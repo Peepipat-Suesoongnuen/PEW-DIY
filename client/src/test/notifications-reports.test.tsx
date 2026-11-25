@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "../lib/session";
 import { NotificationMenu } from "../components/NotificationMenu";
 import { LoansPage } from "../pages/LoansPage";
+import { ReportsPage } from "../pages/ReportsPage";
 
 const response = (status: number, data?: unknown) =>
   new Response(data === undefined ? null : JSON.stringify(data), {
@@ -125,5 +126,110 @@ describe("F-07 NotificationMenu & LoansPage Overdue UI (TEST-F07-05)", () => {
     fireEvent.click(overdueTab);
     expect((await screen.findAllByText("Oscilloscope")).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Overdue").length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe("Sprint 3 F-09 ReportsPage (TEST-F09-02/03)", () => {
+  it("renders Custodian inventory/loan KPIs and item breakdown on /reports", async () => {
+    const fetcher = vi.fn(async (input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path === "/api/auth/me") {
+        return response(200, { data: { user: { id: "c1", username: "Staff", role: "CUSTODIAN" } } });
+      }
+      if (path === "/api/reports/summary") {
+        return response(200, {
+          data: {
+            generated_at: "2026-11-26T10:00:00Z",
+            business_date: "2026-11-26",
+            inventory: {
+              total_items: 2,
+              active_items: 1,
+              retired_items: 1,
+              total_units: 6,
+              held_units: 2,
+              available_units: 4,
+              unavailable_active_items: 0,
+            },
+            requests: {
+              pending_count: 1,
+              approved_count: 0,
+              rejected_count: 0,
+              cancelled_count: 0,
+              checked_out_count: 1,
+            },
+            loans: {
+              active_count: 1,
+              return_pending_count: 0,
+              returned_count: 0,
+              overdue_count: 1,
+            },
+            items: [
+              {
+                id: "eq-1",
+                name: "Fluke 87V",
+                description: "",
+                category: "Meters",
+                quantity_total: 4,
+                held_units: 2,
+                quantity_available: 2,
+                availability: "AVAILABLE",
+                catalog_status: "ACTIVE",
+              },
+            ],
+            overdue_loans: [
+              {
+                loan_id: "loan-1",
+                equipment_id: "eq-1",
+                equipment_name: "Fluke 87V",
+                borrower_username: "Alice",
+                quantity_borrowed: 2,
+                due_on: "2026-11-24",
+                days_overdue: 2,
+              },
+            ],
+          },
+        });
+      }
+      throw new Error(`Unexpected fetch: ${path}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+
+    render(
+      <MemoryRouter initialEntries={["/reports"]}>
+        <SessionProvider>
+          <Routes>
+            <Route path="/reports" element={<ReportsPage />} />
+          </Routes>
+        </SessionProvider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Inventory & Loan Report")).toBeInTheDocument();
+    expect((await screen.findAllByText("Fluke 87V")).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("Alice")).toBeInTheDocument();
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
+  });
+
+  it("denies Borrower access to /reports without calling /api/reports/summary", async () => {
+    const fetcher = vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input) === "/api/auth/me") {
+        return response(200, { data: { user: { id: "b1", username: "Alice", role: "BORROWER" } } });
+      }
+      throw new Error(`Unexpected fetch: ${input}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+
+    render(
+      <MemoryRouter initialEntries={["/reports"]}>
+        <SessionProvider>
+          <Routes>
+            <Route path="/reports" element={<ReportsPage />} />
+          </Routes>
+        </SessionProvider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Only Custodian accounts can view inventory reports.")).toBeInTheDocument();
+    expect(fetcher.mock.calls.some(([url]) => String(url).includes("/api/reports"))).toBe(false);
   });
 });
