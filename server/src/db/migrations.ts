@@ -173,6 +173,10 @@ CREATE TABLE IF NOT EXISTS notifications (
   CONSTRAINT notifications_unique_user_kind_ref UNIQUE (user_id, kind, reference_id)
 );
 CREATE INDEX IF NOT EXISTS notifications_user_idx ON notifications(user_id, created_at DESC);
+
+ALTER TABLE loans ADD COLUMN IF NOT EXISTS return_requested_at TIMESTAMPTZ;
+ALTER TABLE loans ADD COLUMN IF NOT EXISTS return_requested_by TEXT REFERENCES users(id);
+ALTER TABLE loans ADD COLUMN IF NOT EXISTS return_note TEXT NOT NULL DEFAULT '';
 `;
 
 /** F-05: stock and request status derive from this durable relation. */

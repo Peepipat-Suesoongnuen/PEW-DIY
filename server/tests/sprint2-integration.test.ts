@@ -449,3 +449,143 @@ describe("A-11 Approval Workflow, Multi-Item Bundles, 1-14d Duration & Cancellat
     expect(rejectedCheckout.body.error.code).toBe("NOT_APPROVED");
   });
 });
+
+describe("F-06 Two-Step Return & F-08 Full Loan Views/History (TEST-F06-01..05, TEST-F08-05)", () => {
+  it("supports Borrower return notice, Custodian atomic return + bundle return, 409 ALREADY_RETURNED, authz, rollback & loan scopes", async () => {
+    const e1 = await seedItem("ret1", `${PREFIX}Oscilloscope`, "Lab", 3);
+    const e2 = await seedItem("ret2", `${PREFIX}Logic Analyzer`, "Lab", 2);
+    const app = appWithNow("2026-11-23T10:00:00Z");
+
+    // Seed single loan for B-A and bundle loan for B-B
+    const rA = await request(app)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: e1, quantity_requested: 2 });
+    const reqAId = rA.body.data.id as string;
+    await request(app).post(`/api/requests/${reqAId}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    const checkoutA = await request(app)
+      .post(`/api/requests/${reqAId}/checkout`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(checkoutA.status).toBe(201);
+    expect(checkoutA.body.data.checked_out_by_username).toBe("s2-c-a");
+    const loanAId = checkoutA.body.data.id as string;
+
+    // TEST-F06-04: Anonymous -> 401; Borrower /return -> 403; cross-owner /request-return -> 403
+    expect(
+      (await request(app).post(`/api/loans/${loanAId}/request-return`).set("Origin", config.appOrigin).send({})).status,
+    ).toBe(401);
+    expect(
+      (await request(app).post(`/api/loans/${loanAId}/return`).set("Origin", config.appOrigin).set("Cookie", cookies[0]!).send({})).status,
+    ).toBe(403);
+    expect(
+      (await request(app).post(`/api/loans/${loanAId}/request-return`).set("Origin", config.appOrigin).set("Cookie", cookies[1]!).send({})).status,
+    ).toBe(403);
+
+    // TEST-F06-01: Borrower submits request-return -> 200 RETURN_PENDING, stock unchanged (still 1 available)
+    const reqRet = await request(app)
+      .post(`/api/loans/${loanAId}/request-return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ return_note: "Leaving at desk B" });
+    expect(reqRet.status).toBe(200);
+    expect(reqRet.body.data.status).toBe("RETURN_PENDING");
+    expect(reqRet.body.data.return_note).toBe("Leaving at desk B");
+    const eqBeforeReturn = await request(app).get(`/api/equipment/${e1}`).set("Cookie", cookies[0]!);
+    expect(eqBeforeReturn.body.data.quantity_available).toBe(1);
+
+    // TEST-F06-05: Fault injected before return commit rolls back returned_at and stock
+    const failingApp = createApp({
+      auth,
+      config,
+      loans: new LoanService(pool, {
+        timeZone: "Asia/Bangkok",
+        now: () => new Date("2026-11-24T10:00:00Z"),
+        afterInsert: async () => {
+          throw new Error("injected-return-failure");
+        },
+      }),
+    });
+    const failedRet = await request(failingApp)
+      .post(`/api/loans/${loanAId}/return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(failedRet.status).toBe(500);
+    const stillPending = await request(app).get(`/api/loans/${loanAId}`).set("Cookie", cookies[0]!);
+    expect(stillPending.body.data.status).toBe("RETURN_PENDING");
+    expect((await request(app).get(`/api/equipment/${e1}`).set("Cookie", cookies[0]!)).body.data.quantity_available).toBe(1);
+
+    // TEST-F06-02: Custodian confirms return -> 200 RETURNED, stock restored to 3
+    const confirmRet = await request(app)
+      .post(`/api/loans/${loanAId}/return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(confirmRet.status).toBe(200);
+    expect(confirmRet.body.data.status).toBe("RETURNED");
+    expect(confirmRet.body.data.returned_by).toBe("s2-c-a");
+    expect((await request(app).get(`/api/equipment/${e1}`).set("Cookie", cookies[0]!)).body.data.quantity_available).toBe(3);
+
+    // TEST-F06-03: Repeat /return and /request-return on RETURNED loan -> 409 ALREADY_RETURNED
+    const repeatRet = await request(app)
+      .post(`/api/loans/${loanAId}/return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(repeatRet.status).toBe(409);
+    expect(repeatRet.body.error.code).toBe("ALREADY_RETURNED");
+
+    const repeatReqRet = await request(app)
+      .post(`/api/loans/${loanAId}/request-return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({});
+    expect(repeatReqRet.status).toBe(409);
+    expect(repeatReqRet.body.error.code).toBe("ALREADY_RETURNED");
+
+    // Bundle return + TEST-F08-05 loan scopes (Custodian all/history/active; Borrower history & 403 cross-owner)
+    const bBundle = await request(app)
+      .post("/api/request-bundles")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[1]!)
+      .send({
+        items: [
+          { equipment_id: e1, quantity_requested: 1 },
+          { equipment_id: e2, quantity_requested: 1 },
+        ],
+      });
+    const bBundleId = bBundle.body.data.bundle_id as string;
+    await request(app).post(`/api/request-bundles/${bBundleId}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+    await request(app).post(`/api/request-bundles/${bBundleId}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({});
+
+    const custodianActive = await request(app).get("/api/loans?scope=active").set("Cookie", cookies[2]!);
+    expect(custodianActive.status).toBe(200);
+    expect(custodianActive.body.data.map((l: { id: string }) => l.id)).not.toContain(loanAId);
+    expect(custodianActive.body.data.filter((l: { bundle_id: string | null }) => l.bundle_id === bBundleId)).toHaveLength(2);
+
+    const custodianHistory = await request(app).get("/api/loans?scope=history").set("Cookie", cookies[2]!);
+    expect(custodianHistory.status).toBe(200);
+    expect(custodianHistory.body.data.map((l: { id: string }) => l.id)).toContain(loanAId);
+
+    const borrowerAHistory = await request(app).get("/api/loans?scope=history").set("Cookie", cookies[0]!);
+    expect(borrowerAHistory.status).toBe(200);
+    expect(borrowerAHistory.body.data.map((l: { id: string }) => l.id)).toEqual([loanAId]);
+
+    // Borrower B cannot read Borrower A's returned loan detail -> 403
+    expect((await request(app).get(`/api/loans/${loanAId}`).set("Cookie", cookies[1]!)).status).toBe(403);
+
+    // Custodian confirms entire bundle return -> both loans RETURNED, stock restored
+    const bundleRet = await request(app)
+      .post(`/api/loan-bundles/${bBundleId}/return`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({ return_note: "Bundle complete" });
+    expect(bundleRet.status).toBe(200);
+    expect(bundleRet.body.data).toHaveLength(2);
+    expect(bundleRet.body.data.every((l: { status: string }) => l.status === "RETURNED")).toBe(true);
+    expect((await request(app).get(`/api/equipment/${e2}`).set("Cookie", cookies[0]!)).body.data.quantity_available).toBe(2);
+  });
+});

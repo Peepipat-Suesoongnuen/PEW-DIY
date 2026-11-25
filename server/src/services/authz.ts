@@ -43,8 +43,11 @@ export const PROTECTED_ROUTES: ReadonlyArray<{
   { method: "POST", path: "/api/request-bundles/{bundleId}/cancel", allowedRoles: ["BORROWER"] },
   { method: "POST", path: "/api/requests/{requestId}/checkout", allowedRoles: ["CUSTODIAN"] },
   { method: "POST", path: "/api/request-bundles/{bundleId}/checkout", allowedRoles: ["CUSTODIAN"] },
-  { method: "GET", path: "/api/loans", allowedRoles: ["BORROWER"] },
-  { method: "GET", path: "/api/loans/{loanId}", allowedRoles: ["BORROWER"] },
+  { method: "GET", path: "/api/loans", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "GET", path: "/api/loans/{loanId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "POST", path: "/api/loans/{loanId}/request-return", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/loans/{loanId}/return", allowedRoles: ["CUSTODIAN"] },
+  { method: "POST", path: "/api/loan-bundles/{bundleId}/return", allowedRoles: ["CUSTODIAN"] },
   { method: "GET", path: "/api/requests", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/requests/{requestId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
 ];

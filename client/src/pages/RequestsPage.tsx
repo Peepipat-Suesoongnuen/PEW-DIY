@@ -6,11 +6,10 @@ import {
   ApiError,
   PURPOSE_CATEGORIES,
   type BorrowingRequest,
-  type Loan,
   type PurposeCategory,
   type RequestStatus,
 } from "../lib/api";
-import { newRequestPath, requestIdFromPathname, requestPath } from "../lib/paths";
+import { loanPath, newRequestPath, requestIdFromPathname, requestPath } from "../lib/paths";
 import { useSession, useUnauthorizedRedirect } from "../lib/session";
 import { Alert } from "../components/Alert";
 import { BackButton } from "../components/BackButton";
@@ -18,7 +17,6 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { CheckoutRequest } from "../components/CheckoutRequest";
 import { EmptyState } from "../components/EmptyState";
-import { LoanDetails } from "../components/LoanDetails";
 import { Loading } from "../components/Loading";
 import { RequestStatusBadge } from "../components/StatusBadge";
 import { Table, Th } from "../components/Table";
@@ -66,7 +64,6 @@ export function RequestsPage() {
   const [decisionNote, setDecisionNote] = useState("");
   const [actionBusy, setActionBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [checkedOutLoans, setCheckedOutLoans] = useState<Loan[] | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
 
   const load = useCallback(async () => {
@@ -108,7 +105,6 @@ export function RequestsPage() {
   useEffect(() => {
     setDecisionNote("");
     setActionError(null);
-    setCheckedOutLoans(null);
     void load();
   }, [load]);
 
@@ -179,12 +175,6 @@ export function RequestsPage() {
                 <h1 className="text-xl font-semibold text-text">Request details</h1>
                 <RequestStatusBadge status={detail.status} />
               </div>
-
-              {checkedOutLoans && checkedOutLoans.length > 0 ? (
-                <div className="mb-4">
-                  <Alert tone="success">Checkout completed.</Alert>
-                </div>
-              ) : null}
 
               {actionError ? (
                 <div className="mb-4">
@@ -306,16 +296,9 @@ export function RequestsPage() {
                     requestId={detail.id}
                     bundleId={detail.bundle_id}
                     bundleApprovedCount={bundleApprovedCount}
-                    onSuccess={(loan) => {
-                      setCheckedOutLoans([loan]);
-                      setDetail((prev) => (prev ? { ...prev, status: "CHECKED_OUT" } : prev));
-                    }}
-                    onBundleSuccess={(loans) => {
-                      setCheckedOutLoans(loans);
-                      setDetail((prev) => (prev ? { ...prev, status: "CHECKED_OUT" } : prev));
-                    }}
+                    onSuccess={(loan) => navigate(loanPath(loan.id), { state: { checkedOut: true } })}
+                    onBundleSuccess={() => navigate("/loans", { state: { checkedOut: true } })}
                     onRefresh={() => {
-                      setCheckedOutLoans(null);
                       setRefreshTick((t) => t + 1);
                       void load();
                     }}
@@ -323,20 +306,6 @@ export function RequestsPage() {
                 </div>
               ) : null}
             </Card>
-
-            {checkedOutLoans?.map((loan) => (
-              <Card key={loan.id} title="Active loan">
-                <LoanDetails
-                  loan={loan}
-                  borrowerName={detail.borrower_username ?? detail.borrower_id}
-                  equipmentName={
-                    items?.find((r) => r.id === loan.request_id)?.equipment_name ??
-                    detail.equipment_name ??
-                    detail.equipment_id
-                  }
-                />
-              </Card>
-            ))}
 
             {bundleSiblings.length > 1 ? (
               <Card title="Items in this bundle">
