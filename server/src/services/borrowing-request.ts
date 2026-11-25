@@ -30,12 +30,16 @@ function addDays(instant: Date, days: number): Date {
   return new Date(instant.getTime() + days * 86_400_000);
 }
 
+export function isRequestExpired(expiresAt: unknown, now: Date): boolean {
+  if (expiresAt === null || expiresAt === undefined) return false;
+  return now.getTime() >= new Date(expiresAt as Date).getTime();
+}
+
 function isRowExpired(row: Record<string, unknown>, now: Date): boolean {
   if (row.fulfilled) return false;
   const ap = String(row.approval_status ?? "PENDING");
   if (ap !== "PENDING" && ap !== "APPROVED") return false;
-  if (!row.expires_at) return false;
-  return now.getTime() > new Date(row.expires_at as Date).getTime();
+  return isRequestExpired(row.expires_at, now);
 }
 
 function shortRef(id: string): string {

@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import type { Pool, PoolClient } from "pg";
-import { RequestError } from "./borrowing-request";
+import { isRequestExpired, RequestError } from "./borrowing-request";
 import { getEquipment } from "./catalog";
 import type { SessionUser } from "./session";
 
@@ -157,7 +157,7 @@ export class LoanService {
       }
       if (!this.options.timeZone) throw new RequestError(503, "CALENDAR_POLICY_UNCONFIGURED", "Checkout is temporarily unavailable.");
       const now = (this.options.now ?? (() => new Date()))();
-      if (record.expires_at != null && now.getTime() > new Date(record.expires_at as Date).getTime()) {
+      if (isRequestExpired(record.expires_at, now)) {
         throw new RequestError(409, "REQUEST_EXPIRED", "Approved request has expired and cannot be checked out.");
       }
       const stock = await getEquipment(client, equipmentId);
@@ -216,7 +216,7 @@ export class LoanService {
         if (record.approval_status !== "APPROVED") {
           throw new RequestError(409, "NOT_APPROVED", "Bundle must be approved before checkout.");
         }
-        if (record.expires_at != null && now.getTime() > new Date(record.expires_at as Date).getTime()) {
+        if (isRequestExpired(record.expires_at, now)) {
           throw new RequestError(409, "REQUEST_EXPIRED", "Approved bundle request has expired and cannot be checked out.");
         }
         const stock = await getEquipment(client, String(record.equipment_id));

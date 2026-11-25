@@ -944,4 +944,102 @@ describe("UI/UX Polish & Request Lifecycle Rules (1000-char purpose, bundle requ
     expect(sixth.status).toBe(409);
     expect(sixth.body.error.code).toBe("REQUEST_LIMIT_EXCEEDED");
   });
+
+  it("treats now === expires_at as EXPIRED consistently across read, queue, decide, cancel, and checkout", async () => {
+    const eqId = await seedItem("exp-eq", `${PREFIX}Boundary Scope`, "Lab", 5);
+    const eq2Id = await seedItem("exp-eq2", `${PREFIX}Boundary Probe`, "Lab", 5);
+    const appT0 = appWithNow("2026-11-01T10:00:00Z");
+
+    const pendingRes = await request(appT0)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: eqId, quantity_requested: 1 });
+    expect(pendingRes.status).toBe(201);
+    const pendingId = pendingRes.body.data.id as string;
+
+    const approvedSingleRes = await request(appT0)
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: eqId, quantity_requested: 1 });
+    expect(approvedSingleRes.status).toBe(201);
+    const approvedId = approvedSingleRes.body.data.id as string;
+
+    const approvedBundleRes = await request(appT0)
+      .post("/api/request-bundles")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({
+        items: [
+          { equipment_id: eqId, quantity_requested: 1 },
+          { equipment_id: eq2Id, quantity_requested: 1 },
+        ],
+      });
+    expect(approvedBundleRes.status).toBe(201);
+    const bundleId = approvedBundleRes.body.data.bundle_id as string;
+
+    const appApprove = appWithNow("2026-11-01T11:00:00Z");
+    expect(
+      (
+        await request(appApprove)
+          .post(`/api/requests/${approvedId}/approve`)
+          .set("Origin", config.appOrigin)
+          .set("Cookie", cookies[2]!)
+          .send({})
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await request(appApprove)
+          .post(`/api/request-bundles/${bundleId}/approve`)
+          .set("Origin", config.appOrigin)
+          .set("Cookie", cookies[2]!)
+          .send({})
+      ).status,
+    ).toBe(200);
+
+    // Exact APPROVED expiry boundary: 2026-11-04T11:00:00Z
+    const appExactApproved = appWithNow("2026-11-04T11:00:00Z");
+    const checkoutSingleBoundary = await request(appExactApproved)
+      .post(`/api/requests/${approvedId}/checkout`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(checkoutSingleBoundary.status).toBe(409);
+    expect(checkoutSingleBoundary.body.error.code).toBe("REQUEST_EXPIRED");
+
+    const checkoutBundleBoundary = await request(appExactApproved)
+      .post(`/api/request-bundles/${bundleId}/checkout`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(checkoutBundleBoundary.status).toBe(409);
+    expect(checkoutBundleBoundary.body.error.code).toBe("REQUEST_EXPIRED");
+
+    // Exact PENDING expiry boundary: 2026-11-08T10:00:00Z
+    const appExactPending = appWithNow("2026-11-08T10:00:00Z");
+    const readExact = await request(appExactPending).get(`/api/requests/${pendingId}`).set("Cookie", cookies[0]!);
+    expect(readExact.status).toBe(200);
+    expect(readExact.body.data.status).toBe("EXPIRED");
+
+    const queueExact = await request(appExactPending).get("/api/requests").set("Cookie", cookies[2]!);
+    expect(queueExact.body.data.map((r: { id: string }) => r.id)).not.toContain(pendingId);
+
+    const approveExact = await request(appExactPending)
+      .post(`/api/requests/${pendingId}/approve`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({});
+    expect(approveExact.status).toBe(409);
+    expect(approveExact.body.error.code).toBe("REQUEST_EXPIRED");
+
+    const cancelExact = await request(appExactPending)
+      .post(`/api/requests/${pendingId}/cancel`)
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({});
+    expect(cancelExact.status).toBe(409);
+    expect(cancelExact.body.error.code).toBe("REQUEST_EXPIRED");
+  });
 });
