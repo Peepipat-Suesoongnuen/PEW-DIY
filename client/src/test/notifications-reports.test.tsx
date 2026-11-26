@@ -156,6 +156,7 @@ describe("Sprint 3 F-09 ReportsPage (TEST-F09-02/03)", () => {
               rejected_count: 0,
               cancelled_count: 0,
               checked_out_count: 1,
+              expired_count: 2,
             },
             loans: {
               active_count: 1,

@@ -73,6 +73,7 @@ export interface InventoryReportSummary {
     rejected_count: number;
     cancelled_count: number;
     checked_out_count: number;
+    expired_count: number;
   };
   loans: {
     active_count: number;

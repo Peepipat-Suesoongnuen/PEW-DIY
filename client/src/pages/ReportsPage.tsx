@@ -114,7 +114,7 @@ export function ReportsPage() {
             <MetricBox
               label="Pending / Approved requests"
               value={report.requests.pending_count + report.requests.approved_count}
-              note={`${report.requests.pending_count} pending · ${report.requests.approved_count} approved`}
+              note={`${report.requests.pending_count} pending · ${report.requests.approved_count} approved · ${report.requests.expired_count} expired`}
             />
             <MetricBox
               label="Overdue loans"
