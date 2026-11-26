@@ -1,16 +1,20 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { Alert } from "../components/Alert";
 import { AvailabilityBadge, QuantityDisplay } from "../components/AvailabilityBadge";
+import { BackButton } from "../components/BackButton";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { DetailList } from "../components/DetailList";
 import { EmptyState } from "../components/EmptyState";
+import { EquipmentImage } from "../components/EquipmentImage";
 import { Field } from "../components/Field";
 import { ItemCard } from "../components/ItemCard";
 import { Loading } from "../components/Loading";
+import { Pagination, usePagination } from "../components/Pagination";
+import { CatalogStatusBadge, LoanStatusBadge, RequestStatusBadge } from "../components/StatusBadge";
 import { Table, Th } from "../components/Table";
 import type { Equipment } from "../lib/api";
 
@@ -158,5 +162,102 @@ describe("ItemCard (mobile list)", () => {
     );
     const link = screen.getByRole("link", { name: "View Arduino Uno" });
     expect(link).toHaveAttribute("href", "/items/fixture%23opaque");
+  });
+});
+
+describe("BackButton / EquipmentImage / StatusBadges", () => {
+  it("renders BackButton with target href and accessible text", () => {
+    render(
+      <MemoryRouter>
+        <BackButton to="/catalog" label="Back to catalog" />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("link", { name: "Back to catalog" })).toHaveAttribute("href", "/catalog");
+  });
+
+  it("renders EquipmentImage url when provided, rejects unsafe schemes, and renders status badges", () => {
+    render(
+      <div>
+        <EquipmentImage imageUrl="https://example.com/item.png" name="Scope" category="Instruments" />
+        <EquipmentImage imageUrl="javascript:alert(1)" name="Unsafe" category="Tools" />
+        <EquipmentImage imageUrl="//evil.com/x.png" name="ProtocolRelative" category="Tools" />
+        <RequestStatusBadge status="APPROVED" />
+        <LoanStatusBadge status="ACTIVE" overdue />
+        <CatalogStatusBadge status="RETIRED" />
+      </div>,
+    );
+    expect(screen.getByAltText("Scope")).toHaveAttribute("src", "https://example.com/item.png");
+    expect(screen.queryByAltText("Unsafe")).not.toBeInTheDocument();
+    expect(screen.queryByAltText("ProtocolRelative")).not.toBeInTheDocument();
+    expect(screen.getByText("Approved")).toBeInTheDocument();
+    expect(screen.getByText("Overdue")).toBeInTheDocument();
+    expect(screen.getByText("Retired")).toBeInTheDocument();
+  });
+
+  it("falls back to category icon on image load error and recovers when imageUrl changes to a new valid URL", () => {
+    const { rerender } = render(
+      <EquipmentImage imageUrl="https://example.com/broken.png" name="Scope" category="Instruments" />,
+    );
+    const brokenImg = screen.getByAltText("Scope");
+    fireEvent.error(brokenImg);
+    expect(screen.queryByAltText("Scope")).not.toBeInTheDocument();
+
+    rerender(<EquipmentImage imageUrl="https://example.com/fixed.png" name="Scope" category="Instruments" />);
+    const fixedImg = screen.getByAltText("Scope");
+    expect(fixedImg).toHaveAttribute("src", "https://example.com/fixed.png");
+  });
+});
+
+function PaginatedProbe({ count }: { count: number }) {
+  const items = Array.from({ length: count }, (_, idx) => `Row ${idx + 1}`);
+  const pg = usePagination(items, 10);
+  return (
+    <div>
+      <ul>
+        {pg.pageItems.map((row) => (
+          <li key={row}>{row}</li>
+        ))}
+      </ul>
+      <Pagination
+        page={pg.page}
+        pageSize={pg.pageSize}
+        totalItems={pg.totalItems}
+        totalPages={pg.totalPages}
+        onPageChange={pg.setPage}
+        onPageSizeChange={pg.setPageSize}
+      />
+    </div>
+  );
+}
+
+describe("Pagination & usePagination", () => {
+  it("renders range, navigates pages, changes page size, clamps on shrink, and hides when empty", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<PaginatedProbe count={25} />);
+
+    expect(screen.getByText("Showing 1–10 of 25")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
+    expect(screen.getByText("Row 1")).toBeInTheDocument();
+    expect(screen.queryByText("Row 11")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+    expect(screen.getByText("Showing 11–20 of 25")).toBeInTheDocument();
+    expect(screen.getByText("Row 11")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Page 2" })).toHaveAttribute("aria-current", "page");
+
+    await user.selectOptions(screen.getByLabelText("Rows per page"), "20");
+    expect(screen.getByText("Showing 1–20 of 25")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Page 1" })).toHaveAttribute("aria-current", "page");
+
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+    expect(screen.getByText("Showing 21–25 of 25")).toBeInTheDocument();
+
+    // Shrinking items below current page clamps safely back to page 1.
+    rerender(<PaginatedProbe count={5} />);
+    expect(screen.getByText("Showing 1–5 of 5")).toBeInTheDocument();
+    expect(screen.getByText("Row 1")).toBeInTheDocument();
+
+    rerender(<PaginatedProbe count={0} />);
+    expect(screen.queryByRole("navigation", { name: "Table pagination" })).not.toBeInTheDocument();
   });
 });

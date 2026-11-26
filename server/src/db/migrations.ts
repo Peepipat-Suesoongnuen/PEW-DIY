@@ -102,7 +102,93 @@ export async function migrate(client: Pick<PoolClient, "query">): Promise<void> 
   await client.query(MIGRATION_001_SQL);
   await client.query(MIGRATION_002_REQUESTS_SQL);
   await client.query(MIGRATION_003_LOANS_SQL);
+  await client.query(MIGRATION_004_SPRINT2_SQL);
 }
+
+/**
+ * F-08 Sprint 2 equipment catalog extensions (Slice 2 #102):
+ * - equipment: optional image_url and catalog_status (ACTIVE/RETIRED)
+ */
+export const MIGRATION_004_SPRINT2_SQL = `
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS image_url TEXT NOT NULL DEFAULT '';
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS catalog_status TEXT NOT NULL DEFAULT 'ACTIVE';
+DO $migration$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'equipment_catalog_status_check' AND conrelid = 'equipment'::regclass
+  ) THEN
+    ALTER TABLE equipment
+      ADD CONSTRAINT equipment_catalog_status_check CHECK (catalog_status IN ('ACTIVE', 'RETIRED'));
+  END IF;
+END
+$migration$;
+
+CREATE TABLE IF NOT EXISTS request_bundles (
+  id TEXT PRIMARY KEY,
+  borrower_id TEXT NOT NULL REFERENCES users(id),
+  purpose_category TEXT NOT NULL DEFAULT 'OTHER',
+  purpose_detail TEXT NOT NULL DEFAULT '',
+  requested_days INTEGER NOT NULL DEFAULT 7 CHECK (requested_days BETWEEN 1 AND 14),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS request_bundles_owner_idx ON request_bundles(borrower_id, created_at);
+
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS bundle_id TEXT REFERENCES request_bundles(id);
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS purpose_category TEXT NOT NULL DEFAULT 'OTHER';
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS purpose_detail TEXT NOT NULL DEFAULT '';
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS requested_days INTEGER NOT NULL DEFAULT 7;
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS approval_status TEXT NOT NULL DEFAULT 'PENDING';
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS reviewed_by TEXT REFERENCES users(id);
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ;
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS decision_note TEXT NOT NULL DEFAULT '';
+ALTER TABLE borrowing_requests ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+
+UPDATE borrowing_requests
+SET expires_at = CASE
+  WHEN approval_status = 'PENDING' THEN created_at + INTERVAL '7 days'
+  WHEN approval_status = 'APPROVED' THEN COALESCE(reviewed_at, created_at) + INTERVAL '3 days'
+  ELSE expires_at
+END
+WHERE expires_at IS NULL
+  AND approval_status IN ('PENDING', 'APPROVED')
+  AND NOT EXISTS (SELECT 1 FROM loans l WHERE l.request_id = borrowing_requests.id);
+
+DO $migration$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'borrowing_requests_days_check' AND conrelid = 'borrowing_requests'::regclass
+  ) THEN
+    ALTER TABLE borrowing_requests
+      ADD CONSTRAINT borrowing_requests_days_check CHECK (requested_days BETWEEN 1 AND 14);
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'borrowing_requests_approval_status_check' AND conrelid = 'borrowing_requests'::regclass
+  ) THEN
+    ALTER TABLE borrowing_requests
+      ADD CONSTRAINT borrowing_requests_approval_status_check CHECK (approval_status IN ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'));
+  END IF;
+END
+$migration$;
+CREATE INDEX IF NOT EXISTS borrowing_requests_bundle_idx ON borrowing_requests(bundle_id);
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  reference_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  read_at TIMESTAMPTZ,
+  cleared_at TIMESTAMPTZ,
+  CONSTRAINT notifications_unique_user_kind_ref UNIQUE (user_id, kind, reference_id)
+);
+CREATE INDEX IF NOT EXISTS notifications_user_idx ON notifications(user_id, created_at DESC);
+
+ALTER TABLE loans ADD COLUMN IF NOT EXISTS return_requested_at TIMESTAMPTZ;
+ALTER TABLE loans ADD COLUMN IF NOT EXISTS return_requested_by TEXT REFERENCES users(id);
+ALTER TABLE loans ADD COLUMN IF NOT EXISTS return_note TEXT NOT NULL DEFAULT '';
+`;
 
 /** F-05: stock and request status derive from this durable relation. */
 export const MIGRATION_003_LOANS_SQL = `

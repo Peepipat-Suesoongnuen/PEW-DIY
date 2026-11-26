@@ -9,6 +9,7 @@ A university equipment-borrowing system for the D.I.Y. Room, which supports stud
 - [Software Requirements Specification (SRS)](docs/srs.md)
 - [System-Level Design Specification (SDS)](docs/system-sds.md)
 - [Sprint 1 Engineering Contracts (Part E)](docs/sprints/sprint-1/README.md) — feature specifications, AC/STS mapping and Product DoD
+- [Sprint 2 Engineering Contracts](docs/sprints/sprint-2/README.md) — `F-06` Return, `F-07` Overdue/Notifications, `F-08` Catalog CRUD/Search/Sort & Loans, `A-11` Approval & Bundles, and Sprint 3 `F-09` Inventory Reporting contract
 - [Lab 6 Sprint 1 UAT handoff](docs/labs/lab-06/README.md) — executable Product Team cases, safe handoff requirements and evidence templates (Issue [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80))
 
 ## Project Structure
@@ -128,16 +129,22 @@ For the normal release path in group specification §5.3, a repository administr
 
 F-01 through F-05 and F-10 were integrated into `sprint/1-staging` together with PR #41 UI fixes and PR #43 CI, and historical Sprint 1 release [PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) merged candidate `d291873c10c2021d4eb5ebe733aa68012f813678` into `main` at `d8e3cc6a5cb19c2b8d034fb845a2aae0b99219e4` (2026-11-09 UTC). [Part F evidence](docs/verification/sprint-1/README.md) records the candidate `d291873` results (164 server/74 client/57 browser passes, 49/49 application AC, setup and source fingerprints; older `8676957` results are historical). Following Lab 5 deployment PR #79, the current deployed `main` commit is `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` (Cloud Run `pewdiy-00008-mfk` and isolated UAT `pewdiy-uat-00003-8c5`). Merging PR #42 or passing CI does not close remaining acceptance/process gates: A-12 shared-team ratification, documented independent README repetition, final board/disclosure/TDD checks, clean-source verification/audit on the release commit, and formal Lab 6 UAT sign-off / Part B remain explicit pending gates.
 
-## Borrowing Requests (F-04 / Issue #11)
+## Implemented Baseline (Sprint 1 — Active on `main` / `sprint/2-staging` Base)
 
-After `npm run migrate` and the existing synthetic seed, open the React app (`/login`), sign in as Borrower, open an available item, and submit a positive quantity up to its current availability. Success opens **My requests**, where list/detail reads survive reload. Custodian sees the **Submitted requests** queue but cannot create requests. Requests do not reserve stock; repeated requests have no additional per-borrower cap (SRS A-12).
+The active source code at base commit `d079bc6` implements **Sprint 1 (`F-01`–`F-05`, `F-10`, migrations `001`–`003`)**:
+- Authentication (`POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`)
+- Read-only equipment catalog (`GET /api/equipment`, `GET /api/equipment/:id`)
+- Single-item borrowing requests (`POST /api/requests`, `GET /api/requests`, `GET /api/requests/:id`)
+- Direct Custodian checkout & active loan reads (`POST /api/requests/:id/checkout`, `GET /api/loans`, `GET /api/loans/:id`)
 
-Migration 002 creates `borrowing_requests`; migration003 now supplies the Loan relation owned by Issue #12. Historical F-04 results remain in [F-04 execution/TDD evidence](docs/sprints/sprint-1/tdd-evidence-f04.md); fresh F-05 runs verify the fulfilled-request transition and previously Loan-gated cases. No `.env` secret or demo password belongs in Git.
+## Implemented Sprint 2 & Sprint 3 Progress (`sprint/2-staging` — Slices #101–#106)
 
-## Checkout and Active Loans (F-05 / Issue #12)
+> **Status:** Slices `#101`–`#105` are merged into `sprint/2-staging` (`50a6b9d`) and Slice `#106` completes `F-09` Inventory Reporting summary & verification evidence sync (parent trackers [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). Remaining Sprint 3 items (CSV export `AC-F09-04` and formal `NFR-07` 100-item benchmark `AC-F09-05`) are scheduled for Final Delivery by 13 Dec 2026.
 
-Set `APP_TIMEZONE=Asia/Bangkok` and run `npm run migrate` on the development database. Migration003 creates `loans` with unique request linkage and FK/positive-quantity constraints. As Custodian, open **Submitted requests**, inspect a request and choose **Check out**. The committed result shows the active loan, full requested quantity and due date. As Borrower, open **My loans** to read/reload only your own active loans.
+- **Catalog CRUD & Search/Filter/Sort (`F-08`):** `POST /api/equipment`, `PATCH /api/equipment/:id` (`409 HELD_QUANTITY_CONFLICT`), `image_url`, `catalog_status`, and `q`/`category`/`availability`/`status`/`sort` query filters.
+- **Create Request, Bundles & Duration (`F-04`, `A-11`, `BR-07`):** `/requests/new`, `POST /api/request-bundles`, purpose category/detail, and `1–14` calendar day duration (`Asia/Bangkok`).
+- **Approval Workflow (`A-11`):** Custodian `approve`/`reject` and Borrower `cancel` before checkout (`PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`).
+- **Two-Step Return & Print Slip (`F-06`, `FR-15`):** Borrower `request-return` notice (`RETURN_PENDING`), Custodian `return` / bundle `return` (`RETURNED`), and printable Loan Slip.
+- **Overdue, Notifications & Reports (`F-07`, `F-09`):** Derived overdue status (`scope=overdue|history|all`), persistent notifications (`GET/DELETE /api/notifications`, `POST /api/notifications/:id/read`), Custodian `GET /api/reports/summary` (`/reports`), Migration `004`, and `ARCH-01 Phase P4` legacy `.html` retirement.
 
-Checkout rechecks stock inside a PostgreSQL transaction, serializing on Equipment then Request row locks across app processes. Requests reserve no stock. Unavailable/repeated checkout returns409 without another loan; failures roll back. Due date is the Asia/Bangkok checkout calendar date +7 days, while the checkout instant is UTC. Missing timezone disables checkout safely; invalid timezone prevents startup. Return/overdue/general staff loan history remain later-sprint work.
-
-Tests require a dedicated `TEST_DATABASE_URL`. Apply the checked-in migrations to that test database **before test discovery**, so existing relation-gated F-03/F-04 tests execute. `npm test` includes two actual API processes racing 50 independent requests, rollback/dirty-read checks and restart of the production application entrypoint. `npm run test:e2e` includes F-05 scenarios using temporary schemas in the test database; its test DB role needs CREATE SCHEMA privilege. These tests never expose their fault/barrier hooks through the production application. See [F-05 execution/TDD evidence](docs/sprints/sprint-1/tdd-evidence-f05.md) for commands, actual environments and pending review/release gates.
+Tests require a dedicated `TEST_DATABASE_URL`. Apply checked-in migrations before test discovery (`npm run migrate:test`). See [Sprint 2 Engineering Contracts](docs/sprints/sprint-2/README.md) and [Sprint 2 Verification Matrix](docs/sprints/sprint-2/verification-matrix.md).

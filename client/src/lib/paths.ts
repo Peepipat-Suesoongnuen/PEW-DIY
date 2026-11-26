@@ -62,6 +62,12 @@ export function loanIdFromPathname(pathname: string): string | null {
 
 export function requestIdFromPathname(pathname: string): string | null {
   const raw = pathname.match(/^\/requests\/([^/]+)\/?$/)?.[1];
-  if (!raw) return null;
+  if (!raw || raw === "new") return null;
   try { return decodeURIComponent(raw); } catch { return raw; }
 }
+
+export function newRequestPath(equipmentId?: string): string {
+  return equipmentId ? `/requests/new?equipmentId=${encodeURIComponent(equipmentId)}` : "/requests/new";
+}
+
+export const REPORTS_PATH = "/reports";

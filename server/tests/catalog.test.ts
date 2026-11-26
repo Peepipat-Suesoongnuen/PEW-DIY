@@ -18,6 +18,7 @@ import { SessionStore } from "../src/services/session";
 import { hashPassword } from "../src/services/password";
 import { loadConfig, AppConfig } from "../src/config/config";
 import { createTestContext, TestContext } from "./harness";
+import { validateCreateEquipmentBody, validateUpdateEquipmentBody } from "../src/services/catalog";
 import { validateEquipmentInput, seedEquipmentFixture } from "../src/services/catalog";
 
 let ctx: TestContext;
@@ -206,32 +207,20 @@ describe("Availability derivation and UI serving (TEST-F02-07/08 backend portion
     expect(byId["fixture-e-zero"].availability).toBe("UNAVAILABLE");
   });
 
-  it("catalog and item UI pages are served (UI journey harness; browser E2E deferred with TEST-F01-13)", async () => {
-    const catalog = await request(app).get("/catalog.html");
-    expect(catalog.status).toBe(200);
-    expect(catalog.text).toContain("catalog");
-    const item = await request(app).get("/item.html");
-    expect(item.status).toBe(200);
-    const loginPage = await request(app).get("/login.html");
-    expect(loginPage.status).toBe(200);
-  });
-
-  it("UI-to-API-to-DB journey: login page -> login API -> catalog page -> catalog API -> item page -> detail API (Borrower flow)", async () => {
+  it("retires legacy .html pages (ARCH-01 Phase P4) and keeps React entry + API catalog + readiness endpoints live", async () => {
     await seedFixtures();
-    // The journey the UI JS performs (catalog.html fetches /api/equipment with
-    // the session cookie; item.html fetches /api/equipment/{id}). Verified
-    // through the real app against the real database; browser rendering is
-    // asserted separately (deferred with TEST-F01-13 track).
-    const loginPage = await request(app).get("/login.html");
-    expect(loginPage.status).toBe(200);
+    expect((await request(app).get("/catalog.html")).status).toBe(404);
+    expect((await request(app).get("/item.html")).status).toBe(404);
+    expect((await request(app).get("/login.html")).status).toBe(404);
+    const spaEntry = await request(app).get("/").set("Accept", "text/html");
+    expect(spaEntry.status).toBe(200);
+    expect(spaEntry.headers["content-type"]).toContain("text/html");
+    const ready = await request(app).get("/api/ready");
+    expect(ready.status).toBe(200);
     const cookie = await login("B-A-cat", "pw-cat");
-    const catalogPage = await request(app).get("/catalog.html");
-    expect(catalogPage.status).toBe(200);
     const list = await request(app).get("/api/equipment").set("Cookie", `pew_session=${cookie}`);
     expect(list.status).toBe(200);
     expect(list.body.data.map((i: { id: string }) => i.id)).toContain("fixture-e-one");
-    const itemPage = await request(app).get("/item.html");
-    expect(itemPage.status).toBe(200);
     const detail = await request(app).get("/api/equipment/fixture-e-one").set("Cookie", `pew_session=${cookie}`);
     expect(detail.status).toBe(200);
     expect(detail.body.data.name).toBe("Synthetic single-unit fixture");
@@ -301,5 +290,37 @@ describe("Safe failure and restart persistence (TEST-F02-09/10)", () => {
     const after = res.body.data.map((i: { id: string; name: string; quantity_total: number }) => ({ id: i.id, name: i.name, quantity_total: i.quantity_total }));
     expect(after).toEqual(before.rows.map((r: { id: string; name: string; quantity_total: number }) => ({ id: r.id, name: r.name, quantity_total: Number(r.quantity_total) })));
     // loan-dependent domain records portion of TEST-F02-10 remains dependency-gated (F-04/F-05)
+  });
+
+  it("enforces max length bounds (120 name, 60 category, 1000 description) on create and update", () => {
+    const okCreate = validateCreateEquipmentBody({
+      name: `  ${"N".repeat(120)}  `,
+      category: ` ${"C".repeat(60)} `,
+      description: "D".repeat(1000),
+      quantity_total: 2,
+    });
+    expect(okCreate.name).toHaveLength(120);
+    expect(okCreate.category).toHaveLength(60);
+    expect(okCreate.description).toHaveLength(1000);
+
+    expect(() =>
+      validateCreateEquipmentBody({ name: "N".repeat(121), category: "Tools", description: "", quantity_total: 1 }),
+    ).toThrow(/VALIDATION_ERROR/);
+    expect(() =>
+      validateCreateEquipmentBody({ name: "Meter", category: "C".repeat(61), description: "", quantity_total: 1 }),
+    ).toThrow(/VALIDATION_ERROR/);
+    expect(() =>
+      validateCreateEquipmentBody({ name: "Meter", category: "Tools", description: "D".repeat(1001), quantity_total: 1 }),
+    ).toThrow(/VALIDATION_ERROR/);
+
+    const okUpdate = validateUpdateEquipmentBody({
+      name: "N".repeat(120),
+      category: "C".repeat(60),
+      description: "D".repeat(1000),
+    });
+    expect(okUpdate.name).toHaveLength(120);
+    expect(() => validateUpdateEquipmentBody({ name: "N".repeat(121) })).toThrow(/VALIDATION_ERROR/);
+    expect(() => validateUpdateEquipmentBody({ category: "C".repeat(61) })).toThrow(/VALIDATION_ERROR/);
+    expect(() => validateUpdateEquipmentBody({ description: "D".repeat(1001) })).toThrow(/VALIDATION_ERROR/);
   });
 });

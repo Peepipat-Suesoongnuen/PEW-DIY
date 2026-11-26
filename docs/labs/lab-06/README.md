@@ -4,7 +4,7 @@
 >
 > **Source:** `Lab_6_Sprint_1_UAT.pdf`, Parts A–D and submission checklist
 >
-> **Status:** Interim partner UAT results received on `pewdiy-uat` (`pewdiy-uat-00002-bnt` and restarted `pewdiy-uat-00003-8c5`, 2026-11-22); live `UAT-06`/`UAT-07` API corroboration logs attached, and Finding 05 is proposed/accepted by the Product Team as a Minor UX Limitation pending UAT Team agreement and final sign-off. Part B (testing the partner product) remains blocked.
+> **Status (Reconciled 2026-11-23):** Part A interim UAT (`UAT-01–UAT-08`) was executed on `pewdiy-uat` (`b03c904`) with `Finding 05` (Minor UX) and `UAT-07 UX Note` carried into Sprint 2 Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) / [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100) for remediation. Although GitHub Issues `#80–#84` and `#90` were closed during Lab 6 submission (`TH-056_P2_lab6_sec131`), formal Part B partner handoff/release/execution evidence, Finding 05 UAT Team confirmation, and the signed §5 final acceptance decision are not yet attached in this repository and remain recorded as `BLOCKED` / `NOT RECORDED` in §1, §4, and §5 below.
 
 ## 1. Purpose, roles, and scope
 

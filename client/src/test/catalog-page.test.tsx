@@ -294,4 +294,168 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
 
     expect(await screen.findByText("LOGIN_PAGE")).toBeInTheDocument();
   });
+
+  it("renders HTML-bearing item fields as literal text — no element creation or script execution (ARCH-01 P4 / C-3)", async () => {
+    const xssItem: Equipment = {
+      id: "E-XSS",
+      name: "<img src=x onerror=alert(1)>",
+      description: "<script>window.__pwned = true</script>",
+      category: "<b>Sensors</b>",
+      quantity_total: 2,
+      quantity_available: 2,
+      availability: "AVAILABLE",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "u1", username: "B-A", role: "BORROWER" } } });
+        }
+        return jsonResponse(200, { data: [xssItem] });
+      }),
+    );
+    const { container } = renderCatalog();
+
+    expect((await screen.findAllByText("<img src=x onerror=alert(1)>")).length).toBe(2);
+    expect(screen.getAllByText("<b>Sensors</b>").length).toBeGreaterThanOrEqual(2);
+    expect(container.querySelector("b")).toBeNull();
+    expect(container.querySelector("img[src='x']")).toBeNull();
+    expect(container.querySelector("script")).toBeNull();
+  });
+
+  it("applies search, category, status & sort filters, preserves category options, and allows Custodian to add equipment (FR-09/FR-10)", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/auth/me")) {
+        return jsonResponse(200, { data: { user: { id: "c1", username: "C-A", role: "CUSTODIAN" } } });
+      }
+      if (url === "/api/equipment" && init?.method === "POST") {
+        return jsonResponse(201, {
+          data: {
+            id: "new-eq",
+            name: "Servo Arm",
+            description: "",
+            category: "Robotics",
+            quantity_total: 4,
+            quantity_available: 4,
+            availability: "AVAILABLE",
+            image_url: "/images/analyzer.png",
+            catalog_status: "ACTIVE",
+          },
+        });
+      }
+      if (url.includes("status=RETIRED")) {
+        return jsonResponse(200, { data: [] });
+      }
+      if (url.includes("category=Electronics")) {
+        return jsonResponse(200, { data: [items[0]] });
+      }
+      return jsonResponse(200, { data: items });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    renderCatalog();
+
+    await screen.findAllByText("Arduino Uno");
+    expect(fetchMock.mock.calls.some(([u]) => String(u) === "/api/equipment?status=ACTIVE")).toBe(true);
+    await user.selectOptions(screen.getByLabelText("Sort by"), "available_desc");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("sort=available_desc"))).toBe(true);
+
+    // Selecting category=Electronics still keeps Instruments in the Category dropdown
+    await user.selectOptions(screen.getByLabelText("Category"), "Electronics");
+    expect(screen.getByRole("option", { name: "Instruments" })).toBeInTheDocument();
+
+    // Filtering status=RETIRED with 0 matches shows filter empty state + Clear filters button
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "RETIRED");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("status=RETIRED"))).toBe(true);
+    expect(await screen.findByText("No equipment matched your filters.")).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "ALL");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("status=ALL"))).toBe(true);
+    await user.selectOptions(screen.getByLabelText(/Catalog status/), "RETIRED");
+    expect(await screen.findByText("No equipment matched your filters.")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Clear filters" }));
+    await screen.findAllByText("Arduino Uno");
+
+    // Custodian creates equipment with relative image path and empty description
+    await user.click(screen.getByRole("button", { name: "Add equipment" }));
+    await user.type(screen.getByLabelText("Equipment name"), "Draft Item");
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "Add equipment" }));
+    expect(screen.getByLabelText("Equipment name")).toHaveValue("");
+
+    await user.selectOptions(screen.getByLabelText("Category"), "Electronics");
+    await user.type(screen.getByLabelText("Equipment name"), "Servo Arm");
+    await user.type(screen.getByLabelText("Equipment category"), "Robotics");
+    await user.type(screen.getByLabelText(/Preview image URL/), "/images/analyzer.png");
+    await user.click(screen.getByRole("button", { name: "Save equipment" }));
+
+    expect(fetchMock.mock.calls.some(([u, i]) => String(u) === "/api/equipment" && i?.method === "POST")).toBe(true);
+    expect(screen.getByRole("option", { name: "Robotics" })).toBeInTheDocument();
+  });
+
+  it("paginates CatalogPage items (default 10) and resets to page 1 when filters change", async () => {
+    const manyItems: Equipment[] = Array.from({ length: 12 }, (_, idx) => ({
+      id: `eq-pg-${idx + 1}`,
+      name: `Catalog Gear ${idx + 1}`,
+      description: "Test gear",
+      category: "Tools",
+      quantity_total: 2,
+      quantity_available: 2,
+      availability: "AVAILABLE",
+    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "u1", username: "B-A", role: "BORROWER" } } });
+        }
+        return jsonResponse(200, { data: manyItems });
+      }),
+    );
+    const user = userEvent.setup();
+    renderCatalog();
+
+    expect(await screen.findByText("Showing 1–10 of 12")).toBeInTheDocument();
+    expect(screen.queryByText("Catalog Gear 11")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+    expect(screen.getByText("Showing 11–12 of 12")).toBeInTheDocument();
+    expect(screen.getAllByText("Catalog Gear 11").length).toBeGreaterThanOrEqual(1);
+
+    await user.selectOptions(screen.getByLabelText("Sort by"), "name_desc");
+    expect(await screen.findByText("Showing 1–10 of 12")).toBeInTheDocument();
+  });
+
+  it("enforces maxLength (120/60/1000) and live character counters on Custodian Add equipment form", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "c1", username: "C-A", role: "CUSTODIAN" } } });
+        }
+        return jsonResponse(200, { data: items });
+      }),
+    );
+    const user = userEvent.setup();
+    renderCatalog();
+
+    await user.click(await screen.findByRole("button", { name: "Add equipment" }));
+    const nameInput = screen.getByLabelText("Equipment name");
+    const categoryInput = screen.getByLabelText("Equipment category");
+    const descInput = screen.getByLabelText("Description");
+
+    expect(nameInput).toHaveAttribute("maxLength", "120");
+    expect(categoryInput).toHaveAttribute("maxLength", "60");
+    expect(descInput).toHaveAttribute("maxLength", "1000");
+
+    expect(screen.getByText("0 / 120")).toBeInTheDocument();
+    expect(screen.getByText("0 / 60")).toBeInTheDocument();
+    expect(screen.getByText("0 / 1,000")).toBeInTheDocument();
+
+    await user.type(nameInput, "Fluke");
+    expect(screen.getByText("5 / 120")).toBeInTheDocument();
+  });
 });

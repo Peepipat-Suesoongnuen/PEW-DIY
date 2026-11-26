@@ -30,18 +30,20 @@ const checkout = (id: string, cookie = cookies[2]!, body: unknown = {}, app = ap
   .post(`/api/requests/${encodeURIComponent(id)}/checkout`).set("Origin", config.appOrigin).set("Cookie", cookie).send(body);
 async function fixture(total = 1, qty = 1, owner = users[0]!.id) {
   const item = "f05-" + randomUUID(), id = "f05-" + randomUUID();
-  await pool.query("INSERT INTO equipment VALUES($1,'F05 synthetic','Test','Synthetic',$2)", [item, total]);
-  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested) VALUES($1,$2,$3,$4)", [id, owner, item, qty]);
+  await pool.query("INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,'F05 synthetic','Test','Synthetic',$2)", [item, total]);
+  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested,approval_status) VALUES($1,$2,$3,$4,'APPROVED')", [id, owner, item, qty]);
   return { item, id };
 }
 async function second(item: string, qty = 1) {
   const id = "f05-" + randomUUID();
-  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested) VALUES($1,$2,$3,$4)", [id, users[1]!.id, item, qty]);
+  await pool.query("INSERT INTO borrowing_requests(id,borrower_id,equipment_id,quantity_requested,approval_status) VALUES($1,$2,$3,$4,'APPROVED')", [id, users[1]!.id, item, qty]);
   return id;
 }
 async function cleanup() {
+  await pool.query("DELETE FROM notifications WHERE user_id IN ('f05-a','f05-b','f05-c')");
   await pool.query("DELETE FROM loans WHERE request_id IN (SELECT id FROM borrowing_requests WHERE borrower_id IN ('f05-a','f05-b'))");
   await pool.query("DELETE FROM borrowing_requests WHERE borrower_id IN ('f05-a','f05-b')");
+  await pool.query("DELETE FROM request_bundles WHERE borrower_id IN ('f05-a','f05-b')");
   await pool.query("DELETE FROM equipment WHERE id LIKE 'f05-%'");
 }
 beforeAll(async () => {
@@ -75,9 +77,12 @@ describe("F-05 real PostgreSQL/API", () => {
     }
     expect((await getEquipment(pool, item))!.quantity_available).toBe(1);
     expect((await pool.query("SELECT * FROM loans WHERE request_id=ANY($1::text[])", [submitted])).rowCount).toBe(0);
+    for (const reqId of submitted) {
+      expect((await request(app).post(`/api/requests/${reqId}/approve`).set("Origin", config.appOrigin).set("Cookie", cookies[2]!).send({})).status).toBe(200);
+    }
     expect((await checkout(submitted[0]!)).status).toBe(201);
     expect((await getEquipment(pool, item))!.quantity_available).toBe(0);
-    for (const [index, status] of ["CHECKED_OUT", "SUBMITTED"].entries()) {
+    for (const [index, status] of ["CHECKED_OUT", "APPROVED"].entries()) {
       expect((await request(app).get(`/api/requests/${submitted[index]}`).set("Cookie", cookies[index]!)).body.data.status).toBe(status);
     }
     expect((await request(app).get("/api/requests").set("Cookie", cookies[2]!)).body.data.map((r: { id: string }) => r.id)).toEqual([submitted[1]]);
@@ -136,7 +141,7 @@ describe("F-05 real PostgreSQL/API", () => {
     expect((await request(app).get("/api/loans").set("Cookie", cookies[0]!)).body.data.map((l: {id: string}) => l.id)).toEqual([la.id]);
     const foreign = await request(app).get(`/api/loans/${lb.id}`).set("Cookie", cookies[0]!);
     expect(foreign.status).toBe(403); expect(JSON.stringify(foreign.body)).not.toContain(users[1]!.id);
-    for (const path of ["/api/loans", `/api/loans/${la.id}`]) expect((await request(app).get(path).set("Cookie", cookies[2]!)).status).toBe(403);
+    for (const path of ["/api/loans", `/api/loans/${la.id}`]) expect((await request(app).get(path).set("Cookie", cookies[2]!)).status).toBe(200);
     expect((await request(app).get("/api/loans/missing").set("Cookie", cookies[0]!)).status).toBe(404);
   });
   it("rejects injected fields, non-object bodies and malformed IDs (TEST-F05-13)", async () => {
@@ -178,12 +183,14 @@ describe("F-05 real PostgreSQL/API", () => {
     expect((await checkout(id)).status).toBe(201);
     await expect(insert(id, 1)).rejects.toMatchObject({ code: "23505" });
   });
-  it("restricts Borrower reads to active records, with no return endpoint", async () => {
+  it("restricts active list to active records while allowing Borrower history & detail reads", async () => {
     const { id } = await fixture(); const loan = (await checkout(id)).body.data;
-    // Future-lifecycle fixture only; no application return operation is added.
     await pool.query("UPDATE loans SET returned_at=now(),returned_by=$1 WHERE id=$2", [users[2]!.id, loan.id]);
     expect((await request(appFor()).get("/api/loans").set("Cookie", cookies[0]!)).body.data).toEqual([]);
-    expect((await request(appFor()).get(`/api/loans/${loan.id}`).set("Cookie", cookies[0]!)).status).toBe(404);
+    expect((await request(appFor()).get("/api/loans?scope=history").set("Cookie", cookies[0]!)).body.data.map((l: { id: string }) => l.id)).toEqual([loan.id]);
+    const detail = await request(appFor()).get(`/api/loans/${loan.id}`).set("Cookie", cookies[0]!);
+    expect(detail.status).toBe(200);
+    expect(detail.body.data.status).toBe("RETURNED");
   });
   it("persists API-created loan across two actual app processes (TEST-F05-11)", async () => {
     const { id, item } = await fixture();
@@ -236,7 +243,7 @@ async function startWorker(mode = "normal") {
   const ready = production ? await (async () => {
     const deadline = Date.now() + 15000;
     while (Date.now() < deadline && proc.exitCode === null) {
-      try { if ((await fetch("http://127.0.0.1:3158/login.html")).ok) return 3158; } catch { /* starting */ }
+      try { if ((await fetch("http://127.0.0.1:3158/api/ready")).ok) return 3158; } catch { /* starting */ }
       await new Promise((r) => setTimeout(r, 100));
     }
     proc.kill(); throw new Error("Production app startup timed out");

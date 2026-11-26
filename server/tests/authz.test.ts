@@ -36,7 +36,7 @@ describe("PROTECTED_ROUTES registry (TEST-F01-05 route-parameterized)", () => {
     expect(PROTECTED_ROUTES.length).toBeGreaterThan(0);
     for (const route of PROTECTED_ROUTES) {
       expect(route.allowedRoles.length).toBeGreaterThan(0);
-      expect(["GET", "POST"]).toContain(route.method);
+      expect(["GET", "POST", "PATCH", "DELETE"]).toContain(route.method);
       expect(route.path.startsWith("/api/")).toBe(true);
     }
   });

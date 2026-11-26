@@ -3,6 +3,7 @@ import { Cpu, Menu, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { AccountMenu } from "./AccountMenu";
+import { NotificationMenu } from "./NotificationMenu";
 
 /**
  * AppShell: top navigation + centered content (ui-spec §2.1/§2.2, decision N-1).
@@ -33,10 +34,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                 Catalog
               </NavLink>
               <NavLink to="/requests" className={navLinkClass}>{user?.role === "CUSTODIAN" ? "Submitted requests" : "My requests"}</NavLink>
-              {user?.role === "BORROWER" ? <NavLink to="/loans" className={navLinkClass}>My loans</NavLink> : null}
+              <NavLink to="/loans" className={navLinkClass}>{user?.role === "CUSTODIAN" ? "Loans" : "My loans"}</NavLink>
+              {user?.role === "CUSTODIAN" ? <NavLink to="/reports" className={navLinkClass}>Reports</NavLink> : null}
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {user ? <NotificationMenu /> : null}
             {user ? <AccountMenu user={user} /> : null}
             <button
               type="button"
@@ -51,13 +54,20 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         {menuOpen ? (
           <div className="border-t border-border px-4 py-2 md:hidden">
-            {user?.role === "BORROWER" ? <NavLink to="/loans" className={navLinkClass} onClick={() => setMenuOpen(false)}>My loans</NavLink> : null}
+            <NavLink to="/loans" className={navLinkClass} onClick={() => setMenuOpen(false)}>
+              {user?.role === "CUSTODIAN" ? "Loans" : "My loans"}
+            </NavLink>
             <NavLink to="/catalog" className={navLinkClass} onClick={() => setMenuOpen(false)}>
               Catalog
             </NavLink>
             <NavLink to="/requests" className={navLinkClass} onClick={() => setMenuOpen(false)}>
               {user?.role === "CUSTODIAN" ? "Submitted requests" : "My requests"}
             </NavLink>
+            {user?.role === "CUSTODIAN" ? (
+              <NavLink to="/reports" className={navLinkClass} onClick={() => setMenuOpen(false)}>
+                Reports
+              </NavLink>
+            ) : null}
           </div>
         ) : null}
       </nav>

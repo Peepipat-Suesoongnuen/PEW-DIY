@@ -17,9 +17,13 @@ import { createAuthMiddleware, AuthenticatedRequest } from "../services/authz";
 import { createEquipmentRouter } from "./equipment-routes";
 import { createRequestRouter } from "./request-routes";
 import { createLoanRouter } from "./loan-routes";
+import { createNotificationRouter } from "./notification-routes";
+import { createReportRouter } from "./report-routes";
 import { createHealthRouter } from "./health-routes";
 import { LoanService } from "../services/loan";
-import type { BorrowingRequestService } from "../services/borrowing-request";
+import { BorrowingRequestService } from "../services/borrowing-request";
+import { NotificationService } from "../services/notification";
+import { ReportingService } from "../services/reporting";
 import { AppConfig } from "../config/config";
 
 export interface AppDeps {
@@ -27,9 +31,11 @@ export interface AppDeps {
   config: AppConfig;
   requests?: BorrowingRequestService;
   loans?: LoanService;
+  notifications?: NotificationService;
+  reports?: ReportingService;
 }
 
-export function createApp({ auth, config, requests, loans }: AppDeps): express.Application {
+export function createApp({ auth, config, requests, loans, notifications, reports }: AppDeps): express.Application {
   const app = express();
 
   // Request ID first so parser/guard failures also carry a correlation id
@@ -166,24 +172,32 @@ export function createApp({ auth, config, requests, loans }: AppDeps): express.A
 
   app.use("/api", router);
   app.use("/api", createLoanRouter(auth, config.session.cookieName, loans ?? new LoanService(auth.pool, { timeZone: config.appTimezone })));
-  app.use("/api", createRequestRouter(auth, config.session.cookieName, requests));
+  app.use("/api", createRequestRouter(auth, config.session.cookieName, requests ?? new BorrowingRequestService(auth.pool, { now: loans?.getClockOptions()?.now })));
+  app.use(
+    "/api",
+    createNotificationRouter(
+      auth,
+      config.session.cookieName,
+      notifications ?? new NotificationService(auth.pool, loans?.getClockOptions() ?? { timeZone: config.appTimezone }),
+    ),
+  );
+  app.use(
+    "/api",
+    createReportRouter(
+      auth,
+      config.session.cookieName,
+      reports ?? new ReportingService(auth.pool, loans?.getClockOptions() ?? { timeZone: config.appTimezone }),
+    ),
+  );
 
   // F-02 Equipment Catalog routes (GET /api/equipment, GET /api/equipment/:id).
   // Mounted before the unknown-route 404 handler; shares the auth guard.
   app.use("/api", createEquipmentRouter({ auth, cookieName: config.session.cookieName }));
 
-  // Static UI (UI-02, ARCH-01 §12.1 coexistence plan):
-  // - The React application build is served from client/dist (index.html at
-  //   "/", hashed assets under /assets) — `vite build` output.
-  // - The legacy framework-free pages (client/*.html, F-02) keep being served
-  //   at their .html paths until they are retired at migration phase P4.
-  // - `index: false` on client/ keeps its Vite source entry (client/index.html)
-  //   from shadowing the built app shell at "/".
-  // Real files always win over the SPA fallback below.
+  // Static UI (ARCH-01 Phase P4 complete): serve React SPA build from client/dist;
+  // legacy .html static files retired.
   const clientDistDir = path.resolve(process.cwd(), "client", "dist");
   app.use(express.static(clientDistDir));
-  const clientDir = path.resolve(process.cwd(), "client");
-  app.use(express.static(clientDir, { index: false }));
 
   // Unknown /api routes: safe 404 without leaking implementation details.
   app.use("/api", (_req: Request, res: Response) => {
@@ -204,6 +218,10 @@ export function createApp({ auth, config, requests, loans }: AppDeps): express.A
       return;
     }
     if (req.path.startsWith("/api/")) {
+      next();
+      return;
+    }
+    if (req.path.endsWith(".html") && req.path !== "/index.html") {
       next();
       return;
     }

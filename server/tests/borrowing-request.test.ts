@@ -48,7 +48,9 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await pool.query("DELETE FROM notifications WHERE user_id = ANY($1::text[])", [ids]);
   await pool.query("DELETE FROM borrowing_requests WHERE borrower_id = ANY($1::text[])", [ids]);
+  await pool.query("DELETE FROM request_bundles WHERE borrower_id = ANY($1::text[])", [ids]);
   for (const [id, total] of [[one, 1], [many, 3], [zero, 0]] as const) {
     await pool.query(`INSERT INTO equipment(id,name,description,category,quantity_total) VALUES($1,$1,'Fixture','Synthetic',$2)
       ON CONFLICT(id) DO UPDATE SET quantity_total=EXCLUDED.quantity_total`, [id, total]);
@@ -57,7 +59,9 @@ beforeEach(async () => {
 
 afterAll(async () => {
   if (!pool) return;
+  await pool.query("DELETE FROM notifications WHERE user_id = ANY($1::text[])", [ids]);
   await pool.query("DELETE FROM borrowing_requests WHERE borrower_id = ANY($1::text[])", [ids]);
+  await pool.query("DELETE FROM request_bundles WHERE borrower_id = ANY($1::text[])", [ids]);
   await pool.query("DELETE FROM equipment WHERE id = ANY($1::text[])", [[one, many, zero]]);
   await pool.query("DELETE FROM sessions WHERE user_id = ANY($1::text[])", [ids]);
   await pool.query("DELETE FROM users WHERE id = ANY($1::text[])", [ids]);
@@ -68,7 +72,7 @@ describe("F-04 real API/PostgreSQL", () => {
   it("persists server-owned request fields, opaque item ID and fresh retrieval (TEST-F04-01)", async () => {
     const res = await post(body());
     expect(res.status).toBe(201);
-    expect(res.body.data).toMatchObject({ borrower_id: ids[0], equipment_id: one, quantity_requested: 1, status: "SUBMITTED" });
+    expect(res.body.data).toMatchObject({ borrower_id: ids[0], equipment_id: one, quantity_requested: 1, status: "PENDING" });
     expect(typeof res.body.data.id).toBe("string");
     expect(Number.isNaN(Date.parse(res.body.data.created_at))).toBe(false);
     const read = await request(app).get(`/api/requests/${encodeURIComponent(res.body.data.id)}`).set("Cookie", cookies[0]!);

@@ -22,22 +22,39 @@ export type Role = "BORROWER" | "CUSTODIAN";
  * route-parameterized tests whenever a protected route is added").
  */
 export const PROTECTED_ROUTES: ReadonlyArray<{
-  method: "GET" | "POST";
+  method: "GET" | "POST" | "PATCH" | "DELETE";
   path: string;
   allowedRoles: ReadonlyArray<Role>;
 }> = [
   { method: "GET", path: "/api/auth/me", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "POST", path: "/api/auth/logout", allowedRoles: ["BORROWER", "CUSTODIAN"] },
-  // F-02 (contract f-02 §4): shared room catalog — both roles may read;
-  // no ownership predicate on the catalog itself.
+  // F-02 / F-08 catalog routes: both roles read; Custodian creates/updates.
   { method: "GET", path: "/api/equipment", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/equipment/{equipmentId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "POST", path: "/api/equipment", allowedRoles: ["CUSTODIAN"] },
+  { method: "PATCH", path: "/api/equipment/{equipmentId}", allowedRoles: ["CUSTODIAN"] },
   { method: "POST", path: "/api/requests", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/request-bundles", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/requests/{requestId}/approve", allowedRoles: ["CUSTODIAN"] },
+  { method: "POST", path: "/api/requests/{requestId}/reject", allowedRoles: ["CUSTODIAN"] },
+  { method: "POST", path: "/api/requests/{requestId}/cancel", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/request-bundles/{bundleId}/approve", allowedRoles: ["CUSTODIAN"] },
+  { method: "POST", path: "/api/request-bundles/{bundleId}/reject", allowedRoles: ["CUSTODIAN"] },
+  { method: "POST", path: "/api/request-bundles/{bundleId}/cancel", allowedRoles: ["BORROWER"] },
   { method: "POST", path: "/api/requests/{requestId}/checkout", allowedRoles: ["CUSTODIAN"] },
-  { method: "GET", path: "/api/loans", allowedRoles: ["BORROWER"] },
-  { method: "GET", path: "/api/loans/{loanId}", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/request-bundles/{bundleId}/checkout", allowedRoles: ["CUSTODIAN"] },
+  { method: "GET", path: "/api/loans", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "GET", path: "/api/loans/{loanId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "POST", path: "/api/loans/{loanId}/request-return", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/loan-bundles/{bundleId}/request-return", allowedRoles: ["BORROWER"] },
+  { method: "POST", path: "/api/loans/{loanId}/return", allowedRoles: ["CUSTODIAN"] },
+  { method: "POST", path: "/api/loan-bundles/{bundleId}/return", allowedRoles: ["CUSTODIAN"] },
   { method: "GET", path: "/api/requests", allowedRoles: ["BORROWER", "CUSTODIAN"] },
   { method: "GET", path: "/api/requests/{requestId}", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "GET", path: "/api/notifications", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "POST", path: "/api/notifications/{notificationId}/read", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "DELETE", path: "/api/notifications", allowedRoles: ["BORROWER", "CUSTODIAN"] },
+  { method: "GET", path: "/api/reports/summary", allowedRoles: ["CUSTODIAN"] },
 ];
 
 export function createAuthMiddleware(auth: AuthService, cookieName: string) {

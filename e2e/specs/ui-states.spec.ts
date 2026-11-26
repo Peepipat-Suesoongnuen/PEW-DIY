@@ -98,12 +98,10 @@ test.describe("shared UI states (f-02 §3 / ui-spec §0.3)", () => {
     expect(reactLogin.status()).toBe(200);
     expect(reactLogin.headers()["content-type"]).toContain("text/html");
 
-    // Legacy HTML remains a supported serving contract until migration P4.
-    // Assert its distinct page content so the SPA fallback cannot mask its removal.
+    // Legacy HTML routes were retired in ARCH-01 Phase P4 and must return 404
+    // rather than falling through to the SPA shell.
     const legacyLogin = await request.get("/login.html");
-    expect(legacyLogin.status()).toBe(200);
-    expect(legacyLogin.headers()["content-type"]).toContain("text/html");
-    expect(await legacyLogin.text()).toContain('id="login-form"');
+    expect(legacyLogin.status()).toBe(404);
 
     const spaRoute = await request.get("/some/client/route");
     expect(spaRoute.status()).toBe(200);
