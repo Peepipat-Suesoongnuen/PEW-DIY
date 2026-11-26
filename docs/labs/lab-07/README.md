@@ -16,11 +16,11 @@
 
 | Section | Topic | Evidence IDs | Status |
 | --- | --- | --- | --- |
-| [Version Traceability](#version-traceability-lab-7-42) | Sprint 1 baseline, contract rev, maintenance change, staging & release revisions | `EV-L7-A1`, `EV-L7-A2` | Populated (release SHA pending Task 3) |
+| [Version Traceability](#version-traceability-lab-7-42) | Sprint 1 baseline, contract rev, maintenance change, staging & release revisions | `EV-L7-A1`, `EV-L7-A2` | Populated (pending Release PR (`sprint/2-staging` → `main`) & GCP Cloud Run deploy) |
 | [Part A](#part-a--change-impact-and-updated-contract) | Change request spec, impact traceability table, old/new contract excerpts & PR `#98` review | `EV-L7-A1`, `EV-L7-A2` | Complete |
 | [Part B](#part-b--maintenance-implementation-tdd-and-regression) | Maintenance implementation diff, TDD RED → GREEN, and regression verification | `EV-L7-B1`–`EV-L7-B4` | Complete (release PR & GCP deploy pending) |
 | [Part C](#part-c--software-maintenance-and-quality-metrics) | Five objective engineering metrics, reconcilable source tables, and `<= 100`-word interpretation | `EV-L7-C1`, `EV-L7-C2` | Complete |
-| [Part D](#part-d--release-readiness-and-deployment-verification) | Release PR, GCP Cloud Run deploy, smoke checks, and Go/No-Go checklist | `EV-L7-B2`, `EV-L7-D1` | Placeholder (Task 3/5) |
+| [Part D](#part-d--release-readiness-and-submission-sign-off) | Release readiness checklist, technical debt, retrospective, contributions & §5 submission check | `EV-L7-D1`–`EV-L7-D3` | Complete (pending Release PR (`sprint/2-staging` → `main`) & GCP Cloud Run deploy) |
 
 ---
 
@@ -35,7 +35,7 @@
 | **Pre-Change Contract Revision** | `sprint/2-staging` | `7e111101a5fd4c0c1a54b62d75063b37901db13c` | PR `#98` / Issue `#97` | `2026-11-24T09:54:41Z`; `L0u1sss` 9× `CHANGES_REQUESTED` + `APPROVED` `2026-11-24T09:54:02Z` (`92710ee`) | Updated SRS rev 6, System SDS rev 7, and Sprint 2/3 feature contracts **before** code changes |
 | **Maintenance Change Implementation** | `sprint/2-staging` | `8b493796a676342b2efce82c9ed7e8414abdbe80` | PR `#109` / Issue `#103` | `2026-11-24T18:12:02Z` (head `0d9fd3d`); `L0u1sss` `APPROVED` `2026-11-24T18:11:29Z` | Implements `A-11` approval workflow, bundles, 1–14d duration, `Finding 05`, `UAT-07` hints |
 | **Current Staging Integration** | `sprint/2-staging` | `d4b11422c4f699cbb1556bc2a611917d42c20535` | PR `#116` / Issue `#115` | `2026-11-26T09:03:04Z`; `L0u1sss` `APPROVED` `2026-11-26T09:02:27Z` (`76632df`) | Latest integrated staging commit (`CI & Docker Build` run `45788402551` passed) |
-| **Release `main` & GCP Deployed Revision** | `main` / Cloud Run `pewdiy` | `[PENDING_RELEASE_PR_AND_GCP_DEPLOY]` | `[PENDING]` | `[PENDING]` | To be populated after Task 3 release promotion & Cloud Run deployment |
+| **Release `main` & GCP Deployed Revision** | `main` / Cloud Run `pewdiy` | `[PENDING_RELEASE_PR_AND_GCP_DEPLOY]` | `[PENDING]` | `[PENDING]` | Pending Release PR (`sprint/2-staging` → `main`) & GCP Cloud Run deploy |
 
 ### Intervening Sprint 2 / 3 Development on `sprint/2-staging`
 
@@ -435,6 +435,75 @@ Although `sprint/2-staging` integrates 9 PRs with 33/34 (97.1%) CI passes and 44
 
 ---
 
-## Part D — Release Readiness and Deployment Verification
+## Part D — Release Readiness and Submission Sign-Off
 
-*(Placeholder — to be completed in Tasks 3 & 5.)*
+### D.1 Release Readiness Checklist (`EV-L7-D1` — Maintained Sprint 1 Scope)
+
+| Check Area | Observed Status & Evidence | Gate Status |
+| --- | --- | --- |
+| **Submitted / Staging Version** | Integrated staging branch `sprint/2-staging` @ `d4b1142` (`d4b11422c4f699cbb1556bc2a611917d42c20535`, PR `#116`). Release PR → `main` & Cloud Run deploy `[PENDING_RELEASE_PR_AND_GCP_DEPLOY]`; live `main` currently remains `d079bc6` (docs) / `b03c904` (`pewdiy-00008-mfk`). | **Staging Ready / Release Pending** |
+| **Defects by Severity / Status** | `0` open Critical, Major, or Minor product defects (`Finding 05` Minor & `UAT-07 UX Note` resolved in PRs `#109`, `#110`, `#114`; formal partner retest sign-off remains pending). | **Pass** *(retest sign-off pending)* |
+| **Automated & User-Test Results** | Authoritative CI `449/449` passed (`293` server + `96` client + `60` E2E, `0` failed, `0` skipped on `d4b1142` run `45788402551`, plus `12/12` tooling & `7/7` deploy tests). Local run: `96/96` client + `291/293` server (`2` `migration-repair.test.ts` skipped without `MIGRATION_REPAIR_TEST_DATABASE_URL`; local E2E blocked on occupied port `3000`). Partner interim UAT (`UAT-01–UAT-08`) ran on Sprint 1 `pewdiy-uat-00003-8c5`; Partner UAT Part B (`#82`) remains `BLOCKED`. | **Pass (CI)** / **Blocked (Part B `#82`)** |
+| **Configuration / Secrets** | Fail-closed runtime config in [`server/src/config/config.ts`](../../../server/src/config/config.ts); `.env` / `.env.*` git-ignored in [`.gitignore`](../../../.gitignore); GCP Secret Manager + Workload Identity Federation in [`deploy/deploy.sh`](../../../deploy/deploy.sh); `C-03` Docker check passed (`45788402551`) with no secrets in Git, image, or PDF. | **Pass** |
+| **Documentation / Run Instructions** | [`README.md`](../../../README.md), [`docs/labs/lab-05/deployment.md`](../lab-05/deployment.md), [`docs/srs.md`](../../srs.md), [`docs/system-sds.md`](../../system-sds.md), and [`docs/sprints/sprint-2/`](../../sprints/sprint-2/README.md) updated and peer-reviewed. | **Pass** |
+| **Deployment / Smoke Status** | Sprint 1 baseline `b03c904` remains live & healthy (`pewdiy-00008-mfk` at `https://pewdiy-qtz73ahnlq-as.a.run.app`). Sprint 2 / Lab 7 release deployment & post-deploy smoke checks `[PENDING_RELEASE_PR_AND_GCP_DEPLOY]`. | **Pending Release Deploy** |
+
+#### Explicit Readiness Verdict
+
+- **Overall Release Verdict:** **`NOT READY` for final `main` release** until the Release PR (`sprint/2-staging` → `main`) is reviewed and merged and Lab 5 GCP Cloud Run deployment + post-deploy smoke checks complete; **`READY` at the `sprint/2-staging` code/CI gate** (`d4b1142`, `449/449` CI tests passing, `0` open product defects, and `10/10` merged PRs peer-reviewed by `L0u1sss`).
+- **Outstanding Items, Owners & Actions:**
+  1. **Release PR (`sprint/2-staging` → `main`):** `d4b1142` has not yet been promoted from staging to `main`. **Owner:** `Peepipat-Suesoongnuen` (author) / `L0u1sss` (reviewer). **Action:** Open, peer-review, and merge Release PR before `2026-11-29`.
+  2. **GCP Cloud Run Deployment & Post-Deploy Smoke Checks:** Production service `pewdiy` still serves Sprint 1 `b03c904` (`pewdiy-00008-mfk`). **Owner:** `Peepipat-Suesoongnuen` / `L0u1sss`. **Action:** Run the Lab 5 Cloud Run deploy workflow after `main` merges, verify `/api/ready`, live `A-11`/`BR-07` behavior, and preserved `BR-04`/`BR-05` isolation, and record the resulting `main` SHA and revision in `Version Traceability`.
+  3. **Partner UAT Part B (`#82`) & Formal `Finding 05` Retest Sign-Off:** External partner handoff and retest confirmation remain unreceived. **Owner:** `Peepipat-Suesoongnuen` / `L0u1sss`. **Action:** Continue tracking/escalating via the course channel without misreporting external partner confirmation as complete.
+
+---
+
+### D.2 Technical Debt Table (`EV-L7-D2` — Distinct from Defects)
+
+| Item | Impact | Priority | Disposition / Action |
+| --- | --- | --- | --- |
+| **Remaining Sprint 3 `F-09` deliverables** (`AC-F09-04` CSV export/filtering & `AC-F09-05` formal 100-item `NFR-07` `p95 <= 2000 ms` benchmark) | Reporting summary (`GET /api/reports/summary` + `/reports`) is delivered, but CSV export and formal 100-item latency proof are not yet implemented | **Medium** | Deferred to Sprint 3 Final Delivery (`2026-12-13`) per [`f-09-inventory-reporting.md`](../../sprints/sprint-3/f-09-inventory-reporting.md). |
+| **Local E2E & `migration-repair` environment parity** (`MIGRATION_REPAIR_TEST_DATABASE_URL` unset in local `.env`; port `3000` conflict aborting local `npm run test:e2e`) | Causes `2` skipped server tests and pre-test E2E abort locally, requiring CI `postgres:17` for full `449/449` proof | **Low** | Documented in §B.3; CI `postgres:17` covers both cleanly; standardize local `.env` template & port-cleanup script before Final Delivery (`2026-12-13`). |
+| **Lab 6 Partner UAT Part B (`#82`) & formal signed `Finding 05` retest record** | External acceptance artifact remains incomplete despite product-side fixes (`PR #109`, `#110`, `#114`) | **Medium** | External partner dependency; track/escalate per course channel without blocking `sprint/2-staging` code quality. |
+
+---
+
+### D.3 Retrospective (`EV-L7-D3`)
+
+- **What helped:** Reconciling and peer-reviewing the updated Sprint 2/3 engineering contracts in PR `#98` before writing code eliminated ambiguity across `A-11`, `BR-07`, and `F-06`–`F-09`. Shipping small vertical-slice PRs (`#107`–`#116`) gated by `L0u1sss` reviews and CI `npm run test:ci` caught regressions early and kept `sprint/2-staging` at `449/449` passing tests.
+- **What hurt:** Missing external Partner UAT handoff prerequisites left Lab 6 Part B (`#82`) and formal `Finding 05` retest sign-off blocked outside our control, while local environment parity friction (unset `MIGRATION_REPAIR_TEST_DATABASE_URL` and port `3000` collisions during local E2E runs) slowed local verification. In addition, deferring the Release PR promotion from `sprint/2-staging` to `main` until after staging integration left the live Cloud Run service still running Sprint 1 (`b03c904`) at this checkpoint.
+- **What will change:** Before `2026-11-29`, `Peepipat-Suesoongnuen` and `L0u1sss` will promote `sprint/2-staging` to `main` via peer-reviewed Release PR and run the Lab 5 Cloud Run deploy plus post-deploy smoke checks. For Final Delivery (`2026-12-13`), we will add a local `.env` and port-cleanup preflight script and complete the remaining `F-09` CSV export (`AC-F09-04`) and 100-item `NFR-07` benchmark (`AC-F09-05`) on `sprint/3-staging`.
+
+---
+
+### D.4 Team Contributions, AI-Use Declaration & Known Limitations (`EV-L7-D3`)
+
+#### Team Contributions
+
+| Team Member | Student ID | Primary Roles & Deliverables | Verification & Review Contributions |
+| --- | --- | --- | --- |
+| `Peepipat-Suesoongnuen` | `[STUDENT_1_ID]` *(fill in PDF cover)* | Authored Sprint 2/3 contract reconciliation (`PR #98`), `ARCH-01` Phase P4 & `F-06`–`F-11` implementation PRs (`#107`–`#112`, `#114`, `#116`), and Lab 7 Parts A–D evidence drafting (`#117`) | Executed local builds/tests on `d4b1142`, tracked CI runs, and integrated staging PRs after approval |
+| `L0u1sss` | `[STUDENT_2_ID]` *(fill in PDF cover)* | Independent peer reviewer across all `10/10` merged window PRs (`#96`, `#98`, `#107`–`#112`, `#114`, `#116`), including the 9-round contract review on `PR #98` and release gating | Enforced SRS/SDS contract alignment, edge-case guards, and `CHANGES_REQUESTED` → `APPROVED` gates prior to merge |
+
+#### AI-Use Declaration
+
+An AI coding and planning assistant was used to assist with drafting updated contract excerpts, scaffolding unit/integration tests, compiling reconcilable metric tables, and formatting Lab 7 evidence documentation. All generated code, tests, metrics, and prose were independently verified by executing the test suites (`npm run test:ci` / local Vitest) and inspecting actual git/GitHub artifacts, and every merged PR was peer-reviewed and approved by human teammates (`Peepipat-Suesoongnuen` and `L0u1sss`).
+
+#### Known Limitations
+
+- **Pending `main` Release & Cloud Run Redeploy:** `sprint/2-staging` (`d4b1142`) has not yet been merged into `main`, so the live Cloud Run URL (`https://pewdiy-qtz73ahnlq-as.a.run.app`) still serves Sprint 1 (`b03c904` / `pewdiy-00008-mfk`).
+- **Pending Partner UAT Closure:** Lab 6 Partner UAT Part B (`#82`) and formal Partner UAT Team retest sign-off for `Finding 05` and `UAT-07` remain unreceived external dependencies.
+- **Deferred Sprint 3 `F-09` Scope:** `AC-F09-04` (CSV export/filtering) and `AC-F09-05` (formal 100-item `NFR-07` benchmark) are scheduled for Sprint 3 Final Delivery (`2026-12-13`).
+
+---
+
+### D.5 Submission Checklist (§5 Self-Check Table)
+
+| # | Lab 7 §5 Requirement | Evidence / Section | Current Status & Pre-PDF Action |
+| --- | --- | --- | --- |
+| 1 | **Version Traceability:** Sprint 1 baseline, pre-change contract, maintenance implementation, staging & release SHAs/revisions recorded | `EV-L7-A1`, `EV-L7-A2` ([Version Traceability](#version-traceability-lab-7-42)) | Complete for staging (`b03c904`, `d079bc6`, `7e11110`, `8b49379`, `d4b1142`); populate `main` SHA & Cloud Run revision after Release PR + GCP deploy |
+| 2 | **Part A:** Change request spec, impact traceability table, old/new contract excerpts, and pre-implementation teammate review | `EV-L7-A1`, `EV-L7-A2` ([Part A](#part-a--change-impact-and-updated-contract)) | Complete |
+| 3 | **Part B:** TDD RED failure evidence, GREEN diff (`PR #109`), full regression results (`449/449` CI), and peer-review/deploy status | `EV-L7-B1`–`EV-L7-B4` ([Part B](#part-b--maintenance-implementation-tdd-and-regression)) | Complete for staging; append post-deploy Cloud Run smoke check after Release PR + GCP deploy |
+| 4 | **Part C:** Five dated objective metrics, reconcilable source tables, and `<= 100`-word interpretation | `EV-L7-C1`, `EV-L7-C2` ([Part C](#part-c--software-maintenance-and-quality-metrics)) | Complete |
+| 5 | **Part D:** Release readiness checklist + explicit verdict, technical debt table, 3 retrospective answers (1–2 sentences each), contributions/AI-use/limitations | `EV-L7-D1`–`EV-L7-D3` ([Part D](#part-d--release-readiness-and-submission-sign-off)) | Complete for staging; update verdict & checklist once Release PR merges and GCP deploy passes |
+| 6 | **Submission Packaging:** Student names/IDs filled, no secrets/credentials exposed, clickable links & legible evidence in final PDF | Header & §D.4 | Fill `[STUDENT_1_ID]` / `[STUDENT_2_ID]`, merge Release PR + GCP deploy, then export final PDF |
