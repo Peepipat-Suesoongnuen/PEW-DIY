@@ -440,9 +440,7 @@ Authoritative full-suite execution ran on **GitHub Actions `CI & Docker Build` r
 
 ### C.3 Evidence-Based Interpretation (`<= 100 Words`)
 
-Although `sprint/2-staging` integrates 9 PRs with 33/34 (97.1%) CI passes and 449/449 (100.0%) tests passing on `d4b1142`, `main` and Cloud Run `pewdiy` still serve Sprint 1 (`b03c904`), local runs hit environment parity gaps (2 skipped migration-repair tests; port 3000 E2E collision), Partner UAT (`#82`) is blocked, and `F-09` CSV/benchmark scope remains open. **Action:** `Peepipat-Suesoongnuen` (with `L0u1sss` review) will merge the `sprint/2-staging` to `main` release PR and deploy Lab 5 Cloud Run with smoke checks before 2026-11-29, targeting Final Delivery (2026-12-13) for `F-09`.
-
-*(Post-snapshot execution update: The action above completed via PR `#120` [`7dbf137`] and Release PR `#119` [`5f82a8e`, `2026-11-26T17:49:44Z`], deploying `pewdiy-00010-fd6` via `Deploy demo` Run `45870992457`; see Sec. B.4 and Sec. D.1.)*
+As of `2026-11-26T13:15Z`, `sprint/2-staging` integrated 9 PRs with 33/34 (97.1%) CI passes and 449/449 (100.0%) tests passing on `d4b1142`, yet `main` and Cloud Run `pewdiy` still served Sprint 1 (`b03c904`), local runs hit parity gaps (2 skipped migration-repair tests; port 3000 E2E collision), Partner UAT (`#82`) was blocked, and `F-09` CSV/benchmark scope remained open. **Action:** `Peepipat-Suesoongnuen` (with `L0u1sss` review) had to promote `sprint/2-staging` to `main` with Cloud Run smoke checks before 2026-11-29 (subsequently completed in PR `#119`), then finish `F-09` for Final Delivery (2026-12-13).
 
 ---
 
@@ -514,6 +512,6 @@ An AI coding and planning assistant was used to assist with drafting updated con
 | 1 | **Version Traceability:** Sprint 1 baseline, pre-change contract, maintenance implementation, staging & release SHAs/revisions recorded | `EV-L7-A1`, `EV-L7-A2` ([Version Traceability](#version-traceability-lab-7-42)) | Complete (`b03c904`, `d079bc6`, `7e11110`, `8b49379`, `d4b1142`, `5f82a8e` / `pewdiy-00010-fd6`) |
 | 2 | **Part A:** Change request spec, impact traceability table, old/new contract excerpts, and pre-implementation teammate review | `EV-L7-A1`, `EV-L7-A2` ([Part A](#part-a--change-impact-and-updated-contract)) | Complete |
 | 3 | **Part B:** TDD RED failure evidence, GREEN diff (`PR #109`), full regression results, peer-review, `main` release & GCP deploy | `EV-L7-B1`–`EV-L7-B4` ([Part B](#part-b--maintenance-implementation-tdd-and-regression)) | Complete (`PR #119` `5f82a8e`, `Deploy demo` `45870992457`, `pewdiy-00010-fd6`) |
-| 4 | **Part C:** Five dated objective metrics, reconcilable source tables, and `<= 100`-word interpretation | `EV-L7-C1`, `EV-L7-C2` ([Part C](#part-c--software-maintenance-and-quality-metrics)) | Complete (`82` words) |
+| 4 | **Part C:** Five dated objective metrics, reconcilable source tables, and `<= 100`-word interpretation | `EV-L7-C1`, `EV-L7-C2` ([Part C](#part-c--software-maintenance-and-quality-metrics)) | Complete (`84` words) |
 | 5 | **Part D:** Release readiness checklist + explicit verdict, technical debt table, 3 retrospective answers (1–2 sentences each), contributions/AI-use/limitations | `EV-L7-D1`–`EV-L7-D3` ([Part D](#part-d--release-readiness-and-submission-sign-off)) | Complete (`READY` for Maintained Sprint 1 Scope) |
-| 6 | **Submission Packaging:** Student names/IDs filled, no secrets/credentials exposed, clickable links & legible evidence in final PDF | Header, Sec. D.4 & `Lab7_PEW-DIY_Report.html` | Complete (ready for Print / Save as PDF → LEB2) |
+| 6 | **Submission Packaging:** Student names/IDs filled, no secrets/credentials exposed, clickable links & legible evidence in final PDF | Header & Sec. D.4 (tracked Markdown source; final HTML/PDF package is generated locally outside this repo) | Pending LEB2 PDF export (tracked Markdown ready; local HTML/PDF deliverable is untracked outside repo) |
