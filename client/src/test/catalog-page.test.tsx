@@ -427,4 +427,35 @@ describe("CatalogPage (ui-spec §2 / f-02 §3 states)", () => {
     await user.selectOptions(screen.getByLabelText("Sort by"), "name_desc");
     expect(await screen.findByText("Showing 1–10 of 12")).toBeInTheDocument();
   });
+
+  it("enforces maxLength (120/60/1000) and live character counters on Custodian Add equipment form", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "c1", username: "C-A", role: "CUSTODIAN" } } });
+        }
+        return jsonResponse(200, { data: items });
+      }),
+    );
+    const user = userEvent.setup();
+    renderCatalog();
+
+    await user.click(await screen.findByRole("button", { name: "Add equipment" }));
+    const nameInput = screen.getByLabelText("Equipment name");
+    const categoryInput = screen.getByLabelText("Equipment category");
+    const descInput = screen.getByLabelText("Description");
+
+    expect(nameInput).toHaveAttribute("maxLength", "120");
+    expect(categoryInput).toHaveAttribute("maxLength", "60");
+    expect(descInput).toHaveAttribute("maxLength", "1000");
+
+    expect(screen.getByText("0 / 120")).toBeInTheDocument();
+    expect(screen.getByText("0 / 60")).toBeInTheDocument();
+    expect(screen.getByText("0 / 1,000")).toBeInTheDocument();
+
+    await user.type(nameInput, "Fluke");
+    expect(screen.getByText("5 / 120")).toBeInTheDocument();
+  });
 });

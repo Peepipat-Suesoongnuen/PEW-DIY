@@ -188,29 +188,43 @@ export function CatalogPage() {
         <Card title="Add catalog equipment">
           {createError ? <div className="mb-3"><Alert tone="danger">{createError}</Alert></div> : null}
           <form onSubmit={handleCreateEquipment} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field
-              id="create-eq-name"
-              label="Equipment name"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              required
-              disabled={creating}
-            />
-            <Field
-              id="create-eq-category"
-              label="Equipment category"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              required
-              disabled={creating}
-            />
+            <div>
+              <Field
+                id="create-eq-name"
+                label="Equipment name"
+                value={newName}
+                maxLength={120}
+                onChange={(e) => setNewName(e.target.value)}
+                required
+                disabled={creating}
+              />
+              <p className="mt-1 text-right text-xs tabular-nums text-text-muted">{newName.length} / 120</p>
+            </div>
+            <div>
+              <Field
+                id="create-eq-category"
+                label="Equipment category"
+                value={newCategory}
+                maxLength={60}
+                onChange={(e) => setNewCategory(e.target.value)}
+                required
+                disabled={creating}
+              />
+              <p className="mt-1 text-right text-xs tabular-nums text-text-muted">{newCategory.length} / 60</p>
+            </div>
             <div className="sm:col-span-2">
-              <label htmlFor="create-eq-desc" className="mb-1 block text-sm font-medium text-text">
-                Description
-              </label>
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <label htmlFor="create-eq-desc" className="block text-sm font-medium text-text">
+                  Description
+                </label>
+                <span className="text-xs tabular-nums text-text-muted">
+                  {newDescription.length.toLocaleString()} / 1,000
+                </span>
+              </div>
               <textarea
                 id="create-eq-desc"
                 rows={2}
+                maxLength={1000}
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
                 disabled={creating}

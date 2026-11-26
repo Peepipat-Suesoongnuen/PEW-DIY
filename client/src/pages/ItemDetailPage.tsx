@@ -16,9 +16,9 @@ import { CatalogStatusBadge } from "../components/StatusBadge";
 
 function LabeledBox({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-control border border-border bg-white p-4">
+    <div className="min-w-0 rounded-control border border-border bg-white p-4">
       <p className="text-xs font-medium uppercase tracking-wide text-text-muted">{label}</p>
-      <div className="mt-1.5 text-sm text-text">{children}</div>
+      <div className="mt-1.5 text-sm text-text [overflow-wrap:anywhere]">{children}</div>
     </div>
   );
 }
@@ -167,7 +167,7 @@ export function ItemDetailPage() {
               />
               <div className="min-w-0 flex-1 space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h1 className="text-xl font-semibold text-text">{item.name}</h1>
+                  <h1 className="min-w-0 text-xl font-semibold text-text [overflow-wrap:anywhere]">{item.name}</h1>
                   <div className="flex items-center gap-2">
                     <AvailabilityBadge availability={item.availability} />
                     <CatalogStatusBadge status={catalogStatus} />
@@ -236,29 +236,43 @@ export function ItemDetailPage() {
             <Card title="Edit equipment details">
               {saveError ? <div className="mb-3"><Alert tone="danger">{saveError}</Alert></div> : null}
               <form onSubmit={handleSave} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field
-                  id="edit-eq-name"
-                  label="Equipment name"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  required
-                  disabled={saving}
-                />
-                <Field
-                  id="edit-eq-category"
-                  label="Category"
-                  value={editCategory}
-                  onChange={(e) => setEditCategory(e.target.value)}
-                  required
-                  disabled={saving}
-                />
+                <div>
+                  <Field
+                    id="edit-eq-name"
+                    label="Equipment name"
+                    value={editName}
+                    maxLength={120}
+                    onChange={(e) => setEditName(e.target.value)}
+                    required
+                    disabled={saving}
+                  />
+                  <p className="mt-1 text-right text-xs tabular-nums text-text-muted">{editName.length} / 120</p>
+                </div>
+                <div>
+                  <Field
+                    id="edit-eq-category"
+                    label="Category"
+                    value={editCategory}
+                    maxLength={60}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                    required
+                    disabled={saving}
+                  />
+                  <p className="mt-1 text-right text-xs tabular-nums text-text-muted">{editCategory.length} / 60</p>
+                </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="edit-eq-desc" className="mb-1 block text-sm font-medium text-text">
-                    Description
-                  </label>
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <label htmlFor="edit-eq-desc" className="block text-sm font-medium text-text">
+                      Description
+                    </label>
+                    <span className="text-xs tabular-nums text-text-muted">
+                      {editDescription.length.toLocaleString()} / 1,000
+                    </span>
+                  </div>
                   <textarea
                     id="edit-eq-desc"
                     rows={3}
+                    maxLength={1000}
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     disabled={saving}

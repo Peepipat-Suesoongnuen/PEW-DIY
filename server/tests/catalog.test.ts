@@ -18,6 +18,7 @@ import { SessionStore } from "../src/services/session";
 import { hashPassword } from "../src/services/password";
 import { loadConfig, AppConfig } from "../src/config/config";
 import { createTestContext, TestContext } from "./harness";
+import { validateCreateEquipmentBody, validateUpdateEquipmentBody } from "../src/services/catalog";
 import { validateEquipmentInput, seedEquipmentFixture } from "../src/services/catalog";
 
 let ctx: TestContext;
@@ -289,5 +290,37 @@ describe("Safe failure and restart persistence (TEST-F02-09/10)", () => {
     const after = res.body.data.map((i: { id: string; name: string; quantity_total: number }) => ({ id: i.id, name: i.name, quantity_total: i.quantity_total }));
     expect(after).toEqual(before.rows.map((r: { id: string; name: string; quantity_total: number }) => ({ id: r.id, name: r.name, quantity_total: Number(r.quantity_total) })));
     // loan-dependent domain records portion of TEST-F02-10 remains dependency-gated (F-04/F-05)
+  });
+
+  it("enforces max length bounds (120 name, 60 category, 1000 description) on create and update", () => {
+    const okCreate = validateCreateEquipmentBody({
+      name: `  ${"N".repeat(120)}  `,
+      category: ` ${"C".repeat(60)} `,
+      description: "D".repeat(1000),
+      quantity_total: 2,
+    });
+    expect(okCreate.name).toHaveLength(120);
+    expect(okCreate.category).toHaveLength(60);
+    expect(okCreate.description).toHaveLength(1000);
+
+    expect(() =>
+      validateCreateEquipmentBody({ name: "N".repeat(121), category: "Tools", description: "", quantity_total: 1 }),
+    ).toThrow(/VALIDATION_ERROR/);
+    expect(() =>
+      validateCreateEquipmentBody({ name: "Meter", category: "C".repeat(61), description: "", quantity_total: 1 }),
+    ).toThrow(/VALIDATION_ERROR/);
+    expect(() =>
+      validateCreateEquipmentBody({ name: "Meter", category: "Tools", description: "D".repeat(1001), quantity_total: 1 }),
+    ).toThrow(/VALIDATION_ERROR/);
+
+    const okUpdate = validateUpdateEquipmentBody({
+      name: "N".repeat(120),
+      category: "C".repeat(60),
+      description: "D".repeat(1000),
+    });
+    expect(okUpdate.name).toHaveLength(120);
+    expect(() => validateUpdateEquipmentBody({ name: "N".repeat(121) })).toThrow(/VALIDATION_ERROR/);
+    expect(() => validateUpdateEquipmentBody({ category: "C".repeat(61) })).toThrow(/VALIDATION_ERROR/);
+    expect(() => validateUpdateEquipmentBody({ description: "D".repeat(1001) })).toThrow(/VALIDATION_ERROR/);
   });
 });

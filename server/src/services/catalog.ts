@@ -9,6 +9,10 @@ import type { Pool, PoolClient } from "pg";
 export type CatalogStatus = "ACTIVE" | "RETIRED";
 export type CatalogSort = "name_asc" | "name_desc" | "available_desc" | "available_asc";
 
+export const MAX_EQUIPMENT_NAME_LENGTH = 120;
+export const MAX_EQUIPMENT_CATEGORY_LENGTH = 60;
+export const MAX_EQUIPMENT_DESCRIPTION_LENGTH = 1000;
+
 export interface EquipmentInput {
   id: string;
   name: string;
@@ -262,6 +266,20 @@ export async function getEquipment(pool: Pick<Pool, "query">, id: string): Promi
   return row ? toView(row as StockRow) : null;
 }
 
+function parseBoundedText(value: unknown, field: string, maxLength: number, required: boolean): string {
+  if (typeof value !== "string" || value.includes("\0")) {
+    throw new CatalogError(400, "VALIDATION_ERROR", `Invalid ${field}.`);
+  }
+  const trimmed = value.trim();
+  if (required && trimmed.length === 0) {
+    throw new CatalogError(400, "VALIDATION_ERROR", `${field} is required.`);
+  }
+  if (trimmed.length > maxLength) {
+    throw new CatalogError(400, "VALIDATION_ERROR", `${field} must be at most ${maxLength} characters.`);
+  }
+  return trimmed;
+}
+
 export function validateCreateEquipmentBody(input: unknown): {
   name: string;
   description: string;
@@ -276,10 +294,10 @@ export function validateCreateEquipmentBody(input: unknown): {
   for (const key of Object.keys(body)) {
     if (!allowed.has(key)) throw invalid();
   }
-  if (typeof body.name !== "string" || body.name.trim().length === 0 || body.name.includes("\0")) throw invalid();
-  const description = body.description === undefined ? "" : body.description;
-  if (typeof description !== "string" || description.includes("\0")) throw invalid();
-  if (typeof body.category !== "string" || body.category.trim().length === 0 || body.category.includes("\0")) throw invalid();
+  const name = parseBoundedText(body.name, "name", MAX_EQUIPMENT_NAME_LENGTH, true);
+  const rawDescription = body.description === undefined ? "" : body.description;
+  const description = parseBoundedText(rawDescription, "description", MAX_EQUIPMENT_DESCRIPTION_LENGTH, false);
+  const category = parseBoundedText(body.category, "category", MAX_EQUIPMENT_CATEGORY_LENGTH, true);
   if (
     typeof body.quantity_total !== "number" ||
     !Number.isSafeInteger(body.quantity_total) ||
@@ -290,9 +308,9 @@ export function validateCreateEquipmentBody(input: unknown): {
   }
   const image_url = validateImageUrl(body.image_url);
   return {
-    name: body.name.trim(),
-    description: description.trim(),
-    category: body.category.trim(),
+    name,
+    description,
+    category,
     quantity_total: body.quantity_total,
     image_url,
   };
@@ -329,16 +347,13 @@ export function validateUpdateEquipmentBody(input: unknown): {
   }
   const patch: ReturnType<typeof validateUpdateEquipmentBody> = {};
   if (Object.hasOwn(body, "name")) {
-    if (typeof body.name !== "string" || body.name.trim().length === 0 || body.name.includes("\0")) throw invalid();
-    patch.name = body.name.trim();
+    patch.name = parseBoundedText(body.name, "name", MAX_EQUIPMENT_NAME_LENGTH, true);
   }
   if (Object.hasOwn(body, "description")) {
-    if (typeof body.description !== "string" || body.description.includes("\0")) throw invalid();
-    patch.description = body.description.trim();
+    patch.description = parseBoundedText(body.description, "description", MAX_EQUIPMENT_DESCRIPTION_LENGTH, false);
   }
   if (Object.hasOwn(body, "category")) {
-    if (typeof body.category !== "string" || body.category.trim().length === 0 || body.category.includes("\0")) throw invalid();
-    patch.category = body.category.trim();
+    patch.category = parseBoundedText(body.category, "category", MAX_EQUIPMENT_CATEGORY_LENGTH, true);
   }
   if (Object.hasOwn(body, "quantity_total")) {
     if (
