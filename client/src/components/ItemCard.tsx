@@ -20,13 +20,13 @@ export function ItemCard({ item }: { item: Equipment }) {
         <EquipmentImage imageUrl={item.image_url} name={item.name} category={item.category} size="md" />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <h3 className="text-base font-medium text-text">{item.name}</h3>
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <h3 className="text-base font-medium text-text [overflow-wrap:anywhere]">{item.name}</h3>
               {item.catalog_status === "RETIRED" ? <CatalogStatusBadge status="RETIRED" /> : null}
             </div>
             <AvailabilityBadge availability={item.availability} />
           </div>
-          <p className="mt-1 text-sm text-text-muted">{item.category}</p>
+          <p className="mt-1 text-sm text-text-muted [overflow-wrap:anywhere]">{item.category}</p>
           <p className="mt-2 text-sm text-text">
             <strong>{item.quantity_available}</strong> available of {item.quantity_total} total
           </p>

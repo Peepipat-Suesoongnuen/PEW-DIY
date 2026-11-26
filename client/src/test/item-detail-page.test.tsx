@@ -213,4 +213,43 @@ describe("ItemDetailPage (ui-spec §3, minus F-04 request panel)", () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Request this item" })).not.toBeInTheDocument();
   });
+
+  it("enforces maxLength (120/60/1000) and live counters on Custodian Edit form and wraps long names safely", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/auth/me")) {
+          return jsonResponse(200, { data: { user: { id: "c1", username: "C-A", role: "CUSTODIAN" } } });
+        }
+        return jsonResponse(200, {
+          data: {
+            id: "E-ONE",
+            name: "Arduino Uno",
+            description: "Microcontroller",
+            category: "Electronics",
+            quantity_total: 3,
+            quantity_available: 3,
+            availability: "AVAILABLE",
+            image_url: "",
+            catalog_status: "ACTIVE",
+          },
+        });
+      }),
+    );
+    const user = userEvent.setup();
+    renderDetail();
+
+    const heading = await screen.findByRole("heading", { name: "Arduino Uno" });
+    expect(heading).toHaveClass("[overflow-wrap:anywhere]");
+
+    await user.click(screen.getByRole("button", { name: "Edit equipment" }));
+    expect(screen.getByLabelText("Equipment name")).toHaveAttribute("maxLength", "120");
+    expect(screen.getByLabelText("Category")).toHaveAttribute("maxLength", "60");
+    expect(screen.getByLabelText("Description")).toHaveAttribute("maxLength", "1000");
+
+    expect(screen.getByText("11 / 120")).toBeInTheDocument();
+    expect(screen.getByText("11 / 60")).toBeInTheDocument();
+    expect(screen.getByText("15 / 1,000")).toBeInTheDocument();
+  });
 });
