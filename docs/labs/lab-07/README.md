@@ -19,7 +19,7 @@
 | [Version Traceability](#version-traceability-lab-7-42) | Sprint 1 baseline, contract rev, maintenance change, staging & release revisions | `EV-L7-A1`, `EV-L7-A2` | Populated (release SHA pending Task 3) |
 | [Part A](#part-a--change-impact-and-updated-contract) | Change request spec, impact traceability table, old/new contract excerpts & PR `#98` review | `EV-L7-A1`, `EV-L7-A2` | Complete |
 | [Part B](#part-b--maintenance-implementation-tdd-and-regression) | Maintenance implementation diff, TDD RED → GREEN, and regression verification | `EV-L7-B1`–`EV-L7-B4` | Complete (release PR & GCP deploy pending) |
-| [Part C](#part-c--software-maintenance-and-quality-metrics) | Maintenance metrics, review/CI turnaround, defect & change density | `EV-L7-C1` | Placeholder (Task 4/5) |
+| [Part C](#part-c--software-maintenance-and-quality-metrics) | Five objective engineering metrics, reconcilable source tables, and `<= 100`-word interpretation | `EV-L7-C1`, `EV-L7-C2` | Complete |
 | [Part D](#part-d--release-readiness-and-deployment-verification) | Release PR, GCP Cloud Run deploy, smoke checks, and Go/No-Go checklist | `EV-L7-B2`, `EV-L7-D1` | Placeholder (Task 3/5) |
 
 ---
@@ -308,7 +308,130 @@ Authoritative full-suite execution ran on **GitHub Actions `CI & Docker Build` r
 
 ## Part C — Software Maintenance and Quality Metrics
 
-*(Placeholder — to be completed in Tasks 4–5.)*
+### C.1 Five Dated Engineering Metrics (`EV-L7-C1`)
+
+- **Repository Scope:** `Peepipat-Suesoongnuen/PEW-DIY` (GitHub Issues, Pull Requests, and GitHub Actions workflows).
+- **Observation Window:** `2026-11-23T00:00:00Z` – `2026-11-26T13:15:00Z` UTC (`d079bc6` on `main` through `d4b1142` on `sprint/2-staging`, prior to `#117` Lab 7 documentation commits).
+
+| Metric | Definition & Scope | Window / Snapshot | Value | Source / Evidence ID |
+| --- | --- | --- | --- | --- |
+| **1. Completed Issues** | GitHub issues in `CLOSED` state within window (`6` Lab 6 reconciliation `#80`–`#84`, `#90`; `1` contract/docs `#97`; `2` Sprint 2 parent epics `#99`, `#100` delivered via slices `#101`–`#106`; `8` implementation slice issues `#101`–`#106`, `#113`, `#115`; `#117` remains `OPEN` for Lab 7). | `2026-11-23T00:00:00Z` – `2026-11-26T13:15:00Z` UTC | **`17` closed** (`17/18` = `94.4%` of active window issues; `1` open: `#117`) | `EV-L7-C2` (§C.2.1); GitHub Issues `#80`–`#84`, `#90`, `#97`, `#99`–`#106`, `#113`, `#115`, `#117` |
+| **2. Merged PRs** | Pull requests merged into `main` (`#96`) or `sprint/2-staging` (`#98`, `#107`–`#112`, `#114`, `#116`), all independently reviewed and `APPROVED` by `L0u1sss`. | `2026-11-23T00:00:00Z` – `2026-11-26T13:15:00Z` UTC | **`10` merged** (`1/10` = `10.0%` → `main`; `9/10` = `90.0%` → `sprint/2-staging`; `10/10` = `100.0%` `APPROVED`; `7/10` = `70.0%` after `CHANGES_REQUESTED`) | `EV-L7-C2` (§C.2.2); PRs `#96`, `#98`, `#107`–`#112`, `#114`, `#116` |
+| **3. Automated Test Results** | Authoritative full `npm run test:ci` suite on clean staging head `d4b1142` (`Node v24.15.0`, `PostgreSQL 17.12`), alongside local tree verification on `d4b1142`. | Snapshot `d4b1142` (`2026-11-26T09:03:07Z` CI; `2026-11-26` local) | **`449/449` (`100.0%`) passed**, `0` failed, `0` skipped (`293` server + `96` client + `60` E2E; plus `12/12` tooling & `7/7` deploy tests). *Local partial:* `291/293` (`99.3%`, `2` skipped) server + `96/96` (`100.0%`) client; local E2E exited `1` (port `3000` in use). | `EV-L7-B3`, `EV-L7-C2` (§C.2.3); CI run `45788402551` |
+| **4. UAT Defect Status** | Product-side Sprint 1 findings from Lab 6 interim UAT (`Finding 05` Minor UX + `UAT-07 UX Note` Enhancement) tracked against Sprint 2 fixes (`#109`, `#110`, `#114`); separate Partner UAT Part B (`#82`) remains `BLOCKED`. | Window `2026-11-23` – `2026-11-26` UTC | **`2/2` (`100.0%`) Product-side findings resolved** (`0` open critical/major defects); Partner UAT Part B (`#82`) unreceived / formal UAT retest sign-off pending | `EV-L7-A1`, `EV-L7-C2` (§C.2.4); [Lab 6 README](../lab-06/README.md) |
+| **5. CI Run Outcomes (`sprint/2-staging`)** | All `CI & Docker Build` workflow runs on `sprint/2-staging` (`push` merge runs + `pull_request` feature-branch runs targeting `sprint/2-staging`). | `2026-11-23T00:00:00Z` – `2026-11-26T13:15:00Z` UTC (`34` runs) | **`33/34` (`97.1%`) `success`**, **`1/34` (`2.9%`) `failure`** (`45406971680` on `3f9b679`, fixed in `81e6250`/`cb5321f`), **`0/34` (`0.0%`) `cancelled`** (`10/10` = `100.0%` push + `23/24` = `95.8%` PR) | `EV-L7-C2` (§C.2.5); GitHub Actions `CI & Docker Build` |
+
+---
+
+### C.2 Reconcilable Source Tables (`EV-L7-C2`)
+
+#### C.2.1 Closed Issues in Observation Window (`17` Closed, `1` Open)
+
+| # | Issue | Title | Role / Category | State | Closed At (UTC) |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `#80` | `[Lab 6] Prepare Sprint 1 UAT handoff and track independent acceptance` | Lab 6 UAT parent | `CLOSED` | `2026-11-23T08:32:34Z` |
+| 2 | `#81` | `[Lab 6 / Part A] Finalize the executable Sprint 1 UAT handoff` | Lab 6 Part A | `CLOSED` | `2026-11-23T08:32:44Z` |
+| 3 | `#82` | `[Lab 6 / Part B] Execute independent UAT on the partner Sprint 1 release` | Lab 6 Part B (`BLOCKED` record) | `CLOSED` | `2026-11-23T08:32:49Z` |
+| 4 | `#83` | `[Lab 6 / Part C] Report, classify, and disposition UAT findings` | Lab 6 Part C | `CLOSED` | `2026-11-23T08:32:56Z` |
+| 5 | `#84` | `[Lab 6 / Part D] Resolve release blockers and obtain independent UAT decision` | Lab 6 Part D | `CLOSED` | `2026-11-23T08:33:00Z` |
+| 6 | `#90` | `[Lab 6] Coordinate missing UAT handoff prerequisites` | Lab 6 prerequisites | `CLOSED` | `2026-11-23T08:33:04Z` |
+| 7 | `#97` | `docs(sprint2): reconcile SRS/SDS/plan and establish Sprint 2 & 3 contracts` | Pre-change contract (`PR #98`) | `CLOSED` | `2026-11-24T10:12:18Z` |
+| 8 | `#99` | `feat(sprint2): implement backend API & DB migration for F-06, F-07, F-08, A-11, and F-09` | Sprint 2 backend parent epic (slices `#101`–`#106`) | `CLOSED` | `2026-11-24T12:44:46Z` |
+| 9 | `#101` | `feat(sprint2): ARCH-01 Phase P4 legacy HTML retirement and shared UI primitives` | Slice `S2-01` (`PR #107`) | `CLOSED` | `2026-11-24T13:06:35Z` |
+| 10 | `#100` | `feat(sprint2): overhaul client UI/UX, Lab 6 fixes (Finding 05, UAT-07, Phase P4), and E2E tests` | Sprint 2 client parent epic (slices `#101`–`#106`) | `CLOSED` | `2026-11-24T15:29:41Z` |
+| 11 | `#102` | `feat(sprint2): F-08 catalog CRUD, images, retire, search/filter/sort, and UAT-07 UI` | Slice `S2-02` (`PR #108`) | `CLOSED` | `2026-11-24T16:09:49Z` |
+| 12 | `#103` | `feat(sprint2): A-11 approval workflow, multi-item bundles, 1-14d duration, and request UI` | Slice `S2-03` (`PR #109`) | `CLOSED` | `2026-11-24T18:14:13Z` |
+| 13 | `#104` | `feat(sprint2): F-06 two-step return, F-08 loan views/history, printable slip, and Finding 05 loans UI` | Slice `S2-04` (`PR #110`) | `CLOSED` | `2026-11-25T09:53:22Z` |
+| 14 | `#105` | `feat(sprint2): F-07 overdue derivation and persistent in-app notifications` | Slice `S2-05` (`PR #111`) | `CLOSED` | `2026-11-25T10:28:52Z` |
+| 15 | `#106` | `feat(sprint3): F-09 inventory reporting summary progress and Sprint 2 verification evidence sync` | Slice `S2-06` (`PR #112`) | `CLOSED` | `2026-11-25T11:46:31Z` |
+| 16 | `#113` | `feat(s2-07): UI/UX zero-scroll blended bundle tables, universal pagination, 1,000-char counter, request expiration & pending queue limits` | Slice `S2-07` (`PR #114`) | `CLOSED` | `2026-11-25T16:54:22Z` |
+| 17 | `#115` | `feat(s2-08): enforce Equipment name (120), category (60), description (1,000) limits & overflow wrapping` | Slice `S2-08` (`PR #116`) | `CLOSED` | `2026-11-26T09:47:03Z` |
+
+*(Open issue in window: `#117` `docs(lab7): prepare Lab 7 maintenance metrics, Sprint 1 change evidence, and release readiness`, created `2026-11-26T13:04:41Z`, state `OPEN`. Reconciliation: `6` Lab 6 + `1` contract + `2` parent epics + `8` slices = `17` closed; `17 / (17 + 1) = 94.4%` closed.)*
+
+#### C.2.2 Merged Pull Requests in Observation Window (`10` PRs)
+
+| # | PR | Title | Head → Base | Merge SHA | Merged At (UTC) | `L0u1sss` Review History (UTC) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | `#96` | `release: promote Lab 6 UAT documentation and evidence to main` | `sprint/1-staging` → `main` | `d079bc6` | `2026-11-23T10:19:27Z` | `CHANGES_REQUESTED` (`09:49:22Z`); `APPROVED` (`10:16:58Z`) |
+| 2 | `#98` | `docs(sprint2): reconcile baseline docs and add Sprint 2 & 3 contracts` | `docs/sprint2-contracts-and-docs` → `sprint/2-staging` | `7e11110` | `2026-11-24T09:54:41Z` | `9×` `CHANGES_REQUESTED` (`2026-11-23T16:23:03Z`..`2026-11-24T09:38:29Z`); `APPROVED` (`09:54:02Z`) |
+| 3 | `#107` | `feat(sprint2): ARCH-01 Phase P4 legacy HTML retirement and shared UI primitives (#101)` | `feat/s2-01-p4-and-ui-primitives` → `sprint/2-staging` | `ad60778` | `2026-11-24T12:43:12Z` | `CHANGES_REQUESTED` (`11:45:30Z`); `APPROVED` (`12:33:32Z`) |
+| 4 | `#108` | `feat(sprint2): F-08 catalog CRUD, images, retire, search/filter/sort, and UAT-07 UI (#102)` | `feat/s2-02-f08-catalog-crud-search` → `sprint/2-staging` | `c0a13ad` | `2026-11-24T15:16:20Z` | `CHANGES_REQUESTED` (`14:12:36Z`); `APPROVED` (`15:12:00Z`) |
+| 5 | `#109` | `feat(s2): implement A-11 approval workflow, bundles, and 1-14 day duration (#103)` | `feat/s2-03-a11-approval-bundles` → `sprint/2-staging` | `8b49379` | `2026-11-24T18:12:02Z` | `APPROVED` (`18:11:29Z`) |
+| 6 | `#110` | `feat(s2): implement F-06 two-step return, F-08 loan views, and printable slip (#104)` | `feat/s2-04-f06-return-f08-loans` → `sprint/2-staging` | `6a5f5ff` | `2026-11-25T09:50:14Z` | `CHANGES_REQUESTED` (`09:07:25Z`); `APPROVED` (`09:49:52Z`) |
+| 7 | `#111` | `feat(s2): implement F-07 overdue derivation and in-app notifications (#105)` | `feat/s2-05-f07-overdue-notifications` → `sprint/2-staging` | `50a6b9d` | `2026-11-25T10:22:56Z` | `APPROVED` (`10:22:44Z`) |
+| 8 | `#112` | `feat(s3): implement F-09 inventory reporting summary and sync Sprint 2 evidence (#106)` | `feat/s2-06-f09-reporting-and-evidence` → `sprint/2-staging` | `9e8a5e3` | `2026-11-25T11:53:48Z` | `CHANGES_REQUESTED` (`10:59:18Z`); `APPROVED` (`11:42:54Z`) |
+| 9 | `#114` | `feat(s2-07): UI/UX zero-scroll blended bundle tables, universal pagination, 1,000-char counter, request expiration & pending queue limits (#113)` | `feat/s2-07-ui-ux-bundle-expiry-limits` → `sprint/2-staging` | `22b1ad7` | `2026-11-25T16:45:53Z` | `CHANGES_REQUESTED` (`16:27:56Z`); `APPROVED` (`16:45:28Z`) |
+| 10 | `#116` | `feat(s2-08): enforce Equipment name (120), category (60), description (1,000) limits & overflow wrap (#115)` | `feat/s2-08-equipment-field-limits` → `sprint/2-staging` | `d4b1142` | `2026-11-26T09:03:04Z` | `APPROVED` (`09:02:27Z`) |
+
+*(All `10/10` (`100.0%`) merged PRs were authored by `Peepipat-Suesoongnuen` and `APPROVED` by `L0u1sss`: `7/10` (`70.0%`) required `CHANGES_REQUESTED` before approval; `3/10` (`30.0%`) were `APPROVED` on first review.)*
+
+#### C.2.3 Automated Test Suite Breakdown on `d4b1142` (`449/449` App Tests)
+
+| Suite / Environment | Command / Job | Passed | Failed | Skipped | Total | Pass Rate | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **CI Server (`d4b1142`)** | `CI & Docker Build` (`45788402551`) | `293` | `0` | `0` | `293` | `293/293` (`100.0%`) | `20` files (`PostgreSQL 17.12`, includes `migration-repair.test.ts` `2/2`) |
+| **CI Client (`d4b1142`)** | `CI & Docker Build` (`45788402551`) | `96` | `0` | `0` | `96` | `96/96` (`100.0%`) | `9` files (`Vitest` + React Testing Library) |
+| **CI Browser E2E (`d4b1142`)** | `CI & Docker Build` (`45788402551`) | `60` | `0` | `0` | `60` | `60/60` (`100.0%`) | `8` Playwright spec files, `0` flaky |
+| **Total `npm run test:ci` (`d4b1142`)** | `45788402551` (`test-and-docker`) | **`449`** | **`0`** | **`0`** | **`449`** | **`449/449` (`100.0%`)** | Auxiliary CI checks in same job: `12/12` (`100.0%`) tooling + `7/7` (`100.0%`) deploy |
+| **Local Server (`d4b1142`)** | `npm test` (local Windows + PG `17`) | `291` | `0` | `2` | `293` | `291/293` (`99.3%`) | `migration-repair.test.ts` (`2`) skipped (`MIGRATION_REPAIR_TEST_DATABASE_URL` unset) |
+| **Local Client (`d4b1142`)** | `npm --prefix client test` | `96` | `0` | `0` | `96` | `96/96` (`100.0%`) | `9` files (`3.24s`) |
+| **Local E2E (`d4b1142`)** | `npm run test:e2e` | `0` | `0` | `0` | `0` | Exit `1` (pre-test) | Aborted because local `http://localhost:3000/login` was occupied |
+
+#### C.2.4 UAT Defect Disposition Summary (`2/2` Product-Side Resolved)
+
+| Finding ID | Origin (`Lab 6`) | Severity / Type | Resolution in Sprint 2 | Status |
+| --- | --- | --- | --- | --- |
+| `Finding 05` | Partner interim UAT `UAT-05` (`F-05` checkout conflict UX) | Minor — Accepted Limitation | `CheckoutRequest.tsx` maps `409` codes (`INSUFFICIENT_AVAILABILITY`, `ALREADY_CHECKED_OUT`, `NOT_APPROVED`, `EQUIPMENT_RETIRED`, `REQUEST_EXPIRED`) + `F-08` loans UI (`PR #109`, `#110`, `#114`) | **Resolved (`1/2`)** (awaiting partner retest sign-off) |
+| `UAT-07 UX Note` | Partner interim UAT `UAT-07` (`F-04` quantity bounds UX) | Minor — Enhancement | `CreateRequestPage.tsx` adds explicit `allowed: 1–{maxQty}` and `1–14` day range hints + `1,000`-char counter (`PR #109`, `#114`) | **Resolved (`2/2`)** (awaiting partner retest sign-off) |
+| Partner UAT Part B (`#82`) | Our team testing partner Sprint 1 release | External dependency | No partner handoff, URL, cases, or credentials received | **`BLOCKED`** (not counted as resolved) |
+
+#### C.2.5 `sprint/2-staging` `CI & Docker Build` Run Log (`34` Runs: `33/34` `success`, `1/34` `failure`, `0/34` `cancelled`)
+
+| # | Run ID | Event | Source Branch / PR | Head SHA | Created At (UTC) | Conclusion |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | `45204212328` | `push` | `sprint/2-staging` (`PR #96`) | `d079bc6` | `2026-11-23T15:20:57Z` | `success` |
+| 2 | `45204865229` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `bdcc812` | `2026-11-23T15:24:26Z` | `success` |
+| 3 | `45220576433` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `e03d6d4` | `2026-11-23T16:48:06Z` | `success` |
+| 4 | `45226976916` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `99f3fc7` | `2026-11-23T17:22:35Z` | `success` |
+| 5 | `45229041371` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `095af4b` | `2026-11-23T17:33:56Z` | `success` |
+| 6 | `45234422720` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `13d61d6` | `2026-11-23T18:04:22Z` | `success` |
+| 7 | `45244452653` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `3a51db6` | `2026-11-23T19:01:04Z` | `success` |
+| 8 | `45251878877` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `cd180c3` | `2026-11-23T19:43:26Z` | `success` |
+| 9 | `45331541275` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `817531d` | `2026-11-24T05:11:34Z` | `success` |
+| 10 | `45361076153` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `c44c3ec` | `2026-11-24T09:00:22Z` | `success` |
+| 11 | `45368968449` | `pull_request` | `docs/sprint2-contracts-and-docs` (`PR #98`) | `92710ee` | `2026-11-24T09:50:15Z` | `success` |
+| 12 | `45369665588` | `push` | `sprint/2-staging` (`PR #98`) | `7e11110` | `2026-11-24T09:54:43Z` | `success` |
+| 13 | `45380309426` | `pull_request` | `feat/s2-01-p4-and-ui-primitives` (`PR #107`) | `65aae5e` | `2026-11-24T11:01:37Z` | `success` |
+| 14 | `45394185211` | `pull_request` | `feat/s2-01-p4-and-ui-primitives` (`PR #107`) | `72fbef1` | `2026-11-24T12:30:35Z` | `success` |
+| 15 | `45396243115` | `push` | `sprint/2-staging` (`PR #107`) | `ad60778` | `2026-11-24T12:43:15Z` | `success` |
+| 16 | `45406971680` | `pull_request` | `feat/s2-02-f08-catalog-crud-search` (`PR #108`) | `3f9b679` | `2026-11-24T13:46:51Z` | **`failure`** |
+| 17 | `45408360281` | `pull_request` | `feat/s2-02-f08-catalog-crud-search` (`PR #108`) | `81e6250` | `2026-11-24T13:54:54Z` | `success` |
+| 18 | `45419429143` | `pull_request` | `feat/s2-02-f08-catalog-crud-search` (`PR #108`) | `cb5321f` | `2026-11-24T14:55:00Z` | `success` |
+| 19 | `45423568227` | `push` | `sprint/2-staging` (`PR #108`) | `c0a13ad` | `2026-11-24T15:16:23Z` | `success` |
+| 20 | `45445038308` | `pull_request` | `feat/s2-03-a11-approval-bundles` (`PR #109`) | `0d9fd3d` | `2026-11-24T17:07:34Z` | `success` |
+| 21 | `45456902039` | `push` | `sprint/2-staging` (`PR #109`) | `8b49379` | `2026-11-24T18:12:04Z` | `success` |
+| 22 | `45461878291` | `pull_request` | `feat/s2-04-f06-return-f08-loans` (`PR #110`) | `0f9edef` | `2026-11-24T18:39:28Z` | `success` |
+| 23 | `45588663516` | `pull_request` | `feat/s2-04-f06-return-f08-loans` (`PR #110`) | `e053c9b` | `2026-11-25T09:46:57Z` | `success` |
+| 24 | `45589188640` | `push` | `sprint/2-staging` (`PR #110`) | `6a5f5ff` | `2026-11-25T09:50:17Z` | `success` |
+| 25 | `45593080783` | `pull_request` | `feat/s2-05-f07-overdue-notifications` (`PR #111`) | `b54b5f1` | `2026-11-25T10:14:36Z` | `success` |
+| 26 | `45594442163` | `push` | `sprint/2-staging` (`PR #111`) | `50a6b9d` | `2026-11-25T10:22:58Z` | `success` |
+| 27 | `45599575015` | `pull_request` | `feat/s2-06-f09-reporting-and-evidence` (`PR #112`) | `d696ff0` | `2026-11-25T10:55:28Z` | `success` |
+| 28 | `45605000517` | `pull_request` | `feat/s2-06-f09-reporting-and-evidence` (`PR #112`) | `5a9cc54` | `2026-11-25T11:30:04Z` | `success` |
+| 29 | `45608649394` | `push` | `sprint/2-staging` (`PR #112`) | `9e8a5e3` | `2026-11-25T11:53:51Z` | `success` |
+| 30 | `45642517090` | `pull_request` | `feat/s2-07-ui-ux-bundle-expiry-limits` (`PR #114`) | `b1d11cb` | `2026-11-25T15:12:24Z` | `success` |
+| 31 | `45656224601` | `pull_request` | `feat/s2-07-ui-ux-bundle-expiry-limits` (`PR #114`) | `c273e9c` | `2026-11-25T16:39:17Z` | `success` |
+| 32 | `45657456393` | `push` | `sprint/2-staging` (`PR #114`) | `22b1ad7` | `2026-11-25T16:45:56Z` | `success` |
+| 33 | `45778987562` | `pull_request` | `feat/s2-08-equipment-field-limits` (`PR #116`) | `76632df` | `2026-11-26T07:55:49Z` | `success` |
+| 34 | `45788402551` | `push` | `sprint/2-staging` (`PR #116`) | `d4b1142` | `2026-11-26T09:03:07Z` | `success` |
+
+*(Reconciliation: `10/10` (`100.0%`) `push` runs `success` + `23/24` (`95.8%`) `pull_request` runs `success` + `1/24` (`4.2%`) `pull_request` run `failure` = `33/34` (`97.1%`) `success`, `1/34` (`2.9%`) `failure`, `0/34` (`0.0%`) `cancelled`. Outside the `sprint/2-staging` metric scope, `main` (`PR #96`) ran `2/2` (`100.0%`) `success` (`45155042767` `CI & Docker Build` and `45155042849` `Deploy demo`), and `sprint/1-staging` ran `3/3` (`100.0%`) `success` (`45144617086`, `45154332191`, `45154343680`).)*
+
+---
+
+### C.3 Evidence-Based Interpretation (`<= 100 Words`)
+
+Although `sprint/2-staging` integrates 9 PRs with 33/34 (97.1%) CI passes and 449/449 (100.0%) tests passing on `d4b1142`, `main` and Cloud Run `pewdiy` still serve Sprint 1 (`b03c904`), local runs hit environment parity gaps (2 skipped migration-repair tests; port 3000 E2E collision), Partner UAT (`#82`) is blocked, and `F-09` CSV/benchmark scope remains open. **Action:** `Peepipat-Suesoongnuen` (with `L0u1sss` review) will merge the `sprint/2-staging` to `main` release PR and deploy Lab 5 Cloud Run with smoke checks before 2026-11-29, targeting Final Delivery (2026-12-13) for `F-09`.
 
 ---
 
