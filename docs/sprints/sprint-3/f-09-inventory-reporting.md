@@ -24,7 +24,7 @@
    - Queries live persisted tables in read-consistent aggregates:
      - `inventory`: `total_items`, `active_items`, `retired_items`, `total_units`, `held_units`, `available_units`, `unavailable_active_items`
      - `loans`: `active_count`, `return_pending_count`, `returned_count`, `overdue_count` (derived in `APP_TIMEZONE=Asia/Bangkok`)
-     - `requests`: `pending_count`, `approved_count`, `rejected_count`, `cancelled_count`, `checked_out_count`
+     - `requests`: `pending_count`, `approved_count`, `rejected_count`, `cancelled_count`, `checked_out_count`, `expired_count` (derived against the same service clock `now >= expires_at`)
      - `items`: per-item breakdown (`id`, `name`, `category`, `catalog_status`, `quantity_total`, `held_units`, `quantity_available`, `availability`)
      - `overdue_loans`: list of overdue loan summaries (`loan_id`, `equipment_name`, `borrower_username`, `quantity_borrowed`, `due_on`, `days_overdue`)
 2. **Custodian Reports Page (`/reports` — Target: Issue [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)):**

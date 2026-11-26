@@ -774,6 +774,91 @@ describe("F-09 Inventory Reporting Summary (TEST-F09-01..02)", () => {
     expect(queries[0]).toMatch(/BEGIN\s+ISOLATION\s+LEVEL\s+REPEATABLE\s+READ\s+READ\s+ONLY/i);
     expect(queries[queries.length - 1]).toMatch(/COMMIT/i);
   });
+
+  it("excludes expired PENDING (7d) and APPROVED (3d) requests from active request KPIs and counts them in expired_count", async () => {
+    const appCust = appWithNow("2026-11-20T10:00:00Z");
+    const eqRes = await request(appCust)
+      .post("/api/equipment")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[2]!)
+      .send({ name: "Expiry Report Meter", description: "Multimeter", category: "Meters", quantity_total: 5 });
+    const eqId = eqRes.body.data.id as string;
+
+    // 1) Old PENDING (created 2026-11-20T10:00Z -> expires 2026-11-27T10:00Z) and old APPROVED (expires 2026-11-23T10:00Z)
+    const oldPending = await request(appWithNow("2026-11-20T10:00:00Z"))
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: eqId, quantity_requested: 1 });
+    expect(oldPending.status).toBe(201);
+
+    const oldApproved = await request(appWithNow("2026-11-20T10:00:00Z"))
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[1]!)
+      .send({ equipment_id: eqId, quantity_requested: 1 });
+    expect(oldApproved.status).toBe(201);
+    expect(
+      (
+        await request(appWithNow("2026-11-20T10:00:00Z"))
+          .post(`/api/requests/${oldApproved.body.data.id}/approve`)
+          .set("Origin", config.appOrigin)
+          .set("Cookie", cookies[2]!)
+          .send({})
+      ).status,
+    ).toBe(200);
+
+    // Just before 3-day APPROVED expiry (2026-11-23T09:59:59Z): 1 pending, 1 approved, 0 expired
+    const beforeApprovedExpiry = await new ReportingService(pool, {
+      timeZone: "Asia/Bangkok",
+      now: () => new Date("2026-11-23T09:59:59Z"),
+    }).getSummary();
+    expect(beforeApprovedExpiry.requests.pending_count).toBe(1);
+    expect(beforeApprovedExpiry.requests.approved_count).toBe(1);
+    expect(beforeApprovedExpiry.requests.expired_count).toBe(0);
+
+    // Exact 3-day APPROVED boundary (2026-11-23T10:00:00Z): APPROVED is expired, PENDING is still active
+    const atApprovedExpiry = await new ReportingService(pool, {
+      timeZone: "Asia/Bangkok",
+      now: () => new Date("2026-11-23T10:00:00Z"),
+    }).getSummary();
+    expect(atApprovedExpiry.requests.pending_count).toBe(1);
+    expect(atApprovedExpiry.requests.approved_count).toBe(0);
+    expect(atApprovedExpiry.requests.expired_count).toBe(1);
+
+    // Create fresh non-expired PENDING & APPROVED on 2026-11-25T10:00:00Z
+    const freshPending = await request(appWithNow("2026-11-25T10:00:00Z"))
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[0]!)
+      .send({ equipment_id: eqId, quantity_requested: 1 });
+    expect(freshPending.status).toBe(201);
+
+    const freshApproved = await request(appWithNow("2026-11-25T10:00:00Z"))
+      .post("/api/requests")
+      .set("Origin", config.appOrigin)
+      .set("Cookie", cookies[1]!)
+      .send({ equipment_id: eqId, quantity_requested: 1 });
+    expect(freshApproved.status).toBe(201);
+    expect(
+      (
+        await request(appWithNow("2026-11-25T10:00:00Z"))
+          .post(`/api/requests/${freshApproved.body.data.id}/approve`)
+          .set("Origin", config.appOrigin)
+          .set("Cookie", cookies[2]!)
+          .send({})
+      ).status,
+    ).toBe(200);
+
+    // Exact 7-day PENDING boundary (2026-11-27T10:00:00Z): both 2026-11-20 requests are expired, only 2026-11-25 pair remain active
+    const atPendingExpiry = await new ReportingService(pool, {
+      timeZone: "Asia/Bangkok",
+      now: () => new Date("2026-11-27T10:00:00Z"),
+    }).getSummary();
+    expect(atPendingExpiry.requests.pending_count).toBe(1);
+    expect(atPendingExpiry.requests.approved_count).toBe(1);
+    expect(atPendingExpiry.requests.expired_count).toBe(2);
+  });
 });
 
 describe("UI/UX Polish & Request Lifecycle Rules (1000-char purpose, bundle request-return, expiry & limits)", () => {

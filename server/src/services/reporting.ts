@@ -3,6 +3,7 @@
  * Read-only aggregates over persisted equipment, borrowing_requests, and loans.
  */
 import type { Pool } from "pg";
+import { isRequestExpired } from "./borrowing-request";
 import { listEquipment, type EquipmentView } from "./catalog";
 import { businessDateInZone, isLoanOverdue } from "./loan";
 
@@ -38,6 +39,7 @@ export interface InventoryReportSummary {
     rejected_count: number;
     cancelled_count: number;
     checked_out_count: number;
+    expired_count: number;
   };
   loans: {
     active_count: number;
@@ -91,7 +93,7 @@ export class ReportingService {
       const held_units = total_units - available_units;
 
       const reqRows = await client.query(
-        `SELECT r.approval_status, EXISTS (SELECT 1 FROM loans l WHERE l.request_id = r.id) AS fulfilled
+        `SELECT r.approval_status, r.expires_at, EXISTS (SELECT 1 FROM loans l WHERE l.request_id = r.id) AS fulfilled
          FROM borrowing_requests r`,
       );
       const requests = {
@@ -100,10 +102,13 @@ export class ReportingService {
         rejected_count: 0,
         cancelled_count: 0,
         checked_out_count: 0,
+        expired_count: 0,
       };
       for (const r of reqRows.rows) {
         if (r.fulfilled) requests.checked_out_count++;
-        else if (r.approval_status === "PENDING") requests.pending_count++;
+        else if ((r.approval_status === "PENDING" || r.approval_status === "APPROVED") && isRequestExpired(r.expires_at, now)) {
+          requests.expired_count++;
+        } else if (r.approval_status === "PENDING") requests.pending_count++;
         else if (r.approval_status === "APPROVED") requests.approved_count++;
         else if (r.approval_status === "REJECTED") requests.rejected_count++;
         else if (r.approval_status === "CANCELLED") requests.cancelled_count++;
