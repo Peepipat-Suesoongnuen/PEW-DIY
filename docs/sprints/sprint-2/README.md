@@ -1,8 +1,8 @@
 # Sprint 2 Engineering Contracts — Deliverable 2 Part B
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System  
-> **Revision:** 1 — 2026-11-23 | **Status:** Baseline drafted prior to Sprint 2 implementation on `sprint/2-staging`  
-> **Sources:** [SRS](../../srs.md) rev 6 · [Feature Inventory](../../features.md) rev 2 · [Traceability](../../traceability.md) rev 3 · [System SDS](../../system-sds.md) rev 7 · [Sprint Plan](../plan.md) rev 6  
+> **Revision:** 2 — 2026-11-28 | **Status:** Implemented & verified on `main` (`5f82a8e`, `PR #119`) · Slices `#101`–`#106`, `#113`, `#115`, `#118`, `#120`  
+> **Sources:** [SRS](../../srs.md) rev 8 · [Feature Inventory](../../features.md) rev 3 · [Traceability](../../traceability.md) rev 4 · [System SDS](../../system-sds.md) rev 8 · [Sprint Plan](../plan.md) rev 7  
 > **Sprint 1 Baseline Reference:** `main` commit `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` (deployed binary) / `d079bc6` (post-PR #96 docs merge)
 
 ---
@@ -25,7 +25,7 @@ All rules from [Sprint 1 Shared Conventions](../sprint-1/shared-conventions.md) 
 - **Authentication & Authorization Precedence:** Every `/api/*` endpoint except `POST /api/auth/login` and `/api/health`, `/api/ready` requires a valid session cookie (`401 UNAUTHENTICATED`), checks role permissions (`403 FORBIDDEN`) before payload validation where appropriate, and checks ownership (`Loan → Request → Borrower`) before returning private data.
 - **Anti-CSRF:** State-changing requests (`POST`, `PATCH`, `DELETE`) require valid `Origin`/`Referer` matching `APP_ORIGIN` (`403` otherwise).
 - **Error Envelope:** `{ "error": { "code": "...", "message": "...", "requestId": "..." } }`.
-- **New Error Codes:** `ALREADY_RETURNED` (`409`), `NOT_APPROVED` (`409`), `EQUIPMENT_RETIRED` (`409`), `INVALID_STATE_TRANSITION` (`409`), `HELD_QUANTITY_CONFLICT` (`409`).
+- **New Error Codes:** `ALREADY_RETURNED` (`409`), `NOT_APPROVED` (`409`), `EQUIPMENT_RETIRED` (`409`), `INVALID_STATE_TRANSITION` (`409`), `HELD_QUANTITY_CONFLICT` (`409`), `REQUEST_EXPIRED` (`409`), `REQUEST_LIMIT_EXCEEDED` (`409`).
 - **Date & Timezone Policy:** UTC instants (`TIMESTAMPTZ`) for events; `due_on` (`DATE`, `YYYY-MM-DD`) computed in `APP_TIMEZONE=Asia/Bangkok`.
 
 ---
@@ -35,3 +35,4 @@ All rules from [Sprint 1 Shared Conventions](../sprint-1/shared-conventions.md) 
 | Rev | Date | Change | Basis |
 |---|---|---|---|
 | 1 | 2026-11-23 | Initial Sprint 2 contract index and shared wire conventions prior to implementation | `docs/srs.md` rev 6; `project_deliverable_2_v1.pdf` §3.2 |
+| 2 | 2026-11-28 | Marked Sprint 2 implemented & verified on `main` (`5f82a8e`); added `REQUEST_EXPIRED` (`409`) and `REQUEST_LIMIT_EXCEEDED` (`409`) | Slices `#101`–`#106`, `#113`, `#115`, `PR #119`, `PR #120` |

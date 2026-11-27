@@ -1,7 +1,7 @@
 # F-09 — Inventory Reporting (Sprint 3 Contract & Deliverable 2 Progress)
 
 > **Contract:** Sprint 3 · Feature `F-09`  
-> **Revision:** 2 — 2026-11-23 · **Status:** Contract baseline only in this Docs PR (implementation tracked in Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100); Summary API `GET /api/reports/summary` + `/reports` targeted for Deliverable 2 progress, with NFR-07 benchmark & CSV/detail drilldowns scheduled for Final Delivery by 13 Dec)
+> **Revision:** 3 — 2026-11-28 · **Status:** Partial Implementation Verified on `main` (`5f82a8e`: `AC-F09-01..03` + `expired_count` via `#106`/`PR #112` & `PR #120`); `AC-F09-04` (CSV export / filters) & `AC-F09-05` (`NFR-07` 100-item benchmark) remain **Planned for 13 December 2026**
 
 ---
 
@@ -38,11 +38,11 @@
 
 | AC ID | Observable Acceptance Outcome | Current Repo Status |
 |---|---|---|
-| **AC-F09-01** | Custodian calling `GET /api/reports/summary` receives `200` with accurate live aggregates matching persisted `equipment`, `borrowing_requests`, and `loans` (including `overdue_count` in `Asia/Bangkok`). | **Contracted (Pending Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99))** |
-| **AC-F09-02** | Anonymous caller receives `401`; Borrower calling `GET /api/reports/summary` (or navigating to `/reports`) receives `403 FORBIDDEN` without inventory/loan summary leaks. | **Contracted (Pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) / [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100))** |
-| **AC-F09-03** | Custodian `/reports` UI renders inventory/loan/overdue summary cards and per-item availability table accurately after checkout/return mutations. | **Contracted (Pending Issue [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100))** |
-| **AC-F09-04** | Category/date-range report filter and CSV export (read-only) work accurately for Custodians and reject Borrowers (`403`). | **Planned (Sprint 3 completion by 13 Dec)** |
-| **AC-F09-05** | `NFR-07` baseline timing benchmark: `GET /api/equipment` and `GET /api/reports/summary` with 100 seeded items complete at `p95 <= 2000 ms` locally. | **Planned (Sprint 3 verification by 13 Dec)** |
+| **AC-F09-01** | Custodian calling `GET /api/reports/summary` receives `200` with accurate live aggregates matching persisted `equipment`, `borrowing_requests`, and `loans` (including `overdue_count` in `Asia/Bangkok` and `expired_count`). | **Implemented & Verified** (`#106`/`PR #112` `9e8a5e3`, `PR #120` `7dbf137` → `main` `5f82a8e`) |
+| **AC-F09-02** | Anonymous caller receives `401`; Borrower calling `GET /api/reports/summary` (or navigating to `/reports`) receives `403 FORBIDDEN` without inventory/loan summary leaks. | **Implemented & Verified** (`#106`/`PR #112` `9e8a5e3` → `main` `5f82a8e`) |
+| **AC-F09-03** | Custodian `/reports` UI renders inventory/loan/overdue/expired summary cards and per-item availability table accurately after checkout/return mutations. | **Implemented & Verified** (`#106`/`PR #112` `9e8a5e3`, `PR #120` `7dbf137` → `main` `5f82a8e`) |
+| **AC-F09-04** | Category/date-range report filter and CSV export (read-only) work accurately for Custodians and reject Borrowers (`403`). | **Planned — Not Implemented** (Sprint 3 completion by 13 Dec) |
+| **AC-F09-05** | `NFR-07` baseline timing benchmark: `GET /api/equipment` and `GET /api/reports/summary` with 100 seeded items complete at `p95 <= 2000 ms` locally. | **Planned — Not Executed** (Sprint 3 verification by 13 Dec) |
 
 ---
 
@@ -50,14 +50,15 @@
 
 | Test ID | AC | Level | Preconditions / Input | Action & Expected Result | Current Repo Status |
 |---|---|---|---|---|---|
-| **TEST-F09-01** | AC-F09-01 | API/DB integration | Seeded active/retired items, pending/approved requests, active/overdue/returned loans; `C-A` | `GET /api/reports/summary` → `200`, all inventory/loan/request/overdue counts match SQL ground truth | **Planned (Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99))** |
-| **TEST-F09-02** | AC-F09-02 | API/DB integration | Valid `B-A` session and anonymous client | Anonymous → `401`; `B-A` → `403 FORBIDDEN` with zero summary data | **Planned (Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99))** |
-| **TEST-F09-03** | AC-F09-03 | UI/E2E | `C-A` browser after checkout/return; `B-A` browser | `C-A` opens `/reports` and verifies counts match DB; `B-A` sees access denied | **Planned (Issue [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100))** |
-| **TEST-F09-04** | AC-F09-04 | API/DB + UI | Category filter + CSV export (`C-A`, `B-A`) | Filtered totals & CSV rows match; `B-A` gets `403` | **Planned (Sprint 3)** |
-| **TEST-F09-05** | AC-F09-05 | Performance check | 100 synthetic catalog items + active loans | Measure 20 repeated requests; `p95 <= 2000 ms` | **Planned (Sprint 3)** |
+| **TEST-F09-01** | AC-F09-01 | API/DB integration | Seeded active/retired items, pending/approved/expired requests, active/overdue/returned loans; `C-A` | `GET /api/reports/summary` → `200`, all inventory/loan/request/overdue/expired counts match SQL ground truth | **Passed** (`server/tests/sprint2-integration.test.ts` on `5f82a8e`) |
+| **TEST-F09-02** | AC-F09-02 | API/DB integration | Valid `B-A` session and anonymous client | Anonymous → `401`; `B-A` → `403 FORBIDDEN` with zero summary data | **Passed** (`server/tests/sprint2-integration.test.ts` on `5f82a8e`) |
+| **TEST-F09-03** | AC-F09-03 | UI/E2E | `C-A` browser after checkout/return; `B-A` browser | `C-A` opens `/reports` and verifies counts match DB; `B-A` sees access denied | **Passed** (`client/src/test/notifications-reports.test.tsx`, `e2e/specs/sprint2-journey.spec.ts` on `5f82a8e`) |
+| **TEST-F09-04** | AC-F09-04 | API/DB + UI | Category filter + CSV export (`C-A`, `B-A`) | Filtered totals & CSV rows match; `B-A` gets `403` | **Planned — Not Executed** (Sprint 3) |
+| **TEST-F09-05** | AC-F09-05 | Performance check | 100 synthetic catalog items + active loans | Measure 20 repeated requests; `p95 <= 2000 ms` | **Planned — Not Executed** (Sprint 3) |
 
 ---
 
 ## 5. Definition of Done & Revision History
-- Deliverable 2 Part C targets `AC-F09-01..03` for implementation and testing in Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100) (`TEST-F09-01..03` — currently **Contracted / Planned** in this Docs PR) and tracks `AC-F09-04..05` in the Remaining-Work Plan for 13 December.
+- Deliverable 2 Part C delivers `AC-F09-01..03` + `expired_count` (`TEST-F09-01..03` **Passed** on `main` `5f82a8e`) and tracks `AC-F09-04..05` in the Remaining-Work Plan for 13 December.
 - **Rev 1–2 (2026-11-23):** Initial Sprint 3 contract created during Sprint 2 per `project_deliverable_2_v1.pdf` §3.3; status marked Contracted/Planned pending Issues #99/#100.
+- **Rev 3 (2026-11-28):** Updated status to reflect implemented & verified `AC-F09-01..03` (`#106`/`PR #112` `9e8a5e3` + `PR #120` `7dbf137` → `main` `5f82a8e`) while keeping `AC-F09-04` and `AC-F09-05` explicitly `Planned — Not Executed`.

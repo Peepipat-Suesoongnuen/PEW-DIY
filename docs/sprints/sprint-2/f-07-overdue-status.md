@@ -1,7 +1,7 @@
 # F-07 — Overdue Status & Dismissible In-App Notifications
 
 > **Contract:** Sprint 2 · Feature `F-07`  
-> **Revision:** 1 — 2026-11-23 · **Status:** Baselines contract before implementation
+> **Revision:** 2 — 2026-11-28 · **Status:** Implemented & verified (`Slice 5` `#105` / `PR #111` `50a6b9d` → `main` `5f82a8e`)
 
 ---
 
@@ -74,3 +74,4 @@
 ## 6. Definition of Done & Revision History
 - Satisfies `AC-F07-01`..`05`, TDD RED→GREEN evidence on date boundary (`TEST-F07-01`), peer review, and full regression.
 - **Rev 1 (2026-11-23):** Initial Sprint 2 contract.
+- **Rev 2 (2026-11-28):** Marked implemented & verified (`Slice 5` `#105` / `PR #111` `50a6b9d`, promoted to `main` `5f82a8e`).

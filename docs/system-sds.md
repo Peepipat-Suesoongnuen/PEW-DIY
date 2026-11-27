@@ -4,11 +4,11 @@
 >
 > **Deliverable:** D1-03 Part C — System-Level SDS | **Issue:** [#3](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/3)
 >
-> **Revision:** 7, 2026-11-23 | **Status:** Updated baseline for Sprint 1 + Sprint 2/3 contract architecture
+> **Revision:** 8, 2026-11-28 | **Status:** Deliverable 2 Baseline (`main` `5f82a8e`, Cloud Run `pewdiy-00010-fd6`)
 >
-> **Baseline:** [SRS](srs.md) rev 6 and [Feature Inventory](features.md) rev 2 (reconciled for Sprint 2; original D1 snapshot at `9d3c57b`)
+> **Baseline:** [SRS](srs.md) rev 8 and [Feature Inventory](features.md) rev 3 (original D1 snapshot at `9d3c57b`)
 >
-> **Language:** English (SRS A-07). This is a system-level design specification: sections below document the **Implemented & Verified Sprint 1 + Lab 5 baseline (`d079bc6`)** alongside **Contracted / Planned Sprint 2 & Sprint 3 extensions (pending Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100))**, while preserving early Deliverable 1 option analyses as **Historical / Superseded** context.
+> **Language:** English (SRS A-07). Sections below document the **Implemented & Verified Sprint 1 + Lab 5 + Sprint 2 + Sprint 3 `F-09` Summary (`5f82a8e`)**, alongside **Remaining Sprint 3 scope (`AC-F09-04` CSV export, `AC-F09-05`/`NFR-07` benchmark)** scheduled for 13 December, while preserving early Deliverable 1 option analyses as **Historical / Superseded** context.
 
 ## 1. Sources, Status, and Design Boundaries
 
@@ -36,7 +36,7 @@ The team selected and implemented the Sprint 1 stack below (`SDS-OQ-01/02` resol
 
 | Layer | Selected & Implemented Technology | Verification / Evidence |
 |---|---|---|
-| **Web UI** | React 19 + Vite + TypeScript + Tailwind CSS v4 (`@theme` tokens) + Lucide Icons, served via Express SPA fallback (`client/dist`) | PR #33 (`ARCH-01`, `docs/sprints/sprint-1/ui-02-evidence.md`); legacy `.html` coexistence until Sprint 2 Phase P4 (#100) |
+| **Web UI** | React 19 + Vite + TypeScript + Tailwind CSS v4 (`@theme` tokens) + Lucide Icons, served via Express SPA fallback (`client/dist`) | PR #33 (`ARCH-01`, `docs/sprints/sprint-1/ui-02-evidence.md`); legacy `.html` retired in Sprint 2 Phase P4 (`#101` / `PR #107`) |
 | **Runtime / API** | Node.js 24 + TypeScript + Express 5 | PR #22 implementation; `package.json` / `package-lock.json` |
 | **Database** | PostgreSQL 17 (`pg` driver; parameterized SQL + ordered SQL migrations `001`–`003`) | PR #22 `server/src/db` (Sprint 2 migration `004` contracted pending #99) |
 | **Password Hashing** | Argon2id via `@node-rs/argon2` | PR #22 `server/src/services/password.ts` |
@@ -379,3 +379,4 @@ Notes above distinguish between **Sprint 1 implemented baseline (`d079bc6`)** an
 | 5 — 2026-11-06 | Distinguished the recorded A-12 user choice from pending team-ratification evidence and repaired malformed ASCII separators; no behavioral change | PR #36 provenance review; SRS rev 5 |
 | 6 — 2026-11-07 | Recorded the explicit Asia/Bangkok calendar decision for #12 and fail-closed configuration; no return/overdue scope added | User implementation-session confirmation; F-05 tests/evidence |
 | 7 — 2026-11-23 | Reconciled Sprint 2 architecture decisions: resolved `SDS-OQ-04` (GCP Cloud Run + Cloud SQL deployed in Lab 5), added `request_bundles`, `approval_status`, `1–14` day duration, `return_requested_at`, `image_url`/`catalog_status`, `notifications`, and `F-09` reporting endpoint (`GET /api/reports/summary`) | `docs/srs.md` rev 6; `docs/labs/lab-05/deployment.md`; Sprint 2 plan approval |
+| 8 — 2026-11-28 | Reconciled Deliverable 2 implemented architecture on `main` (`5f82a8e`, Cloud Run `pewdiy-00010-fd6`): Sprint 2 `MIGRATION_004_SPRINT2_SQL` (`request_bundles`, `borrowing_requests.expires_at`, `notifications`, `loans` return-notice columns, `equipment` `120/60/1,000` char limits), `REQUEST_EXPIRED`/`REQUEST_LIMIT_EXCEEDED` error codes, `ARCH-01 Phase P4` completion, and `F-09` `GET /api/reports/summary` (incl. `expired_count`); kept `AC-F09-04`/`05` planned for 13 Dec | `docs/srs.md` rev 8; `PR #107`–`#120`; `5f82a8e` |

@@ -1,7 +1,7 @@
 # F-08 — Catalog Management, Search/Filter/Sort & Full Loan Views
 
 > **Contract:** Sprint 2 · Feature `F-08`  
-> **Revision:** 1 — 2026-11-23 · **Status:** Baselines contract before implementation
+> **Revision:** 2 — 2026-11-28 · **Status:** Implemented & verified (`Slices #102, #104, #113, #115` → `main` `5f82a8e`)
 
 ---
 
@@ -19,8 +19,8 @@
 ## 2. Feature SDS & Workflow
 
 1. **Custodian Catalog Management (`FR-09`):**
-   - **Create (`POST /api/equipment`):** Custodian creates a new item (`name`, `description`, `category`, `quantity_total >= 0`, optional `image_url`). Defaults to `catalog_status = 'ACTIVE'`.
-   - **Update / Adjust Quantity / Retire (`PATCH /api/equipment/:id`):** Locks `equipment` row `FOR UPDATE`, recomputes `held(item)` from active loans, and **rejects `quantity_total < held` with `409 HELD_QUANTITY_CONFLICT`**. Allows updating `name`, `description`, `category`, `image_url`, and `catalog_status` (`ACTIVE` | `RETIRED`) without deleting historical requests/loans.
+   - **Create (`POST /api/equipment`):** Custodian creates a new item (`name` ≤ 120 chars, `category` ≤ 60 chars, `description` ≤ 1,000 chars, `quantity_total >= 0`, optional `image_url`). Defaults to `catalog_status = 'ACTIVE'`.
+   - **Update / Adjust Quantity / Retire (`PATCH /api/equipment/:id`):** Locks `equipment` row `FOR UPDATE`, recomputes `held(item)` from active loans, and **rejects `quantity_total < held` with `409 HELD_QUANTITY_CONFLICT`**. Allows updating `name`, `description`, `category` (same `120/60/1,000` char bounds), `image_url`, and `catalog_status` (`ACTIVE` | `RETIRED`) without deleting historical requests/loans. Also enforces UI table/card text wrapping (`break-words`) and universal `Pagination` (`10` rows/page default, `5/10/20/50` selector).
 2. **Catalog Search, Filter & Sort (`FR-10`):**
    - `GET /api/equipment?q=&category=&availability=&status=&sort=`
    - `q`: case-insensitive match on `name` or `description`.
@@ -85,3 +85,4 @@
 ## 6. Definition of Done & Revision History
 - Satisfies `AC-F08-01`..`06`, TDD RED→GREEN logs (`new_total < held`), peer review, and full regression.
 - **Rev 1 (2026-11-23):** Initial Sprint 2 contract.
+- **Rev 2 (2026-11-28):** Marked implemented & verified (`Slices #102` `c0a13ad`, `#104` `6a5f5ff`, `#113` `22b1ad7` pagination/table ergonomics, `#115` `d4b1142` `120/60/1,000` char field bounds & overflow wrap → `main` `5f82a8e`).
