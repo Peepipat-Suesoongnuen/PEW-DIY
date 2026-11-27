@@ -1,8 +1,8 @@
 # Software Requirements Specification (SRS)
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
-> **Deliverable:** D1-01 Part A — SRS and Product Scope (Project Deliverable 1)
-> **Issue:** [D1-01] | **Status:** Draft for team review | **Language:** English (team decision)
+> **Deliverable:** D1-01 Part A / Deliverable 2 Part D Baseline — SRS and Product Scope
+> **Issue:** [D1-01] | **Status:** Deliverable 2 Baseline (rev 8 — 2026-11-28) | **Language:** English (team decision)
 > **Reference:** `group_work_specs_v1.pdf` (Theme 2: Inventory and Borrowing System), `project_deliverable_1_v1.pdf` §3.1
 >
 > ID conventions: `FR-xx` Functional Requirements · `BR-xx` Business Rules · `NFR-xx` Non-Functional Requirements · `A-xx` Assumptions / Design Decisions · `OQ-xx` Open Questions
@@ -212,3 +212,5 @@ Each rule is stated as testable behavior with its rejection/edge case.
 **Revision 6 — 2026-11-23 (Sprint 2 Baseline Update):** resolved OQ-02/03/04/06 for Sprint 2; added `FR-06/09` `image_url` and `catalog_status`, `FR-10` sorting, `FR-11/12/13` Sprint 2 approval workflow + multi-item bundles + cancellation + purpose + 1–14 day duration, `FR-15` printable loan slip, `FR-17` two-step return notice/confirm, `FR-19`/`BR-13` dismissible/clearable in-app notifications. Preserved `BORROWER`/`CUSTODIAN` 2-role model (`FR-04`, `A-05`).
 
 **Revision 7 — 2026-11-25 (Sprint 2 UX & Request Lifecycle Refinement):** added `EXPIRED` status to `FR-12` (`7d` pending / `3d` approved expiration windows), bounded active pending queue (`5` requests/bundles) and bundle size (`10` items) with `1,000`-character `purpose_detail`, and extended `FR-17` with optional whole-bundle Borrower return notices alongside per-item returns.
+
+**Revision 8 — 2026-11-28 (Deliverable 2 Baseline Reconciliation):** added `FR-06`/`FR-09` equipment field-length bounds (`name` ≤ 120, `category` ≤ 60, `description` ≤ 1,000 characters via `#115`) and confirmed `FR-20` initial summary implementation (`GET /api/reports/summary` + `/reports` including `expired_count` via `#106`/`#120`) while keeping CSV export and `NFR-07` formal 100-item benchmark scheduled for 13 December.

@@ -1,10 +1,10 @@
 # Feature Inventory (Part B)
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
-> **Deliverable:** D1-02 Part B — Feature Inventory and Traceability | **Issue:** [D1-02]
-> **Status:** Draft for team review | **Language:** English (team decision A-07)
-> **Source of truth:** `docs/srs.md` (rev 6). This document references requirement IDs and does not restate requirement text.
-> **Reference:** `project_deliverable_1_v1.pdf` §3.2 | **Companion document:** `docs/traceability.md` (rev 3)
+> **Deliverable:** D1-02 Part B / Deliverable 2 Part D — Feature Inventory | **Issue:** [D1-02]
+> **Status:** Deliverable 2 Baseline (rev 3 — 2026-11-28) | **Language:** English (team decision A-07)
+> **Source of truth:** `docs/srs.md` (rev 8). This document references requirement IDs and does not restate requirement text.
+> **Reference:** `project_deliverable_1_v1.pdf` §3.2, `project_deliverable_2_v1.pdf` §3.4 | **Companion document:** `docs/traceability.md` (rev 4)
 > ID conventions: `F-xx` features and named system responsibilities · `SN-xx` stakeholder needs (defined in this document only)
 
 ---
@@ -34,7 +34,7 @@ Stakeholder needs derived from the SRS §1.1 problem statement.
 | F-06 | Return | Borrower submits return notice on own active loan; Custodian confirms return to close Active Loan and restore availability atomically | Sprint 2 | FR-17 | BR-04, BR-09 | NFR-04 (S2), NFR-06 (S2) | F-05 | Sprint 2 contracts |
 | F-07 | Overdue Status & Notifications | Compute overdue (`now > due_on` in `Asia/Bangkok`, no return), present overdue list to custodians, and provide dismissible/clearable in-app alerts (approval, rejection, due ≤ 2 days, overdue) | Sprint 2 | FR-19 | BR-08, BR-13 | — | F-05 | Sprint 2 contracts |
 | F-08 | Catalog Management, Search, and Loan Views | Custodian creates/updates/retires items (with `image_url`) and adjusts quantities; catalog search/filter/sort; custodian views all loans; borrower full loan history; standardized UI tables & `BackButton` | Sprint 2 | FR-06 (`image_url`/`status`), FR-09, FR-10, FR-16 (history), FR-18, FR-21 | BR-06 | — | F-02, F-05 | Sprint 2 contracts |
-| F-09 | Inventory Reporting | Inventory/loan/overdue summaries and reports | Sprint 3 (contract drafted in D2; summary workflow contracted for Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)) | FR-20 | — | NFR-07 (verify) | F-06, F-07, F-08 | Sprint 3 contracts |
+| F-09 | Inventory Reporting | Inventory/loan/request/overdue summaries and reports | Sprint 3 (`Summary` + `/reports` + `expired_count` implemented & verified in `#106`/`#120` → `5f82a8e`; CSV export `AC-F09-04` & `NFR-07` benchmark `AC-F09-05` planned for 13 Dec) | FR-20 | — | NFR-07 (planned) | F-06, F-07, F-08 | Sprint 3 contracts |
 | F-10 | Integration and Verification *(named system responsibility)* | End-to-end integration of features; test automation; reproducible setup; persistence/durability verification | Sprint 1–3 | — | BR-11 (verify) | NFR-08, NFR-09 | F-01–F-09 | [D1-06.6] / D2 |
 
 \* **BR-02/BR-03/NFR-05** are *enforced* at checkout (F-05) using availability data maintained by F-03 — mapped to both features (cross-cutting rule).
@@ -71,3 +71,4 @@ Detailed rows: see `docs/traceability.md`. No requirement is intentionally left 
 |---|---|---|
 | 1 | Initial feature inventory | `docs/srs.md` rev 2 (approved; merged to `sprint/1-staging`) |
 | 2 — 2026-11-23 | Updated Sprint 2 scope per approved Deliverable 2 baseline: added `A-11` approval workflow, multi-item bundles, cancellation, 1–14 day duration, two-step return notice/confirm, item images, catalog sorting, in-app notifications (`BR-13`), printable loan slip, and updated `BR` count to 13 | `docs/srs.md` rev 6; Sprint 2 planning approval (2026-11-23) |
+| 3 — 2026-11-28 | Reconciled Sprint 2 completion (`5f82a8e`) and Sprint 3 `F-09` partial delivery (`Summary` + `/reports` + `expired_count` implemented vs `AC-F09-04`/`05` planned for 13 Dec) | `docs/srs.md` rev 8; Deliverable 2 Part D |

@@ -10,7 +10,10 @@ A university equipment-borrowing system for the D.I.Y. Room, which supports stud
 - [System-Level Design Specification (SDS)](docs/system-sds.md)
 - [Sprint 1 Engineering Contracts (Part E)](docs/sprints/sprint-1/README.md) — feature specifications, AC/STS mapping and Product DoD
 - [Sprint 2 Engineering Contracts](docs/sprints/sprint-2/README.md) — `F-06` Return, `F-07` Overdue/Notifications, `F-08` Catalog CRUD/Search/Sort & Loans, `A-11` Approval & Bundles, and Sprint 3 `F-09` Inventory Reporting contract
+- [Sprint 2 Verification Matrix](docs/sprints/sprint-2/verification-matrix.md) & [Sprint 2 TDD Evidence](docs/sprints/sprint-2/tdd-evidence-s2.md)
+- [Lab 5 Deployment & Release Guide](docs/labs/lab-05/deployment.md)
 - [Lab 6 Sprint 1 UAT handoff](docs/labs/lab-06/README.md) — executable Product Team cases, safe handoff requirements and evidence templates (Issue [#80](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/80))
+- [Lab 7 Maintenance & Release Readiness](docs/labs/lab-07/README.md) — post-release maintenance metrics and equipment-limit change (`#115` / `#117`)
 
 ## Project Structure
 
@@ -125,26 +128,23 @@ The runner creates separate server/browser schemas, migrates before server test 
 
 For the normal release path in group specification §5.3, a repository administrator must require the **Build, tests and Docker build** job (id `test-and-docker`) on `main` and sprint staging via branch protection/rulesets after its first successful run, alongside independent teammate review. This change does not configure repository settings. CI checks the PR merge result by default and cannot replace teammate approval, the F-10 setup/evidence audit or a release decision. Existing `rehearse:sprint1 -> verify:sprint1 -> audit:sprint1` clean-source gates remain in place. Docker image delivery and accepted-release deployment from `main` are separate Lab5 work; this workflow establishes CI only.
 
-## Sprint 1 verification and handoff
+## Sprint 1 Verification and Historical Baseline
 
-F-01 through F-05 and F-10 were integrated into `sprint/1-staging` together with PR #41 UI fixes and PR #43 CI, and historical Sprint 1 release [PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) merged candidate `d291873c10c2021d4eb5ebe733aa68012f813678` into `main` at `d8e3cc6a5cb19c2b8d034fb845a2aae0b99219e4` (2026-11-09 UTC). [Part F evidence](docs/verification/sprint-1/README.md) records the candidate `d291873` results (164 server/74 client/57 browser passes, 49/49 application AC, setup and source fingerprints; older `8676957` results are historical). Following Lab 5 deployment PR #79, the current deployed `main` commit is `b03c9043533a6dc1f8a6fb958983ddb0da9529c7` (Cloud Run `pewdiy-00008-mfk` and isolated UAT `pewdiy-uat-00003-8c5`). Merging PR #42 or passing CI does not close remaining acceptance/process gates: A-12 shared-team ratification, documented independent README repetition, final board/disclosure/TDD checks, clean-source verification/audit on the release commit, and formal Lab 6 UAT sign-off / Part B remain explicit pending gates.
+F-01 through F-05 and F-10 were integrated into `sprint/1-staging` together with PR #41 UI fixes and PR #43 CI, and historical Sprint 1 release [PR #42](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/42) merged candidate `d291873c10c2021d4eb5ebe733aa68012f813678` into `main` at `d8e3cc6a5cb19c2b8d034fb845a2aae0b99219e4` (2026-11-09 UTC). [Part F evidence](docs/verification/sprint-1/README.md) records the candidate `d291873` results (164 server/74 client/57 browser passes, 49/49 application AC). Following Lab 5 deployment PR #79 (`b03c904`, Cloud Run `pewdiy-00008-mfk` and isolated UAT `pewdiy-uat-00003-8c5`) and Lab 6 (`PR #96` `d079bc6`), Sprint 2 and initial Sprint 3 (`F-09`) were promoted to `main`.
 
-## Implemented Baseline (Sprint 1 — Active on `main` / `sprint/2-staging` Base)
+## Implemented Release on `main` (Sprint 1 + Sprint 2 + Sprint 3 `F-09` Summary)
 
-The active source code at base commit `d079bc6` implements **Sprint 1 (`F-01`–`F-05`, `F-10`, migrations `001`–`003`)**:
-- Authentication (`POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`)
-- Read-only equipment catalog (`GET /api/equipment`, `GET /api/equipment/:id`)
-- Single-item borrowing requests (`POST /api/requests`, `GET /api/requests`, `GET /api/requests/:id`)
-- Direct Custodian checkout & active loan reads (`POST /api/requests/:id/checkout`, `GET /api/loans`, `GET /api/loans/:id`)
+> **Current `main` release:** `5f82a8e0bdd52fa85b3e488c96bdafbdc9a6f3cc` ([PR #119](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/pull/119), merged `2026-11-26T17:49:44Z`) · Deployed Cloud Run service `pewdiy` revision `pewdiy-00010-fd6` (`https://pewdiy-qtz73ahnlq-as.a.run.app`) · `CI & Docker Build` run `45870992387` & `Deploy demo` run `45870992457` (both `success`).
+>
+> **Automated test suites in repository:** `20` server test files (`server/tests/*.test.ts`), `9` client test files (`client/src/test/*.test.ts*`), and `8` Playwright E2E spec files (`e2e/specs/*.spec.ts`).
+>
+> **Remaining Sprint 3 scope (scheduled by 13 Dec 2026):** `AC-F09-04` (category/date filter + CSV export), `AC-F09-05` / `NFR-07` formal 100-item performance benchmark, and Lab 6 Partner UAT Part B ([Issue #82](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/82)).
 
-## Implemented Sprint 2 & Sprint 3 Progress (`sprint/2-staging` — Slices #101–#106)
-
-> **Status:** Slices `#101`–`#105` are merged into `sprint/2-staging` (`50a6b9d`) and Slice `#106` completes `F-09` Inventory Reporting summary & verification evidence sync (parent trackers [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99) and [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). Remaining Sprint 3 items (CSV export `AC-F09-04` and formal `NFR-07` 100-item benchmark `AC-F09-05`) are scheduled for Final Delivery by 13 Dec 2026.
-
-- **Catalog CRUD & Search/Filter/Sort (`F-08`):** `POST /api/equipment`, `PATCH /api/equipment/:id` (`409 HELD_QUANTITY_CONFLICT`), `image_url`, `catalog_status`, and `q`/`category`/`availability`/`status`/`sort` query filters.
-- **Create Request, Bundles & Duration (`F-04`, `A-11`, `BR-07`):** `/requests/new`, `POST /api/request-bundles`, purpose category/detail, and `1–14` calendar day duration (`Asia/Bangkok`).
-- **Approval Workflow (`A-11`):** Custodian `approve`/`reject` and Borrower `cancel` before checkout (`PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`).
-- **Two-Step Return & Print Slip (`F-06`, `FR-15`):** Borrower `request-return` notice (`RETURN_PENDING`), Custodian `return` / bundle `return` (`RETURNED`), and printable Loan Slip.
-- **Overdue, Notifications & Reports (`F-07`, `F-09`):** Derived overdue status (`scope=overdue|history|all`), persistent notifications (`GET/DELETE /api/notifications`, `POST /api/notifications/:id/read`), Custodian `GET /api/reports/summary` (`/reports`), Migration `004`, and `ARCH-01 Phase P4` legacy `.html` retirement.
+- **Sprint 1 Core (`F-01`–`F-05`, `F-10`, migrations `001`–`003`):** Cookie-session auth, server-side `BORROWER`/`CUSTODIAN` RBAC, read-only catalog & availability, single-item borrowing requests, and atomic checkout.
+- **Catalog CRUD, Limits & Search/Filter/Sort (`F-08`, Slices `#102`, `#115`):** `POST /api/equipment`, `PATCH /api/equipment/:id` (`409 HELD_QUANTITY_CONFLICT`), `image_url`, `catalog_status` (`ACTIVE`/`RETIRED`), field length bounds (`name` ≤ 120, `category` ≤ 60, `description` ≤ 1,000 chars), and `q`/`category`/`availability`/`status`/`sort` query filters.
+- **Create Request, Bundles, Expiration & Limits (`F-04`, `A-11`, `BR-07`, Slices `#103`, `#113`):** `/requests/new`, `POST /api/request-bundles` (max `10` items), `1,000`-char `purpose_detail`, `1–14` calendar day duration (`Asia/Bangkok`), max `5` active non-expired `PENDING` requests/bundles (`409 REQUEST_LIMIT_EXCEEDED`), and `7d`/`3d` expiration (`EXPIRED`, `409 REQUEST_EXPIRED`).
+- **Approval Workflow (`A-11`, Slice `#103`):** Custodian `approve`/`reject` and Borrower `cancel` before checkout (`PENDING → APPROVED → CHECKED_OUT`, `PENDING → REJECTED`, `PENDING/APPROVED → CANCELLED`).
+- **Two-Step Return & Print Slip (`F-06`, `FR-15`, Slices `#104`, `#113`):** Borrower single/bundle `request-return` notice (`RETURN_PENDING`), Custodian `return` / bundle `return` (`RETURNED`), and printable Loan Slip.
+- **Overdue, Notifications & Reports (`F-07`, `F-09`, Slices `#105`, `#106`, `PR #120`):** Derived overdue status (`scope=overdue|history|all`), persistent notifications (`GET/DELETE /api/notifications`, `POST /api/notifications/:id/read`), Custodian `GET /api/reports/summary` (`/reports`, including `expired_count`), Migration `004`, and `ARCH-01 Phase P4` legacy `.html` retirement.
 
 Tests require a dedicated `TEST_DATABASE_URL`. Apply checked-in migrations before test discovery (`npm run migrate:test`). See [Sprint 2 Engineering Contracts](docs/sprints/sprint-2/README.md) and [Sprint 2 Verification Matrix](docs/sprints/sprint-2/verification-matrix.md).
