@@ -81,11 +81,11 @@ Keep identity/access, catalog/availability, borrowing/loans, and reporting as mo
 
 ## 3. Data Model and Consistency
 
-### 3.1 Logical Entities (Sprint 1 Implemented; Sprint 2 Contracted)
+### 3.1 Logical Entities (`5f82a8e`: Sprint 1 + Sprint 2 Implemented)
 
 With `SDS-OQ-01` resolved (§2.1), Sprint 1–2 SQL migrations (`001`–`004` in `server/src/db/migrations.ts`) implement `users`, `sessions`, `equipment`, `request_bundles`, `borrowing_requests`, `loans`, and `notifications` using PostgreSQL `TEXT` IDs, `INTEGER` quantities, and `TIMESTAMPTZ`/`DATE` columns (`main` `5f82a8e`). No individual serial-number entity is introduced (SRS A-01).
 
-| Entity | Principal fields (Sprint 1 Implemented vs Sprint 2 Contracted `#99`) | Integrity, ownership, and use |
+| Entity | Principal fields (Sprint 1 `001`–`003` + Sprint 2 `004` Implemented on `5f82a8e`) | Integrity, ownership, and use |
 |---|---|---|
 | **User** (`users` + `sessions`) | **Implemented (`MIGRATION_001_SQL`):** `id` PK; `username` text; `password_hash` text; `role` constrained code (`BORROWER` / `CUSTODIAN`); `sessions` table (`session_key`, `user_id`, `created_at`, `expires_at`, `absolute_expires_at`, `revoked_at`, `last_seen_at`) | Unique username; exactly one role (`BORROWER` or `CUSTODIAN`); Argon2id `password_hash` never exposed in responses. Seeded accounts (`B-A`, `B-B`, `C-A`); no registration feature (FR-01–FR-05, BR-10). |
 | **Equipment** (`equipment`) | **Implemented (`MIGRATION_001_SQL` + `004`):** `id` PK; `name` (≤120), `description` (≤1,000), `category` (≤60) text; `quantity_total` integer; `image_url` (`TEXT NOT NULL DEFAULT ''`); `catalog_status` (`ACTIVE`/`RETIRED`, default `ACTIVE`) | Required catalog fields; `quantity_total >= 0` (`BR-03` invariant `0 <= held <= quantity_total` enforced on derived reads and locked transactions). In Sprint 2 (`F-08`, `FR-09`, `#102`/`#115`), reducing `quantity_total < held` is rejected (`BR-06`, `409 HELD_QUANTITY_CONFLICT`), while retiring (`ACTIVE` → `RETIRED`) prevents new borrowing (`BR-01`, `409 EQUIPMENT_RETIRED`) without deleting active or historical loans. |
@@ -117,7 +117,7 @@ stateDiagram-v2
     ActiveLoan --> ReturnedLoan: Custodian return, Sprint 2
 ```
 
-The diagram shows domain progression; request and loan remain distinct persisted records. A submitted request expresses intent and — **Confirmed by team decision (Direction A, 2026-11-06; SRS BR-12/A-11)** — does not reserve units or reduce availability; only a committed Active Loan reduces Available Quantity. Concurrent requests can therefore outnumber stock; successful request creation does not promise successful checkout. Checkout rechecks availability and may reject a previously submitted request. No separate approve/reject/cancel/expiry step exists in Sprint 1; per the same team decision, an approval workflow is added in **Sprint 2 only** (specification deferred to the Sprint 2 contracts) and its pending requests still do not reserve units.
+The diagram shows domain progression; request and loan remain distinct persisted records. A submitted request expresses intent and — **Confirmed by team decision (`A-11`, `BR-12`)** — does not reserve units or reduce availability; only a committed Active Loan reduces Available Quantity. Concurrent requests can therefore outnumber stock; successful request creation does not promise successful checkout. Checkout rechecks availability and rejects non-`APPROVED` or expired requests (`409 NOT_APPROVED` / `409 REQUEST_EXPIRED`, implemented in Sprint 2 `PR #109`/`#114` → `5f82a8e`) while still never reserving units.
 
 ### 3.3 Availability Invariant and Checkout Transaction
 
@@ -136,7 +136,7 @@ Under the selected full-quantity return policy (`A-12`, `BR-09`), an active loan
 1. Authenticate and authorize role (`CUSTODIAN` for checkout; `BORROWER` for request creation). Load the request's immutable `equipment_id`; never accept borrower, due date, or actor identity from the checkout payload.
 2. Begin a PostgreSQL `READ COMMITTED` transaction and acquire row-level locks in consistent order: `SELECT id FROM equipment WHERE id = $1 FOR UPDATE`, then `SELECT * FROM borrowing_requests WHERE id = $1 FOR UPDATE`. Reject an already fulfilled request (`409 ALREADY_CHECKED_OUT`).
 3. Re-read `quantity_total` and derived `quantity_available` (`quantity_total - held`) via `getEquipment(client, equipmentId)` **after** acquiring the lock so committed concurrent checkouts/returns are visible, and enforce `assertCheckoutAvailable` (`1..quantity_available`, `OQ-02` / `A-12`). Reject insufficient stock (`409 INSUFFICIENT_AVAILABILITY`) without creating a loan.
-4. Insert exactly one `loans` row linked to that request (`UNIQUE (request_id)`), with server-assigned `checked_out_by`, `checkout_at` (UTC), and `due_on` (`Asia/Bangkok` calendar date + `7` days in S1, or `requested_days` `1..14` contracted in S2). Availability changes automatically through the committed loan row.
+4. Insert exactly one `loans` row linked to that request (`UNIQUE (request_id)`), with server-assigned `checked_out_by`, `checkout_at` (UTC), and `due_on` (`Asia/Bangkok` calendar date + `7` days in S1, or `requested_days` `1–14` in S2 `5f82a8e`). Availability changes automatically through the committed loan row.
 5. `COMMIT` all writes together, then respond. Any validation, conflict, or DB error runs `ROLLBACK` (`TEST-F05-04/05/08`; transient lock/serialization codes `40P01`/`40001`/`55P03` return `503 RETRY_LATER`).
 
 Every writer affecting held units or total quantity (checkout, Sprint 2 return, and Sprint 2 total adjustment) uses the same Equipment-first `FOR UPDATE` serialization protocol so multi-instance Cloud Run deployments cannot race. At request creation (`borrowing-request.ts`), the service validates derived availability from the DB under the same `equipment FOR UPDATE` lock without decrementing stock (`BR-01`, `BR-12`). Sprint 2 catalog total reductions (`F-08`, `PR #108`) reject `new_total < held` (`409 HELD_QUANTITY_CONFLICT`) under the same lock.
@@ -152,7 +152,7 @@ Every writer affecting held units or total quantity (checkout, Sprint 2 return, 
 
 > **Historical note on rejected partial-return option:** Because full-quantity return was selected under `A-12` (`OQ-02` closed), no partial-return table or partial-quantity parameter is part of the schema or Sprint 2 `F-06` contract. Closing an active loan always sets `returned_at IS NOT NULL` in a single atomic transaction (`BR-09`, `NFR-06`), decreasing held units by the full `quantity_borrowed` and increasing derived availability accordingly.
 
-**Date representation — user-confirmed for Issue #12 (2026-11-07):** store event timestamps as UTC instants; calculate `due_on` as the checkout's calendar date in `Asia/Bangkok` plus seven calendar days in Sprint 1 (A-03/BR-07; extended to `1–14` requested calendar days, default `7`, in Sprint 2 `F-11`). The user explicitly answered “ยืนยันใช้ Asia/Bangkok” in the implementation session, resolving SDS-OQ-03 for implementation; this is not fabricated teammate approval. Configure `APP_TIMEZONE=Asia/Bangkok`; an absent zone disables checkout with safe 503, and an invalid zone fails startup. Overdue is contracted in Sprint 2 (`F-07`): its derivation is `returned_at IS NULL AND business_current_date > due_on` (BR-08), with equality not overdue. Clients cannot choose the due date. See [F-05 contract and execution evidence](sprints/sprint-1/f-05-checkout-active-loan.md) for local-midnight/month/year boundary tests.
+**Date representation (`PR #98` ratified, `5f82a8e` implemented):** store event timestamps as UTC instants; calculate `due_on` as the checkout's calendar date in `Asia/Bangkok` plus seven calendar days in Sprint 1 (`1–14` requested calendar days, default `7`, in Sprint 2 `F-11`). Configure `APP_TIMEZONE=Asia/Bangkok`; an absent zone disables checkout with safe `503`, and an invalid zone fails startup. Overdue is derived in Sprint 2 (`F-07`, `PR #111` → `5f82a8e`) as `returned_at IS NULL AND business_current_date > due_on` (`BR-08`), with equality not overdue. Clients cannot choose the due date.
 
 Sprint 2 (`main` `5f82a8e`) implements return (`F-06`), overdue & persistent in-app notifications (`F-07`), catalog management/search/filter/sort & full loan history (`F-08`), and request approval/bundles/1–14d duration/print slip (`F-11`); Sprint 3 reporting (`F-09` summary + `/reports` + `expired_count`) reads the same persisted catalog/loan data (`AC-F09-04` CSV export & `AC-F09-05`/`NFR-07` benchmark remain planned for 13 Dec). No separate reporting database, scheduled overdue mutation job, financial penalties, or external email/SMS notification service is used.
 
@@ -162,7 +162,7 @@ With `SDS-OQ-01` resolved (§2.1), runnable setup, ordered SQL migrations (`MIGR
 
 1. **Pinned runtime & isolated databases (Implemented):** Node.js 24 + PostgreSQL 17 (`package.json` scripts) use an isolated development database (`DATABASE_URL`) and disposable test databases/schemas (`TEST_DATABASE_URL` / `CI_TEST_DATABASE_URL`); neither uses real university data.
 2. **Tracked `.env.example` & fail-closed config (Implemented):** `.env.example` provides non-secret variable names and placeholders only. `server/src/config/config.ts` validates required DB/auth/timezone settings before accepting requests and fails closed when incomplete.
-3. **Ordered SQL migrations (Implemented `001`–`003`; Contracted `004` in `#99`):** `npm run migrate` (and `npm run migrate:test`) applies idempotent SQL migrations from `server/src/db/migrations.ts`: `MIGRATION_001_SQL` (`users`, `sessions`, `equipment`) → `MIGRATION_002_REQUESTS_SQL` (`borrowing_requests`) → `MIGRATION_003_LOANS_SQL` (`loans` with FKs, checks, and unique `request_id`). Sprint 2 adds `004` (`image_url`, `catalog_status`, `request_bundles`, `approval_status`, `requested_days`, `return_requested_at`, `notifications`) in Issue [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99).
+3. **Ordered SQL migrations (Implemented `001`–`004` on `5f82a8e`):** `npm run migrate` (and `npm run migrate:test`) applies idempotent SQL migrations from `server/src/db/migrations.ts`: `MIGRATION_001_SQL` (`users`, `sessions`, `equipment`) → `MIGRATION_002_REQUESTS_SQL` (`borrowing_requests`) → `MIGRATION_003_LOANS_SQL` (`loans` with FKs, checks, and unique `request_id`) → `MIGRATION_004_SPRINT2_SQL` (`image_url`, `catalog_status`, `request_bundles`, `approval_status`, `requested_days`, `expires_at`, `return_requested_at`, `notifications`).
 4. **Idempotent synthetic seed (Implemented):** `npm run seed` (`server/src/db/seed.ts`) inserts deterministic synthetic fixtures (`docs/sprints/sprint-1/fixtures.md`) using `ON CONFLICT DO NOTHING` so existing loans, stock, passwords, and role assignments are preserved on re-runs. Destructive reset is never an application startup step.
 5. **Restart & redeployment durability (Implemented & Verified):** Verified by `server/tests/restart-e2e.test.ts`, `npm run verify:sprint1`, and Lab 5/6 Cloud Run + Cloud SQL (`pewdiy-pg`) restart/redeploy checks (`C-05`, `UAT-08`).
 
@@ -174,26 +174,26 @@ With `SDS-OQ-01` resolved (§2.1), runnable setup, ordered SQL migrations (`MIGR
 
 Seed only salted Argon2id password hashes; generate hashes from transient local/CI input and protect logs from credential/hash output (`project_deliverable_1_v1.pdf` §4.4).
 
-**Implemented constraints & indexes (`001`–`003`, plus `004` contracted in `#99`):** FK-backed owner/item lookups; unique `users.username` and `loans.request_id`; `quantity_total >= 0`, `quantity_requested > 0`, and `quantity_borrowed > 0` `CHECK` constraints; indexes on `borrowing_requests(borrower_id, created_at)`, `borrowing_requests(equipment_id)`, and `loans(request_id) WHERE returned_at IS NULL`. Cross-row stock limits (`0 <= held <= quantity_total`) are enforced by the derived-availability calculation and `SELECT ... FOR UPDATE` transaction protocol (§3.3) in addition to row `CHECK` constraints.
+**Implemented constraints & indexes (`001`–`004` on `5f82a8e`):** FK-backed owner/item lookups; unique `users.username`, `loans.request_id`, and `notifications(user_id, kind, reference_id)`; `quantity_total >= 0`, `quantity_requested > 0`, and `quantity_borrowed > 0` `CHECK` constraints; indexes on `borrowing_requests(borrower_id, created_at)`, `borrowing_requests(equipment_id)`, and `loans(request_id) WHERE returned_at IS NULL`. Cross-row stock limits (`0 <= held <= quantity_total`) are enforced by the derived-availability calculation and `SELECT ... FOR UPDATE` transaction protocol (§3.3) in addition to row `CHECK` constraints.
 
 ## 5. Main Screens and Shared UI Behavior
 
-Sprint 1 routes (`/login`, `/catalog`, `/equipment/:id`, `/requests`, `/loans`, `/custodian/requests`) are **implemented in React 19 (`client/src/`)** on `d079bc6`. Sprint 2/3 screens and enhancements (`/requests/new`, loan return/overdue/history tabs, catalog CRUD modal, notification bell, `/reports`) are **contracted pending Issue [#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)**. Role-based visibility helps navigation; §6 controls API access regardless of the UI.
+All Sprint 1 and Sprint 2 routes plus Sprint 3 `/reports` (`/login`, `/catalog`, `/equipment/:id`, `/requests`, `/requests/new`, `/requests/:id`, `/loans`, `/loans/:id`, `/reports`) are **implemented in React 19 (`client/src/`)** on `main` (`5f82a8e`), with legacy `.html` prototypes retired in `PR #107`. Role-based visibility helps navigation; §6 controls API access regardless of the UI.
 
 | Screen / navigation | Role and data shown | Feature / allocation & status |
 |---|---|---|
-| Login → catalog | Both roles; generic invalid-credentials feedback; fetch current-user identity after login/reload | F-01, Sprint 1 (**Implemented**) |
-| Catalog → item detail → request form | Both roles read name/category/quantity/availability; only Borrower submits a request | F-02/F-03/F-04, Sprint 1 (**Implemented**); search/filter/sort & item images F-08 in Sprint 2 (**Contracted `#100`**) |
-| My requests & Create request | Borrower, own requests; Sprint 2 adds multi-item bundle creation (`/requests/new`), purpose, 1–14d duration, and cancel | F-04, Sprint 1 (**Implemented**); Sprint 2 extensions F-11 (**Contracted `#100`**) |
-| My active loans & loan slip | Borrower, own item/quantity/checkout/due data; Sprint 2 adds return notice (`request-return`), full history, and printable loan slip | F-05, Sprint 1 (**Implemented**); F-06/F-08/F-11 in Sprint 2 (**Contracted `#100`**) |
-| Submitted requests → approve / reject / checkout | Custodian, submitted requests and checkout action; Sprint 2 adds `approve`/`reject` gate (`A-11`) before checkout | F-04/F-05, Sprint 1 (**Implemented**); F-11 in Sprint 2 (**Contracted `#100`**) |
-| Loan management / return / overdue | Custodian, all loans (`ACTIVE`, `RETURN_PENDING`, `OVERDUE`, `RETURNED`) and confirm-return controls | F-06/F-07/F-08, Sprint 2 (**Contracted `#100`**) |
-| Catalog management / notifications | Custodian catalog CRUD (`ACTIVE`/`RETIRED`, `image_url`); persistent in-app notification bell for both roles | F-07/F-08, Sprint 2 (**Contracted `#100`**) |
-| Inventory reports (`/reports`) | Custodian, inventory/loan/overdue summary cards and tables | F-09, Sprint 3 (**Contracted `#100`**) |
+| Login → catalog | Both roles; generic invalid-credentials feedback; fetch current-user identity after login/reload | `F-01`, Sprint 1 (**Implemented `5f82a8e`**) |
+| Catalog → item detail → request shortcut | Both roles read name/category/quantity/availability; search/filter/sort & item images (`image_url`) | `F-02`/`F-03`/`F-08`, Sprint 1–2 (**Implemented `5f82a8e`**) |
+| My requests & Create request | Borrower, own requests/bundles; multi-item bundle creation (`/requests/new`), purpose (`1,000` chars), `1–14`d duration, expiry, and cancel | `F-04`/`F-11`, Sprint 1–2 (**Implemented `5f82a8e`**) |
+| My active loans, history & loan slip | Borrower, own active/return-pending/returned loans, `Notify return`, and printable loan slip (`@media print`) | `F-05`/`F-06`/`F-08`/`F-11`, Sprint 1–2 (**Implemented `5f82a8e`**) |
+| Submitted requests → approve / reject / checkout | Custodian, request/bundle queue, `approve`/`reject` gate (`A-11`), and `checkout` action | `F-04`/`F-05`/`F-11`, Sprint 1–2 (**Implemented `5f82a8e`**) |
+| Loan management / return / overdue | Custodian, all loans (`ACTIVE`, `RETURN_PENDING`, `OVERDUE`, `RETURNED`) and confirm-return controls | `F-06`/`F-07`/`F-08`, Sprint 2 (**Implemented `5f82a8e`**) |
+| Catalog management / notifications | Custodian catalog CRUD (`ACTIVE`/`RETIRED`, `image_url`, `120/60/1,000` char limits); persistent in-app notification bell | `F-07`/`F-08`, Sprint 2 (**Implemented `5f82a8e`**) |
+| Inventory reports (`/reports`) | Custodian, live inventory/loan/overdue/`expired_count` cards and tables (`AC-F09-01..03`); CSV export (`AC-F09-04`) planned for 13 Dec | `F-09`, Sprint 3 (**Summary Implemented `5f82a8e`; CSV Planned**) |
 
-Provide visible navigation appropriate to the current server-returned role and an accessible logout action. Do not expose a general Custodian all-loans list in Sprint 1 merely because the checkout response includes a created loan (FR-18 is Sprint 2).
+Provide visible navigation appropriate to the current server-returned role and an accessible logout action.
 
-| State | Shared UI/API behavior (Implemented in Sprint 1; carried across Sprint 2/3 contracts) |
+| State | Shared UI/API behavior (Implemented on `5f82a8e`) |
 |---|---|
 | Validation | Show field errors next to inputs, preserve safe entered data, and repeat validation on the server. Multi-unit quantity bounds (`1..quantity_available`, `OQ-02` / `A-12`) are enforced; never calculate the authoritative due date/availability in the browser. |
 | Loading / mutation | Indicate loading, prevent duplicate form submission while pending, and update from the committed API response. Do not show checkout success before commit. |
@@ -204,9 +204,9 @@ Provide visible navigation appropriate to the current server-returned role and a
 
 ## 6. API Conventions and Role/Record Access
 
-### 6.1 API Conventions (Implemented in Sprint 1; Extended by Sprint 2/3 Contracts)
+### 6.1 API Conventions (Implemented on `main` `5f82a8e`)
 
-All endpoints use `/api/*`, JSON request/response bodies, and resource-oriented routes (`/api/auth/*`, `/api/equipment/*`, `/api/requests/*`, `/api/loans/*` implemented in Sprint 1; `/api/request-bundles/*`, `/api/notifications/*`, `/api/reports/summary` contracted for Issues [#99](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/99)/[#100](https://github.com/Peepipat-Suesoongnuen/PEW-DIY/issues/100)). Exact paths, payloads, and test IDs live in `docs/sprints/sprint-1/`, `docs/sprints/sprint-2/`, and `docs/sprints/sprint-3/`.
+All endpoints use `/api/*`, JSON request/response bodies, and resource-oriented routes (`/api/auth/*`, `/api/equipment/*`, `/api/requests/*`, `/api/request-bundles/*`, `/api/loans/*`, `/api/loan-bundles/*`, `/api/notifications/*`, `/api/reports/summary`). Exact paths, payloads, and test IDs live in `docs/sprints/sprint-1/`, `docs/sprints/sprint-2/`, and `docs/sprints/sprint-3/`.
 
 Success returns a documented `data` object/list (or an explicitly documented empty response). Errors use a consistent safe envelope, for example:
 
@@ -220,7 +220,7 @@ Success returns a documented `data` object/list (or an explicitly documented emp
 }
 ```
 
-| HTTP result | Implemented / Contracted convention |
+| HTTP result | Implemented convention |
 |---|---|
 | 200 / 201 / 204 | Successful read/action, newly created resource, or documented no-content action respectively |
 | 400 | Malformed JSON, wrong types, missing fields, or rejected input fields; optional safe field-error list |
@@ -245,12 +245,12 @@ Validate allow-listed fields and supported content types; do not bind incoming J
 | List/read / approve / reject requests | Denied | Own records only; approve/reject denied (`403`) | Submitted/pending requests; `approve`/`reject` in S2 (`A-11`) | F-04 / S1 (Implemented); F-11 / S2 |
 | Checkout | Denied | Denied for every request, including own | Direct checkout (S1) / `APPROVED` request or bundle only (S2); actor is current Custodian | F-05 / S1 (Implemented); F-11 / S2 |
 | Read own active loans | Denied | Own records only | Created loan in checkout response; general all-loans view in S2 | F-05 / S1 (Implemented) |
-| Read all loans / return notice / confirm return | Denied | Own `request-return` notice only (`BR-04`); `/return` denied (`403`) | All room loans; confirm full return (`ACTIVE` / `RETURN_PENDING` → `RETURNED`) | F-06/F-08 / S2 (Contracted) |
-| Own complete borrowing history | Denied | Own records only | Uses authorized staff loan views (`FR-18`) | F-08 / S2 (Contracted) |
-| Create/edit/retire equipment or adjust quantity | Denied | Denied | Room catalog; preserve existing held units (`new_total >= held`) and history | F-08 / S2 (Contracted) |
-| Search/filter/sort catalog | Denied | Catalog scope (`ACTIVE` only) | Catalog scope (`ACTIVE`/`RETIRED`/`ALL`) | F-08 / S2 (Contracted) |
-| Overdue list & in-app notifications | Denied | Own notifications read/clear only; `/loans?scope=overdue` denied (`403`) | Room overdue active loans + own notifications | F-07 / S2 (Contracted) |
-| Inventory reports | Denied | Denied | Room inventory/loan summaries (`GET /api/reports/summary`) | F-09 / S3 (Contracted) |
+| Read all loans / return notice / confirm return | Denied | Own `request-return` notice only (`BR-04`); `/return` denied (`403`) | All room loans; confirm full return (`ACTIVE` / `RETURN_PENDING` → `RETURNED`) | `F-06`/`F-08` / S2 (**Implemented `5f82a8e`**) |
+| Own complete borrowing history | Denied | Own records only | Uses authorized staff loan views (`FR-18`) | `F-08` / S2 (**Implemented `5f82a8e`**) |
+| Create/edit/retire equipment or adjust quantity | Denied | Denied | Room catalog; preserve existing held units (`new_total >= held`) and history | `F-08` / S2 (**Implemented `5f82a8e`**) |
+| Search/filter/sort catalog | Denied | Catalog scope (`ACTIVE` only) | Catalog scope (`ACTIVE`/`RETIRED`/`ALL`) | `F-08` / S2 (**Implemented `5f82a8e`**) |
+| Overdue list & in-app notifications | Denied | Own notifications read/clear only; `/loans?scope=overdue` denied (`403`) | Room overdue active loans + own notifications | `F-07` / S2 (**Implemented `5f82a8e`**) |
+| Inventory reports | Denied | Denied | Room inventory/loan/expired summaries (`GET /api/reports/summary`); CSV export (`AC-F09-04`) planned 13 Dec | `F-09` / S3 (**Summary Implemented `5f82a8e`; CSV Planned**) |
 
 Borrower list queries always include the authenticated owner predicate. Detail/action lookups check ownership through BorrowingRequest (Loan → Request → Borrower), independent of URL/body IDs. A Borrower requesting another Borrower's ID receives 403 without the row. The exact denial envelope must be uniform and must not disclose names, request contents or loan contents. Never trust a UI-supplied role, `borrower_id`, or a guessed record identifier. The single-room staff scope follows SRS A-08 as a working assumption, not a multi-room authorization design.
 
@@ -277,7 +277,7 @@ Login accepts credentials over HTTPS when deployed and returns the same safe err
 | Logout | Delete/invalidate server session row in PostgreSQL and clear browser cookie/private UI state; replay of old cookie is denied (`401`) | *(Historical alternative)* Server-side token revocation list |
 | Scaling/durability | Shared PostgreSQL `sessions` table survives process restart and multi-instance Cloud Run scaling (`TEST-F01-16`, `UAT-08`) | *(Historical alternative)* Shared revocation store required |
 
-**Historical tradeoff rationale:** server sessions were selected for a single-origin browser application requiring observable server-side session invalidation and logout replay denial (FR-02). Exact cookie names, timeout durations (`60`/`480`), anti-CSRF checks, and `sessions` schema are closed under `SDS-OQ-02` and tested in Sprint 1 (`TEST-F01-07/08/15/16`). Any future Sprint 2/3 auth extensions remain out of current scope until explicitly contracted.
+**Historical tradeoff rationale:** server sessions were selected for a single-origin browser application requiring observable server-side session invalidation and logout replay denial (FR-02). Exact cookie names, timeout durations (`60`/`480`), anti-CSRF checks, and `sessions` schema are closed under `SDS-OQ-02` and tested across Sprint 1 and Sprint 2 (`TEST-F01-07/08/15/16`, `sprint2-integration.test.ts`); multi-role or external-IdP auth remains explicitly excluded (`SRS §3.2`).
 
 ## 8. Configuration and Deployment Design
 
