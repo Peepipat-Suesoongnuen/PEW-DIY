@@ -103,7 +103,7 @@ Sprint 1:   F-01 → F-02 → F-03 → F-04 → F-05 → F-10 (integration) → 
 Sprint 2:   F-05 ─┬→ F-06 (Return) → F-07 (Overdue) ─┐
             F-02 ─┴→ F-08 (Catalog mgmt/search/views) ┴→ integration → RC
 Sprint 3:   F-06/F-07/F-08 data → F-09 (Reporting) + hardening → final release
-Decision gates status: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (Asia/Bangkok calendar policy), SDS-OQ-04 (Cloud Run/Cloud SQL), and SRS OQ-03..OQ-06 are resolved in SRS rev 6 / SDS rev 7; SRS OQ-02 / A-12 policy decision is resolved in SRS rev 6 with shared-team baseline ratification pending PR #98 (§10); synthetic seed fixtures under OQ-01 remain explicitly documented.
+Decision gates status: SDS-OQ-01 (stack), SDS-OQ-02 (auth), SDS-OQ-03 (Asia/Bangkok calendar policy), SDS-OQ-04 (Cloud Run/Cloud SQL), SRS OQ-02 / A-12, and SRS OQ-03..OQ-06 are all ratified (`PR #98` `7e11110`) and implemented on `main` (`5f82a8e`); synthetic seed fixtures under OQ-01 remain explicitly documented alongside Custodian-managed catalog items (`F-08`).
 ```
 
 Rule: every feature is implemented on a branch from the current sprint staging branch (`sprint/1-staging` for Sprint 1; `sprint/2-staging` for Sprint 2) under its engineering contract, peer-reviewed, and integrated before release (`AGENT.md` §11.3).
@@ -149,7 +149,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 
 | SDS-OQ-03 (calendar/timezone policy) | Due-date and overdue date boundaries | **Resolved (`Asia/Bangkok` + UTC timestamps)** — confirmed in Sprint 1 F-05 and carried to Sprint 2 |
 | **Demo video length conflict** — master spec §9 + `project_final_delivery_v1.pdf` §2 say ≤ 10 min; `project_final_delivery_v1.pdf` §3.5 says ≤ 4 min | Final Delivery rubric compliance | Confirm with instructor/TA; **plan ≤ 4 min meanwhile** (stricter limit satisfies both readings) — recorded per PR #20 review |
 | SRS OQ-01 (actual catalog) | Seed fixtures vs real room catalog | Synthetic fixtures (`E-ONE`/`E-MANY`/`E-ZERO`) active for Sprint 1/2; real catalog management contracted via `FR-09` (`F-08`) |
-| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | **Policy decision resolved (`A-12`, SRS rev 6); shared-team baseline ratification pending PR #98** — multi-unit up to stock, full-return only with two-step notice/confirm (`F-06`) |
+| SRS OQ-02 (multi-unit loans + partial return) | F-04/F-05 quantity contract and F-06 return semantics | **Ratified (`PR #98` `7e11110`) & Implemented (`PR #110` / `5f82a8e`)** — multi-unit up to stock, full-return only with two-step notice/confirm (`F-06`) |
 | Deliverable 1 date (8 vs possible 15 Nov) | Sprint 1 buffer | **Resolved — 8 Nov confirmed** by §4 table row and §9 (removed as OQ per PR #20 review rev 3) |
 | Team capacity split (§8) | Task assignment | Team confirmation |
 
@@ -161,7 +161,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 
 
 > **Reconciled Post-Lab 5, Lab 6 & Sprint 2 Status (2026-11-28):** Lab 5 (`R-01`–`R-12`, `C-01`–`C-06`) was **Completed and Verified** on GCP Cloud Run + Cloud SQL (`main` `b03c904`, image `sha256:e636ea0c...`, revision `pewdiy-00008-mfk`; subsequently updated to `5f82a8e` / `pewdiy-00010-fd6`; see [Lab 5 Deployment Guide](../labs/lab-05/deployment.md)). Lab 6 (`TH-056_P2_lab6_sec131`) was executed against isolated UAT revision `pewdiy-uat-00002-bnt`/`00003-8c5` (`docs/labs/lab-06/README.md`); `Finding 05` and `UAT-07 UX Note` were remediated in Sprint 2 (`PR #108`/`#109`/`#110` → `main` `5f82a8e`, with `Finding 05` partner retest pending).
 
-| ID | Requirement (summary) | Current Status (`d079bc6`) | Owner / target | How verified |
+| ID | Requirement (summary) | Lab 5 Snapshot (`d079bc6`) | Owner / target | How verified |
 |---|---|---|---|---|
 | R-01 | Docker packaging; fresh build from clean clone produces a working container | **Completed (PR #57)** | Both members | `C-03` (`Dockerfile`, `.github/workflows/ci-docker.yml`) |
 | R-02 | Read every setting from environment; document each variable (`.env.example` or `deployment.md`); no real secret committed | **Completed (PR #22 / PR #57)** | Both members | `C-03` + `.env.example` + `docs/labs/lab-05/deployment.md` |
@@ -178,7 +178,7 @@ Uncovered requirements: **none** (`docs/traceability.md` §5: 21 FR + 13 BR + 9 
 
 ### 11.2 Lab 5 Required Files checklist
 
-| File | Current Status (`d079bc6`) | Note |
+| File | Lab 5 Snapshot (`d079bc6`) | Note |
 |---|---|---|
 | `Dockerfile`, `.dockerignore` | **Completed (PR #57)** | Multi-stage Node 24 production image verified by `C-03` |
 | `.env.example` | **Completed (PR #22 / PR #57)** | Documents all runtime, session, seed, and CI database variables |
