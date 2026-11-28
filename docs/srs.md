@@ -1,8 +1,8 @@
 # Software Requirements Specification (SRS)
 
 > **Project:** PEW-DIY — D.I.Y. Room Equipment Borrowing System
-> **Deliverable:** D1-01 Part A — SRS and Product Scope (Project Deliverable 1)
-> **Issue:** [D1-01] | **Status:** Draft for team review | **Language:** English (team decision)
+> **Deliverable:** D1-01 Part A / Deliverable 2 Part D Baseline — SRS and Product Scope
+> **Issue:** [D1-01] | **Status:** Deliverable 2 Baseline (rev 8 — 2026-11-28) | **Language:** English (team decision)
 > **Reference:** `group_work_specs_v1.pdf` (Theme 2: Inventory and Borrowing System), `project_deliverable_1_v1.pdf` §3.1
 >
 > ID conventions: `FR-xx` Functional Requirements · `BR-xx` Business Rules · `NFR-xx` Non-Functional Requirements · `A-xx` Assumptions / Design Decisions · `OQ-xx` Open Questions
@@ -180,7 +180,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | A-06 | Assumption | All data is synthetic; no real payment, messaging, or external services are integrated. | Per course spec §5.3 |
 | A-07 | Design Decision | Requirement and deliverable documents are written in **English**. | **Confirmed** by team (2026-11-03) |
 | A-11 | Design Decision | **Non-reservation + Sprint 2 Approval Workflow (Direction A):** (1) Sprint 1 used Non-reservation + Direct Checkout; (2) a Borrowing Request (`PENDING` or `APPROVED`) does not reserve units and does not reduce Available Quantity (`BR-12`); only a committed Active Loan does; (3) Sprint 2 adds Custodian `APPROVE`/`REJECT`, Borrower `CANCEL`, multi-item `request_bundles`, and purpose metadata. | **Confirmed** by team (2026-11-06, Direction A; Sprint 2 details approved 2026-11-23) |
-| A-12 | Design Decision | **Quantity/return policy:** multiple units per request are permitted up to current availability, with no additional per-borrower cap; each loan is returned in full (`Full-quantity return only`). Requests remain non-reserving under BR-12. In Sprint 2, Borrowers may submit a return notice (`request-return`) and Custodians confirm return (`return`) to restore stock atomically. | **Policy decision resolved** (user choices 2026-11-06 & 2026-11-23); **shared-team baseline ratification pending PR #98** |
+| A-12 | Design Decision | **Quantity/return policy:** multiple units per request are permitted up to current availability, with no additional per-borrower cap; each loan is returned in full (`Full-quantity return only`). Requests remain non-reserving under BR-12. In Sprint 2, Borrowers may submit a return notice (`request-return`) and Custodians confirm return (`return`) to restore stock atomically. | **Ratified & Implemented** (`PR #98` `7e11110` → Sprint 2 `PR #110` / `main` `5f82a8e`) |
 
 ### 7.2 Assumptions (working assumptions to be validated)
 
@@ -195,7 +195,7 @@ Each rule is stated as testable behavior with its rejection/edge case.
 | ID | Question | Impact | Target / Status |
 |---|---|---|---|
 | OQ-01 | What is the actual initial equipment catalog? | Seed data content | Synthetic fixtures (`E-ONE`, `E-MANY`, `E-ZERO`) retained for Sprint 1/2 verification; Custodian CRUD (`FR-09`) enables creating real/demo items in Sprint 2 |
-| OQ-02 | Multi-unit loans + return semantics (`A-12`) | Request/loan model and BR-09 return | **Policy decision resolved (2026-11-06 / Sprint 2 2026-11-23); shared-team baseline ratification pending PR #98:** multi-unit requests (single or bundle), **full-quantity return only** per loan, two-step Borrower return notice → Custodian confirm |
+| OQ-02 | Multi-unit loans + return semantics (`A-12`) | Request/loan model and BR-09 return | **Resolved & Implemented (`PR #98` `7e11110` → Sprint 2 `PR #110` / `main` `5f82a8e`):** multi-unit requests (single or bundle), **full-quantity return only** per loan, two-step Borrower return notice → Custodian confirm |
 | OQ-03 | Loan-period differences / borrower selection (`BR-07`) | Checkout due-date calculation | **Resolved (Sprint 2, 2026-11-23):** Borrower chooses `1–14` calendar days (default `7`) at request time; Custodian confirms at checkout (`Asia/Bangkok`) |
 | OQ-04 | What happens to overdue loans beyond listing? | BR-08 / notifications | **Resolved (Sprint 2, 2026-11-23):** Status-only + dismissible/clearable in-app alerts (`FR-19`, `BR-13`) for due ≤ 2 days and overdue; no fines or external email |
 | OQ-05 | Should returned items record condition (ok/damaged)? | Excluded (§3.2) | Remains excluded; optional return note only |
@@ -212,3 +212,5 @@ Each rule is stated as testable behavior with its rejection/edge case.
 **Revision 6 — 2026-11-23 (Sprint 2 Baseline Update):** resolved OQ-02/03/04/06 for Sprint 2; added `FR-06/09` `image_url` and `catalog_status`, `FR-10` sorting, `FR-11/12/13` Sprint 2 approval workflow + multi-item bundles + cancellation + purpose + 1–14 day duration, `FR-15` printable loan slip, `FR-17` two-step return notice/confirm, `FR-19`/`BR-13` dismissible/clearable in-app notifications. Preserved `BORROWER`/`CUSTODIAN` 2-role model (`FR-04`, `A-05`).
 
 **Revision 7 — 2026-11-25 (Sprint 2 UX & Request Lifecycle Refinement):** added `EXPIRED` status to `FR-12` (`7d` pending / `3d` approved expiration windows), bounded active pending queue (`5` requests/bundles) and bundle size (`10` items) with `1,000`-character `purpose_detail`, and extended `FR-17` with optional whole-bundle Borrower return notices alongside per-item returns.
+
+**Revision 8 — 2026-11-28 (Deliverable 2 Baseline Reconciliation):** added `FR-06`/`FR-09` equipment field-length bounds (`name` ≤ 120, `category` ≤ 60, `description` ≤ 1,000 characters via `#115`) and confirmed `FR-20` initial summary implementation (`GET /api/reports/summary` + `/reports` including `expired_count` via `#106`/`#120`) while keeping CSV export and `NFR-07` formal 100-item benchmark scheduled for 13 December.
